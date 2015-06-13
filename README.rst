@@ -3,7 +3,7 @@ Ditto
 =====
 
 
-Development:
+Development::
 
     $ python setup.py develop
     $ ./demo/manage.py test
