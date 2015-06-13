@@ -5,5 +5,6 @@ Ditto
 
 Development:
 
-    $ python setup.py develop
+    $ python setup.py develop  
     $ ./demo/manage.py runserver
+
