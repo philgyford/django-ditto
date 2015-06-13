@@ -1,0 +1,7 @@
+include LICENSE
+include README.rst
+recursive-include demo *
+recursive-include ditto/static *
+recursive-include ditto/templates *
+recursive-include docs *
+
