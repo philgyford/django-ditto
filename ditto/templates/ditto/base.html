@@ -3,22 +3,23 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-		<title>{% block head_title %}Ditto{% endblock %}</title>
+        <title>{% block head_title %}Ditto{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
     </head>
     <body>
 
-		<div class="container">
-			<h1>{% block body_title %}Ditto{% endblock %}</h1>
+        <div class="container">
+            <p>{% block section_title %}Ditto{% endblock %}</p>
+            <h1>{% block body_title %}Latest{% endblock %}</h1>
 
-{% block content %}
-{% endblock content %}
+            {% block content %}
+            {% endblock content %}
 
-		</div>
+        </div>
 
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	</body>
+    </body>
 </html>
