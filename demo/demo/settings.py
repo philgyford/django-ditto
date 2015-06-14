@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ditto',
+    'ditto.pinboard',
 )
 
 MIDDLEWARE_CLASSES = (

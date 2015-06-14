@@ -1,3 +1,7 @@
-from django.db import models
+from polymorphic import PolymorphicModel
 
-# Create your models here.
+
+#class DittoItem(PolymorphicModel):
+    #title = models.CharField(max_length=30)
+
+
