@@ -12,6 +12,7 @@ setup(
     version='0.1',
     packages=['ditto'],
     install_requires=[
+        'django-polymorphic',
         'pinboard',
     ],
     include_package_data=True,
