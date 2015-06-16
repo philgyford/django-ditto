@@ -1,0 +1,4 @@
+Django==1.8.2
+django-debug-toolbar
+factory_boy
+

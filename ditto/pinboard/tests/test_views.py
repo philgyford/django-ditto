@@ -9,5 +9,5 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/pinboard/index.html')
         self.assertTemplateUsed(response, 'ditto/pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/core/base.html')
 
