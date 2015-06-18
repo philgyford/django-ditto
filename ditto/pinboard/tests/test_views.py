@@ -11,7 +11,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/bookmark_list.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/core/base.html')
+        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
 
     def test_bookmark_detail(self):
         bookmark = factories.BookmarkFactory.create()

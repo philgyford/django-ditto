@@ -1,7 +1,7 @@
 from django.core.validators import URLValidator
 from django.db import models
 
-from ditto.core.models import DittoAccount, DittoItem
+from ditto.ditto.models import DittoAccount, DittoItem
 
 
 class Account(DittoAccount):

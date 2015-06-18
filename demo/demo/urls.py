@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^pinboard/', include('ditto.pinboard.urls')),
-    url(r'^$', include('ditto.core.urls')),
+    url(r'^$', include('ditto.ditto.urls')),
 ]

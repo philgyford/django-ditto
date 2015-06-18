@@ -5,10 +5,10 @@ from django.test import TestCase
 class DittoViewTests(TestCase):
 
     def test_home(self):
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('ditto'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'ditto/core/index.html')
-        self.assertTemplateUsed(response, 'ditto/core/base.html')
+        self.assertTemplateUsed(response, 'ditto/ditto/index.html')
+        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
 
 
 

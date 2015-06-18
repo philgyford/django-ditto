@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('time_created', models.DateTimeField(auto_now_add=True)),
                 ('time_modified', models.DateTimeField(auto_now=True)),
                 ('title', models.CharField(max_length=255, blank=True)),
-                ('permalink', models.URLField(help_text=b"URL of the item on the service's website.")),
+                ('permalink', models.URLField(help_text=b"URL of the item on the service's website.", blank=True)),
                 ('summary', models.TextField(help_text=b"eg, First paragraph of a blog post, start of the description of a photo, all of a Tweet's text, etc.", blank=True)),
                 ('is_private', models.BooleanField(default=False, help_text=b'If True, this item should NOT be shown on public-facing pages.')),
                 ('fetch_time', models.DateTimeField(help_text=b'The time the Raw data was last fetched.', null=True, blank=True)),
