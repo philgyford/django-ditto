@@ -28,3 +28,8 @@ class PinboardViewTests(TestCase):
         self.assertTrue('bookmark' in response.context)
         self.assertEqual(bookmark.pk, response.context['bookmark'].pk)
 
+    def test_bookmark_detail_fails(self):
+        bookmark = factories.BookmarkFactory.create()
+        response = self.client.get(reverse('bookmark_detail', kwargs={'pk':2}))
+        self.assertEquals(response.status_code, 404)
+
