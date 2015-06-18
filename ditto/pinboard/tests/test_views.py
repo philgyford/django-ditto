@@ -15,7 +15,8 @@ class PinboardViewTests(TestCase):
 
     def test_bookmark_detail(self):
         bookmark = factories.BookmarkFactory.create()
-        response = self.client.get(reverse('bookmark_detail', kwargs={'pk': bookmark.pk}))
+        response = self.client.get(reverse('bookmark_detail',
+                                                kwargs={'pk': bookmark.pk}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/bookmark_detail.html')
 
