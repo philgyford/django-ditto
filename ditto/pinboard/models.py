@@ -18,9 +18,6 @@ class Account(DittoAccount):
 class Bookmark(DittoItem):
     account = models.ForeignKey(Account, null=False, blank=False)
 
-    # `description` in the Pinboard API:
-    # title is defined in Item
-
     # `url` in the Pinboard API:
     url = models.TextField(null=False, blank=False,
                 validators=[URLValidator()])
@@ -35,9 +32,17 @@ class Bookmark(DittoItem):
     # `toread` in the Pinboard API:
     to_read = models.BooleanField(default=False, null=False, blank=False)
 
+    shared = models.BooleanField(default=True, null=False, blank=False)
+
     # Up to 100 tags
     # Up to 255 chars each. No commas or whitespace.
     # Private tags start with a period.
-    #tags
+    # TODO tags
 
+    # TODO: MAke SUMMARY
+    # TODO: Make permalink
+
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('bookmark_details', args=[str(self.id)])
 

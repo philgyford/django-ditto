@@ -10,3 +10,5 @@ class DittoViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/core/index.html')
         self.assertTemplateUsed(response, 'ditto/core/base.html')
 
+
+

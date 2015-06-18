@@ -16,6 +16,7 @@ setup(
     ],
     tests_require=[
         'factoryboy',
+        'pytz',
     ],
     include_package_data=True,
     license='MIT License',

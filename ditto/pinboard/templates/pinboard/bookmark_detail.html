@@ -1,9 +1,10 @@
-{% extends 'ditto/pinboard/base.html' %}
+{% extends 'pinboard/base.html' %}
 
 {% block head_title %}Pinboard{% endblock %}
 {% block body_title %}Pinboard{% endblock %}
 
 {% block content %}
-PINBOARD HOME.
+{{ bookmark.title }}
+
 {% endblock content %}
 

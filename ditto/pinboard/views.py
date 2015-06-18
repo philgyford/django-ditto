@@ -1,6 +1,14 @@
-from django.views.generic import TemplateView
+from django.views.generic import DetailView, ListView
+
+from . import models
 
 
-class PinboardHomeView(TemplateView):
-    template_name = "ditto/pinboard/index.html"
+class HomeView(ListView):
+    model = models.Bookmark
+    #template_name = "ditto/pinboard/index.html"
+
+
+class BookmarkDetailView(DetailView):
+    model = models.Bookmark
+    #template_name = "ditto/pinboard/bookmark_detail.html"
 

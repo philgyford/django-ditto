@@ -5,8 +5,13 @@ from . import views
 urlpatterns = patterns("",
     url(
         regex=r"^$",
-        view=views.PinboardHomeView.as_view(),
-        name='pinboard_home'
+        view=views.HomeView.as_view(),
+        name='pinboard'
     ),
+    url(
+        regex=r"^(?P<pk>\d+)$",
+        view=views.BookmarkDetailView.as_view(),
+        name='bookmark_detail'
+    )
 )
 

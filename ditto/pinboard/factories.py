@@ -1,9 +1,11 @@
+import datetime
+import pytz
 import factory
 
 from . import models
 
 
-class AccountFactory(factory.Factory):
+class AccountFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Account
 
@@ -12,4 +14,24 @@ class AccountFactory(factory.Factory):
                                                                 obj.username)
     api_token = factory.LazyAttribute(lambda obj: '%s:123ABC' % obj.username)
 
+
+class BookmarkFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.Bookmark
+
+    # DittoItem properties:
+    title = factory.Sequence(lambda n: 'A Title %d' % n)
+    is_private = False
+
+    # Bookmark properties:
+    account = factory.SubFactory(AccountFactory)
+    url = factory.Sequence(lambda n: 'http://www.example.com/%d' % n)
+
+    post_time = factory.LazyAttribute(lambda o:
+                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+                        - datetime.timedelta(hours=1)
+                    )
+    description = factory.Sequence(lambda n: 'A description of %d' % n)
+    to_read = False
+    shared = True
 
