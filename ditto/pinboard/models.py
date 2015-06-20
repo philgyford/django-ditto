@@ -19,7 +19,7 @@ class Bookmark(DittoItem):
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:
-    url = models.TextField(null=False, blank=False,
+    url = models.TextField(null=False, blank=False, unique=True,
                 validators=[URLValidator()])
 
     # `dt` in the Pinboard API:
@@ -39,8 +39,9 @@ class Bookmark(DittoItem):
     # Private tags start with a period.
     # TODO tags
 
-    # TODO: MAke SUMMARY
-    # TODO: Make permalink
+    def save(self, *args, **kwargs):
+        self.summary = self.description
+        super(Bookmark, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
