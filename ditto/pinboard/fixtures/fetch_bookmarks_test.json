@@ -1,0 +1,24 @@
+[
+{
+    "fields": {
+        "username": "philgyford",
+        "url": "https://pinboard.in/u:philgyford",
+        "time_modified": "2015-06-21T14:57:41.530Z",
+        "time_created": "2015-06-21T14:57:25.227Z",
+        "api_token": "philgyford:1234567890ABCDEFGHIJ"
+    },
+    "model": "pinboard.account",
+    "pk": 1
+},
+{
+    "fields": {
+        "username": "testuser",
+        "url": "https://pinboard.in/u:testuser",
+        "time_modified": "2015-06-21T15:00:21.704Z",
+        "time_created": "2015-06-21T15:00:21.704Z",
+        "api_token": "testuser:ABCDEFGHIJ1234567890"
+    },
+    "model": "pinboard.account",
+    "pk": 2
+}
+]

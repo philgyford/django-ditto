@@ -7,8 +7,7 @@ from ...fetch import FetchBookmarks
 
 
 class Command(BaseCommand):
-    """
-    Fetches bookmarks from Pinboard
+    """Fetches bookmarks from Pinboard
 
     Fetch all bookmarks, from all accounts:
     ./manage.py fetch_pinboard --all
@@ -66,33 +65,39 @@ class Command(BaseCommand):
         account = options['account'] if options['account'] else None;
 
         if options['all']:
-            results = FetchBookmarks.fetch_all(account=account)
+            results = FetchBookmarks.fetch_all(username=account)
 
         elif options['date']:
             results = FetchBookmarks.fetch_date(post_date=options['date'],
-                                                            account=account)
+                                                            username=account)
 
         elif options['recent']:
             results = FetchBookmarks.fetch_recent(num=options['recent'],
-                                                            account=account)
+                                                            username=account)
 
         elif options['url']:
             results = FetchBookmarks.fetch_url(url=options['url'],
-                                                            account=account)
+                                                            username=account)
 
         elif options['account']:
             raise CommandError("Specify --all, --recent, --date= or --url= as well as --account.")
         else:
             raise CommandError("Specify --all, --recent, --date= or --url=")
 
-        # We should get 'success' or 'failure' in results['result']
-        # If 'success', we should also get 'fetched' (an int).
-        # If 'failure', we should get 'message' (a string).
-        if results['result'] == 'success':
-            noun = 'bookmark' if results['fetched'] == 1 else 'bookmarks'
-            self.stdout.write('Fetched %s %s' % (results['fetched'], noun))
+        # results should be a list of dicts.
+        # If a result dict is for one account it'll have an 'account' element.
+        # Each result dict will have:
+        #   'success': True or False.
+        #   'fetched': integer, the number of Bookmarks fetched.
+        # If it failed, we should also get 'message' (a string).
+        for result in results:
+            account = result['account'] if 'account' in result else 'all'
+            if result['success']:
+                noun = 'bookmark' if result['fetched'] == 1 else 'bookmarks'
+                self.stdout.write('%s: Fetched %s %s' % (
+                                            account, result['fetched'], noun))
 
-        elif results['result'] == 'failure':
-            self.stderr.write('Failed to fetch bookmarks: %s' %
-                                                            results['message'])
+            else:
+                self.stderr.write('%s: Failed to fetch bookmarks: %s' %
+                                                (account, result['message']))
 

@@ -1,14 +1,24 @@
 from django.core.validators import URLValidator
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
-from ditto.ditto.models import DittoAccount, DittoItem
+from ditto.ditto.models import DittoItem, TimeStampedModel
 
 
-class Account(DittoAccount):
+@python_2_unicode_compatible
+class Account(TimeStampedModel, models.Model):
+    username = models.CharField(null=False, blank=False, max_length=30,
+                unique=True,
+                help_text="eg, 'philgyford'")
+    url = models.URLField(max_length=255, null=False, blank=False,
+                help_text="eg, 'https://pinboard.in/u:philgyford'")
     # max_length derived from DittoAccount.username max_length plus
     # 21 characters for ':12345...'.
     api_token = models.CharField(null=False, blank=False, max_length=51,
                     help_text='From https://pinboard.in/settings/password eg, "philgyford:1234567890ABCDEFGHIJ"')
+
+    def __str__(self):
+        return "%s: %s" % (self.service_name, self.username)
 
     @property
     def service_name(self):
