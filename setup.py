@@ -12,7 +12,6 @@ setup(
     version='0.1',
     packages=['ditto'],
     install_requires=[
-        'pinboard',
     ],
     tests_require=[
         'factoryboy',
