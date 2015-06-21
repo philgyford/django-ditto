@@ -59,38 +59,37 @@ class FetchBookmarks(object):
         return self._fetch(
                     fetch_type='url', params={'url': url}, username=username)
 
-    def _fetch(self, fetch_type, params={}, username=None):
-        # if username
-        #   check this is an Account.
-        #   if so:
-        #       accounts = [Account]
-        #   else:
-        #       return error
-        # else:
-        #   accounts = [all Accounts]
-        #
-        # For each Account(s):
-        #   response = self.send_request(fetch_type, params, api_key)
-        #   if successful:
-        #       count = self.save_bookmarks(response)
-        #       to_return.append({username: username, fetched: count})
-        #   else:
-        #       to_return.append({username: username, message: error})
-        # return to_return
 
+    def _fetch(self, fetch_type, params={}, username=None):
+        """The main method for making all types of Bookmark requests, and
+        saving the data.
+
+        Keyword arguments:
+        fetch_type -- 'all', 'date', 'recent' or 'url'.
+        params -- Any params specific to the type (eg, url='http://foo.com')
+                    These will be used directly with the Pinboard API.
+        username -- the username of the one Account to fetch (or None for all).
+        """
+        # Each element will be a dict, like:
+        # {'username':'philgyford', 'success':True, 'fetched':12}
         result = []
 
         if username is not None:
+            # Fetching for only one account.
             accounts = [Account.objects.get(username=username)]
         else:
             accounts = Account.objects.all()
 
         for account in accounts:
             response = self._send_request(fetch_type, params, account.api_token)
+
             if response['success']:
+                # Tidy the raw data:
                 bookmark_data = self._parse_response(response['json'])
+                # Create/update in DB:
                 self._save_bookmarks(bookmark_data)
                 response['fetched'] = len(bookmark_data)
+                # Don't need to pass this around any more:
                 del(response['json'])
             else:
                 response['fetched'] = 0
@@ -158,12 +157,6 @@ class FetchBookmarks(object):
             return {'success': True, 'json': response.text}
 
 
-    def _save_bookmarks(self, bookmarks_data):
-        """Takes the raw JSON response from the API, creates or updates the
-        Bookmark objects.
-        """
-        pass
-
     def _parse_response(self, json_text):
         """Takes the JSON response for a Bookmark from the API and turns it
         into something more pythony.
@@ -174,4 +167,10 @@ class FetchBookmarks(object):
 
         return json_response['posts']
 
+
+    def _save_bookmarks(self, bookmarks_data):
+        """Takes the raw JSON response from the API, creates or updates the
+        Bookmark objects.
+        """
+        pass
 
