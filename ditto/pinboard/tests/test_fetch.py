@@ -2,6 +2,7 @@
 import datetime
 
 from mock import patch
+import json
 import requests
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
 import responses
@@ -18,6 +19,10 @@ class FetchTypesTestCase(TestCase):
 
     # ./demo/manage.py dumpdata pinboard.Account --indent 4 > ditto/pinboard/fixtures/fetch_bookmarks_test.json
     fixtures = ['fetch_bookmarks_test.json']
+
+    # Path to the 
+    api_fixture = 'ditto/pinboard/fixtures/api/bookmarks_2015-06-24.json'
+
 
     def add_response(self, body, method='get', status=200):
         """If the URL given here is called, then the request is faked, and
@@ -110,7 +115,26 @@ class FetchTypesTestCase(TestCase):
 
 
     # Check parsing of JSON.
-    # TODO
+
+    def test_fetch_json_parsing(self):
+        json_data = open(self.api_fixture)
+        bookmarks = FetchBookmarks()._parse_response(json_data.read())
+        json_data.close()
+
+        # Check time has been turned into an object.
+        self.assertEqual(bookmarks[0]['time'], datetime.datetime.strptime(
+                                '2015-06-18T09:48:31Z', '%Y-%m-%dT%H:%M:%SZ'))
+        
+        # Check 'yes'/'no' have been turned into booleans:
+        self.assertTrue(bookmarks[0]['shared'])
+        self.assertFalse(bookmarks[0]['toread'])
+        self.assertFalse(bookmarks[1]['shared'])
+        self.assertTrue(bookmarks[1]['toread'])
+
+        # Check it has a 'json' element that is the JSON version of the
+        # bookmark:
+        raw = json.loads(bookmarks[0]['json'])
+        self.assertEqual(raw['description'], "Fontello - icon fonts generator")
 
 
     # Check Bookmarks are created.

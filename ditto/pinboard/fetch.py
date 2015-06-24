@@ -8,6 +8,9 @@ from .models import Account, Bookmark
 
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"
+PINBOARD_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+PINBOARD_ALTERNATE_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+PINBOARD_DATE_FORMAT = "%Y-%m-%d"
 
 class FetchBookmarks(object):
 
@@ -160,13 +163,23 @@ class FetchBookmarks(object):
     def _parse_response(self, json_text):
         """Takes the JSON response for a Bookmark from the API and turns it
         into something more pythony.
+        Returns a list of bookmark data.
         """
-        json_response = json.loads(json_text)
 
-        # TODO: Tidy data
+        response = json.loads(json_text)
 
-        return json_response['posts']
+        for bookmark in response['posts']:
+            # Before we do anything to it, we give the bookmark a 'json'
+            # element with its original state in:
+            bookmark['json'] = json.dumps(bookmark)
+            # Time string to object:
+            bookmark['time'] = datetime.datetime.strptime(bookmark['time'],
+                                                        '%Y-%m-%dT%H:%M:%SZ')
+            # 'yes'/'no' to booleans:
+            bookmark['shared'] = True if bookmark['shared'] == 'yes' else False
+            bookmark['toread'] = True if bookmark['toread'] == 'yes' else False
 
+        return response['posts']
 
     def _save_bookmarks(self, bookmarks_data):
         """Takes the raw JSON response from the API, creates or updates the
