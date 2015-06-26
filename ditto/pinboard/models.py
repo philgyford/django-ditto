@@ -60,5 +60,5 @@ class Bookmark(DittoItem):
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
-        return reverse('bookmark_details', args=[str(self.id)])
+        return reverse('bookmark_detail', kwargs={'pk': self.id})
 

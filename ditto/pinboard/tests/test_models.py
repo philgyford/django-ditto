@@ -53,7 +53,7 @@ class PinboardBookmarkTests(TestCase):
         self.assertEqual(bookmark.summary, bookmark.description)
 
     def test_get_absolute_url(self):
-        # TODO
-        pass
+        bookmark = factories.BookmarkFactory()
+        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/1')
 
 
