@@ -1,6 +1,7 @@
 # coding: utf-8
 import datetime
 import json
+import pytz
 import requests
 import urllib
 
@@ -90,7 +91,7 @@ class FetchBookmarks(object):
                 # Tidy the raw data:
                 bookmark_data = self._parse_response(response['json'])
                 # Create/update in DB:
-                self._save_bookmarks(bookmark_data)
+                self._save_bookmarks(account, bookmark_data)
                 response['fetched'] = len(bookmark_data)
                 # Don't need to pass this around any more:
                 del(response['json'])
@@ -173,17 +174,32 @@ class FetchBookmarks(object):
             # element with its original state in:
             bookmark['json'] = json.dumps(bookmark)
             # Time string to object:
-            bookmark['time'] = datetime.datetime.strptime(bookmark['time'],
-                                                        '%Y-%m-%dT%H:%M:%SZ')
+            bookmark['time'] = datetime.datetime.strptime(
+                                        bookmark['time'], '%Y-%m-%dT%H:%M:%SZ'
+                                    ).replace(tzinfo=pytz.utc)
             # 'yes'/'no' to booleans:
             bookmark['shared'] = True if bookmark['shared'] == 'yes' else False
             bookmark['toread'] = True if bookmark['toread'] == 'yes' else False
 
         return response['posts']
 
-    def _save_bookmarks(self, bookmarks_data):
+    def _save_bookmarks(self, account, bookmarks_data):
         """Takes the raw JSON response from the API, creates or updates the
         Bookmark objects.
         """
-        pass
+        for bookmark in bookmarks_data:
+            b = Bookmark(
+                title = bookmark['description'],
+                #permalink not used
+                #summary made by Bookmark::save()
+                is_private = not bookmark['shared'],
+                #fetch_time TODO
+                raw = bookmark['json'],
+                account = account,
+                url = bookmark['href'],
+                post_time = bookmark['time'],
+                description = bookmark['extended'],
+                to_read = bookmark['toread']
+            )
+            b.save()
 

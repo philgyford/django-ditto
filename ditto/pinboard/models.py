@@ -29,10 +29,10 @@ class Bookmark(DittoItem):
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:
-    url = models.TextField(null=False, blank=False, unique=True,
-                validators=[URLValidator()])
+    url = models.TextField(null=False, blank=False,
+                                                validators=[URLValidator()])
 
-    # `dt` in the Pinboard API:
+    # `time` in the Pinboard API:
     post_time = models.DateTimeField(null=False, blank=False)
 
     # `extended` in the Pinboard API:
@@ -42,14 +42,19 @@ class Bookmark(DittoItem):
     # `toread` in the Pinboard API:
     to_read = models.BooleanField(default=False, null=False, blank=False)
 
-    shared = models.BooleanField(default=True, null=False, blank=False)
+    # 'shared' in the Pinboard API is inverted and saved as
+    # DittoItem::is_private.
 
     # Up to 100 tags
     # Up to 255 chars each. No commas or whitespace.
     # Private tags start with a period.
     # TODO tags
 
+    class Meta:
+        unique_together = (('account', 'url'),)
+
     def save(self, *args, **kwargs):
+        # TODO: May want to trim the description.
         self.summary = self.description
         super(Bookmark, self).save(*args, **kwargs)
 

@@ -32,7 +32,7 @@ class DittoItem(TimeStampedModel, models.Model):
     fetch_time = models.DateTimeField(null=True, blank=True,
                     help_text="The time the Raw data was last fetched.")
     raw = models.TextField(null=False, blank=True,
-                    help_text="The raw JSON from the API.")
+                    help_text="eg, the raw JSON from the API.")
 
     class Meta:
         abstract = True

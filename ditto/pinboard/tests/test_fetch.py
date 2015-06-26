@@ -3,6 +3,7 @@ import datetime
 
 from mock import patch
 import json
+import pytz
 import requests
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
 import responses
@@ -10,6 +11,7 @@ import responses
 from django.test import TestCase
 
 from ..fetch import FetchBookmarks
+from ..models import Account, Bookmark
 
 
 class FetchTypesTestCase(TestCase):
@@ -38,6 +40,7 @@ class FetchTypesTestCase(TestCase):
         )
 
     def make_success_body(self, num_posts=1, post_date='2015-06-18', username='philgyford'):
+        """Makes JSON representing a number of bookmarks."""
         posts = []
         for n in range(0, num_posts):
             posts.append('{"href":"http:\\/\\/example%s.com\\/","description":"My description %s","extended":"My extended %s.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"%sT09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}' % (n, n, n, post_date))
@@ -117,29 +120,68 @@ class FetchTypesTestCase(TestCase):
     # Check parsing of JSON.
 
     def test_fetch_json_parsing(self):
-        json_data = open(self.api_fixture)
-        bookmarks = FetchBookmarks()._parse_response(json_data.read())
-        json_data.close()
+        """Ensure this method takes a piece of JSON and does the correct
+        munging, returning the result.
+        """
+        json_file = open(self.api_fixture)
+        json_data = json_file.read()
+        bd = FetchBookmarks()._parse_response(json_data)
+        json_file.close()
 
         # Check time has been turned into an object.
-        self.assertEqual(bookmarks[0]['time'], datetime.datetime.strptime(
-                                '2015-06-18T09:48:31Z', '%Y-%m-%dT%H:%M:%SZ'))
+        self.assertEqual(bd[0]['time'], datetime.datetime.strptime(
+                                '2015-06-18T09:48:31Z',
+                                '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc))
         
         # Check 'yes'/'no' have been turned into booleans:
-        self.assertTrue(bookmarks[0]['shared'])
-        self.assertFalse(bookmarks[0]['toread'])
-        self.assertFalse(bookmarks[1]['shared'])
-        self.assertTrue(bookmarks[1]['toread'])
+        self.assertTrue(bd[0]['shared'])
+        self.assertFalse(bd[0]['toread'])
+        self.assertFalse(bd[1]['shared'])
+        self.assertTrue(bd[1]['toread'])
 
         # Check it has a 'json' element that is the JSON version of the
         # bookmark:
-        raw = json.loads(bookmarks[0]['json'])
+        raw = json.loads(bd[0]['json'])
         self.assertEqual(raw['description'], "Fontello - icon fonts generator")
 
 
     # Check Bookmarks are created.
-    # TODO
 
+    def test_save_bookmarks(self):
+        """Ensure this method takes some parsed JSON and creates saved
+        Bookmark objects.
+        """
+        # Too reliant on _parse_response() for my liking, but it saves us
+        # manually making some data to parse to _save_bookmarks().
+        json_file = open(self.api_fixture)
+        json_data = json_file.read()
+        bookmarks_data = FetchBookmarks()._parse_response(json_data)
+        json_file.close()
+
+        raw_bookmark = json.dumps(json.loads(json_data)['posts'][0])
+
+        account = Account.objects.get(pk=1)
+        FetchBookmarks()._save_bookmarks(account, bookmarks_data)
+
+        self.assertEqual(Bookmark.objects.all().count(), 2)
+
+        bookmarks = Bookmark.objects.all()
+
+        self.assertEqual(bookmarks[0].title, 'Fontello - icon fonts generator')
+        self.assertEqual(bookmarks[0].summary, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+        self.assertEqual(bookmarks[0].raw, raw_bookmark)
+        self.assertEqual(bookmarks[0].account, account)
+        self.assertEqual(bookmarks[0].url, 'http://fontello.com/')
+        self.assertEqual(bookmarks[0].post_time, datetime.datetime.strptime(
+                                '2015-06-18T09:48:31Z',
+                                '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc))
+        self.assertEqual(bookmarks[0].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+
+        self.assertFalse(bookmarks[0].is_private)
+        self.assertFalse(bookmarks[0].to_read)
+        self.assertTrue(bookmarks[1].is_private)
+        self.assertTrue(bookmarks[1].to_read)
+        
 
     # Check potential errors.
 

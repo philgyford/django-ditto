@@ -33,5 +33,4 @@ class BookmarkFactory(factory.DjangoModelFactory):
                     )
     description = factory.Sequence(lambda n: 'A description of %d' % n)
     to_read = False
-    shared = True
 
