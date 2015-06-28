@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -5,7 +6,7 @@ from .. import factories
 from ..models import Bookmark
 
 
-class PinboardAccountTests(TestCase):
+class PinboardAccountTestCase(TestCase):
 
     def test_str(self):
         account = factories.AccountFactory(username='bill')
@@ -15,7 +16,7 @@ class PinboardAccountTests(TestCase):
         account = factories.AccountFactory()
         self.assertEqual(account.service_name, 'Pinboard')
 
-class PinboardBookmarkTests(TestCase):
+class PinboardBookmarkTestCase(TestCase):
 
     def test_save(self):
         "Make sure its save() method calls the parent, so actually saves."
@@ -48,9 +49,14 @@ class PinboardBookmarkTests(TestCase):
             self.fail("It looks like there's a Unique constraint on Bookmark.url, which there shouldn't be.")
 
     def test_summary_creation(self):
-        "Make sure it creates Item's summary."
-        bookmark = factories.BookmarkFactory(description='My description')
-        self.assertEqual(bookmark.summary, bookmark.description)
+        "Make sure it creates Item's summary correctly."
+
+        self.maxDiff = None
+        bookmark = factories.BookmarkFactory(description="""<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus.</p>
+
+        <p>Fusce ullamcorper nunc vitae tincidunt sodales. Vestibulum sit amet lacus at sem porta porta. Donec fringilla laoreet orci eu porta. Aenean non lacus hendrerit, semper odio a, feugiat orci. Suspendisse potenti.</p>""")
+
+        self.assertEqual(bookmark.summary, u'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales.…')
 
     def test_get_absolute_url(self):
         bookmark = factories.BookmarkFactory()

@@ -25,8 +25,8 @@ class DittoItem(TimeStampedModel, models.Model):
     title = models.CharField(null=False, blank=True, max_length=255)
     permalink = models.URLField(null=False, blank=True,
                     help_text="URL of the item on the service's website.")
-    summary = models.TextField(null=False, blank=True,
-                help_text="eg, First paragraph of a blog post, start of the description of a photo, all of a Tweet's text, etc.")
+    summary = models.CharField(null=False, blank=True, max_length=255,
+                help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
     is_private = models.BooleanField(default=False, null=False, blank=False,
                     help_text="If True, this item should NOT be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,

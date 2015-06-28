@@ -1,8 +1,10 @@
+# coding: utf-8
 from django.core.validators import URLValidator
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 from ditto.ditto.models import DittoItem, TimeStampedModel
+from ditto.ditto.utils import truncate_string
 
 
 @python_2_unicode_compatible
@@ -54,8 +56,7 @@ class Bookmark(DittoItem):
         unique_together = (('account', 'url'),)
 
     def save(self, *args, **kwargs):
-        # TODO: May want to trim the description.
-        self.summary = self.description
+        self.summary = truncate_string(self.description, strip_html=True, chars=255, truncate=u'…', at_word_boundary=True)
         super(Bookmark, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
