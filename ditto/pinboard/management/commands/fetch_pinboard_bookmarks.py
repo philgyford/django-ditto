@@ -10,19 +10,19 @@ class Command(BaseCommand):
     """Fetches bookmarks from Pinboard
 
     Fetch all bookmarks, from all accounts:
-    ./manage.py fetch_pinboard --all
+    ./manage.py fetch_pinboard_bookmarks --all
 
     Fetch bookmarks posted on one date:
-    ./manage.py fetch_pinboard --date=2015-06-20
+    ./manage.py fetch_pinboard_bookmarks --date=2015-06-20
 
     Fetch the 20 most recent bookmarks:
-    ./manage.py fetch_pinboard --recent=20
+    ./manage.py fetch_pinboard_bookmarks --recent=20
 
     Fetch the bookmark for one URL:
-    ./manage.py fetch_pinboard --url=http://new-aesthetic.tumblr.com/
+    ./manage.py fetch_pinboard_bookmarks --url=http://new-aesthetic.tumblr.com/
 
     Restrict any of the above to one account by adding the account's username:
-    ./manage.py fetch_pinboard --all --account=philgyford
+    ./manage.py fetch_pinboardbookmarks --all --account=philgyford
     """
     help = "Fetches bookmarks from Pinboard"
 
@@ -36,25 +36,25 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--date',
-            action='store_true',
+            action='store',
             default=False,
             help='Fetch bookmarks posted on one day, e.g. "2015-06-20".'
         )
         parser.add_argument(
             '--recent',
-            action='store_true',
+            action='store',
             default=False,
             help='Fetch the most recent bookmarks, e.g. "10".'
         )
         parser.add_argument(
             '--url',
-            action='store_true',
+            action='store',
             default=False,
             help='Fetch the bookmark for one URL, e.g. "http://www.foo.com".',
         )
         parser.add_argument(
             '--account',
-            action='store_true',
+            action='store',
             default=False,
             help='Only fetch for one Pinboard account.',
         )
@@ -65,18 +65,18 @@ class Command(BaseCommand):
         account = options['account'] if options['account'] else None;
 
         if options['all']:
-            results = FetchBookmarks.fetch_all(username=account)
+            results = FetchBookmarks().fetch_all(username=account)
 
         elif options['date']:
-            results = FetchBookmarks.fetch_date(post_date=options['date'],
+            results = FetchBookmarks().fetch_date(post_date=options['date'],
                                                             username=account)
 
         elif options['recent']:
-            results = FetchBookmarks.fetch_recent(num=options['recent'],
+            results = FetchBookmarks().fetch_recent(num=options['recent'],
                                                             username=account)
 
         elif options['url']:
-            results = FetchBookmarks.fetch_url(url=options['url'],
+            results = FetchBookmarks().fetch_url(url=options['url'],
                                                             username=account)
 
         elif options['account']:
