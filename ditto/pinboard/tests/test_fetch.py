@@ -1,8 +1,9 @@
 # coding: utf-8
 import datetime
+import json
 
 from mock import patch
-import json
+from freezegun import freeze_time
 import pytz
 import requests
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
@@ -22,7 +23,7 @@ class FetchTypesTestCase(TestCase):
     # ./demo/manage.py dumpdata pinboard.Account --indent 4 > ditto/pinboard/fixtures/fetch_bookmarks_test.json
     fixtures = ['fetch_bookmarks_test.json']
 
-    # Path to the 
+    # Path to the file we'll use as a mock response from Pinboard.
     api_fixture = 'ditto/pinboard/fixtures/api/bookmarks_2015-06-24.json'
 
 
@@ -147,6 +148,7 @@ class FetchTypesTestCase(TestCase):
 
     # Check Bookmarks are created.
 
+    @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
     def test_save_bookmarks(self):
         """Ensure this method takes some parsed JSON and creates saved
         Bookmark objects.
@@ -161,13 +163,22 @@ class FetchTypesTestCase(TestCase):
         raw_bookmark = json.dumps(json.loads(json_data)['posts'][0])
 
         account = Account.objects.get(pk=1)
-        FetchBookmarks()._save_bookmarks(account, bookmarks_data)
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        FetchBookmarks()._save_bookmarks(
+                            account=account,
+                            bookmarks_data=bookmarks_data,
+                            fetch_time=fetch_time)
 
         self.assertEqual(Bookmark.objects.all().count(), 2)
 
         bookmarks = Bookmark.objects.all()
 
         self.assertEqual(bookmarks[0].title, 'Fontello - icon fonts generator')
+
+        self.assertEqual(bookmarks[0].fetch_time, datetime.datetime.strptime(
+                            '2015-07-01 12:00:00',
+                            '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
         self.assertEqual(bookmarks[0].summary, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
         self.assertEqual(bookmarks[0].raw, raw_bookmark)
         self.assertEqual(bookmarks[0].account, account)

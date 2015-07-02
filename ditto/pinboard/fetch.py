@@ -85,14 +85,19 @@ class FetchBookmarks(object):
             accounts = Account.objects.all()
 
         for account in accounts:
+            fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
             response = self._send_request(fetch_type, params, account.api_token)
 
             if response['success']:
                 # Tidy the raw data:
-                bookmark_data = self._parse_response(response['json'])
+                bookmarks_data = self._parse_response(response['json'])
                 # Create/update in DB:
-                self._save_bookmarks(account, bookmark_data)
-                response['fetched'] = len(bookmark_data)
+                self._save_bookmarks(
+                                account=account,
+                                bookmarks_data=bookmarks_data,
+                                fetch_time=fetch_time)
+                response['fetched'] = len(bookmarks_data)
                 # Don't need to pass this around any more:
                 del(response['json'])
             else:
@@ -112,9 +117,9 @@ class FetchBookmarks(object):
         If True, will have a 'json' element with the fetched data in.
 
         Keyword arguments:
-        fetch_type: 'all', 'date', 'recent' or 'url'.
-        params: Any params needed for this type. eg 'dt':datetime.
-        api_token: Pinboard API token for the account to fetch from.
+        fetch_type -- 'all', 'date', 'recent' or 'url'.
+        params -- Any params needed for this type. eg 'dt':datetime.
+        api_token -- Pinboard API token for the account to fetch from.
         """
 
         url_parts = ['posts']
@@ -183,9 +188,14 @@ class FetchBookmarks(object):
 
         return response['posts']
 
-    def _save_bookmarks(self, account, bookmarks_data):
+    def _save_bookmarks(self, account, bookmarks_data, fetch_time):
         """Takes the raw JSON response from the API, creates or updates the
         Bookmark objects.
+        
+        Keyword arguments:
+        account -- The Account object to add these bookmarks for.
+        bookmarks_data -- A list, each one data to create a single Bookmark.
+        fetch_time -- The UTC time at which these bookmarks were fetched.
         """
         for bookmark in bookmarks_data:
             b = Bookmark(
@@ -193,7 +203,7 @@ class FetchBookmarks(object):
                 #permalink not used
                 #summary made by Bookmark::save()
                 is_private = not bookmark['shared'],
-                #fetch_time TODO
+                fetch_time = fetch_time,
                 raw = bookmark['json'],
                 account = account,
                 url = bookmark['href'],
