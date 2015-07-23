@@ -198,18 +198,31 @@ class FetchBookmarks(object):
         fetch_time -- The UTC time at which these bookmarks were fetched.
         """
         for bookmark in bookmarks_data:
-            b = Bookmark(
-                title = bookmark['description'],
-                #permalink not used
-                #summary made by Bookmark::save()
-                is_private = not bookmark['shared'],
-                fetch_time = fetch_time,
-                raw = bookmark['json'],
-                account = account,
-                url = bookmark['href'],
-                post_time = bookmark['time'],
-                description = bookmark['extended'],
-                to_read = bookmark['toread']
-            )
+            try:
+                b = Bookmark.objects.get(
+                                        account=account, url=bookmark['href'])
+                b.title = bookmark['description']
+                b.is_private = not bookmark['shared']
+                b.raw = bookmark['json']
+                b.description = bookmark['extended']
+                b.to_read = bookmark['toread']
+                b.fetch_time = fetch_time
+                # post_time won't change
+                # account won't change
+                # url won't change
+            except Bookmark.DoesNotExist:
+                b = Bookmark(
+                    title = bookmark['description'],
+                    is_private = not bookmark['shared'],
+                    raw = bookmark['json'],
+                    description = bookmark['extended'],
+                    to_read = bookmark['toread'],
+                    fetch_time = fetch_time,
+                    post_time = bookmark['time'],
+                    account = account,
+                    url = bookmark['href']
+                    #permalink not used
+                    #summary made by Bookmark::save()
+                )
             b.save()
 
