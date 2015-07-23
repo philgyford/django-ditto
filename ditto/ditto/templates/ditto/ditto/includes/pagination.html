@@ -1,0 +1,39 @@
+{# Expects page_obj to be a DiggPaginator instance. #}
+
+{% if page_obj.paginator.num_pages > 0 %}
+	<nav>
+		<ul class="pagination">
+			{% if page_obj.has_previous %}
+				<li>
+					<a href="?p={{ page_obj.previous_page_number }}" title="Previous page">&larr;</a>
+				</li>
+			{% else %}
+				<li class="disabled">
+					<span><span aria-hidden="true">&larr;</span></span>
+				</li>
+			{% endif %}
+
+				{% for p in page_obj.page_range %}
+					{% if not p %}
+						<li class="disabled">
+							<span><span aria-hedden="true">…</span></span>
+						</li>
+					{% else %}
+						<li{% if p == page_obj.number %} class="active"{% endif %}>
+							<a href="?p={{ p }}">{{ p }}</a>
+						</li>
+					{% endif %}
+				{% endfor %}
+
+			{% if page_obj.has_next %}
+				<li>
+					<a href="?p={{ page_obj.next_page_number }}" title="Next page">&rarr;</a>
+				</li>
+			{% else %}
+				<li class="disabled">
+					<span><span aria-hidden="true">&rarr;</span></span>
+				</li>
+			{% endif %}
+		</ul>
+	</nav>
+{% endif %}

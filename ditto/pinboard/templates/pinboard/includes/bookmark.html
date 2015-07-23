@@ -1,0 +1,25 @@
+{% comment %}
+
+Expects:
+ * bookmark, a Bookmark object. $}
+ * detail, boolean
+
+{% endcomment %}
+ 
+
+{% if detail %}
+	<h2>{{ bookmark.title }}</h2>
+{% else %}
+	<h2 class="h4 media-heading"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
+{% endif %}
+
+{% if bookmark.description %}
+	<p>{{ bookmark.description }}</p>
+{% endif %}
+<p class="text-muted">
+	{% if not detail %}
+		<a href="{{ bookmark.get_absolute_url }}">#</a>
+	{% endif %}
+	<time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
+</p>
+

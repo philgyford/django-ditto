@@ -4,7 +4,8 @@
 {% block body_title %}Pinboard{% endblock %}
 
 {% block content %}
-{{ bookmark.title }}
+
+	{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True only %}
 
 {% endblock content %}
 

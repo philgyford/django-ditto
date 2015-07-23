@@ -4,6 +4,18 @@
 {% block body_title %}Pinboard{% endblock %}
 
 {% block content %}
-PINBOARD HOME.
+
+	<ul class="media-list">
+		{% for bookmark in bookmark_list %}
+			<li class="media">
+				<div class="media-body">
+					{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False only %}
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+
+	{% include 'ditto/ditto/includes/pagination.html' %}
+	
 {% endblock content %}
 
