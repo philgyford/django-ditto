@@ -91,7 +91,8 @@ class FetchBookmarks(object):
 
             if response['success']:
                 # Tidy the raw data:
-                bookmarks_data = self._parse_response(response['json'])
+                bookmarks_data = self._parse_response(
+                                                fetch_type, response['json'])
                 # Create/update in DB:
                 self._save_bookmarks(
                                 account=account,
@@ -166,15 +167,25 @@ class FetchBookmarks(object):
             return {'success': True, 'json': response.text}
 
 
-    def _parse_response(self, json_text):
+    def _parse_response(self, fetch_type, json_text):
         """Takes the JSON response for a Bookmark from the API and turns it
         into something more pythony.
         Returns a list of bookmark data.
+
+        Keyword arguments:
+        fetch_type -- 'all', 'date', 'recent' or 'url'.
+        json_text -- The raw JSON returned from the API.
         """
 
         response = json.loads(json_text)
 
-        for bookmark in response['posts']:
+        # The JSON has different formats depending on what we fetched:
+        if fetch_type == 'all':
+            posts = response
+        else:
+            posts = response['posts']
+
+        for bookmark in posts:
             # Before we do anything to it, we give the bookmark a 'json'
             # element with its original state in:
             bookmark['json'] = json.dumps(bookmark)
@@ -186,7 +197,7 @@ class FetchBookmarks(object):
             bookmark['shared'] = True if bookmark['shared'] == 'yes' else False
             bookmark['toread'] = True if bookmark['toread'] == 'yes' else False
 
-        return response['posts']
+        return posts
 
     def _save_bookmarks(self, account, bookmarks_data, fetch_time):
         """Takes the raw JSON response from the API, creates or updates the

@@ -38,21 +38,30 @@ class FetchTypesTestRemoteCase(TestCase):
             body=body
         )
 
-    def make_success_body(self, num_posts=1, post_date='2015-06-18', username='philgyford'):
-        """Makes JSON representing a number of bookmarks."""
+    def make_success_body(self, method='date', num_posts=1, post_date='2015-06-18', username='philgyford'):
+        """Makes JSON representing a number of bookmarks.
+        `method` is 'get' or 'recent' or 'all'.
+        """
         posts = []
         for n in range(0, num_posts):
             posts.append('{"href":"http:\\/\\/example%s.com\\/","description":"My description %s","extended":"My extended %s.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"%sT09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}' % (n, n, n, post_date))
 
-        return '{"date":"%sT09:48:31Z","user":"%s","posts":[%s]}\t\n' % (post_date, username, ','.join(posts))
+        posts_json = '[%s]\t\n'  % (','.join(posts))
+
+        if method == 'all':
+            return posts_json
+        else:
+            return '{"date":"%sT09:48:31Z","user":"%s","posts":%s}\t\n' % (post_date, username, posts_json)
 
 
     # Check that all interface methods return expected results on success.
 
     @responses.activate
     def test_fetch_all_success(self):
-        self.add_response(method='all',
-                                    body=self.make_success_body(num_posts=12))
+        self.add_response(
+                method='all',
+                body=self.make_success_body(method='all', num_posts=12)
+            )
         result = FetchBookmarks().fetch_all(username='philgyford')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertTrue(result[0]['success'])
@@ -171,7 +180,7 @@ class FetchTypesSaveTestCase(TestCase):
         """
         json_file = open(self.api_fixture)
         json_data = json_file.read()
-        bookmarks_data = FetchBookmarks()._parse_response(json_data)
+        bookmarks_data = FetchBookmarks()._parse_response('date', json_data)
         json_file.close()
 
         return {'json': json_data,
