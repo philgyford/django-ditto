@@ -11,4 +11,5 @@ Development::
     $ ./demo/manage.py runserver
 
 
+Pinboard rate limits: https://pinboard.in/api/#limits
 
