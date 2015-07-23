@@ -16,6 +16,17 @@ class PinboardAccountTestCase(TestCase):
         account = factories.AccountFactory()
         self.assertEqual(account.service_name, 'Pinboard')
 
+    def test_unique_username(self):
+        account_1 = factories.AccountFactory(username='billy')
+        with self.assertRaises(IntegrityError):
+            account_2 = factories.AccountFactory(username='billy')
+
+    def test_unique_url(self):
+        account_1 = factories.AccountFactory(url='https://pinboard.in/u:billy')
+        with self.assertRaises(IntegrityError):
+            account_2 = factories.AccountFactory(
+                                            url='https://pinboard.in/u:billy')
+
 class PinboardBookmarkTestCase(TestCase):
 
     def test_save(self):

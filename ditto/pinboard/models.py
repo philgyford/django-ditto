@@ -13,6 +13,7 @@ class Account(TimeStampedModel, models.Model):
                 unique=True,
                 help_text="eg, 'philgyford'")
     url = models.URLField(max_length=255, null=False, blank=False,
+                unique=True,
                 help_text="eg, 'https://pinboard.in/u:philgyford'")
     # max_length derived from DittoAccount.username max_length plus
     # 21 characters for ':12345...'.
