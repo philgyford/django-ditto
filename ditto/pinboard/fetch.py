@@ -191,7 +191,7 @@ class FetchBookmarks(object):
     def _save_bookmarks(self, account, bookmarks_data, fetch_time):
         """Takes the raw JSON response from the API, creates or updates the
         Bookmark objects.
-        
+
         Keyword arguments:
         account -- The Account object to add these bookmarks for.
         bookmarks_data -- A list, each one data to create a single Bookmark.
@@ -199,6 +199,7 @@ class FetchBookmarks(object):
         """
         for bookmark in bookmarks_data:
             try:
+                # Update.
                 b = Bookmark.objects.get(
                                         account=account, url=bookmark['href'])
                 b.title = bookmark['description']
@@ -206,11 +207,16 @@ class FetchBookmarks(object):
                 b.raw = bookmark['json']
                 b.description = bookmark['extended']
                 b.to_read = bookmark['toread']
-                b.fetch_time = fetch_time
                 # post_time won't change
                 # account won't change
                 # url won't change
+                if b.has_changed:
+                    # Only update it if something's changed.
+                    b.fetch_time = fetch_time
+                    b.save()
+
             except Bookmark.DoesNotExist:
+                # Create.
                 b = Bookmark(
                     title = bookmark['description'],
                     is_private = not bookmark['shared'],
@@ -224,5 +230,5 @@ class FetchBookmarks(object):
                     #permalink not used
                     #summary made by Bookmark::save()
                 )
-            b.save()
+                b.save()
 

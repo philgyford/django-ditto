@@ -3,12 +3,12 @@ from django.core.validators import URLValidator
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-from ditto.ditto.models import DittoItem, TimeStampedModel
+from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
 from ditto.ditto.utils import truncate_string
 
 
 @python_2_unicode_compatible
-class Account(TimeStampedModel, models.Model):
+class Account(TimeStampedModelMixin, models.Model):
     username = models.CharField(null=False, blank=False, max_length=30,
                 unique=True,
                 help_text="eg, 'philgyford'")
@@ -28,7 +28,7 @@ class Account(TimeStampedModel, models.Model):
       return "Pinboard"
 
 
-class Bookmark(DittoItem):
+class Bookmark(DittoItemModel):
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:

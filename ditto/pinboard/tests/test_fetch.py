@@ -281,7 +281,41 @@ class FetchTypesSaveTestCase(TestCase):
         self.assertFalse(bookmarks[0].is_private)
         self.assertFalse(bookmarks[0].to_read)
         self.assertEqual(bookmarks[0].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+        # This should be updated to now, as we've changed things:
         self.assertEqual(bookmarks[0].fetch_time, datetime.datetime.strptime(
                             '2015-07-01 12:00:00',
                             '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
+
+    @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
+    def test_no_update_bookmarks(self):
+        """Ensure that if no values have changed, we don't update a bookmark.
+        """
+        account = Account.objects.get(pk=1)
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        # Add a Bookmark into the DB before we fetch anything.
+        bookmark = factories.BookmarkFactory(
+                        account=account,
+                        title='Fontello - icon fonts generator',
+                        is_private=False,
+                        to_read=False,
+                        description='Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.',
+                        url='http://fontello.com/',
+                        raw='{"extended": "Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.", "hash": "df25b37a14ed631a0111a647e53fc24e", "description": "Fontello - icon fonts generator", "tags": "fonts icons webdevelopment webdesign", "href": "http://fontello.com/", "meta": "20e8a3c17e9424c7fb6121d0c6961861", "time": "2015-06-18T09:48:31Z", "shared": "yes", "toread": "no"}',
+                        fetch_time=fetch_time)
+
+        bookmarks_from_json = self.get_bookmarks_from_json()
+        bookmarks_data = bookmarks_from_json['bookmarks']
+
+        FetchBookmarks()._save_bookmarks(
+                            account=account,
+                            bookmarks_data=bookmarks_data,
+                            fetch_time=fetch_time)
+
+        self.assertEqual(Bookmark.objects.all().count(), 2)
+
+        bookmarks = Bookmark.objects.all()
+
+        # Nothing has changed, and so the fetch_time should be the original:
+        self.assertEqual(bookmarks[0].fetch_time, fetch_time)
 
