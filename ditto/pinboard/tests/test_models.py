@@ -70,7 +70,8 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(bookmark.summary, u'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales.…')
 
     def test_get_absolute_url(self):
-        bookmark = factories.BookmarkFactory()
-        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/1')
+        account = factories.AccountFactory(username='billy')
+        bookmark = factories.BookmarkFactory(account=account)
+        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1')
 
 
