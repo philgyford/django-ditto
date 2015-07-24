@@ -1,9 +1,12 @@
 # coding: utf-8
+import datetime
+import pytz
+
 from django.db import IntegrityError
 from django.test import TestCase
 
 from .. import factories
-from ..models import Bookmark
+from ..models import Account, Bookmark
 
 
 class PinboardAccountTestCase(TestCase):
@@ -29,6 +32,12 @@ class PinboardAccountTestCase(TestCase):
     def test_get_absolute_url(self):
         account = factories.AccountFactory(username='billy')
         self.assertEqual(account.get_absolute_url(), '/pinboard/billy')
+
+    def test_ordering(self):
+        account_1 = factories.AccountFactory(username='billy')
+        account_2 = factories.AccountFactory(username='amanda')
+        accounts = Account.objects.all()
+        self.assertEqual(accounts[0].username, 'amanda')
 
 
 class PinboardBookmarkTestCase(TestCase):
@@ -77,5 +86,21 @@ class PinboardBookmarkTestCase(TestCase):
         account = factories.AccountFactory(username='billy')
         bookmark = factories.BookmarkFactory(account=account)
         self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1')
+
+    def test_ordering(self):
+        account = factories.AccountFactory(username='billy')
+        post_time = datetime.datetime.strptime(
+                                    '2015-01-01 12:00:00', "%Y-%m-%d %H:%M:%S"
+                    ).replace(tzinfo=pytz.utc)
+        bookmark_1 = factories.BookmarkFactory(
+                            account=account,
+                            post_time=post_time)
+        bookmark_2 = factories.BookmarkFactory(
+                            account=account,
+                            post_time=(post_time + datetime.timedelta(days=1)))
+        bookmarks = Bookmark.objects.all()
+        # Should be most recent first:
+        self.assertEqual(bookmarks[0].pk, bookmark_2.pk)
+        self.assertEqual(bookmarks[1].pk, bookmark_1.pk)
 
 

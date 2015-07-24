@@ -23,6 +23,9 @@ class Account(TimeStampedModelMixin, models.Model):
     def __str__(self):
         return "%s: %s" % (self.service_name, self.username)
 
+    class Meta:
+        ordering = ['username']
+
     @property
     def service_name(self):
       return "Pinboard"
@@ -58,6 +61,7 @@ class Bookmark(DittoItemModel):
     # TODO tags
 
     class Meta:
+        ordering = ['-post_time']
         unique_together = (('account', 'url'),)
 
     def save(self, *args, **kwargs):

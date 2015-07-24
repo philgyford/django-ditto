@@ -30,7 +30,7 @@ class PinboardViewTests(TestCase):
         # Bookmarks for both accounts that have them:
         self.assertEqual(
             [bookmark.pk for bookmark in response.context['bookmark_list']],
-            [1,2,3,4,5,6,7,8,9,10]
+            [10,9,8,7,6,5,4,3,2,1]
         )
 
     def test_account_detail_templates(self):
@@ -57,7 +57,7 @@ class PinboardViewTests(TestCase):
         self.assertEqual(len(response.context['bookmark_list']), 3)
         self.assertEqual(
             [bookmark.pk for bookmark in response.context['bookmark_list']],
-            [1,2,3]
+            [3,2,1]
         )
 
     def test_account_detail_fails(self):

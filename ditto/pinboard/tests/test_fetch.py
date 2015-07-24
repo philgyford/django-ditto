@@ -236,26 +236,27 @@ class FetchTypesSaveTestCase(TestCase):
 
         self.assertEqual(Bookmark.objects.all().count(), 2)
 
+        # Note: they're returned with most recent post_time first:
         bookmarks = Bookmark.objects.all()
 
-        self.assertEqual(bookmarks[0].title, 'Fontello - icon fonts generator')
+        self.assertEqual(bookmarks[1].title, 'Fontello - icon fonts generator')
 
-        self.assertEqual(bookmarks[0].fetch_time, datetime.datetime.strptime(
+        self.assertEqual(bookmarks[1].fetch_time, datetime.datetime.strptime(
                             '2015-07-01 12:00:00',
                             '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
-        self.assertEqual(bookmarks[0].summary, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
-        self.assertEqual(bookmarks[0].raw, raw_bookmark)
-        self.assertEqual(bookmarks[0].account, account)
-        self.assertEqual(bookmarks[0].url, 'http://fontello.com/')
-        self.assertEqual(bookmarks[0].post_time, datetime.datetime.strptime(
+        self.assertEqual(bookmarks[1].summary, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+        self.assertEqual(bookmarks[1].raw, raw_bookmark)
+        self.assertEqual(bookmarks[1].account, account)
+        self.assertEqual(bookmarks[1].url, 'http://fontello.com/')
+        self.assertEqual(bookmarks[1].post_time, datetime.datetime.strptime(
                                 '2015-06-18T09:48:31Z',
                                 '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc))
-        self.assertEqual(bookmarks[0].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+        self.assertEqual(bookmarks[1].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
 
-        self.assertFalse(bookmarks[0].is_private)
-        self.assertFalse(bookmarks[0].to_read)
-        self.assertTrue(bookmarks[1].is_private)
-        self.assertTrue(bookmarks[1].to_read)
+        self.assertFalse(bookmarks[1].is_private)
+        self.assertFalse(bookmarks[1].to_read)
+        self.assertTrue(bookmarks[0].is_private)
+        self.assertTrue(bookmarks[0].to_read)
 
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
