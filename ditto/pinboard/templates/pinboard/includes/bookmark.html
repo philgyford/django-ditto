@@ -1,8 +1,9 @@
 {% comment %}
 
 Expects:
- * bookmark, a Bookmark object. $}
- * detail, boolean
+ * bookmark, a Bookmark object.
+ * detail, boolean - True if this we're showing a single bookmark, False if
+						this bookmark is in a list.
 
 {% endcomment %}
  
@@ -17,9 +18,10 @@ Expects:
 	<p>{{ bookmark.description }}</p>
 {% endif %}
 <p class="text-muted">
+	By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
+	on <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
 	{% if not detail %}
 		<a href="{{ bookmark.get_absolute_url }}">#</a>
 	{% endif %}
-	<time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
 </p>
 

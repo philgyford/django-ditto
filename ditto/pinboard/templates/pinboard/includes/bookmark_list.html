@@ -1,0 +1,17 @@
+{% comment %}
+
+Expects:
+ * bookmark_list, a queryset of Bookmarks.
+
+{% endcomment %}
+
+<ul class="media-list">
+	{% for bookmark in bookmark_list %}
+		<li class="media">
+			<div class="media-body">
+				{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False only %}
+			</div>
+		</li>
+	{% endfor %}
+</ul>
+

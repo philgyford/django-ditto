@@ -1,21 +1,37 @@
 {% extends 'pinboard/base.html' %}
+{% load l10n %}
 
 {% block head_title %}Pinboard{% endblock %}
-{% block body_title %}Pinboard{% endblock %}
+{% block body_title %}Pinboard bookmarks{% endblock %}
 
 {% block content %}
 
-	<ul class="media-list">
-		{% for bookmark in bookmark_list %}
-			<li class="media">
-				<div class="media-body">
-					{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False only %}
-				</div>
-			</li>
-		{% endfor %}
-	</ul>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+			{% if account_list|length == 1 %}
+				by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a>
+			{% else %}
+				by {{ account_list|length }} user{{ account_list|length|pluralize }}:
+			{% endif %}
+		</div>
 
-	{% include 'ditto/ditto/includes/pagination.html' %}
+		{% if account_list|length > 1 %}
+			<ul class="list-group">
+				{% for account in account_list %}
+					<li class="list-group-item"><a href="{{ account.get_absolute_url }}">{{ account.username }}</a></li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</div>
+
+	{% if page_obj.paginator.count > 0 %}
+		{% include 'ditto/ditto/includes/pagination.html' %}
+
+		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list only %}
+
+		{% include 'ditto/ditto/includes/pagination.html' %}
+	{% endif %}
 	
 {% endblock content %}
 

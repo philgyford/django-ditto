@@ -26,6 +26,10 @@ class PinboardAccountTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             account_2 = factories.AccountFactory(
                                             url='https://pinboard.in/u:billy')
+    def test_get_absolute_url(self):
+        account = factories.AccountFactory(username='billy')
+        self.assertEqual(account.get_absolute_url(), '/pinboard/billy')
+
 
 class PinboardBookmarkTestCase(TestCase):
 

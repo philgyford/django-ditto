@@ -1,0 +1,25 @@
+{% extends 'pinboard/base.html' %}
+{% load l10n %}
+
+{% block head_title %}Pinboard{% endblock %}
+{% block body_title %}Pinboard bookmarks for {{ account.username }}{% endblock %}
+
+{% block content %}
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
+			<a href="{{ account.url }}">View {{ account.username }} on Pinboard.in</a>
+		</div>
+	</div>
+
+	{% if page_obj.paginator.count > 0 %}
+		{% include 'ditto/ditto/includes/pagination.html' %}
+
+		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list only %}
+
+		{% include 'ditto/ditto/includes/pagination.html' %}
+	{% endif %}
+	
+{% endblock content %}
+

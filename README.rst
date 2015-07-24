@@ -13,3 +13,8 @@ Development::
 
 Pinboard rate limits: https://pinboard.in/api/#limits
 
+To have numbers formatted nicely, ensure these are in your `settings.py`::
+
+    USE_L10N = True
+    USE_THOUSAND_SEPARATOR = True
+

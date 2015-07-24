@@ -27,6 +27,10 @@ class Account(TimeStampedModelMixin, models.Model):
     def service_name(self):
       return "Pinboard"
 
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('account_detail', kwargs={'username': self.username})
+
 
 class Bookmark(DittoItemModel):
     account = models.ForeignKey(Account, null=False, blank=False)
