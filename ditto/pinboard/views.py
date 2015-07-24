@@ -1,8 +1,7 @@
-from ..ditto.paginator import DiggPaginator
-
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
+from ..ditto.paginator import DiggPaginator
 from .models import Account, Bookmark
 
 

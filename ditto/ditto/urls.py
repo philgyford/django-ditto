@@ -5,7 +5,7 @@ from . import views
 urlpatterns = patterns("",
     url(
         regex=r"^$",
-        view=views.HomeView.as_view(),
+        view=views.Home.as_view(),
         name='ditto'
     ),
 )
