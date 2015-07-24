@@ -161,6 +161,15 @@ class FetchTypesTestRemoteCase(TestCase):
         self.assertEqual(result[0]['message'], 'HTTP Error: 404')
 
     @responses.activate
+    def test_it_handles_429s(self):
+        """Correctly reacts to a 429 when fetching bookmarks"""
+        self.add_response(body='<h1>Too Many Requests</h1>', status=429)
+        result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+                                                username='philgyford')
+        self.assertFalse(result[0]['success'])
+        self.assertEqual(result[0]['message'], 'HTTP Error: 429')
+
+    @responses.activate
     def test_it_handles_500s(self):
         """Correctly reacts to a 500 error when fetching bookmarks"""
         self.add_response(body='<h1>Error</h1>', status=500)
