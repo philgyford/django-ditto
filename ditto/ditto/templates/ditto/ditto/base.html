@@ -6,12 +6,31 @@
         <title>{% block head_title %}Ditto{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
     <body>
 
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#ditto-navbar" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="{% url 'ditto' %}">Ditto</a>
+				</div>
+
+				<div class="collapse navbar-collapse" id="ditto-navbar">
+					<ul class="nav navbar-nav">
+						<li class="{% block pinboard_nav_active %}{% endblock %}"><a href="{% url 'pinboard' %}">Pinboard</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
         <div class="container">
-            <p>{% block section_title %}Ditto{% endblock %}</p>
             <h1>{% block body_title %}Latest{% endblock %}</h1>
 
             {% block content %}
@@ -20,6 +39,6 @@
         </div>
 
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
     </body>
 </html>
