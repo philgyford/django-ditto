@@ -58,6 +58,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_fetch_all_success(self):
+        """Successfully fetches all bookmarks"""
         self.add_response(
                 method='all',
                 body=self.make_success_body(method='all', num_posts=12)
@@ -69,6 +70,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_fetch_date_success(self):
+        """Successfully fetches bookmarks for a particular date"""
         self.add_response(body=self.make_success_body(num_posts=4))
         result = FetchBookmarks().fetch_date(
                                 post_date='2015-06-18', username='philgyford')
@@ -78,6 +80,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_fetch_url_success(self):
+        """Sucessfully fetches the one bookmark for a URL"""
         self.add_response(body=self.make_success_body(num_posts=1))
         result = FetchBookmarks().fetch_url(
                                 url='http://foo.com', username='philgyford')
@@ -87,6 +90,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_fetch_recent_success(self):
+        """Successfully fetches recent bookmarks"""
         self.add_response(method='recent',
                                     body=self.make_success_body(num_posts=5))
         result = FetchBookmarks().fetch_recent(num=5, username='philgyford')
@@ -99,6 +103,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @patch('ditto.pinboard.fetch.FetchBookmarks._fetch')
     def test_fetch_date_invalid(self, fetch_method):
+        """Correctly reacts to an invalid date"""
         result = FetchBookmarks().fetch_date('2015-06-99')
         assert not fetch_method.called
         self.assertFalse(result[0]['success'])
@@ -110,6 +115,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_fetch_multiple_accounts(self):
+        """Successfully fetches bookmarks when there are multiple accounts."""
         # TODO: Because the actual URL of both these requests is the same,
         # only the first is used when the two requests get made in
         # FetchBookmarks()._send_request(). So this test isn't *really*
@@ -129,6 +135,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_it_handles_exceptions(self):
+        """Correctly handles various errors when fetching bookmarks"""
         errors = (
             (ConnectionError,   "Can't connect to domain."),
             (Timeout,           "Connection timed out."),
@@ -146,6 +153,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_it_handles_404s(self):
+        """Correctly reacts to a 404 when fetching bookmarks"""
         self.add_response(body='<h1>Not found</h1>', status=404)
         result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                 username='philgyford')
@@ -154,6 +162,7 @@ class FetchTypesTestRemoteCase(TestCase):
 
     @responses.activate
     def test_it_handles_500s(self):
+        """Correctly reacts to a 500 error when fetching bookmarks"""
         self.add_response(body='<h1>Error</h1>', status=500)
         result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                 username='philgyford')

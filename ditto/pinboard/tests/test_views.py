@@ -7,6 +7,7 @@ from .. import factories
 class PinboardViewTests(TestCase):
 
     def test_home_templates(self):
+        "The Pinboard home page uses the correct templates"
         response = self.client.get(reverse('pinboard'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/bookmark_list.html')
@@ -14,6 +15,7 @@ class PinboardViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/ditto/base.html')
 
     def test_home_context(self):
+        "The Pinboard home page sends the correct data to templates"
         accounts = factories.AccountFactory.create_batch(3)
         bookmarks_1 = factories.BookmarkFactory.create_batch(
                                                     5, account=accounts[0])
@@ -45,6 +47,7 @@ class PinboardViewTests(TestCase):
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
 
     def test_account_detail_templates(self):
+        "Uses the correct templates"
         account = factories.AccountFactory.create()
         response = self.client.get(reverse('account_detail',
                                         kwargs={'username': account.username}))
@@ -54,6 +57,7 @@ class PinboardViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/ditto/base.html')
 
     def test_account_detail_context(self):
+        "Sends the correct data to templates"
         account_1 = factories.AccountFactory.create()
         account_2 = factories.AccountFactory.create()
         bookmarks_1 = factories.BookmarkFactory.create_batch(
@@ -72,6 +76,7 @@ class PinboardViewTests(TestCase):
         )
 
     def test_account_detail_privacy(self):
+        "It does not show private Bookmarks"
         account = factories.AccountFactory.create()
         public_bookmark = factories.BookmarkFactory(
                                             account=account, is_private=False)
@@ -84,12 +89,14 @@ class PinboardViewTests(TestCase):
                                                             public_bookmark.pk)
 
     def test_account_detail_fails(self):
+        "Requests for non-existent accounts 404"
         account = factories.AccountFactory.create()
         response = self.client.get(reverse('account_detail',
                                         kwargs={'username': 'doesnotexist'}))
         self.assertEquals(response.status_code, 404)
 
     def test_bookmark_detail_templates(self):
+        "Uses the correct templates"
         bookmark = factories.BookmarkFactory.create()
         response = self.client.get(reverse('bookmark_detail',
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
@@ -97,6 +104,7 @@ class PinboardViewTests(TestCase):
         self.assertTemplateUsed(response, 'pinboard/bookmark_detail.html')
 
     def test_bookmark_detail_context(self):
+        "Sends the correct data to templates"
         bookmark = factories.BookmarkFactory.create()
         response = self.client.get(reverse('bookmark_detail',
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
@@ -104,12 +112,14 @@ class PinboardViewTests(TestCase):
         self.assertEqual(bookmark.pk, response.context['bookmark'].pk)
 
     def test_bookmark_detail_privacy(self):
+        "Does not display private bookmarks"
         bookmark = factories.BookmarkFactory.create(is_private=True)
         response = self.client.get(reverse('bookmark_detail',
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
         self.assertEquals(response.status_code, 404)
 
     def test_bookmark_detail_fails(self):
+        "Requesting a page for a non-existent bookmark ID 404s"
         bookmark = factories.BookmarkFactory.create()
         response = self.client.get(reverse('bookmark_detail',
                     kwargs={'username': bookmark.account.username, 'pk':2}))

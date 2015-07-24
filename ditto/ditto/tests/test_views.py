@@ -7,12 +7,14 @@ from ...pinboard import factories as pinboardfactories
 class DittoViewTests(TestCase):
 
     def test_home_templates(self):
+        """Overall home page uses the correct templates"""
         response = self.client.get(reverse('ditto'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/ditto/base.html')
 
     def test_home_context(self):
+        """Overall home page sends correct data to templates"""
         pinboard_accounts = pinboardfactories.AccountFactory.create_batch(3)
         pinboard_bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
                                             6, account=pinboard_accounts[0])
@@ -33,6 +35,7 @@ class DittoViewTests(TestCase):
                         'Private bookmark')
 
     def test_home_privacy(self):
+        """Overall home page does not display private Bookmarks etc"""
         public_bookmark = pinboardfactories.BookmarkFactory(is_private=False)
         private_bookmark = pinboardfactories.BookmarkFactory(is_private=True)
         response = self.client.get(reverse('ditto'))

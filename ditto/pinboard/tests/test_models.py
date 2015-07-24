@@ -12,28 +12,34 @@ from ..models import Account, Bookmark
 class PinboardAccountTestCase(TestCase):
 
     def test_str(self):
+        """The string representation of the Account is correct"""
         account = factories.AccountFactory(username='bill')
         self.assertEqual(account.__str__(), 'Pinboard: bill')
 
     def test_service_name(self):
+        """The service name is correct"""
         account = factories.AccountFactory()
         self.assertEqual(account.service_name, 'Pinboard')
 
     def test_unique_username(self):
+        """Ensures that usernames are unique"""
         account_1 = factories.AccountFactory(username='billy')
         with self.assertRaises(IntegrityError):
             account_2 = factories.AccountFactory(username='billy')
 
     def test_unique_url(self):
+        """Ensures that Account URLs at Pinboard are unique"""
         account_1 = factories.AccountFactory(url='https://pinboard.in/u:billy')
         with self.assertRaises(IntegrityError):
             account_2 = factories.AccountFactory(
                                             url='https://pinboard.in/u:billy')
     def test_get_absolute_url(self):
+        """Has the correct URL on this site"""
         account = factories.AccountFactory(username='billy')
         self.assertEqual(account.get_absolute_url(), '/pinboard/billy')
 
     def test_ordering(self):
+        """Multiple accounts are ordered alphabetically"""
         account_1 = factories.AccountFactory(username='billy')
         account_2 = factories.AccountFactory(username='amanda')
         accounts = Account.objects.all()
@@ -43,14 +49,14 @@ class PinboardAccountTestCase(TestCase):
 class PinboardBookmarkTestCase(TestCase):
 
     def test_save(self):
-        "Make sure its save() method calls the parent, so actually saves."
+        """Calls the parent save() method when saving, so it actually saves"""
         bookmark = factories.BookmarkFactory(title='My title')
         bookmark.save()
         b = Bookmark.objects.get(title='My title')
         self.assertEqual(b.pk, bookmark.pk)
 
     def test_url_constraint(self):
-        """url must be unique for an Account's Bookmarks"""
+        """Ensures bookmarks have unique URLs within an Account"""
         account = factories.AccountFactory()
         bookmark_1 = factories.BookmarkFactory(
                                 account=account, url='http://www.example.com')
@@ -73,7 +79,7 @@ class PinboardBookmarkTestCase(TestCase):
             self.fail("It looks like there's a Unique constraint on Bookmark.url, which there shouldn't be.")
 
     def test_summary_creation(self):
-        "Make sure it creates Item's summary correctly."
+        "Creates the Bookmark's summary correctly"
 
         self.maxDiff = None
         bookmark = factories.BookmarkFactory(description="""<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus.</p>
@@ -83,11 +89,13 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(bookmark.summary, u'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales.…')
 
     def test_get_absolute_url(self):
+        "Has the correct URL on this site"
         account = factories.AccountFactory(username='billy')
         bookmark = factories.BookmarkFactory(account=account)
         self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1')
 
     def test_ordering(self):
+        "Bookmarks are ordered correctly, most-recently-posted first"
         account = factories.AccountFactory(username='billy')
         post_time = datetime.datetime.strptime(
                                     '2015-01-01 12:00:00', "%Y-%m-%d %H:%M:%S"
@@ -104,14 +112,14 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(bookmarks[1].pk, bookmark_1.pk)
 
     def test_default_manager(self):
-        "Should include public AND private bookmarks"
+        "The default manager includes public AND private bookmarks"
         public_bookmark_1 = factories.BookmarkFactory(is_private=False)
         private_bookmark = factories.BookmarkFactory(is_private=True)
         public_bookmark_2 = factories.BookmarkFactory(is_private=False)
         self.assertEqual(len(Bookmark.objects.all()), 3)
 
     def test_public_manager(self):
-        "Should NOT include private bookmarks"
+        "The public manager does NOT include private bookmarks"
         public_bookmark_1 = factories.BookmarkFactory(is_private=False)
         private_bookmark = factories.BookmarkFactory(is_private=True)
         public_bookmark_2 = factories.BookmarkFactory(is_private=False)
