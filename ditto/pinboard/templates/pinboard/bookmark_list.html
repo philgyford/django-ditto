@@ -26,7 +26,9 @@
 	</div>
 
 	{% if page_obj.paginator.count > 0 %}
-		{% include 'ditto/ditto/includes/pagination.html' %}
+		{% if page_obj.number > 1 %}
+			{% include 'ditto/ditto/includes/pagination.html' %}
+		{% endif %}
 
 		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list only %}
 
