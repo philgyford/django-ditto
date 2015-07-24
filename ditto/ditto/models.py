@@ -2,6 +2,8 @@ from django.db import models
 from django.forms.models import model_to_dict
 from django.utils.encoding import python_2_unicode_compatible
 
+from .managers import PublicItemManager
+
 
 class TimeStampedModelMixin(models.Model):
     """
@@ -86,6 +88,12 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
                     help_text="The time the item's data was last fetched, and was new or changed.")
     raw = models.TextField(null=False, blank=True,
                     help_text="eg, the raw JSON from the API.")
+
+    # All Items (eg, used in Admin):
+    objects = models.Manager()
+
+    # All Items which aren't private. Should ALWAYS be used for public pages:
+    public_objects = PublicItemManager()
 
     class Meta:
         abstract = True

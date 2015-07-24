@@ -103,4 +103,20 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(bookmarks[0].pk, bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, bookmark_1.pk)
 
+    def test_default_manager(self):
+        "Should include public AND private bookmarks"
+        public_bookmark_1 = factories.BookmarkFactory(is_private=False)
+        private_bookmark = factories.BookmarkFactory(is_private=True)
+        public_bookmark_2 = factories.BookmarkFactory(is_private=False)
+        self.assertEqual(len(Bookmark.objects.all()), 3)
+
+    def test_public_manager(self):
+        "Should NOT include private bookmarks"
+        public_bookmark_1 = factories.BookmarkFactory(is_private=False)
+        private_bookmark = factories.BookmarkFactory(is_private=True)
+        public_bookmark_2 = factories.BookmarkFactory(is_private=False)
+        bookmarks = Bookmark.public_objects.all()
+        self.assertEqual(len(bookmarks), 2)
+        self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
+        self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
 

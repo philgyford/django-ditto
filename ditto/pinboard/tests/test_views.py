@@ -33,6 +33,17 @@ class PinboardViewTests(TestCase):
             [10,9,8,7,6,5,4,3,2,1]
         )
 
+    def test_home_privacy(self):
+        """Only public bookmarks should appear."""
+        public_bookmark_1 = factories.BookmarkFactory(is_private=False)
+        private_bookmark = factories.BookmarkFactory(is_private=True)
+        public_bookmark_2 = factories.BookmarkFactory(is_private=False)
+        response = self.client.get(reverse('pinboard'))
+        bookmarks = response.context['bookmark_list']
+        self.assertEqual(len(bookmarks), 2)
+        self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
+        self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
+
     def test_account_detail_templates(self):
         account = factories.AccountFactory.create()
         response = self.client.get(reverse('account_detail',
@@ -60,6 +71,18 @@ class PinboardViewTests(TestCase):
             [3,2,1]
         )
 
+    def test_account_detail_privacy(self):
+        account = factories.AccountFactory.create()
+        public_bookmark = factories.BookmarkFactory(
+                                            account=account, is_private=False)
+        private_bookmark = factories.BookmarkFactory(
+                                            account=account,is_private=True)
+        response = self.client.get(reverse('account_detail',
+                                        kwargs={'username': account.username}))
+        self.assertEqual(len(response.context['bookmark_list']), 1)
+        self.assertTrue(response.context['bookmark_list'][0].pk,
+                                                            public_bookmark.pk)
+
     def test_account_detail_fails(self):
         account = factories.AccountFactory.create()
         response = self.client.get(reverse('account_detail',
@@ -79,6 +102,12 @@ class PinboardViewTests(TestCase):
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
         self.assertTrue('bookmark' in response.context)
         self.assertEqual(bookmark.pk, response.context['bookmark'].pk)
+
+    def test_bookmark_detail_privacy(self):
+        bookmark = factories.BookmarkFactory.create(is_private=True)
+        response = self.client.get(reverse('bookmark_detail',
+            kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
+        self.assertEquals(response.status_code, 404)
 
     def test_bookmark_detail_fails(self):
         bookmark = factories.BookmarkFactory.create()

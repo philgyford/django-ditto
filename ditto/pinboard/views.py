@@ -7,6 +7,7 @@ from .models import Account, Bookmark
 
 class Home(ListView):
     model = Bookmark
+    queryset = Bookmark.public_objects.all()
     paginator_class = DiggPaginator
     paginate_by = 50
     page_kwarg = 'p'
@@ -36,9 +37,12 @@ class AccountDetail(SingleObjectMixin, ListView):
         return context
 
     def get_queryset(self):
-        return self.object.bookmark_set.all()
+        """Show all the public Bookmarks associated with this account."""
+        return Bookmark.public_objects.filter(account=self.object)
 
 
 class BookmarkDetail(DetailView):
     model = Bookmark
+    # Only display public bookmarks; private ones will 404.
+    queryset = Bookmark.public_objects.all()
 
