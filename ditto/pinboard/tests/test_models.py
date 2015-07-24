@@ -14,7 +14,7 @@ class PinboardAccountTestCase(TestCase):
     def test_str(self):
         """The string representation of the Account is correct"""
         account = factories.AccountFactory(username='bill')
-        self.assertEqual(account.__str__(), 'Pinboard: bill')
+        self.assertEqual(account.__str__(), 'bill')
 
     def test_service_name(self):
         """The service name is correct"""

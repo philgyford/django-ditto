@@ -21,7 +21,7 @@ class Account(TimeStampedModelMixin, models.Model):
                     help_text='From https://pinboard.in/settings/password eg, "philgyford:1234567890ABCDEFGHIJ"')
 
     def __str__(self):
-        return "%s: %s" % (self.service_name, self.username)
+        return self.username
 
     class Meta:
         ordering = ['username']
