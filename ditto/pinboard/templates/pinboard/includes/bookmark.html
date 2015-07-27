@@ -6,7 +6,7 @@ Expects:
 						this bookmark is in a list.
 
 {% endcomment %}
- 
+
 
 {% if detail %}
 	<h2>{{ bookmark.title }}</h2>
@@ -17,6 +17,15 @@ Expects:
 {% if bookmark.description %}
 	<p>{{ bookmark.description }}</p>
 {% endif %}
+
+{% if bookmark.tags.all|length %}
+	<ul class="list-inline">
+		{% for tag in bookmark.tags.all %}
+			<li><a href="{% url 'tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
 <p class="text-muted">
 	By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
 	on <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>

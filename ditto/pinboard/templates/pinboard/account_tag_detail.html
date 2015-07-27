@@ -1,0 +1,27 @@
+{% extends 'pinboard/base.html' %}
+{% load l10n %}
+
+{% block head_title %}Pinboard{% endblock %}
+{% block body_title %}Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”{% endblock %}
+
+{% block content %}
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
+			<a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
+		</div>
+	</div>
+
+	{% if page_obj.paginator.count > 0 %}
+		{% if page_obj.number > 1 %}
+			{% include 'ditto/ditto/includes/pagination.html' %}
+		{% endif %}
+
+		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list only %}
+
+		{% include 'ditto/ditto/includes/pagination.html' %}
+	{% endif %}
+	
+{% endblock content %}
+

@@ -16,7 +16,7 @@
 				{% for p in page_obj.page_range %}
 					{% if not p %}
 						<li class="disabled">
-							<span><span aria-hedden="true">…</span></span>
+							<span><span aria-hidden="true">…</span></span>
 						</li>
 					{% else %}
 						<li{% if p == page_obj.number %} class="active"{% endif %}>
