@@ -196,6 +196,8 @@ class FetchBookmarks(object):
             # 'yes'/'no' to booleans:
             bookmark['shared'] = True if bookmark['shared'] == 'yes' else False
             bookmark['toread'] = True if bookmark['toread'] == 'yes' else False
+            # String into an array of strings:
+            bookmark['tags'] = bookmark['tags'].split()
 
         return posts
 
@@ -221,10 +223,12 @@ class FetchBookmarks(object):
                 # post_time won't change
                 # account won't change
                 # url won't change
-                if b.has_changed:
+                if b.has_changed or not b.slugs_match_tags(bookmark['tags']):
                     # Only update it if something's changed.
                     b.fetch_time = fetch_time
                     b.save()
+                    # Saves the bookmark's tags:
+                    b.tags.set( *bookmark['tags'] )
 
             except Bookmark.DoesNotExist:
                 # Create.
@@ -242,4 +246,9 @@ class FetchBookmarks(object):
                     #summary made by Bookmark::save()
                 )
                 b.save()
+
+                # Bookmark needs an ID before we add its tags.
+                if len(bookmark['tags']) > 0:
+                    # This saves the bookmark's tags too:
+                    b.tags.set(*bookmark['tags'])
 

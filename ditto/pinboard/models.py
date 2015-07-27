@@ -75,3 +75,11 @@ class Bookmark(DittoItemModel):
         return reverse('bookmark_detail',
                     kwargs={'username': self.account.username, 'pk': self.id})
 
+    def slugs_match_tags(self, slugs):
+        """Does a list of slugs equal the slugs of all this Bookmark's tags?
+        Keyword arguments:
+        slugs -- A list of slugs, eg ['carrot', 'pea']
+        Returns boolean
+        """
+        return set(self.tags.slugs()) == set(slugs)
+

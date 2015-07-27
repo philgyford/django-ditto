@@ -122,6 +122,18 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertIsInstance(bookmark_2.tags.first(), Tag)
         self.assertEqual(bookmark_2.tags.first().name, 'cherry')
 
+    def test_slugs_match_tags_true(self):
+        "Returns true if a list of slugs is the same to bookmark's tags"
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('banana', 'cherry')
+        self.assertTrue(bookmark.slugs_match_tags(['cherry', 'banana']))
+
+    def test_slugs_match_tags_false(self):
+        "Returns false if a list of slugs is different to bookmark's tags"
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('banana', 'cherry')
+        self.assertFalse(bookmark.slugs_match_tags(['banana', 'apple']))
+
     def test_default_manager(self):
         "The default manager includes public AND private bookmarks"
         public_bookmark_1 = factories.BookmarkFactory(is_private=False)

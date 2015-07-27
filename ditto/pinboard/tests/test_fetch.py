@@ -9,6 +9,7 @@ import requests
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
 import responses
 
+from taggit.models import Tag
 from django.test import TestCase
 
 from .. import factories
@@ -225,6 +226,10 @@ class FetchTypesSaveTestCase(TestCase):
         self.assertFalse(bookmarks_data[1]['shared'])
         self.assertTrue(bookmarks_data[1]['toread'])
 
+        self.assertEqual(bookmarks_data[0]['tags'],
+                            ['fonts', 'icons', 'webdevelopment', 'webdesign'])
+        self.assertEqual(bookmarks_data[1]['tags'], ['mattwebb', 'chatbots'])
+
         # Check it has a 'json' element that is the JSON version of the
         # bookmark:
         raw = json.loads(bookmarks_data[0]['json'])
@@ -276,6 +281,10 @@ class FetchTypesSaveTestCase(TestCase):
         self.assertTrue(bookmarks[0].is_private)
         self.assertTrue(bookmarks[0].to_read)
 
+        self.assertEqual(len(bookmarks[1].tags.all()), 4)
+        self.assertEqual(len(bookmarks[0].tags.all()), 2)
+        self.assertIsInstance(bookmarks[1].tags.first(), Tag)
+        self.assertEqual(sorted(list(bookmarks[1].tags.slugs()))[0], 'fonts')
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
     def test_update_bookmarks(self):
@@ -292,6 +301,7 @@ class FetchTypesSaveTestCase(TestCase):
                         to_read=True,
                         description='My initial description',
                         url='http://fontello.com/')
+        bookmark.tags.set('initial', 'tags')
 
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json['bookmarks']
@@ -313,6 +323,10 @@ class FetchTypesSaveTestCase(TestCase):
         self.assertEqual(bookmarks[0].fetch_time, datetime.datetime.strptime(
                             '2015-07-01 12:00:00',
                             '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
+
+        self.assertEqual(len(bookmarks[0].tags.all()), 4)
+        self.assertIsInstance(bookmarks[0].tags.first(), Tag)
+        self.assertEqual(sorted(list(bookmarks[0].tags.slugs()))[0], 'fonts')
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
     def test_no_update_bookmarks(self):
