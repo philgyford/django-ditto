@@ -111,6 +111,17 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(bookmarks[0].pk, bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, bookmark_1.pk)
 
+    def test_tags(self):
+        "Can save and recall tags"
+        from taggit.models import Tag
+        bookmark_1 = factories.BookmarkFactory()
+        bookmark_1.tags.add('banana', 'cherry', 'apple')
+        bookmark_1.save()
+        bookmark_2 = Bookmark.objects.get(pk=bookmark_1.pk)
+        self.assertEqual(len(bookmark_2.tags.all()), 3)
+        self.assertIsInstance(bookmark_2.tags.first(), Tag)
+        self.assertEqual(bookmark_2.tags.first().name, 'cherry')
+
     def test_default_manager(self):
         "The default manager includes public AND private bookmarks"
         public_bookmark_1 = factories.BookmarkFactory(is_private=False)
@@ -127,4 +138,3 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
-
