@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
 
+from taggit.managers import TaggableManager
+from taggit.forms import TagWidget
+
 from .models import Account, Bookmark
 
 
@@ -22,9 +25,10 @@ class AccountAdmin(admin.ModelAdmin):
 class BookmarkAdmin(admin.ModelAdmin):
     list_display = ('title', 'post_time', 'account',)
     list_filter = ('post_time', 'is_private', 'to_read', 'account',)
+
     fieldsets = (
         (None, {
-            'fields': ('account', 'title', 'url', 'description', 'summary', 'post_time',)
+            'fields': ('account', 'title', 'url', 'description', 'summary', 'tags', 'post_time',)
         }),
         ('Options', {
             'fields': ('is_private', 'to_read',)
@@ -33,6 +37,7 @@ class BookmarkAdmin(admin.ModelAdmin):
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
         }),
     )
+
     formfield_overrides = {
         # Make the inputs full-width.
         models.CharField: {'widget': TextInput(
@@ -48,6 +53,14 @@ class BookmarkAdmin(admin.ModelAdmin):
                 'rows': 4,
             }
         )},
+        # Make the input full-width.
+        TaggableManager: {'widget': TagWidget(
+            attrs={
+                'class': 'vLargeTextField',
+            }
+        )},
     }
+
     readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
     search_fields = ('title', 'url', 'description',)
+

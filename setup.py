@@ -12,10 +12,11 @@ setup(
     version='0.1',
     packages=['ditto'],
     install_requires=[
+        'django-taggit',
+        'pytz',
     ],
     tests_require=[
         'factoryboy',
-        'pytz',
     ],
     include_package_data=True,
     license='MIT License',
