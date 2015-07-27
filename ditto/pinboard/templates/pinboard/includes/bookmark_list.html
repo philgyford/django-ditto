@@ -2,16 +2,25 @@
 
 Expects:
  * bookmark_list, a queryset of Bookmarks.
+ * page_obj, a DiggPaginator instance.
 
 {% endcomment %}
 
-<ul class="media-list">
-	{% for bookmark in bookmark_list %}
-		<li class="media">
-			<div class="media-body">
-				{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False only %}
-			</div>
-		</li>
-	{% endfor %}
-</ul>
+{% if page_obj.paginator.count > 0 %}
+	{% if page_obj.number > 1 %}
+		{% include 'ditto/ditto/includes/pagination.html' with page_obj=page_obj only %}
+	{% endif %}
+
+	<ul class="media-list">
+		{% for bookmark in bookmark_list %}
+			<li class="media">
+				<div class="media-body">
+					{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False only %}
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+
+	{% include 'ditto/ditto/includes/pagination.html' with page_obj=page_obj only %}
+{% endif %}
 
