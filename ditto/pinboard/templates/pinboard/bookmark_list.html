@@ -19,7 +19,9 @@
 		{% if account_list|length > 1 %}
 			<ul class="list-group">
 				{% for account in account_list %}
-					<li class="list-group-item"><a href="{{ account.get_absolute_url }}">{{ account.username }}</a></li>
+					<li class="list-group-item">
+						<a href="{{ account.get_absolute_url }}">{{ account.username }}</a>
+					</li>
 				{% endfor %}
 			</ul>
 		{% endif %}

@@ -19,7 +19,10 @@
 		{% if account_list|length > 1 %}
 			<ul class="list-group">
 				{% for account in account_list %}
-					<li class="list-group-item"><a href="{{ account.get_absolute_url }}">{{ account.username }}</a> (“<a href="{% url 'account_tag_detail' username=account.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)</li>
+					<li class="list-group-item">
+						<a href="{{ account.get_absolute_url }}">{{ account.username }}</a>
+						(“<a href="{% url 'account_tag_detail' username=account.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
+					</li>
 				{% endfor %}
 			</ul>
 		{% endif %}
