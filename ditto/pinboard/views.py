@@ -58,7 +58,7 @@ class TagList(ListView):
     template_name = 'pinboard/tag_list.html'
 
     def get_queryset(self):
-        return Bookmark.tags.most_common()
+        return Bookmark.tags.most_common_public()
 
 
 class TagDetail(SingleObjectMixin, ListView):

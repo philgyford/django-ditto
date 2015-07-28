@@ -82,3 +82,4 @@ class DittoViewTests(TestCase):
         self.assertTrue('bookmark_list' in response.context)
         self.assertEqual(len(response.context['bookmark_list']), 1)
         self.assertEqual(response.context['bookmark_list'][0].pk, bookmark_2.pk)
+

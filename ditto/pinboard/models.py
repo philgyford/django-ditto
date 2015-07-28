@@ -5,6 +5,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from taggit.managers import TaggableManager
 
+from .managers import _BookmarkTaggableManager
 from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
 from ditto.ditto.utils import truncate_string
 
@@ -60,7 +61,7 @@ class Bookmark(DittoItemModel):
     # Up to 100 tags
     # Up to 255 chars each. No commas or whitespace.
     # Private tags start with a period.
-    tags = TaggableManager()
+    tags = TaggableManager(manager=_BookmarkTaggableManager)
 
     class Meta:
         ordering = ['-post_time']

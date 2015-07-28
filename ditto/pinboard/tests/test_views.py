@@ -144,6 +144,17 @@ class PinboardViewTests(TestCase):
         self.assertTrue('tag_list' in response.context)
         self.assertEqual(len(response.context['tag_list']), 3)
 
+    def test_tag_list_privacy(self):
+        "Doesn't display tags from private bookmarks"
+        bookmark_1 = factories.BookmarkFactory.create(is_private=True)
+        bookmark_1.tags.set('fish', 'carp')
+        bookmark_2 = factories.BookmarkFactory.create(is_private=False)
+        bookmark_2.tags.set('fish', 'cod')
+        response = self.client.get(reverse('pinboard:tag_list'))
+        self.assertEqual(len(response.context['tag_list']), 2)
+        self.assertEqual(response.context['tag_list'][0].name, 'fish')
+        self.assertEqual(response.context['tag_list'][1].name, 'cod')
+
     def test_tag_detail_templates(self):
         "Uses the correct templates"
         bookmark = factories.BookmarkFactory.create()
