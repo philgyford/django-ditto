@@ -119,7 +119,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_bookmark_detail_fails(self):
-        "Requesting a page for a non-existent bookmark ID 404s"
+        "Returns a 404 if a non-existent bookmark's page is requested"
         bookmark = factories.BookmarkFactory.create()
         response = self.client.get(reverse('bookmark_detail',
                     kwargs={'username': bookmark.account.username, 'pk':2}))
@@ -156,6 +156,20 @@ class PinboardViewTests(TestCase):
         self.assertEqual(len(response.context['bookmark_list']), 2)
         self.assertEqual(response.context['bookmark_list'][0].title, 'Cod')
         self.assertEqual(response.context['bookmark_list'][1].title, 'Carp')
+
+    def test_tag_detail_privacy(self):
+        "Does not display private bookmarks"
+        bookmark = factories.BookmarkFactory.create(is_private=True)
+        bookmark.tags.set('fish')
+        response = self.client.get(reverse('tag_detail',
+                                                    kwargs={'slug': 'fish'}))
+        self.assertEquals(response.status_code, 404)
+
+    def test_tag_detail_fails(self):
+        "Returns a 404 if a non-existent tag's page is requested"
+        response = self.client.get(reverse('tag_detail',
+                                                    kwargs={'slug': 'fish'}))
+        self.assertEquals(response.status_code, 404)
 
     def test_account_tag_detail_templates(self):
         "Uses the correct templates"
@@ -197,4 +211,31 @@ class PinboardViewTests(TestCase):
             [bookmark.pk for bookmark in response.context['bookmark_list']],
             [2,1]
         )
+
+    def test_account_tag_detail_privacy(self):
+        "Does not display private bookmarks"
+        bookmark = factories.BookmarkFactory.create(is_private=True)
+        bookmark.tags.set('fish')
+        response = self.client.get(reverse('account_tag_detail',
+            kwargs={'username': bookmark.account.username, 'tag_slug': 'fish'}))
+        self.assertEquals(response.status_code, 404)
+
+    def test_account_tag_detail_fails_1(self):
+        "Returns a 404 if a non-existent account is requested"
+        bookmark = factories.BookmarkFactory.create()
+        bookmark.tags.set('fish')
+
+        response = self.client.get(reverse('account_tag_detail',
+                    kwargs={'username': 'doesntexist', 'tag_slug': 'fish'}))
+        self.assertEquals(response.status_code, 404)
+
+    def test_account_tag_detail_fails_2(self):
+        "Returns a 404 if a non-existent tag is requested"
+        account = factories.AccountFactory.create()
+        bookmark = factories.BookmarkFactory.create(account=account)
+        bookmark.tags.set('fish')
+
+        response = self.client.get(reverse('account_tag_detail',
+                kwargs={'username': account.username, 'tag_slug': 'mammals'}))
+        self.assertEquals(response.status_code, 404)
 
