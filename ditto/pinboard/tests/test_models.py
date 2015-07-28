@@ -114,13 +114,21 @@ class PinboardBookmarkTestCase(TestCase):
     def test_tags(self):
         "Can save and recall tags"
         from taggit.models import Tag
-        bookmark_1 = factories.BookmarkFactory()
-        bookmark_1.tags.add('banana', 'cherry', 'apple')
-        bookmark_1.save()
-        bookmark_2 = Bookmark.objects.get(pk=bookmark_1.pk)
-        self.assertEqual(len(bookmark_2.tags.all()), 3)
-        self.assertIsInstance(bookmark_2.tags.first(), Tag)
-        self.assertEqual(bookmark_2.tags.first().name, 'cherry')
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('banana', 'cherry', 'apple')
+        bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
+        self.assertEqual(len(bookmark_reloaded.tags.all()), 3)
+        self.assertIsInstance(bookmark_reloaded.tags.first(), Tag)
+        self.assertEqual(bookmark_reloaded.tags.first().name, 'cherry')
+
+    def test_tags_private(self):
+        "Doesn't fetch private tags"
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('ispublic', '.isprivate', 'alsopublic')
+        bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
+        self.assertEqual(len(bookmark_reloaded.tags.all()), 2)
+        self.assertEqual(bookmark_reloaded.tags.all()[0].name, 'ispublic')
+        self.assertEqual(bookmark_reloaded.tags.all()[1].name, 'alsopublic')
 
     def test_slugs_match_tags_true(self):
         "Returns true if a list of slugs is the same to bookmark's tags"
