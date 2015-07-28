@@ -125,10 +125,29 @@ class PinboardViewTests(TestCase):
                     kwargs={'username': bookmark.account.username, 'pk':2}))
         self.assertEquals(response.status_code, 404)
 
+    def test_tag_list_templates(self):
+        "Uses the correct templates"
+        # Shouldn't need any bookmarks to exist.
+        response = self.client.get(reverse('tag_list'))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pinboard/tag_list.html')
+        self.assertTemplateUsed(response, 'pinboard/base.html')
+        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+
+    def test_tag_list_context(self):
+        "Sends the correct data to templates"
+        bookmark_1 = factories.BookmarkFactory.create()
+        bookmark_1.tags.set('fish', 'carp')
+        bookmark_2 = factories.BookmarkFactory.create()
+        bookmark_2.tags.set('fish', 'cod')
+        response = self.client.get(reverse('tag_list'))
+        self.assertTrue('tag_list' in response.context)
+        self.assertEqual(len(response.context['tag_list']), 3)
+
     def test_tag_detail_templates(self):
         "Uses the correct templates"
         bookmark = factories.BookmarkFactory.create()
-        bookmark.tags.set('fish', 'carp')
+        bookmark.tags.set('fish')
         response = self.client.get(reverse('tag_detail',
                                                     kwargs={'slug': 'fish'}))
         self.assertEquals(response.status_code, 200)

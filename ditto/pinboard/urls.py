@@ -10,7 +10,12 @@ urlpatterns = patterns("",
         name='pinboard'
     ),
     url(
-        regex=r"^tag/(?P<slug>\w+)$",
+        regex=r"^tags$",
+        view=views.TagList.as_view(),
+        name='tag_list'
+    ),
+    url(
+        regex=r"^tag/(?P<slug>[-_\w]+)$",
         view=views.TagDetail.as_view(),
         name='tag_detail'
     ),
@@ -20,7 +25,7 @@ urlpatterns = patterns("",
         name='account_detail'
     ),
     url(
-        regex=r"^(?P<username>\w+)/tag/(?P<tag_slug>\w+)$",
+        regex=r"^(?P<username>\w+)/tag/(?P<tag_slug>[-_\w]+)$",
         view=views.AccountTagDetail.as_view(),
         name='account_tag_detail'
     ),

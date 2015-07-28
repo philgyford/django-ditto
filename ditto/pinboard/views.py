@@ -54,6 +54,13 @@ class BookmarkDetail(DetailView):
     queryset = Bookmark.public_objects.all()
 
 
+class TagList(ListView):
+    template_name = 'pinboard/tag_list.html'
+
+    def get_queryset(self):
+        return Bookmark.tags.most_common()
+
+
 class TagDetail(SingleObjectMixin, ListView):
     "All Bookmarks with a certain tag from all Accounts"
     template_name = 'pinboard/tag_detail.html'
