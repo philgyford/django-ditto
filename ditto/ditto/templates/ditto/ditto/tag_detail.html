@@ -4,11 +4,11 @@
 
 {% block content %}
 
-	{% if bookmark_list|length %}
-		<h2>Pinboard Bookmarks</h2>
-		
-		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=False only %}
-	{% endif %}
+    {% if bookmark_list|length %}
+        <h2>Pinboard Bookmarks</h2>
+
+        {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=False only %}
+    {% endif %}
 
 {% endblock content %}
 

@@ -3,34 +3,34 @@
 Expects:
  * bookmark, a Bookmark object.
  * detail, boolean - True if this we're showing a single bookmark, False if
-						this bookmark is in a list.
+                        this bookmark is in a list.
 
 {% endcomment %}
 
 
 {% if detail %}
-	<h2>{{ bookmark.title }}</h2>
+    <h2>{{ bookmark.title }}</h2>
 {% else %}
-	<h2 class="h4 media-heading"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
+    <h2 class="h4 media-heading"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
 {% endif %}
 
 {% if bookmark.description %}
-	<p>{{ bookmark.description }}</p>
+    <p>{{ bookmark.description }}</p>
 {% endif %}
 
 {% if bookmark.tags.all|length %}
-	<ul class="list-inline">
-		{% for tag in bookmark.tags.all %}
-			<li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
-		{% endfor %}
-	</ul>
+    <ul class="list-inline">
+        {% for tag in bookmark.tags.all %}
+            <li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
+        {% endfor %}
+    </ul>
 {% endif %}
 
 <p class="text-muted">
-	By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
-	on <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
-	{% if not detail %}
-		<a href="{{ bookmark.get_absolute_url }}">#</a>
-	{% endif %}
+    By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
+    on <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
+    {% if not detail %}
+        <a href="{{ bookmark.get_absolute_url }}">#</a>
+    {% endif %}
 </p>
 
