@@ -2,12 +2,12 @@
 
 Expects:
  * bookmark_list, a queryset of Bookmarks.
- * page_obj, a DiggPaginator instance.
+ * page_obj, a DiggPaginator instance or False.
 
 {% endcomment %}
 
-{% if page_obj.paginator.count > 0 %}
-	{% if page_obj.number > 1 %}
+{% if page_obj == False or page_obj.paginator.count > 0 %}
+	{% if page_obj and page_obj.number > 1 %}
 		{% include 'ditto/ditto/includes/pagination.html' with page_obj=page_obj only %}
 	{% endif %}
 
@@ -21,6 +21,8 @@ Expects:
 		{% endfor %}
 	</ul>
 
-	{% include 'ditto/ditto/includes/pagination.html' with page_obj=page_obj only %}
+	{% if page_obj %}
+		{% include 'ditto/ditto/includes/pagination.html' with page_obj=page_obj only %}
+	{% endif %}
 {% endif %}
 
