@@ -2,13 +2,13 @@
 
 {% block content %}
 
-	{% if pinboard_bookmark_list|length > 0%}
-		<h2>Pinboard bookmarks</h2>
+    {% if pinboard_bookmark_list|length > 0%}
+        <h2>Pinboard bookmarks</h2>
 
-		{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=pinboard_bookmark_list page_obj=False only %}
+        {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=pinboard_bookmark_list page_obj=False only %}
 
-		<p><a href="{% url 'pinboard:index' %}">More Pinboard bookmarks</a></p>
-	{% endif %}
+        <p><a href="{% url 'pinboard:index' %}">More Pinboard bookmarks</a></p>
+    {% endif %}
 
 {% endblock %}
 

@@ -5,15 +5,15 @@
 
 {% block content %}
 
-	{% if tag_list|length == 0 %}
-		<p>There are no tags in use.</p>
-	{% else %}
-		<ul>
-			{% for tag in tag_list %}
-			<li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a> ({{ tag.num_times }})</li>
-			{% endfor %}
-		</ul>
-	{% endif %}
+    {% if tag_list|length == 0 %}
+        <p>There are no tags in use.</p>
+    {% else %}
+        <ul>
+            {% for tag in tag_list %}
+            <li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a> ({{ tag.num_times }})</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 {% endblock content %}
 

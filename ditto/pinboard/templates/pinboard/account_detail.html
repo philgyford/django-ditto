@@ -6,14 +6,14 @@
 
 {% block content %}
 
-	<div class="panel panel-default">
-		<div class="panel-body">
-			{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
-			<a href="{{ account.url }}">View {{ account.username }} on Pinboard</a>
-		</div>
-	</div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
+            <a href="{{ account.url }}">View {{ account.username }} on Pinboard</a>
+        </div>
+    </div>
 
-	{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
 
 {% endblock content %}
 

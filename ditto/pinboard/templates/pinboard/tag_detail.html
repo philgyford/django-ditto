@@ -6,29 +6,29 @@
 
 {% block content %}
 
-	<div class="panel panel-default">
-		<div class="panel-body">
-			{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
-			{% if account_list|length == 1 %}
-				by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a> (“<a href="{% url 'pinboard:account_tag_detail' username=account_list.0.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
-			{% else %}
-				by {{ account_list|length }} user{{ account_list|length|pluralize }}:
-			{% endif %}
-		</div>
-	
-		{% if account_list|length > 1 %}
-			<ul class="list-group">
-				{% for account in account_list %}
-					<li class="list-group-item">
-						<a href="{{ account.get_absolute_url }}">{{ account.username }}</a>
-						(“<a href="{% url 'pinboard:account_tag_detail' username=account.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
-					</li>
-				{% endfor %}
-			</ul>
-		{% endif %}
-	</div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+            {% if account_list|length == 1 %}
+                by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a> (“<a href="{% url 'pinboard:account_tag_detail' username=account_list.0.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
+            {% else %}
+                by {{ account_list|length }} user{{ account_list|length|pluralize }}:
+            {% endif %}
+        </div>
+    
+        {% if account_list|length > 1 %}
+            <ul class="list-group">
+                {% for account in account_list %}
+                    <li class="list-group-item">
+                        <a href="{{ account.get_absolute_url }}">{{ account.username }}</a>
+                        (“<a href="{% url 'pinboard:account_tag_detail' username=account.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 
-	{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
 
 {% endblock content %}
 
