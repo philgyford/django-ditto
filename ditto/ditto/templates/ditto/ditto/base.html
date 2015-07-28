@@ -19,12 +19,12 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="{% url 'ditto' %}">Ditto</a>
+					<a class="navbar-brand" href="{% url 'ditto:index' %}">Ditto</a>
 				</div>
 
 				<div class="collapse navbar-collapse" id="ditto-navbar">
 					<ul class="nav navbar-nav">
-						<li class="{% block pinboard_nav_active %}{% endblock %}"><a href="{% url 'pinboard' %}">Pinboard</a></li>
+						<li class="{% block pinboard_nav_active %}{% endblock %}"><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
 					</ul>
 				</div>
 			</div>

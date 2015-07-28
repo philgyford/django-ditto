@@ -10,7 +10,7 @@
 	{% else %}
 		<ul>
 			{% for tag in tag_list %}
-			<li><a href="{% url 'tag_detail' slug=tag.slug %}">{{ tag.name }}</a> ({{ tag.num_times }})</li>
+			<li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a> ({{ tag.num_times }})</li>
 			{% endfor %}
 		</ul>
 	{% endif %}

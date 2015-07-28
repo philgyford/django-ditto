@@ -1,12 +1,14 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from . import views
 
-urlpatterns = patterns("",
+app_name = 'ditto'
+
+urlpatterns = [
     url(
         regex=r"^$",
         view=views.Home.as_view(),
-        name='ditto'
+        name='index'
     ),
-)
+]
 

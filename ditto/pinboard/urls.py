@@ -1,13 +1,12 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from . import views
 
-
-urlpatterns = patterns("",
+urlpatterns = [
     url(
         regex=r"^$",
         view=views.Home.as_view(),
-        name='pinboard'
+        name='index'
     ),
     url(
         regex=r"^tags$",
@@ -34,5 +33,5 @@ urlpatterns = patterns("",
         view=views.BookmarkDetail.as_view(),
         name='bookmark_detail'
     ),
-)
+]
 

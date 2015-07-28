@@ -21,7 +21,7 @@ Expects:
 {% if bookmark.tags.all|length %}
 	<ul class="list-inline">
 		{% for tag in bookmark.tags.all %}
-			<li><a href="{% url 'tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
+			<li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
 		{% endfor %}
 	</ul>
 {% endif %}

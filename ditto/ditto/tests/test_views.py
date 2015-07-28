@@ -8,7 +8,7 @@ class DittoViewTests(TestCase):
 
     def test_home_templates(self):
         """Overall home page uses the correct templates"""
-        response = self.client.get(reverse('ditto'))
+        response = self.client.get(reverse('ditto:index'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/ditto/base.html')
@@ -24,7 +24,7 @@ class DittoViewTests(TestCase):
                                             account=pinboard_accounts[1],
                                             title='Private bookmark',
                                             is_private=True)
-        response = self.client.get(reverse('ditto'))
+        response = self.client.get(reverse('ditto:index'))
 
         self.assertTrue('pinboard_bookmark_list' in response.context)
         # It shows 10 of all the bookmarks:
@@ -38,7 +38,7 @@ class DittoViewTests(TestCase):
         """Overall home page does not display private Bookmarks etc"""
         public_bookmark = pinboardfactories.BookmarkFactory(is_private=False)
         private_bookmark = pinboardfactories.BookmarkFactory(is_private=True)
-        response = self.client.get(reverse('ditto'))
+        response = self.client.get(reverse('ditto:index'))
 
         self.assertEqual(len(response.context['pinboard_bookmark_list']), 1)
         self.assertTrue(response.context['pinboard_bookmark_list'][0].pk,

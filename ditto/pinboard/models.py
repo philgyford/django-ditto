@@ -34,7 +34,7 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
-        return reverse('account_detail', kwargs={'username': self.username})
+        return reverse('pinboard:account_detail', kwargs={'username': self.username})
 
 
 class Bookmark(DittoItemModel):
@@ -72,7 +72,7 @@ class Bookmark(DittoItemModel):
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
-        return reverse('bookmark_detail',
+        return reverse('pinboard:bookmark_detail',
                     kwargs={'username': self.account.username, 'pk': self.id})
 
     def slugs_match_tags(self, slugs):
