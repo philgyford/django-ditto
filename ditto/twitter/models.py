@@ -13,7 +13,8 @@ class Account(TimeStampedModelMixin, models.Model):
     """
 
     screen_name = models.CharField(null=False, blank=True, max_length=20,
-            help_text="eg 'philgyford'")
+            unique=True,
+            help_text="eg, 'philgyford'")
     consumer_key = models.CharField(null=False, blank=True, max_length=255,
             help_text="(API Key)")
     consumer_secret = models.CharField(null=False, blank=True, max_length=255,
