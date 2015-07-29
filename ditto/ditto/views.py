@@ -6,7 +6,7 @@ from ..pinboard.models import Bookmark
 
 
 class Home(TemplateView):
-    template_name = "ditto/ditto/index.html"
+    template_name = 'ditto/index.html'
 
     def get_context_data(self, **kwargs):
         context = super(Home, self).get_context_data(**kwargs)
@@ -16,7 +16,7 @@ class Home(TemplateView):
 
 class TagDetail(DetailView):
     "All items with a certain tag"
-    template_name = 'ditto/ditto/tag_detail.html'
+    template_name = 'ditto/tag_detail.html'
     model = Tag
 
     def get_context_data(self, **kwargs):

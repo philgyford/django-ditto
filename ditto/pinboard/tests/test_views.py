@@ -12,7 +12,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/bookmark_list.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_home_context(self):
         "The Pinboard home page sends the correct data to templates"
@@ -54,7 +54,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/account_detail.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_account_detail_context(self):
         "Sends the correct data to templates"
@@ -143,7 +143,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/tag_list.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_tag_list_context(self):
         "Sends the correct data to templates"
@@ -232,7 +232,7 @@ class PinboardViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/account_tag_detail.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_account_tag_detail_context(self):
         "Sends the correct data to templates"

@@ -10,8 +10,8 @@ class DittoViewTests(TestCase):
         "Overall home page uses the correct templates"
         response = self.client.get(reverse('ditto:index'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'ditto/ditto/index.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/index.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_home_context(self):
         "Overall home page sends correct data to templates"
@@ -51,8 +51,8 @@ class DittoViewTests(TestCase):
         response = self.client.get(reverse('ditto:tag_detail',
                                                     kwargs={'slug': 'fish'}))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'ditto/ditto/tag_detail.html')
-        self.assertTemplateUsed(response, 'ditto/ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/tag_detail.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_tag_detail_context(self):
         "Sends correct data to templates"
