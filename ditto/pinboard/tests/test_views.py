@@ -10,7 +10,7 @@ class PinboardViewTests(TestCase):
         "The Pinboard home page uses the correct templates"
         response = self.client.get(reverse('pinboard:index'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pinboard/bookmark_list.html')
+        self.assertTemplateUsed(response, 'pinboard/index.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 

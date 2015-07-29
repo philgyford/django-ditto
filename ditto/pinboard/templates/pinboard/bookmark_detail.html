@@ -1,7 +1,13 @@
 {% extends 'pinboard/base.html' %}
 
-{% block content %}
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
+    <li><a href="{% url 'pinboard:account_detail' username=bookmark.account.username %}">{{ bookmark.account.username }}</a></li>
+    <li class="active">Bookmark</li>
+{% endblock %}
 
+{% block content %}
     <h1>{% block title %}Pinboard Bookmark{% endblock %}</h1>
 
     {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True only %}

@@ -1,7 +1,11 @@
 {% extends 'pinboard/base.html' %}
 {% load l10n %}
 
-{% block body_title %}Pinboard bookmarks by {{ account.username }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
+    <li class="active">{{ account.username }}</li>
+{% endblock %}
 
 {% block content %}
     <h1>{% block title %}Pinboard bookmarks by {{ account.username }}{% endblock %}</h1>

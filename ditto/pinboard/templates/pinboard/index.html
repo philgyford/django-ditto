@@ -1,8 +1,12 @@
 {% extends 'pinboard/base.html' %}
 {% load l10n %}
 
-{% block content %}
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li class="active">Pinboard</li>
+{% endblock %}
 
+{% block content %}
     <h1>{% block title %}Pinboard bookmarks{% endblock %}</h1>
 
     <div class="panel panel-default">

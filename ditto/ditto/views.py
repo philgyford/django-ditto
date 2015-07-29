@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from taggit.models import Tag
 
@@ -14,6 +14,13 @@ class Home(TemplateView):
         if apps.is_installed('ditto.pinboard'):
             context['pinboard_bookmark_list'] = Bookmark.public_objects.all()[:5]
         return context
+
+
+class TagList(ListView):
+    template_name = 'ditto/tag_list.html'
+
+    def get_queryset(self):
+        return Bookmark.tags.most_common()
 
 
 class TagDetail(DetailView):

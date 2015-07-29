@@ -1,7 +1,12 @@
 {% extends 'pinboard/base.html' %}
 
-{% block content %}
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
+    <li class="active">Tags</li>
+{% endblock %}
 
+{% block content %}
     <h1>{% block title %}The most common Pinboard tags{% endblock %}</h1>
 
     {% if tag_list|length == 0 %}

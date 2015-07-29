@@ -2,3 +2,8 @@
 
 {% block pinboard_nav_active %}active{% endblock %}
 
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li class="active"><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
+{% endblock %}
+

@@ -1,5 +1,11 @@
 {% extends 'ditto/base.html' %}
 
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'ditto:tag_list' %}">Tags</a></li>
+    <li class="active">{{ tag.name }}</li>
+{% endblock %}
+
 {% block content %}
     <h1>{% block title %}Things tagged with “{{ tag.name }}”{% endblock %}</h1>
 

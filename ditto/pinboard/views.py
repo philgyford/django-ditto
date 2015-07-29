@@ -11,6 +11,7 @@ from .models import Account, Bookmark
 
 class Home(ListView):
     "List all recent Bookmarks and all Accounts"
+    template_name = 'pinboard/index.html'
     model = Bookmark
     queryset = Bookmark.public_objects.all()
     paginator_class = DiggPaginator
