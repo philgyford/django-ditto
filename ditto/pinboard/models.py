@@ -46,7 +46,9 @@ class Bookmark(DittoItemModel):
                                                 validators=[URLValidator()])
 
     # `time` in the Pinboard API:
-    post_time = models.DateTimeField(null=False, blank=False)
+    # Not required just in case the user adds a new bookmark in Django admin.
+    post_time = models.DateTimeField(null=True, blank=True,
+            help_text="The time this was created on Pinboard.")
 
     # `extended` in the Pinboard API:
     description = models.TextField(null=False, blank=True,
