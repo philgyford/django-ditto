@@ -14,6 +14,7 @@ setup(
     install_requires=[
         'django-taggit',
         'pytz',
+        'twython',
     ],
     tests_require=[
         'factoryboy',

@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'taggit',
     'ditto.ditto',
     'ditto.pinboard',
+    'ditto.twitter',
 )
 
 MIDDLEWARE_CLASSES = (
