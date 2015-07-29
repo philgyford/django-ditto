@@ -1,10 +1,9 @@
 {% extends 'pinboard/base.html' %}
 {% load l10n %}
 
-{% block head_title %}Pinboard{% endblock %}
-{% block body_title %}Pinboard bookmarks{% endblock %}
-
 {% block content %}
+
+    <h1>{% block title %}Pinboard bookmarks{% endblock %}</h1>
 
     <div class="panel panel-default">
         <div class="panel-body">
@@ -28,6 +27,6 @@
     </div>
 
     {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
-    
+
 {% endblock content %}
 

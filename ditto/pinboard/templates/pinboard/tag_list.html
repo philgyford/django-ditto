@@ -1,9 +1,8 @@
 {% extends 'pinboard/base.html' %}
 
-{% block head_title %}Pinboard{% endblock %}
-{% block body_title %}The most used Pinboard tags{% endblock %}
-
 {% block content %}
+
+    <h1>{% block title %}The most common Pinboard tags{% endblock %}</h1>
 
     {% if tag_list|length == 0 %}
         <p>There are no tags in use.</p>

@@ -1,10 +1,10 @@
 {% extends 'pinboard/base.html' %}
 {% load l10n %}
 
-{% block head_title %}Pinboard{% endblock %}
 {% block body_title %}Pinboard bookmarks by {{ account.username }}{% endblock %}
 
 {% block content %}
+    <h1>{% block title %}Pinboard bookmarks by {{ account.username }}{% endblock %}</h1>
 
     <div class="panel panel-default">
         <div class="panel-body">

@@ -1,9 +1,8 @@
 {% extends 'pinboard/base.html' %}
 
-{% block head_title %}Pinboard{% endblock %}
-{% block body_title %}Pinboard Bookmark{% endblock %}
-
 {% block content %}
+
+    <h1>{% block title %}Pinboard Bookmark{% endblock %}</h1>
 
     {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True only %}
 

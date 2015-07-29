@@ -1,10 +1,9 @@
 {% extends 'pinboard/base.html' %}
 {% load l10n %}
 
-{% block head_title %}Pinboard{% endblock %}
-{% block body_title %}Bookmarks tagged with “{{ tag.name}}”{% endblock %}
-
 {% block content %}
+
+    <h1>{% block title %}Bookmarks tagged with “{{ tag.name}}”{% endblock %}</h1>
 
     <div class="panel panel-default">
         <div class="panel-body">
@@ -15,7 +14,7 @@
                 by {{ account_list|length }} user{{ account_list|length|pluralize }}:
             {% endif %}
         </div>
-    
+
         {% if account_list|length > 1 %}
             <ul class="list-group">
                 {% for account in account_list %}

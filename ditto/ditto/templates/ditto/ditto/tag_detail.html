@@ -1,8 +1,7 @@
 {% extends 'ditto/ditto/base.html' %}
 
-{% block body_title %}Things tagged with “{{ tag.name}}”{% endblock %}
-
 {% block content %}
+    <h1>{% block title %}Things tagged with “{{ tag.name }}”{% endblock %}</h1>
 
     {% if bookmark_list|length %}
         <h2>Pinboard Bookmarks</h2>

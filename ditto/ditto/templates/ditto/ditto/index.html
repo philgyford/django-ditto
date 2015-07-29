@@ -1,6 +1,9 @@
 {% extends "ditto/ditto/base.html" %}
 
+{% block head_title %}Ditto{% endblock %}
+
 {% block content %}
+    <h1>Ditto</h1>
 
     {% if pinboard_bookmark_list|length > 0%}
         <h2>Pinboard bookmarks</h2>
