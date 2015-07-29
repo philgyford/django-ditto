@@ -1,0 +1,14 @@
+{% extends 'ditto/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li class="active">Tags</li>
+{% endblock %}
+
+{% block content %}
+    <h1>{% block title %}Tags{% endblock %}</h1>
+
+    <p>This page left intentionally blank for now.</p>
+
+{% endblock content %}
+

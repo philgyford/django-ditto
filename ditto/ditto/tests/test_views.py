@@ -57,6 +57,13 @@ class DittoViewTests(TestCase):
             response = self.client.get(reverse('ditto:index'))
             self.assertFalse('pinboard_bookmark_list' in response.context)
 
+    def test_tag_list_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('ditto:tag_list'))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'ditto/tag_list.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
     def test_tag_detail_templates(self):
         "Uses the correct templates"
         bookmark = pinboardfactories.BookmarkFactory.create()

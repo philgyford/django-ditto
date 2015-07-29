@@ -16,11 +16,9 @@ class Home(TemplateView):
         return context
 
 
-class TagList(ListView):
+class TagList(TemplateView):
+    "Doesn't really do anything at the moment."
     template_name = 'ditto/tag_list.html'
-
-    def get_queryset(self):
-        return Bookmark.tags.most_common()
 
 
 class TagDetail(DetailView):
