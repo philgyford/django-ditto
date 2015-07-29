@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.views.generic import DetailView, TemplateView
 
 from taggit.models import Tag
@@ -10,7 +11,8 @@ class Home(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(Home, self).get_context_data(**kwargs)
-        context['pinboard_bookmark_list'] = Bookmark.public_objects.all()[:5]
+        if apps.is_installed('ditto.pinboard'):
+            context['pinboard_bookmark_list'] = Bookmark.public_objects.all()[:5]
         return context
 
 

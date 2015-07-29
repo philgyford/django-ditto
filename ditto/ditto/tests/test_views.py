@@ -1,3 +1,5 @@
+from mock import patch
+
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
@@ -43,6 +45,17 @@ class DittoViewTests(TestCase):
         self.assertEqual(len(response.context['pinboard_bookmark_list']), 1)
         self.assertTrue(response.context['pinboard_bookmark_list'][0].pk,
                                                             public_bookmark.pk)
+
+    def test_home_no_pinboard(self):
+        """Shouldn't try to get pinboard bookmarks if pinboard app isn't
+        installed
+        """
+        from django.apps import apps
+        with patch.object(apps, 'is_installed') as mock_method:
+            # Fake it so it looks like ditto.pinboard isn't installed:
+            mock_method.side_effect = lambda x: {'ditto.pinboard': False}[x]
+            response = self.client.get(reverse('ditto:index'))
+            self.assertFalse('pinboard_bookmark_list' in response.context)
 
     def test_tag_detail_templates(self):
         "Uses the correct templates"
