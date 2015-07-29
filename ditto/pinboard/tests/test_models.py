@@ -16,11 +16,6 @@ class PinboardAccountTestCase(TestCase):
         account = factories.AccountFactory(username='bill')
         self.assertEqual(account.__str__(), 'bill')
 
-    def test_service_name(self):
-        """The service name is correct"""
-        account = factories.AccountFactory()
-        self.assertEqual(account.service_name, 'Pinboard')
-
     def test_unique_username(self):
         """Ensures that usernames are unique"""
         account_1 = factories.AccountFactory(username='billy')

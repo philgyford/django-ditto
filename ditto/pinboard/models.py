@@ -29,10 +29,6 @@ class Account(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['username']
 
-    @property
-    def service_name(self):
-      return "Pinboard"
-
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         return reverse('pinboard:account_detail', kwargs={'username': self.username})
