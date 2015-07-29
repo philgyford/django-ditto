@@ -259,7 +259,7 @@ class DiggPaginator(ExPaginator):
 
         # make the result of our calculations available as custom ranges
         # on the ``Page`` instance.
-        page.main_range = list(range(main_range[0], main_range[1]+2))
+        page.main_range = list(range(main_range[0], main_range[1]+1))
         page.leading_range = leading
         page.trailing_range = trailing
         page.page_range = reduce(lambda x, y: x+((x and y) and [False])+y,

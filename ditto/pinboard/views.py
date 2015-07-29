@@ -79,6 +79,7 @@ class TagDetail(SingleObjectMixin, ListView):
         context['tag'] = self.object
         context['account_list'] = Account.objects.all()
         context['bookmark_list'] = context['object_list']
+        print context['paginator']
         return context
 
     def get_queryset(self):
