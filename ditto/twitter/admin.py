@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from .models import Account
+from .models import Account, Tweet, User
 
 
 @admin.register(Account)
@@ -10,7 +10,7 @@ class AccountAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('screen_name',)
+            'fields': ('screen_name', 'user',)
         }),
         ('API', {
             'fields': ('consumer_key', 'consumer_secret', 'access_token', 'access_token_secret',),
@@ -22,3 +22,7 @@ class AccountAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('time_created', 'time_modified',)
 
+
+admin.site.register(User)
+
+admin.site.register(Tweet)

@@ -73,7 +73,7 @@ class DiffModelMixin(object):
 @python_2_unicode_compatible
 class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """
-    An item on whatever service we're copying.
+    A content item on whatever service we're copying.
     eg, a Tweet, a Photo, a Bookmark, etc.
 
     Should be inherited by a model in child apps.
@@ -83,13 +83,20 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     permalink = models.URLField(null=False, blank=True,
                     help_text="URL of the item on the service's website.")
     summary = models.CharField(null=False, blank=True, max_length=255,
-                help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
+        help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
     is_private = models.BooleanField(default=False, null=False, blank=False,
-                    help_text="If set, this item will not be shown on public-facing pages.")
+        help_text="If set, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
-                    help_text="The time the item's data was last fetched, and was new or changed.")
+        help_text="The time the item's data was last fetched, and was new or changed.")
+
+    # Obviously not relevant to some items, like Bookmarks.
+    latitude = models.DecimalField(null=True, blank=True,
+                                            max_digits=12, decimal_places=9)
+    longitude = models.DecimalField(null=True, blank=True,
+                                            max_digits=12, decimal_places=9)
+
     raw = models.TextField(null=False, blank=True,
-                    help_text="eg, the raw JSON from the API.")
+                                    help_text="eg, the raw JSON from the API.")
 
     # All Items (eg, used in Admin):
     objects = models.Manager()
