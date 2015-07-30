@@ -7,7 +7,6 @@ from taggit.managers import TaggableManager
 
 from .managers import _BookmarkTaggableManager
 from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
-from ditto.ditto.utils import truncate_string
 
 
 @python_2_unicode_compatible
@@ -65,14 +64,14 @@ class Bookmark(DittoItemModel):
         ordering = ['-post_time']
         unique_together = (('account', 'url'),)
 
-    def save(self, *args, **kwargs):
-        self.summary = truncate_string(self.description, strip_html=True, chars=255, truncate=u'…', at_word_boundary=True)
-        super(Bookmark, self).save(*args, **kwargs)
-
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         return reverse('pinboard:bookmark_detail',
                     kwargs={'username': self.account.username, 'pk': self.id})
+
+    def summary_source(self):
+        "The text that will be truncated to make a summary for this Bookmark"
+        return self.description
 
     def slugs_match_tags(self, slugs):
         """Does a list of slugs equal the slugs of all this Bookmark's tags?

@@ -6,11 +6,11 @@ from .models import Account, Tweet, User
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('screen_name', 'time_created', 'time_modified',)
+    list_display = ('user', 'time_created', 'time_modified',)
 
     fieldsets = (
         (None, {
-            'fields': ('screen_name', 'user',)
+            'fields': ('user',)
         }),
         ('API', {
             'fields': ('consumer_key', 'consumer_secret', 'access_token', 'access_token_secret',),

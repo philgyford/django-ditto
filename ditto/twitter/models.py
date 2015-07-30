@@ -12,9 +12,6 @@ class Account(TimeStampedModelMixin, models.Model):
     details here.
     """
 
-    screen_name = models.CharField(null=False, blank=True, max_length=20,
-            unique=True,
-            help_text="Username, eg, 'samuelpepys'")
     user = models.ForeignKey('User', blank=True, null=True,
                                                     on_delete=models.SET_NULL)
 
@@ -23,17 +20,97 @@ class Account(TimeStampedModelMixin, models.Model):
     consumer_secret = models.CharField(null=False, blank=True, max_length=255,
             help_text="(API Secret)")
     access_token = models.CharField(null=False, blank=True, max_length=255)
-    access_token_secret = models.CharField(null=False, blank=True, max_length=255)
+    access_token_secret = models.CharField(null=False, blank=True,
+                                                                max_length=255)
 
     def __str__(self):
-        return self.screen_name
+        if self.user:
+            return self.user.screen_name
+        else:
+            return '%d' % self.pk
 
     class Meta:
-        ordering = ['screen_name']
+        ordering = ['-time_created']
 
     #def get_absolute_url(self):
         #from django.core.urlresolvers import reverse
         #return reverse('twitter:account_detail', kwargs={''})
+
+
+class Tweet(DittoItemModel):
+    """We don't replicate all of the possible Tweet attributes here, only
+    enough to display the most useful things. Given we save the raw JSON
+    about this tweet, we could add more attributes in future, even if original
+    tweets are deleted on Twitter.
+
+    Also, we don't include any 'perspectival' attributes - ones that will vary
+    depending on which Account fetched this data. eg, `favorited` or
+    `current_user_retweet`.
+    """
+    user = models.ForeignKey('User')
+
+    text = models.CharField(null=False, blank=False, max_length=255)
+    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
+    twitter_id_str = models.CharField(null=False, blank=False, unique=True,
+                                                                max_length=20)
+    created_at = models.DateTimeField(null=False, blank=False,
+            help_text="UTC time when this Tweet was created on Twitter")
+    favorite_count = models.PositiveIntegerField(null=False, blank=False,
+            default=0,
+            help_text="Approximately how many times this has been favorited")
+    retweet_count = models.PositiveIntegerField(null=False, blank=False,
+            default=0,
+            help_text="Number of times this has been retweeted")
+
+    in_reply_to_screen_name = models.CharField(null=False, blank=True,
+        max_length=20,
+        help_text="Screen name of the original Tweet's author, if this is a reply")
+    in_reply_to_status_id = models.BigIntegerField(null=True, blank=True,
+            help_text="The ID of the Tweet replied to, if any")
+    in_reply_to_status_id_str = models.CharField(null=False, blank=True,
+                                                                max_length=20)
+    in_reply_to_user_id = models.BigIntegerField(null=True, blank=True,
+            help_text="ID of the original Tweet's author, if this is a reply")
+    in_reply_to_user_id_str = models.CharField(null=False, blank=True,
+                                                                max_length=20)
+
+    language = models.CharField(null=False, blank=False, default='und',
+        max_length=20,
+        help_text="A BCP 47 language identifier, or 'und' if it couldn't be detected")
+
+    # Just enough of the place data to display something readable and useful:
+    place_attribute_street_address = models.CharField(null=False, blank=True,
+                                                                max_length=255)
+    place_full_name = models.CharField(null=False, blank=True, max_length=255)
+    place_country = models.CharField(null=False, blank=True, max_length=255)
+
+    quoted_status_id = models.BigIntegerField(null=True, blank=True,
+            help_text="The ID of the Tweet quoted, if any")
+    quoted_status_id_str = models.CharField(null=False, blank=True,
+                                                                max_length=20)
+
+    source = models.CharField(null=False, blank=True, max_length=255,
+                                help_text="Utility used to post the Tweet")
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        "Privacy depends on the user, so ensure it's set correctly"
+        self.is_private = self.user.is_private
+        super(Tweet, self).save(*args, **kwargs)
+
+    #def get_absolute_url(self):
+        #from django.core.urlresolvers import reverse
+        #return reverse('pinboard:bookmark_detail',
+                    #kwargs={'username': self.account.username, 'pk': self.id})
+
+    def summary_source(self):
+        "The text that will be truncated to make a summary for this Tweet"
+        return self.text
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -95,6 +172,14 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     class Meta:
         ordering = ['screen_name']
 
+    def save(self, *args, **kwargs):
+        """If the user's privacy status has changed, we need to change the
+        privacy of all their tweets
+        """
+        if self.get_field_diff('is_private') is not None:
+            Tweet.objects.filter(user=self).update(is_private=self.is_private)
+        super(User, self).save(*args, **kwargs)
+
     @property
     def permalink(self):
         return 'https://twitter.com/%s' % self.screen_name
@@ -102,65 +187,4 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     #def get_absolute_url(self):
         #from django.core.urlresolvers import reverse
         #return reverse('twitter:account_detail', kwargs={''})
-
-class Tweet(DittoItemModel):
-    """We don't replicate all of the possible Tweet attributes here, only
-    enough to display the most useful things. Given we save the raw JSON
-    about this tweet, we could add more attributes in future, even if original
-    tweets are deleted on Twitter.
-
-    Also, we don't include any 'perspectival' attributes - ones that will vary
-    depending on which Account fetched this data. eg, `favorited` or
-    `current_user_retweet`.
-    """
-    user = models.ForeignKey('User')
-
-    text = models.CharField(null=False, blank=False, max_length=255)
-    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    twitter_id_str = models.CharField(null=False, blank=False, unique=True,
-                                                                max_length=20)
-    created_at = models.DateTimeField(null=False, blank=False,
-            help_text="UTC time when this Tweet was created on Twitter")
-    favorite_count = models.PositiveIntegerField(null=False, blank=False,
-            help_text="Approximately how many times this has been favorited")
-    retweet_count = models.PositiveIntegerField(null=False, blank=False,
-            help_text="Number of times this has been retweeted")
-
-    in_reply_to_screen_name = models.CharField(null=False, blank=True,
-        max_length=20,
-        help_text="Screen name of the original Tweet's author, if this is a reply")
-    in_reply_to_status_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The ID of the Tweet replied to, if any")
-    in_reply_to_status_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
-    in_reply_to_user_id = models.BigIntegerField(null=True, blank=True,
-            help_text="ID of the original Tweet's author, if this is a reply")
-    in_reply_to_user_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
-
-    language = models.CharField(null=False, blank=False, default='und',
-        max_length=20,
-        help_text="A BCP 47 language identifier, or 'und' if it couldn't be detected")
-
-    # Just enough of the place data to display something readable and useful:
-    place_attribute_street_address = models.CharField(null=False, blank=True,
-                                                                max_length=255)
-    place_full_name = models.CharField(null=False, blank=True, max_length=255)
-    place_country = models.CharField(null=False, blank=True, max_length=255)
-
-    quoted_status_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The ID of the Tweet quoted, if any")
-    quoted_status_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
-
-    source = models.CharField(null=False, blank=True, max_length=255,
-                                help_text="Utility used to post the Tweet")
-
-    class Meta:
-        ordering = ['-created_at']
-
-    #def get_absolute_url(self):
-        #from django.core.urlresolvers import reverse
-        #return reverse('pinboard:bookmark_detail',
-                    #kwargs={'username': self.account.username, 'pk': self.id})
 
