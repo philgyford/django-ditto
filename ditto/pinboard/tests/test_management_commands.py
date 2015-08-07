@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.utils.six import StringIO
 
 
-class FetchPinboardTestCase(TestCase):
+class FetchPinboardArgs(TestCase):
 
     def test_fail_with_no_args(self):
         """Fails when no arguments are provided"""
@@ -81,6 +81,8 @@ class FetchPinboardTestCase(TestCase):
                                                             stdout=StringIO())
         fetch_method.assert_called_once_with(url=url, username='philgyford')
 
+
+class FetchPinboardOutput(TestCase):
 
     @patch('ditto.pinboard.fetch.FetchBookmarks.fetch_all')
     def test_success_output(self, fetch_method):
