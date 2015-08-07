@@ -51,28 +51,23 @@ class Tweet(DittoItemModel):
 
     text = models.CharField(null=False, blank=False, max_length=255)
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    twitter_id_str = models.CharField(null=False, blank=False, unique=True,
-                                                                max_length=20)
+
     created_at = models.DateTimeField(null=False, blank=False,
-            help_text="UTC time when this Tweet was created on Twitter")
+        help_text="UTC time when this Tweet was created on Twitter")
     favorite_count = models.PositiveIntegerField(null=False, blank=False,
-            default=0,
-            help_text="Approximately how many times this has been favorited")
+        default=0,
+        help_text="Approximately how many times this had been favorited when fetched")
     retweet_count = models.PositiveIntegerField(null=False, blank=False,
-            default=0,
-            help_text="Number of times this has been retweeted")
+        default=0,
+        help_text="Number of times this had been retweeted when fetched")
 
     in_reply_to_screen_name = models.CharField(null=False, blank=True,
         max_length=20,
         help_text="Screen name of the original Tweet's author, if this is a reply")
     in_reply_to_status_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The ID of the Tweet replied to, if any")
-    in_reply_to_status_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
+        help_text="The ID of the Tweet replied to, if any")
     in_reply_to_user_id = models.BigIntegerField(null=True, blank=True,
-            help_text="ID of the original Tweet's author, if this is a reply")
-    in_reply_to_user_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
+        help_text="ID of the original Tweet's author, if this is a reply")
 
     language = models.CharField(null=False, blank=False, default='und',
         max_length=20,
@@ -85,9 +80,7 @@ class Tweet(DittoItemModel):
     place_country = models.CharField(null=False, blank=True, max_length=255)
 
     quoted_status_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The ID of the Tweet quoted, if any")
-    quoted_status_id_str = models.CharField(null=False, blank=True,
-                                                                max_length=20)
+        help_text="The ID of the Tweet quoted, if any")
 
     source = models.CharField(null=False, blank=True, max_length=255,
                                 help_text="Utility used to post the Tweet")
@@ -120,8 +113,6 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """
 
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    twitter_id_str = models.CharField(null=False, blank=False, unique=True,
-                                                                max_length=20)
     screen_name = models.CharField(null=False, blank=False, max_length=20,
         help_text="Username, eg, 'samuelpepys'")
     name = models.CharField(null=False, blank=False, max_length=30,
