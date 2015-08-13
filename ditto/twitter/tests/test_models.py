@@ -1,15 +1,47 @@
 # coding: utf-8
 import datetime
+import json
+
 import pytz
+import responses
 
 from django.db import IntegrityError
 from django.test import TestCase
 
 from .. import factories
+from ..managers import UserManager
 from ..models import Account, Tweet, User
 
 
 class TwitterAccountTestCase(TestCase):
+
+    api_url = 'https://api.twitter.com/1.1'
+
+    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+
+    def make_verify_credentials_body(self):
+        "Makes the JSON response to a call to verify_credentials"
+        json_file = open(self.api_fixture)
+        json_data = json_file.read()
+        json_file.close()
+        return json_data
+
+    def add_response(self, body, call, status=200):
+        """Add a Twitter API response.
+
+        Keyword arguments:
+        body -- The JSON string representing the body of the response.
+        call -- String, appended to self.api_url, eg
+                    'account/verfiy_credentials'.
+        """
+        responses.add(
+            responses.GET,
+            '%s/%s.json' % (self.api_url, call),
+            status=status,
+            match_querystring=False,
+            body=body,
+            content_type='application/json; charset=utf-8'
+        )
 
     def test_str_1(self):
         "Has the correct string represntation when it has no user"
@@ -28,6 +60,78 @@ class TwitterAccountTestCase(TestCase):
         account_2 = factories.AccountFactory()
         accounts = Account.objects.all()
         self.assertEqual(accounts[0].pk, account_2.pk)
+
+    @responses.activate
+    def test_creates_user(self):
+        "Should fetch user from API on save if it has no user"
+        self.add_response(body=self.make_verify_credentials_body(),
+                            call='account/verify_credentials')
+        account = factories.AccountWithCredentialsFactory(user=None)
+        self.assertIsInstance(account.user, User)
+        self.assertEqual(account.user.screen_name, 'philgyford')
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(
+                '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
+                responses.calls[0].request.url)
+
+    @responses.activate
+    def test_updates_user(self):
+        "Should fetch user from API on save if it already has a user"
+        self.add_response(body=self.make_verify_credentials_body(),
+                            call='account/verify_credentials')
+        user = factories.UserFactory(twitter_id=12552, screen_name='oldname')
+        account = factories.AccountWithCredentialsFactory(user=user)
+        self.assertIsInstance(account.user, User)
+        # Screen name changed to the one in our mocked API response:
+        self.assertEqual(account.user.screen_name, 'philgyford')
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(
+                '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
+                responses.calls[0].request.url)
+
+    @responses.activate
+    def test_update_user_does_nothing_with_no_credentials(self):
+        "Doesn't verify_credentials if Account has none"
+        self.add_response(body=self.make_verify_credentials_body(),
+                            call='account/verify_credentials')
+        # Not saving (as that generates another request):
+        account = factories.AccountFactory.build(user=None)
+        result = account.updateUserFromTwitter()
+        self.assertEqual(result, False)
+        self.assertEqual(0, len(responses.calls))
+
+    @responses.activate
+    def test_update_user_updates_user(self):
+        "Sets the Account's user and returns it if all is well."
+        self.add_response(body=self.make_verify_credentials_body(),
+                            call='account/verify_credentials')
+        # Not saving (as that generates another request):
+        account = factories.AccountWithCredentialsFactory.build(user=None)
+
+        result = account.updateUserFromTwitter()
+        self.assertIsInstance(result, User)
+        self.assertIsInstance(account.user, User)
+        self.assertEqual(account.user.screen_name, 'philgyford')
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(
+                '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
+                responses.calls[0].request.url)
+
+    @responses.activate
+    def test_update_user_returns_error_message(self):
+        "Returns an error message if there's an API error."
+        self.add_response(body='{"errors":[{"message":"Could not authenticate you","code":32}]}',
+                            call='account/verify_credentials',
+                            status=401)
+        # Not saving (as that generates another request):
+        account = factories.AccountWithCredentialsFactory.build(user=None)
+
+        result = account.updateUserFromTwitter()
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(
+                '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
+                responses.calls[0].request.url)
+        self.assertTrue('Could not authenticate you' in result)
 
 
 class TwitterTweetTestCase(TestCase):
@@ -51,12 +155,6 @@ class TwitterTweetTestCase(TestCase):
         tweet_1 = factories.TweetFactory(twitter_id=123)
         with self.assertRaises(IntegrityError):
             tweet_2 = factories.TweetFactory(twitter_id=123)
-
-    def test_unique_twitter_id_str(self):
-        "Ensures twitter_id_str is unique"
-        tweet_1 = factories.TweetFactory(twitter_id_str='123')
-        with self.assertRaises(IntegrityError):
-            tweet_2 = factories.TweetFactory(twitter_id_str='123')
 
     def test_summary_creation(self):
         "Creates the Tweet's summary correctly on save"
@@ -96,6 +194,7 @@ class TwitterTweetTestCase(TestCase):
         tweet = factories.TweetFactory(user=user)
         self.assertTrue(tweet.is_private)
 
+
 class TwitterUserTestCase(TestCase):
 
     def test_str(self):
@@ -120,12 +219,6 @@ class TwitterUserTestCase(TestCase):
         user_1 = factories.UserFactory(twitter_id=123)
         with self.assertRaises(IntegrityError):
             user_2 = factories.UserFactory(twitter_id=123)
-
-    def test_unique_twitter_id_str(self):
-        "Ensures twitter_id_str is unique"
-        user_1 = factories.UserFactory(twitter_id_str='123')
-        with self.assertRaises(IntegrityError):
-            user_2 = factories.UserFactory(twitter_id_str='123')
 
     def test_going_private(self):
         "Makes the user's tweets private if they go private"
@@ -152,4 +245,3 @@ class TwitterUserTestCase(TestCase):
         user.save()
         tweet.refresh_from_db()
         self.assertFalse(tweet.is_private)
-

@@ -88,3 +88,35 @@ class FetchTwitterTweetsOutput(TestCase):
         self.assertIn('all: Failed to fetch tweets: It broke',
                                                             out_err.getvalue())
 
+
+#class UpdateAccounts(TestCase):
+
+    #@patch('ditto.twitter.fetch.UpdateAccounts.update_all')
+    #def test_calls_correct_method(self, update_method):
+        #call_command('update_twitter_accounts', stdout=StringIO())
+        #update_method.assert_called_once_with()
+
+    #@patch('ditto.twitter.fetch.UpdateAccounts.update_all')
+    #def test_success_output(self, update_method):
+        #"Responds correctly when accounts were successfully updated"
+        ## What the mocked method will return:
+        #update_method.side_effect = [
+            #[{'account': 'philgyford', 'success': True}]
+        #]
+        #out = StringIO()
+        #call_command('update_twitter_accounts', stdout=out)
+        #self.assertIn('Updated Account "philgyford"', out.getvalue())
+
+    #@patch('ditto.twitter.fetch.UpdateAccounts.update_all')
+    #def test_error_output(self, update_method):
+        #"Responds correctly when accounts were successfully updated"
+        ## What the mocked method will return:
+        #update_method.side_effect = [
+            #[{'account': 'ID: 7', 'success': False, 'message': 'It broke'}]
+        #]
+        #out = StringIO()
+        #out_err = StringIO()
+        #call_command('update_twitter_accounts', stdout=out, stderr=out_err)
+        #self.assertIn('Failed to update Account "ID: 7": It broke',
+                                                            #out_err.getvalue())
+

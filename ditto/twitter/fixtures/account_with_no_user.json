@@ -1,0 +1,15 @@
+[
+{
+    "fields": {
+        "access_token": "12552-MYFAKEACCESSTOKEN",
+        "access_token_secret": "MYFAKEACCESSTOKENSECRET",
+        "time_modified": "2015-07-29T16:45:28.932Z",
+        "consumer_secret": "MYFAKECONSUMERSECRET",
+        "time_created": "2015-07-29T16:45:28.932Z",
+        "consumer_key": "MYFAKECONSUMERSKEY",
+        "user": null
+    },
+    "model": "twitter.account",
+    "pk": 1
+}
+]

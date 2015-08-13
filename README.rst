@@ -63,6 +63,10 @@ management commands to fetch some or all of your bookmarks. Copying is one way
 - changes made to bookmarks in your Django admin will not be copied back to
 Pinboard, and changes might be overridden when you next fetch bookmarks.
 
+Twitter: Add Account, with API credentials. Then use update_accounts management
+command before calling any other commands. This fetches the user data for each
+account.
+
 Other things
 ************
 
@@ -70,6 +74,7 @@ To have large numbers formatted nicely, ensure these are in your ``settings.py``
 
     USE_L10N = True
     USE_THOUSAND_SEPARATOR = True
+
 
 
 Other notes for development

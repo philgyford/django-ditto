@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-from ditto.ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
 @python_2_unicode_compatible
@@ -23,6 +23,11 @@ class Account(TimeStampedModelMixin, models.Model):
     access_token_secret = models.CharField(null=False, blank=True,
                                                                 max_length=255)
 
+    def save(self, *args, **kwargs):
+        result = self.updateUserFromTwitter()
+        # Quietly ignoring errors. Sorry.
+        super(Account, self).save(*args, **kwargs)
+
     def __str__(self):
         if self.user:
             return self.user.screen_name
@@ -35,6 +40,33 @@ class Account(TimeStampedModelMixin, models.Model):
     #def get_absolute_url(self):
         #from django.core.urlresolvers import reverse
         #return reverse('twitter:account_detail', kwargs={''})
+
+    def updateUserFromTwitter(self):
+        """Calls the Twitter API to fetch the user details for this account.
+        If the user object doesn't exist yet, it is created.
+        But its relationship with this Account isn't saved here, only assigned.
+
+        Returns:
+        1. The User object if the call was successful.
+        2. False if we don't have API credentials to make the call.
+        3. A string containing an error message if something went wrong.
+        """
+        from .fetch import FetchUsers
+
+        if self.hasCredentials():
+            result = FetchUsers().fetch_for_account(account=self)
+            if isinstance(result, User):
+                self.user = result
+            return result
+        else:
+            return False
+
+    def hasCredentials(self):
+        "Does this at least have something in its API fields? True or False"
+        if self.consumer_key and self.consumer_secret and self.access_token and self.access_token_secret:
+            return True
+        else:
+            return False
 
 
 class Tweet(DittoItemModel):

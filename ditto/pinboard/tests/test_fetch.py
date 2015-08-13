@@ -5,7 +5,6 @@ import json
 from mock import patch
 from freezegun import freeze_time
 import pytz
-import requests
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
 import responses
 
