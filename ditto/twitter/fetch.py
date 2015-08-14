@@ -14,11 +14,12 @@ class FetchError(Exception):
 
 class TwitterFetcher(object):
 
-    def api_time_to_datetime(self, api_time):
+    def _api_time_to_datetime(self, api_time):
         # API's created_at is like 'Wed Nov 15 16:55:59 +0000 2006':
-        return datetime.datetime.strptime(api_time,
-                                          '%a %b %d %H:%M:%S +0000 %Y'
-                                        ).replace(tzinfo=pytz.utc)
+        return datetime.datetime.strptime(
+                                        api_time,
+                                        '%a %b %d %H:%M:%S +0000 %Y'
+                                    ).replace(tzinfo=pytz.utc)
 
 
 class FetchTweets(TwitterFetcher):
@@ -164,7 +165,7 @@ class FetchTweets(TwitterFetcher):
             'summary':          tweet['text'],
             'text':             tweet['text'],
             'twitter_id':       tweet['id'],
-            'created_at':       self.api_time_to_datetime(tweet['created_at']),
+            'created_at':       self._api_time_to_datetime(tweet['created_at']),
             'favorite_count':   tweet['favorite_count'],
             'retweet_count':    tweet['retweet_count'],
             'language':         tweet['lang'],
@@ -271,7 +272,7 @@ class FetchUsers(TwitterFetcher):
                 'url': api_user['url'] if api_user['url'] else '',
                 'is_private': api_user['protected'],
                 'is_verified': api_user['verified'],
-                'created_at': self.api_time_to_datetime(api_user['created_at']),
+                'created_at': self._api_time_to_datetime(api_user['created_at']),
                 'description': api_user['description'] if api_user['description'] else '',
                 'location': api_user['location'] if api_user['location'] else '',
                 'time_zone': api_user['time_zone'] if api_user['time_zone'] else '',
