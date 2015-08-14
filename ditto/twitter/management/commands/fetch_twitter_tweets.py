@@ -18,26 +18,26 @@ class Command(BaseCommand):
     Fetch recent tweets since the last fetch, from one account:
     ./manage.py fetch_twitter_tweets --recent --account=philgyford
 
-    Fetch 30 most recent favorited tweets, from all accounts:
-    ./manage.py fetch_twitter_tweets --favorites=30
+    Fetch recent tweets favorited by all accounts:
+    ./manage.py fetch_twitter_tweets --favorites
 
-    Fetch 30 most recent favorited tweets by one account:
-    ./manage.py fetch_twitter_tweets --favorites=30 --account=philgyford
+    Fetch recent tweets favorited by one account:
+    ./manage.py fetch_twitter_tweets --favorites --account=philgyford
     """
     help = "Fetches recent and favorited tweets from Twitter"
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--favorites',
-            action='store',
+            action='store_true',
             default=False,
-            help='Fetch the most recent favorited tweets, e.g. "10".'
+            help='Fetch the most recent favorited tweets.'
         )
         parser.add_argument(
             '--recent',
             action='store_true',
             default=False,
-            help='Fetch the most recent tweets, e.g. "10". Leave blank for all tweets since last fetch.'
+            help='Fetch the most recent tweets.'
         )
         parser.add_argument(
             '--account',
@@ -52,15 +52,14 @@ class Command(BaseCommand):
         account = options['account'] if options['account'] else None;
 
         if options['favorites']:
-            results = FetchTweets().fetch_favorites(
-                                num=options['favorites'], screen_name=account)
+            results = FetchTweets().fetch_favorites(screen_name=account)
         elif options['recent']:
             results = FetchTweets().fetch_recent(screen_name=account)
 
         elif options['account']:
             raise CommandError("Specify --recent or --favorites as well as --account.")
         else:
-            raise CommandError("Specify --recent or --favorites. Favorites can have an optional number. eg --favorites=20")
+            raise CommandError("Specify --recent or --favorites.")
 
         # results should be a list of dicts.
         # Each dict is for one account.

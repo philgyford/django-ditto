@@ -22,8 +22,10 @@ class Account(TimeStampedModelMixin, models.Model):
     access_token = models.CharField(null=False, blank=True, max_length=255)
     access_token_secret = models.CharField(null=False, blank=True,
                                                                 max_length=255)
-    last_fetch_id = models.BigIntegerField(null=True, blank=True,
+    last_recent_id = models.BigIntegerField(null=True, blank=True,
             help_text="The Twitter ID of the most recent Tweet fetched.")
+    last_favorite_id = models.BigIntegerField(null=True, blank=True,
+            help_text="The Twitter ID of the most recent favorited Tweet fetched.")
 
     def save(self, *args, **kwargs):
         if self.user is None:

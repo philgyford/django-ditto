@@ -120,30 +120,30 @@ class FetchTwitterRecentTweets(FetchTwitterTestCase):
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
-    def test_includes_last_fetch_id(self):
-        "If an account has a last_fetch_id, use it in the request"
-        self.account_1.last_fetch_id = 9876543210
+    def test_includes_last_recent_id(self):
+        "If an account has a last_recent_id, use it in the request"
+        self.account_1.last_recent_id = 9876543210
         self.account_1.save()
         self.add_response(body=self.make_response_body())
         result = FetchTweets().fetch_recent(screen_name='jill')
         self.assertTrue('since_id=9876543210' in responses.calls[0][0].url)
 
     @responses.activate
-    def test_omits_last_fetch_id(self):
-        "If an account has no last_fetch_id, it is not used in the request"
+    def test_omits_last_recent_id(self):
+        "If an account has no last_recent_id, it is not used in the request"
         self.add_response(body=self.make_response_body())
         result = FetchTweets().fetch_recent(screen_name='jill')
         self.assertFalse('since_id=9876543210' in responses.calls[0][0].url)
 
     @responses.activate
-    def test_updates_last_fetch_id(self):
-        "The account's last_fetch_id should be set to the most recent tweet's"
-        self.account_1.last_fetch_id = 9876543210
+    def test_updates_last_recent_id(self):
+        "The account's last_recent_id should be set to the most recent tweet's"
+        self.account_1.last_recent_id = 9876543210
         self.account_1.save()
         self.add_response(body=self.make_response_body())
         result = FetchTweets().fetch_recent(screen_name='jill')
         self.account_1.refresh_from_db()
-        self.assertEqual(self.account_1.last_fetch_id, 629377146222419968)
+        self.assertEqual(self.account_1.last_recent_id, 629377146222419968)
 
     @responses.activate
     def test_returns_correct_success_response(self):

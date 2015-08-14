@@ -53,12 +53,12 @@ class FetchTweets(TwitterFetcher):
                             account.access_token, account.access_token_secret)
 
                 try:
-                    # account.last_fetch_id might be None, in which case it's
+                    # account.last_recent_id might be None, in which case it's
                     # not used in the API call:
                     tweets = api.get_user_timeline(
                                             user_id=account.user.twitter_id,
                                             include_rts=True,
-                                            since_id=account.last_fetch_id)
+                                            since_id=account.last_recent_id)
                 except TwythonError as e:
                     result['success'] = False
                     result['message'] = 'Error when calling API: %s' % e
@@ -67,7 +67,7 @@ class FetchTweets(TwitterFetcher):
                         fetch_time = datetime.datetime.utcnow().replace(
                                                             tzinfo=pytz.utc)
                         self.save_tweets(tweets, fetch_time)
-                        account.last_fetch_id = tweets[0]['id']
+                        account.last_recent_id = tweets[0]['id']
                         account.save()
                     result['success'] = True
                     result['fetched'] = len(tweets)
@@ -79,18 +79,53 @@ class FetchTweets(TwitterFetcher):
 
         return results
 
-    def fetch_favorites(self, num=10, screen_name=None):
+    def fetch_favorites(self, screen_name=None):
         """Fetches the most recent Favorites for all or one Accounts.
         Creates/updates the Tweet objects.
 
         Keyword arguments:
-        num -- the number of most recent Tweets to fetch.
         screen_name -- of the one Account to fetch for, or None for all.
 
         Raises:
         FetchError if passed a screen_name there is no Account for.
         """
-        pass
+        accounts = self._get_accounts(screen_name)
+        # Will collect the result info for each account:
+        results = []
+
+        for account in accounts:
+            # What we'll return for each account:
+            result = {'account': account.user.screen_name}
+            if account.hasCredentials():
+                api = Twython(
+                            account.consumer_key, account.consumer_secret,
+                            account.access_token, account.access_token_secret)
+
+                try:
+                    tweets = api.get_favorites(
+                                            user_id=account.user.twitter_id,
+                                            since_id=account.last_favorite_id)
+                except TwythonError as e:
+                    result['success'] = False
+                    result['message'] = 'Error when calling API: %s' % e
+                else:
+                    # TODO: Link Favorite to User.
+                    if (len(tweets) > 0):
+                        fetch_time = datetime.datetime.utcnow().replace(
+                                                            tzinfo=pytz.utc)
+                        self.save_tweets(tweets, fetch_time)
+                        account.last_favorite_id = tweets[0]['id']
+                        account.save()
+                    result['success'] = True
+                    result['fetched'] = len(tweets)
+            else:
+                result['success'] = False
+                result['message'] = 'Account has no API credentials'
+
+            results.append(result)
+
+        return results
+
 
     def save_tweets(self, tweets, fetch_time):
         """Takes a list of tweet data from the API and creates or updates the
@@ -233,7 +268,7 @@ class FetchUsers(TwitterFetcher):
                 'raw': raw_json,
                 'screen_name': api_user['screen_name'],
                 'name': api_user['name'],
-                'url': api_user['url'],
+                'url': api_user['url'] if api_user['url'] else '',
                 'is_private': api_user['protected'],
                 'is_verified': api_user['verified'],
                 'created_at': self.api_time_to_datetime(api_user['created_at']),

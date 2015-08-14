@@ -40,7 +40,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
-    list_display = ('user', 'created_at', 'title', )
+    list_display = ('user','is_private', 'title', 'created_at', )
     list_display_links = ('title', )
     list_filter = ('user', 'created_at',)
 
