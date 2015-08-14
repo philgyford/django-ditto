@@ -33,6 +33,7 @@ class TwitterAccountTestCase(TestCase):
         body -- The JSON string representing the body of the response.
         call -- String, appended to self.api_url, eg
                     'account/verfiy_credentials'.
+        status -- Int, HTTP response status
         """
         responses.add(
             responses.GET,
@@ -75,19 +76,16 @@ class TwitterAccountTestCase(TestCase):
                 responses.calls[0].request.url)
 
     @responses.activate
-    def test_updates_user(self):
-        "Should fetch user from API on save if it already has a user"
+    def test_does_not_update_user(self):
+        "Shouldn't fetch user from API on save if it already has a user"
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
         user = factories.UserFactory(twitter_id=12552, screen_name='oldname')
         account = factories.AccountWithCredentialsFactory(user=user)
         self.assertIsInstance(account.user, User)
-        # Screen name changed to the one in our mocked API response:
-        self.assertEqual(account.user.screen_name, 'philgyford')
-        self.assertEqual(1, len(responses.calls))
-        self.assertEqual(
-                '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
-                responses.calls[0].request.url)
+        # Screen name is not changed to the one in our mocked API response:
+        self.assertEqual(account.user.screen_name, 'oldname')
+        self.assertEqual(0, len(responses.calls))
 
     @responses.activate
     def test_update_user_does_nothing_with_no_credentials(self):
@@ -133,12 +131,22 @@ class TwitterAccountTestCase(TestCase):
                 responses.calls[0].request.url)
         self.assertTrue('Could not authenticate you' in result)
 
+    def test_has_credentials_true(self):
+        self.add_response(body=self.make_verify_credentials_body(),
+                            call='account/verify_credentials')
+        account = factories.AccountWithCredentialsFactory.build(user=None)
+        self.assertTrue(account.hasCredentials())
+
+    def test_has_credentials_false(self):
+        account = factories.AccountFactory.build(user=None)
+        self.assertFalse(account.hasCredentials())
+
 
 class TwitterTweetTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"
-        tweet = factories.TweetFactory(text='My tweet text')
+        tweet = factories.TweetFactory(title='My tweet text')
         self.assertEqual(tweet.__str__(), 'My tweet text')
 
     def test_ordering(self):

@@ -23,29 +23,14 @@ class FetchTwitterTweetsArgs(TestCase):
     def test_with_recent(self, fetch_method):
         "Calls the correct method when fetching recent tweets"
         call_command('fetch_twitter_tweets', '--recent', stdout=StringIO())
-        fetch_method.assert_called_once_with(num=None, screen_name=None)
+        fetch_method.assert_called_once_with(screen_name=None)
 
     @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
     def test_with_recent_and_account(self, fetch_method):
         "Calls the correct method when fetching one account's recent tweets"
         call_command('fetch_twitter_tweets', '--recent', account='philgyford',
                                                             stdout=StringIO())
-        fetch_method.assert_called_once_with(num=None, screen_name='philgyford')
-
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
-    def test_with_recent_value(self, fetch_method):
-        "Calls the correct method when fetching a number of recent tweets"
-        call_command('fetch_twitter_tweets', recent=20, stdout=StringIO())
-        fetch_method.assert_called_once_with(num=20, screen_name=None)
-
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
-    def test_with_recent_value_and_account(self, fetch_method):
-        """Calls the correct method when fetching a number of one account's
-        recent tweets
-        """
-        call_command('fetch_twitter_tweets', recent=20, account='philgyford',
-                                                            stdout=StringIO())
-        fetch_method.assert_called_once_with(num=20, screen_name='philgyford')
+        fetch_method.assert_called_once_with(screen_name='philgyford')
 
     @patch('ditto.twitter.fetch.FetchTweets.fetch_favorites')
     def test_with_favorites(self, fetch_method):
@@ -79,13 +64,14 @@ class FetchTwitterTweetsOutput(TestCase):
         "Responds correctly when there was an error fetching recent tweets"
         # What the mocked method will return:
         fetch_method.side_effect = [
-            [{'success': False, 'message': 'It broke'}]
+                [{'account': 'philgyford', 'success': False,
+                    'message': 'It broke'}]
         ]
         out = StringIO()
         out_err = StringIO()
         call_command('fetch_twitter_tweets', '--recent', stdout=out,
                                                                 stderr=out_err)
-        self.assertIn('all: Failed to fetch tweets: It broke',
+        self.assertIn('philgyford: Failed to fetch tweets: It broke',
                                                             out_err.getvalue())
 
 

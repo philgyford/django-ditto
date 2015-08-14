@@ -8,21 +8,73 @@ from twython import Twython, TwythonError
 from .models import Account, Tweet, User
 
 
-class FetchTweets(object):
+class FetchError(Exception):
+    pass
 
-    def fetch_recent(self, num=None, screen_name=None):
+
+class TwitterFetcher(object):
+
+    def api_time_to_datetime(self, api_time):
+        # API's created_at is like 'Wed Nov 15 16:55:59 +0000 2006':
+        return datetime.datetime.strptime(api_time,
+                                          '%a %b %d %H:%M:%S +0000 %Y'
+                                        ).replace(tzinfo=pytz.utc)
+
+
+class FetchTweets(TwitterFetcher):
+
+    def fetch_recent(self, screen_name=None):
         """Fetches the most recent Tweets for all or one Accounts.
         Creates/updates the Tweet objects.
 
         Keyword arguments:
-        num -- the number of most recent Tweets to fetch, or None to fetch
-                all Tweets since last time we fetched them.
         screen_name -- of the one Account to fetch for, or None for all
                 Accounts.
+
+        Returns a list of dicts, one per Twitter account fetched.
+        Each dict is like:
+            {'account': 'screenname', 'success': True, 'fetched': 37}
+        or:
+            {'account': 'screenname', 'success': False, 'message': 'It broke'}
+
+        Raises:
+        FetchError if passed a screen_name there is no Account for.
         """
         accounts = self._get_accounts(screen_name)
+        # Will collect the result info for each account:
+        results = []
 
-        pass
+        for account in accounts:
+            # What we'll return for each account:
+            result = {'account': account.user.screen_name}
+            if account.hasCredentials():
+                api = Twython(
+                            account.consumer_key, account.consumer_secret,
+                            account.access_token, account.access_token_secret)
+
+                try:
+                    # account.last_fetch_id might be None, in which case it's
+                    # not used in the API call:
+                    tweets = api.get_user_timeline(
+                                            user_id=account.user.twitter_id,
+                                            include_rts=True,
+                                            since_id=account.last_fetch_id)
+                except TwythonError as e:
+                    result['success'] = False
+                    result['message'] = 'Error when calling API: %s' % e
+                else:
+                    if (len(tweets) > 0):
+                        fetch_time = datetime.datetime.utcnow().replace(
+                                                            tzinfo=pytz.utc)
+                        self.save_tweets(tweets, fetch_time)
+                        account.last_fetch_id = tweets[0]['id']
+                        account.save()
+                    result['success'] = True
+                    result['fetched'] = len(tweets)
+
+                results.append(result)
+
+        return results
 
     def fetch_favorites(self, num=10, screen_name=None):
         """Fetches the most recent Favorites for all or one Accounts.
@@ -34,25 +86,104 @@ class FetchTweets(object):
         """
         pass
 
-    def _get_accounts(self, screen_name):
+    def save_tweets(self, tweets, fetch_time):
+        """Takes a list of tweet data from the API and creates or updates the
+        Tweet objects and the posters' User objects.
+
+        Keyword arguments:
+        tweets -- The tweets' data.
+        fetch_time -- datetime object for when this data was fetched.
+        """
+        for tweet in tweets:
+            user = FetchUsers().save_user(tweet['user'], fetch_time)
+            tw = self.save_tweet(tweet, user, fetch_time)
+
+    def save_tweet(self, tweet, user, fetch_time):
+        """Takes a dict of tweet data from the API and creates or updates a
+        Tweet object.
+
+        Keyword arguments:
+        tweet -- The tweet data.
+        user -- A User object for whichever User posted this tweet.
+        fetch_time -- datetime object for when this data was fetched.
+
+        Returns:
+        The Tweet object.
+        """
+
+        raw_json = json.dumps(tweet)
+
+        defaults = {
+            'fetch_time':       fetch_time,
+            'raw':              raw_json,
+            'user':             user,
+            'permalink':        'https://twitter.com/%s/status/%s' % (
+                                                user.screen_name, tweet['id']),
+            'title':            tweet['text'].replace('\n', ' ').replace('\r', ' '),
+            'summary':          tweet['text'],
+            'text':             tweet['text'],
+            'twitter_id':       tweet['id'],
+            'created_at':       self.api_time_to_datetime(tweet['created_at']),
+            'favorite_count':   tweet['favorite_count'],
+            'retweet_count':    tweet['retweet_count'],
+            'language':         tweet['lang'],
+            'source':           tweet['source']
+        }
+
+        if user.is_private:
+            tweet['is_private'] = True
+        else:
+            tweet['is_private'] = False
+
+        if tweet['coordinates'] and 'type' in tweet['coordinates']:
+            if tweet['coordinates']['type'] == 'Point':
+                defaults['latitude'] = tweet['coordinates']['coordinates'][1]
+                defaults['longitude'] = tweet['coordinates']['coordinates'][0]
+            # TODO: Handle Polygons?
+
+        if tweet['in_reply_to_screen_name']:
+            defaults['in_reply_to_screen_name'] =  tweet['in_reply_to_screen_name']
+            defaults['in_reply_to_status_id'] = tweet['in_reply_to_status_id']
+            defaults['in_reply_to_user_id'] = tweet['in_reply_to_user_id']
+
+        if tweet['place'] is not None:
+            if 'attributes' in tweet['place'] and 'street_address' in tweet['place']['attributes']:
+                defaults['place_attribute_street_address'] = tweet['place']['attributes']['street_address']
+            if 'full_name' in tweet['place']:
+                defaults['place_full_name'] = tweet['place']['full_name']
+            if 'country' in tweet['place']:
+                defaults['place_country'] = tweet['place']['country']
+
+        if 'quoted_status_id' in tweet:
+            defaults['quoted_status_id'] = tweet['quoted_status_id']
+
+        tw, created = Tweet.objects.update_or_create(
+                twitter_id=tweet['id'],
+                defaults=defaults
+            )
+        return tw
+
+    def _get_accounts(self, screen_name=None):
         """Returns either all Accounts or just one, indicated by screen_name.
-        Or, if there is no account with screen_name, an error string.
 
         Keyword arguments:
         screen_name -- of the one Account to get, or None for all Accounts.
+
+        Raises:
+        FetchError if passed a screen_name there is no Account for.
         """
         if screen_name is None:
             accounts = Account.objects.all()
         else:
             try:
-                accounts = [ Account.objects.get(screen_name=screen_name) ]
+                accounts = [Account.objects.get(user__screen_name=screen_name)]
             except Account.DoesNotExist:
-                return "There is no Account in the database with a screen_name of '%s'" % screen_name
+                raise FetchError("There is no Account in the database with a screen_name of '%s'" % screen_name)
 
         return accounts
 
 
-class FetchUsers(object):
+class FetchUsers(TwitterFetcher):
 
     def fetch_for_account(self, account):
         """Fetches the Twitter user details for an Account object, creating/
@@ -64,18 +195,19 @@ class FetchUsers(object):
 
         Returns either the User object or an error string.
         """
-        twitter = Twython(account.consumer_key, account.consumer_secret,
+        api = Twython(account.consumer_key, account.consumer_secret,
                             account.access_token, account.access_token_secret)
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
         try:
-            api_user = twitter.verify_credentials()
-            return self._save_user(api_user, fetch_time)
+            api_user = api.verify_credentials()
         except TwythonError as e:
             return 'Something went wrong when verifying credentials: %s' % e
+        else:
+            return self.save_user(api_user, fetch_time)
 
 
-    def _save_user(self, api_user, fetch_time):
+    def save_user(self, api_user, fetch_time):
         """With Twitter user data from the API, it creates or updates the User
         and returns the User object.
 
@@ -98,11 +230,7 @@ class FetchUsers(object):
                 'url': api_user['url'],
                 'is_private': api_user['protected'],
                 'is_verified': api_user['verified'],
-                # API's created_at is like 'Wed Nov 15 16:55:59 +0000 2006':
-                'created_at': datetime.datetime.strptime(
-                                                    api_user['created_at'],
-                                                    '%a %b %d %H:%M:%S +0000 %Y'
-                                                ).replace(tzinfo=pytz.utc),
+                'created_at': self.api_time_to_datetime(api_user['created_at']),
                 'description': api_user['description'],
                 'location': api_user['location'],
                 'time_zone': api_user['time_zone'],

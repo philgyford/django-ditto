@@ -55,9 +55,7 @@ class Command(BaseCommand):
             results = FetchTweets().fetch_favorites(
                                 num=options['favorites'], screen_name=account)
         elif options['recent']:
-            # If we just have '--recent' with no number, send None as number:
-            num = None if options['recent'] is True else options['recent']
-            results = FetchTweets().fetch_recent(num=num, screen_name=account)
+            results = FetchTweets().fetch_recent(screen_name=account)
 
         elif options['account']:
             raise CommandError("Specify --recent or --favorites as well as --account.")
@@ -65,19 +63,24 @@ class Command(BaseCommand):
             raise CommandError("Specify --recent or --favorites, either with an optional number.")
 
         # results should be a list of dicts.
-        # If a result dict is for one account it'll have an 'account' element.
-        # Each result dict will have:
-        #   'success': True or False.
-        #   'fetched': integer, the number of Tweets fetched.
-        # If it failed, we should also get 'message' (a string).
+        # Each dict is for one account.
+        # Each dict will look like either:
+        # { 'account': 'thescreename',
+        #   'success': True,
+        #   'fetched': 200, # The number of tweets fetched
+        # }
+        # or:
+        # { 'account': 'thescreename',
+        #   'success': False,
+        #   'message': 'There was an error fetching data because blah',
+        #}
         for result in results:
-            account = result['account'] if 'account' in result else 'all'
             if result['success']:
                 noun = 'tweet' if result['fetched'] == 1 else 'tweets'
                 self.stdout.write('%s: Fetched %s %s' % (
-                                            account, result['fetched'], noun))
+                                result['account'], result['fetched'], noun))
 
             else:
-                self.stderr.write('%s: Failed to fetch tweets: %s' %
-                                                (account, result['message']))
+                self.stderr.write('%s: Failed to fetch tweets: %s' % (
+                                        result['account'], result['message']))
 

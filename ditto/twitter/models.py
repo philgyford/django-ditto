@@ -22,10 +22,13 @@ class Account(TimeStampedModelMixin, models.Model):
     access_token = models.CharField(null=False, blank=True, max_length=255)
     access_token_secret = models.CharField(null=False, blank=True,
                                                                 max_length=255)
+    last_fetch_id = models.BigIntegerField(null=True, blank=True,
+            help_text="The Twitter ID of the most recent Tweet fetched.")
 
     def save(self, *args, **kwargs):
-        result = self.updateUserFromTwitter()
-        # Quietly ignoring errors. Sorry.
+        if self.user is None:
+            result = self.updateUserFromTwitter()
+            # Quietly ignoring errors. Sorry.
         super(Account, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -81,7 +84,7 @@ class Tweet(DittoItemModel):
     """
     user = models.ForeignKey('User')
 
-    text = models.CharField(null=False, blank=False, max_length=255)
+    text = models.TextField(null=False, blank=False, max_length=140)
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
 
     created_at = models.DateTimeField(null=False, blank=False,
@@ -118,7 +121,7 @@ class Tweet(DittoItemModel):
                                 help_text="Utility used to post the Tweet")
 
     def __str__(self):
-        return self.text
+        return self.title
 
     class Meta:
         ordering = ['-created_at']
