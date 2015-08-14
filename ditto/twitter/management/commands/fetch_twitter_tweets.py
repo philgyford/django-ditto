@@ -12,8 +12,8 @@ class Command(BaseCommand):
     Fetch recent tweets since the last fetch, from all accounts:
     ./manage.py fetch_twitter_tweets --recent
 
-    Fetch 20 recent tweets, from all accounts:
-    ./manage.py fetch_twitter_tweets --recent=20
+    Fetch recent tweets, from all accounts:
+    ./manage.py fetch_twitter_tweets --recent
 
     Fetch recent tweets since the last fetch, from one account:
     ./manage.py fetch_twitter_tweets --recent --account=philgyford
@@ -60,7 +60,7 @@ class Command(BaseCommand):
         elif options['account']:
             raise CommandError("Specify --recent or --favorites as well as --account.")
         else:
-            raise CommandError("Specify --recent or --favorites, either with an optional number.")
+            raise CommandError("Specify --recent or --favorites. Favorites can have an optional number. eg --favorites=20")
 
         # results should be a list of dicts.
         # Each dict is for one account.
