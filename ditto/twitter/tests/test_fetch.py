@@ -164,6 +164,16 @@ class FetchTwitterRecentTweets(FetchTwitterTestCase):
         self.assertTrue('Rate limit exceeded' in result[0]['message'])
 
     @responses.activate
+    def test_returns_error_if_no_creds(self):
+        "If an account has no API credentials, the result is correct"
+        user = factories.UserFactory(screen_name='bobby')
+        account = factories.AccountFactory(user=user)
+        self.add_response(body=self.make_response_body())
+        result = FetchTweets().fetch_recent(screen_name='bobby')
+        self.assertFalse(result[0]['success'])
+        self.assertTrue('Account has no API credentials' in result[0]['message'])
+
+    @responses.activate
     def test_saves_tweets(self):
         self.add_response(body=self.make_response_body())
         result = FetchTweets().fetch_recent(screen_name='jill')

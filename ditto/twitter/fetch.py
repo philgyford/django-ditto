@@ -71,8 +71,11 @@ class FetchTweets(TwitterFetcher):
                         account.save()
                     result['success'] = True
                     result['fetched'] = len(tweets)
+            else:
+                result['success'] = False
+                result['message'] = 'Account has no API credentials'
 
-                results.append(result)
+            results.append(result)
 
         return results
 
@@ -83,6 +86,9 @@ class FetchTweets(TwitterFetcher):
         Keyword arguments:
         num -- the number of most recent Tweets to fetch.
         screen_name -- of the one Account to fetch for, or None for all.
+
+        Raises:
+        FetchError if passed a screen_name there is no Account for.
         """
         pass
 
