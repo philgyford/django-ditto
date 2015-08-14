@@ -35,15 +35,15 @@ class FetchTwitterTweetsArgs(TestCase):
     @patch('ditto.twitter.fetch.FetchTweets.fetch_favorites')
     def test_with_favorites(self, fetch_method):
         "Calls the correct method when fetching favorite tweets"
-        call_command('fetch_twitter_tweets', favorites=20, stdout=StringIO())
-        fetch_method.assert_called_once_with(num=20, screen_name=None)
+        call_command('fetch_twitter_tweets', '--favorites', stdout=StringIO())
+        fetch_method.assert_called_once_with(screen_name=None)
 
     @patch('ditto.twitter.fetch.FetchTweets.fetch_favorites')
     def test_with_favorites_and_account(self, fetch_method):
         "Calls the correct method when fetching one account's favorite tweets"
-        call_command('fetch_twitter_tweets', favorites=20, account='philgyford',
-                                                            stdout=StringIO())
-        fetch_method.assert_called_once_with(num=20, screen_name='philgyford')
+        call_command('fetch_twitter_tweets', '--favorites',
+                                    account='philgyford', stdout=StringIO())
+        fetch_method.assert_called_once_with(screen_name='philgyford')
 
 
 class FetchTwitterTweetsOutput(TestCase):

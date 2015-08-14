@@ -272,9 +272,9 @@ class FetchUsers(TwitterFetcher):
                 'is_private': api_user['protected'],
                 'is_verified': api_user['verified'],
                 'created_at': self.api_time_to_datetime(api_user['created_at']),
-                'description': api_user['description'],
-                'location': api_user['location'],
-                'time_zone': api_user['time_zone'],
+                'description': api_user['description'] if api_user['description'] else '',
+                'location': api_user['location'] if api_user['location'] else '',
+                'time_zone': api_user['time_zone'] if api_user['time_zone'] else '',
                 'profile_image_url': api_user['profile_image_url'],
                 'profile_image_url_https': api_user['profile_image_url_https'],
                 # Note favorites / favourites:
