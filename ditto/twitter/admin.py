@@ -7,7 +7,7 @@ from .models import Account, Tweet, User
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('user', 'time_created', 'time_modified',)
+    list_display = ('user', 'has_credentials', 'time_created', 'time_modified',)
 
     fieldsets = (
         (None, {
@@ -21,7 +21,22 @@ class AccountAdmin(admin.ModelAdmin):
             'fields': ('last_fetch_id', 'time_created', 'time_modified',)
         }),
     )
+
+    formfield_overrides = {
+        # Make the inputs full-width.
+        models.CharField: {'widget': TextInput(
+            attrs={
+                'class': 'vLargeTextField',
+            }
+        )},
+    }
+
     readonly_fields = ('time_created', 'time_modified',)
+
+    def has_credentials(self, obj):
+        return obj.hasCredentials()
+    has_credentials.boolean = True
+
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
@@ -68,5 +83,25 @@ class TweetAdmin(admin.ModelAdmin):
     readonly_fields = ('time_created', 'time_modified',)
     search_fields = ('text', )
 
-admin.site.register(User)
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('screen_name', 'name', 'is_private', 'fetch_time')
+    list_display_links = ('screen_name', )
+
+    fieldsets = (
+        (None, {
+            'fields': ('screen_name', 'name',
+                'is_private', 'is_verified',
+                'profile_image_url', 'profile_image_url_https',
+                'url', 'description', 'location', 'time_zone',
+                'twitter_id', 'created_at',
+            )
+        }),
+        ('Data', {
+            'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
+        }),
+    )
+    readonly_fields = ('time_created', 'time_modified',)
+    search_fields = ('screen_name', 'name')
 

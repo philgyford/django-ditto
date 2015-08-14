@@ -156,7 +156,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="A URL provided by the user as part of their profile")
     # Inverse of Twitter's 'protected', to be similar to DittoItemModel:
     is_private = models.BooleanField(null=False, default=False,
-        help_text="True if this user is 'protected' or private")
+        help_text="True if this user is 'protected'")
     is_verified = models.BooleanField(null=False, default=False)
 
     created_at = models.DateTimeField(null=False, blank=False,
