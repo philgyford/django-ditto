@@ -6,6 +6,8 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from django.utils.six import StringIO
 
+from .. import factories
+
 
 class FetchTwitterTweetsArgs(TestCase):
 
@@ -17,38 +19,38 @@ class FetchTwitterTweetsArgs(TestCase):
     def test_fail_with_account_only(self):
         "Fails when only an account is provided"
         with self.assertRaises(CommandError):
-            call_command('fetch_twitter_tweets', account='philgyford')
+            call_command('fetch_twitter_tweets', account='terry')
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
-    def test_with_recent(self, fetch_method):
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher')
+    def test_with_recent(self, fetch_class):
         "Calls the correct method when fetching recent tweets"
         call_command('fetch_twitter_tweets', '--recent', stdout=StringIO())
-        fetch_method.assert_called_once_with(screen_name=None)
+        fetch_class.assert_called_once_with(screen_name=None)
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
-    def test_with_recent_and_account(self, fetch_method):
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher')
+    def test_with_recent_and_account(self, fetch_class):
         "Calls the correct method when fetching one account's recent tweets"
-        call_command('fetch_twitter_tweets', '--recent', account='philgyford',
+        call_command('fetch_twitter_tweets', '--recent', account='barbara',
                                                             stdout=StringIO())
-        fetch_method.assert_called_once_with(screen_name='philgyford')
+        fetch_class.assert_called_once_with(screen_name='barbara')
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_favorites')
-    def test_with_favorites(self, fetch_method):
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.FavoriteTweetsFetcher')
+    def test_with_favorites(self, fetch_class):
         "Calls the correct method when fetching favorite tweets"
         call_command('fetch_twitter_tweets', '--favorites', stdout=StringIO())
-        fetch_method.assert_called_once_with(screen_name=None)
+        fetch_class.assert_called_once_with(screen_name=None)
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_favorites')
-    def test_with_favorites_and_account(self, fetch_method):
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.FavoriteTweetsFetcher')
+    def test_with_favorites_and_account(self, fetch_class):
         "Calls the correct method when fetching one account's favorite tweets"
         call_command('fetch_twitter_tweets', '--favorites',
-                                    account='philgyford', stdout=StringIO())
-        fetch_method.assert_called_once_with(screen_name='philgyford')
+                                    account='barbara', stdout=StringIO())
+        fetch_class.assert_called_once_with(screen_name='barbara')
 
 
 class FetchTwitterTweetsOutput(TestCase):
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
+    @patch('ditto.twitter.fetch.RecentTweetsFetcher.fetch')
     def test_success_output(self, fetch_method):
         "Responds correctly when recent tweets were successfully fetched"
         # What the mocked method will return:
@@ -59,7 +61,7 @@ class FetchTwitterTweetsOutput(TestCase):
         call_command('fetch_twitter_tweets', '--recent', stdout=out)
         self.assertIn('philgyford: Fetched 23 tweets', out.getvalue())
 
-    @patch('ditto.twitter.fetch.FetchTweets.fetch_recent')
+    @patch('ditto.twitter.fetch.RecentTweetsFetcher.fetch')
     def test_error_output(self, fetch_method):
         "Responds correctly when there was an error fetching recent tweets"
         # What the mocked method will return:

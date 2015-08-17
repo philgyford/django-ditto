@@ -107,7 +107,8 @@ class TwitterAccountTestCase(TestCase):
         account = factories.AccountWithCredentialsFactory.build(user=None)
 
         result = account.updateUserFromTwitter()
-        self.assertIsInstance(result, User)
+        self.assertTrue(result['success'])
+        self.assertIsInstance(result['user'], User)
         self.assertIsInstance(account.user, User)
         self.assertEqual(account.user.screen_name, 'philgyford')
         self.assertEqual(1, len(responses.calls))
@@ -118,9 +119,10 @@ class TwitterAccountTestCase(TestCase):
     @responses.activate
     def test_update_user_returns_error_message(self):
         "Returns an error message if there's an API error."
-        self.add_response(body='{"errors":[{"message":"Could not authenticate you","code":32}]}',
-                            call='account/verify_credentials',
-                            status=401)
+        self.add_response(
+            body='{"errors":[{"message":"Could not authenticate you","code":32}]}',
+            call='account/verify_credentials',
+            status=401)
         # Not saving (as that generates another request):
         account = factories.AccountWithCredentialsFactory.build(user=None)
 
@@ -129,7 +131,8 @@ class TwitterAccountTestCase(TestCase):
         self.assertEqual(
                 '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
                 responses.calls[0].request.url)
-        self.assertTrue('Could not authenticate you' in result)
+        self.assertFalse(result['success'])
+        self.assertTrue('Could not authenticate you' in result['message'])
 
     def test_has_credentials_true(self):
         self.add_response(body=self.make_verify_credentials_body(),

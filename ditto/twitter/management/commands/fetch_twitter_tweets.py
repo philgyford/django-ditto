@@ -3,7 +3,7 @@ import argparse
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch import FetchTweets
+from ...fetch import FavoriteTweetsFetcher, RecentTweetsFetcher
 
 
 class Command(BaseCommand):
@@ -52,10 +52,9 @@ class Command(BaseCommand):
         account = options['account'] if options['account'] else None;
 
         if options['favorites']:
-            results = FetchTweets().fetch_favorites(screen_name=account)
+            results = FavoriteTweetsFetcher(screen_name=account).fetch()
         elif options['recent']:
-            results = FetchTweets().fetch_recent(screen_name=account)
-
+            results = RecentTweetsFetcher(screen_name=account).fetch()
         elif options['account']:
             raise CommandError("Specify --recent or --favorites as well as --account.")
         else:

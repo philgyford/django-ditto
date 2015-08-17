@@ -52,17 +52,21 @@ class Account(TimeStampedModelMixin, models.Model):
         But its relationship with this Account isn't saved here, only assigned.
 
         Returns:
-        1. The User object if the call was successful.
-        2. False if we don't have API credentials to make the call.
-        3. A string containing an error message if something went wrong.
+        a) A dict, or
+        b) False if we don't have API credentials.
+
+        If a dict, will be like one of:
+        {'account': 'text string', 'success': False, 'message': 'Error msg'}
+        or
+        {'account': 'text string', 'success': True, 'user': <User obj>}
         """
-        from .fetch import FetchUsers
+        from .fetch import VerifyForAccount
 
         if self.hasCredentials():
-            result = FetchUsers().fetch_for_account(account=self)
-            if isinstance(result, User):
-                self.user = result
-            return result
+            results = VerifyForAccount(account=self).fetch()
+            if 'user' in results and isinstance(results['user'], User):
+                self.user = results['user']
+            return results
         else:
             return False
 

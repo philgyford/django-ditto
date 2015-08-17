@@ -18,7 +18,7 @@ class AccountAdmin(admin.ModelAdmin):
             'description': 'Keys and secrets require creation of an app at <a href="https://apps.twitter.com/">apps.twitter.com</a>',
         }),
         ('Data', {
-            'fields': ('last_fetch_id', 'time_created', 'time_modified',)
+            'fields': ('last_recent_id', 'last_favorite_id', 'time_created', 'time_modified',)
         }),
     )
 
