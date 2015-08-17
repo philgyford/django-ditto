@@ -50,7 +50,7 @@ class FetchTwitterTweetsArgs(TestCase):
 
 class FetchTwitterTweetsOutput(TestCase):
 
-    @patch('ditto.twitter.fetch.RecentTweetsFetcher.fetch')
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher.fetch')
     def test_success_output(self, fetch_method):
         "Responds correctly when recent tweets were successfully fetched"
         # What the mocked method will return:
@@ -61,7 +61,7 @@ class FetchTwitterTweetsOutput(TestCase):
         call_command('fetch_twitter_tweets', '--recent', stdout=out)
         self.assertIn('philgyford: Fetched 23 tweets', out.getvalue())
 
-    @patch('ditto.twitter.fetch.RecentTweetsFetcher.fetch')
+    @patch('ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher.fetch')
     def test_error_output(self, fetch_method):
         "Responds correctly when there was an error fetching recent tweets"
         # What the mocked method will return:
