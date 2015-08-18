@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from django.test import TestCase
 
 from .. import factories
-from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, VerifyForAccount
+from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, VerifyFetcher, VerifyForAccount
 from ..models import Account, Tweet, User
 
 
@@ -413,7 +413,74 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(jills_faves[0].twitter_id, 629377146222419968)
 
 
-class VerifyFetcherTestCase(FetchTwitterTestCase):
+class VerifyFetcherTestCase(TwitterFetcherTestCase):
+
+    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+
+    api_call = 'account/verify_credentials'
+
+    @responses.activate
+    def test_api_request_for_one_account(self):
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher(screen_name='jill').fetch()
+        self.assertEqual(1, len(responses.calls))
+
+    @responses.activate
+    def test_api_requests_for_all_accounts(self):
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher().fetch()
+        self.assertEqual(2, len(responses.calls))
+
+    @responses.activate
+    def test_ignores_account_with_no_creds(self):
+        user_3 = factories.UserFactory()
+        account_3 = factories.AccountFactory(user=user_3)
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher().fetch()
+        self.assertEqual(2, len(responses.calls))
+
+    @responses.activate
+    def test_returns_correct_success_response(self):
+        "Data returned is correct"
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher().fetch()
+        self.assertEqual(len(result), 2)
+        self.assertTrue(result[1]['account'], 'jill')
+        self.assertTrue(result[1]['success'])
+
+    @responses.activate
+    def test_returns_error_if_api_call_fails(self):
+        self.add_response(body='{"errors":[{"message":"Rate limit exceeded","code":88}]}',
+                            status=429)
+        result = VerifyFetcher(screen_name='jill').fetch()
+        self.assertFalse(result[0]['success'])
+        self.assertTrue('Rate limit exceeded' in result[0]['message'])
+
+    @responses.activate
+    def test_returns_error_if_no_creds(self):
+        "If an account has no API credentials, the result is correct"
+        user = factories.UserFactory(screen_name='bobby')
+        account = factories.AccountFactory(user=user)
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher(screen_name='bobby').fetch()
+        self.assertFalse(result[0]['success'])
+        self.assertTrue('Account has no API credentials' in result[0]['message'])
+
+    @responses.activate
+    def test_saves_users(self):
+        "Updates the Account's user data in the DB with fetched data."
+        user = factories.UserFactory(twitter_id=12552,
+                        screen_name='philgyford', name='This should change')
+        account = factories.AccountWithCredentialsFactory(id=4, user=user)
+
+        self.add_response(body=self.make_response_body())
+        result = VerifyFetcher(screen_name='philgyford').fetch()
+
+        user_reloaded = User.objects.get(screen_name='philgyford')
+        self.assertEqual(user_reloaded.name, 'Phil Gyford')
+
+
+class VerifyForAccountTestCase(FetchTwitterTestCase):
 
     api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
 

@@ -26,6 +26,9 @@ from .models import Account, Tweet, User
 #   RecentTweetsFetcher
 #   FavoriteTweetsFetcher
 #
+# UserFetcher
+#
+#
 # The *Fetcher classes are the ones that should be used externally, like:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
@@ -424,16 +427,45 @@ class TwitterFetcher(object):
 
 
 class VerifyFetcher(TwitterFetcher):
+    """Calls verify_credentials for one/all Accounts.
+
+    If an Account verifies OK, its Twitter User data is fetched and its User
+    is created/updated in the databse.
+
+    Usage (or omit screen_name for all Accounts):
+        fetcher = VerifyFetcher(screen_name='aScreenName')
+        results = fetcher.fetch()
+    """
+
     def _get_account_fetcher(self, account):
         return VerifyForAccount(account)
 
 
 class RecentTweetsFetcher(TwitterFetcher):
+    """Fetches the most recent tweets for one/all Accounts.
+
+    Will fetch tweets since the last fetch.
+
+    Usage (or omit screen_name for all Accounts):
+        fetcher = RecentTweetsFetcher(screen_name='aScreenName')
+        results = fetcher.fetch()
+    """
+
     def _get_account_fetcher(self, account):
         return RecentTweetsForAccount(account)
 
 
 class FavoriteTweetsFetcher(TwitterFetcher):
+    """Fetches tweets favorited by one/all Accounts, and associate each one
+    with the Accounts' twitter User.
+
+    Will fetch favorites since the last fetch.
+
+    Usage (or omit screen_name for all Accounts):
+        fetcher = FavoriteTweetsFetcher(screen_name='aScreenName')
+        results = fetcher.fetch()
+    """
+
     def _get_account_fetcher(self, account):
         return FavoriteTweetsForAccount(account)
 

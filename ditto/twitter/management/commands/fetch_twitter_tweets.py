@@ -7,7 +7,7 @@ from ...fetch import FavoriteTweetsFetcher, RecentTweetsFetcher
 
 
 class Command(BaseCommand):
-    """fetches tweets from Twitter.
+    """Fetches tweets from Twitter.
 
     Fetch recent tweets since the last fetch, from all accounts:
     ./manage.py fetch_twitter_tweets --recent
