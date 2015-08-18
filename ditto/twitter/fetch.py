@@ -48,7 +48,10 @@ class TwitterItemMixin(object):
 
 
 class TweetMixin(TwitterItemMixin):
-    "Provides a method for creating/updating a Tweet using data from the API."
+    """Provides a method for creating/updating a Tweet using data from the API.
+    
+    Expects the class to have a self.fetch_time.
+    """
 
     def save_tweet(self, result, extra={}):
         """Takes a dict of tweet data from the API and creates or updates a
@@ -117,7 +120,10 @@ class TweetMixin(TwitterItemMixin):
 
 
 class UserMixin(TwitterItemMixin):
-    "Provides a method for creating/updating a User using data from the API."
+    """Provides a method for creating/updating a User using data from the API.
+    
+    Expects the class to have a self.fetch_time.
+    """
 
     def save_user(self, result, extra={}):
         """With Twitter user data from the API, it creates or updates the User
