@@ -256,3 +256,16 @@ class TwitterUserTestCase(TestCase):
         user.save()
         tweet.refresh_from_db()
         self.assertFalse(tweet.is_private)
+
+    def test_favorites(self):
+        user = factories.UserFactory(screen_name='bill')
+        tweet_1 = factories.TweetFactory(text ='Tweet 1')
+        tweet_2 = factories.TweetFactory(text ='Tweet 2')
+        user.favorites.add(tweet_1)
+        user.favorites.add(tweet_2)
+        faves = User.objects.get(screen_name='bill').favorites.all()
+        self.assertEqual(len(faves), 2)
+        self.assertIsInstance(faves[0], Tweet)
+        self.assertEqual(faves[0].text, 'Tweet 2')
+        self.assertEqual(faves[1].text, 'Tweet 1')
+
