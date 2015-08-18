@@ -37,6 +37,10 @@ class FetchError(Exception):
 
 
 class TwitterItemMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        super(TwitterItemMixin, self).__init__(*args, **kwargs)
+
     def _api_time_to_datetime(self, api_time):
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like 'Wed Nov 15 16:55:59 +0000 2006'.
@@ -48,120 +52,119 @@ class TwitterItemMixin(object):
 
 
 class TweetMixin(TwitterItemMixin):
-    """Provides a method for creating/updating a Tweet using data from the API.
+    "Provides a method for creating/updating a Tweet using data from the API."
+    def __init__(self, *args, **kwargs):
+        super(TweetMixin, self).__init__(*args, **kwargs)
 
-    Expects the class to have a self.fetch_time.
-    """
-
-    def save_tweet(self, result, extra={}):
+    def save_tweet(self, tweet, fetch_time, user):
         """Takes a dict of tweet data from the API and creates or updates a
         Tweet object.
 
         Keyword arguments:
-        result -- The tweet data.
-        extra['user'] -- A User object for whichever User posted this tweet.
+        tweet -- The tweet data.
+        fetch_time -- A datetime.
+        user -- A User object for whichever User posted this tweet.
 
         Returns:
         The Tweet object that was created or updated.
         """
-        user = extra['user']
-
-        raw_json = json.dumps(result)
+        raw_json = json.dumps(tweet)
 
         defaults = {
-            'fetch_time':       self.fetch_time,
+            'fetch_time':       fetch_time,
             'raw':              raw_json,
             'user':             user,
             'permalink':        'https://twitter.com/%s/status/%s' % (
-                                            user.screen_name, result['id']),
-            'title':            result['text'].replace('\n', ' ').replace('\r', ' '),
-            'summary':          result['text'],
-            'text':             result['text'],
-            'twitter_id':       result['id'],
-            'created_at':       self._api_time_to_datetime(result['created_at']),
-            'favorite_count':   result['favorite_count'],
-            'retweet_count':    result['retweet_count'],
-            'language':         result['lang'],
-            'source':           result['source']
+                                            user.screen_name, tweet['id']),
+            'title':            tweet['text'].replace('\n', ' ').replace('\r', ' '),
+            'summary':          tweet['text'],
+            'text':             tweet['text'],
+            'twitter_id':       tweet['id'],
+            'created_at':       self._api_time_to_datetime(tweet['created_at']),
+            'favorite_count':   tweet['favorite_count'],
+            'retweet_count':    tweet['retweet_count'],
+            'language':         tweet['lang'],
+            'source':           tweet['source']
         }
 
         if user.is_private:
-            result['is_private'] = True
+            tweet['is_private'] = True
         else:
-            result['is_private'] = False
+            tweet['is_private'] = False
 
-        if result['coordinates'] and 'type' in result['coordinates']:
-            if result['coordinates']['type'] == 'Point':
-                defaults['latitude'] = result['coordinates']['coordinates'][1]
-                defaults['longitude'] = result['coordinates']['coordinates'][0]
+        if tweet['coordinates'] and 'type' in tweet['coordinates']:
+            if tweet['coordinates']['type'] == 'Point':
+                defaults['latitude'] = tweet['coordinates']['coordinates'][1]
+                defaults['longitude'] = tweet['coordinates']['coordinates'][0]
             # TODO: Handle Polygons?
 
-        if result['in_reply_to_screen_name']:
-            defaults['in_reply_to_screen_name'] =  result['in_reply_to_screen_name']
-            defaults['in_reply_to_status_id'] = result['in_reply_to_status_id']
-            defaults['in_reply_to_user_id'] = result['in_reply_to_user_id']
+        if tweet['in_reply_to_screen_name']:
+            defaults['in_reply_to_screen_name'] =  tweet['in_reply_to_screen_name']
+            defaults['in_reply_to_status_id'] = tweet['in_reply_to_status_id']
+            defaults['in_reply_to_user_id'] = tweet['in_reply_to_user_id']
 
-        if result['place'] is not None:
-            if 'attributes' in result['place'] and 'street_address' in result['place']['attributes']:
-                defaults['place_attribute_street_address'] = result['place']['attributes']['street_address']
-            if 'full_name' in result['place']:
-                defaults['place_full_name'] = result['place']['full_name']
-            if 'country' in result['place']:
-                defaults['place_country'] = result['place']['country']
+        if tweet['place'] is not None:
+            if 'attributes' in tweet['place'] and 'street_address' in tweet['place']['attributes']:
+                defaults['place_attribute_street_address'] = tweet['place']['attributes']['street_address']
+            if 'full_name' in tweet['place']:
+                defaults['place_full_name'] = tweet['place']['full_name']
+            if 'country' in tweet['place']:
+                defaults['place_country'] = tweet['place']['country']
 
-        if 'quoted_status_id' in result:
-            defaults['quoted_status_id'] = result['quoted_status_id']
+        if 'quoted_status_id' in tweet:
+            defaults['quoted_status_id'] = tweet['quoted_status_id']
 
-        tweet, created = Tweet.objects.update_or_create(
-                twitter_id=result['id'],
+        tweet_obj, created = Tweet.objects.update_or_create(
+                twitter_id=tweet['id'],
                 defaults=defaults
             )
-        return tweet
+        return tweet_obj
 
 
 class UserMixin(TwitterItemMixin):
-    """Provides a method for creating/updating a User using data from the API.
+    "Provides a method for creating/updating a User using data from the API."
 
-    Expects the class to have a self.fetch_time.
-    """
+    def __init__(self, *args, **kwargs):
+        super(UserMixin, self).__init__(*args, **kwargs)
 
-    def save_user(self, result, extra={}):
+    def save_user(self, user, fetch_time, extra={}):
         """With Twitter user data from the API, it creates or updates the User
         and returns the User object.
 
         Keyword arguments:
-        result -- A dict of the data about a user from the API's JSON.
+        user -- A dict of the data about a user from the API's JSON.
+        fetch_time -- A datetime.
 
         Returns the User object.
         """
-        raw_json = json.dumps(result)
+        raw_json = json.dumps(user)
 
-        user, created = User.objects.update_or_create(
-            twitter_id=result['id'],
+        user_obj, created = User.objects.update_or_create(
+            twitter_id=user['id'],
             defaults={
-                'fetch_time': self.fetch_time,
+                'fetch_time': fetch_time,
                 'raw': raw_json,
-                'screen_name': result['screen_name'],
-                'name': result['name'],
-                'url': result['url'] if result['url'] else '',
-                'is_private': result['protected'],
-                'is_verified': result['verified'],
-                'created_at': self._api_time_to_datetime(result['created_at']),
-                'description': result['description'] if result['description'] else '',
-                'location': result['location'] if result['location'] else '',
-                'time_zone': result['time_zone'] if result['time_zone'] else '',
-                'profile_image_url': result['profile_image_url'],
-                'profile_image_url_https': result['profile_image_url_https'],
+                'screen_name': user['screen_name'],
+                'name': user['name'],
+                'url': user['url'] if user['url'] else '',
+                'is_private': user['protected'],
+                'is_verified': user['verified'],
+                'created_at': self._api_time_to_datetime(user['created_at']),
+                'description': user['description'] if user['description'] else '',
+                'location': user['location'] if user['location'] else '',
+                'time_zone': user['time_zone'] if user['time_zone'] else '',
+                'profile_image_url': user['profile_image_url'],
+                'profile_image_url_https': user['profile_image_url_https'],
                 # Note favorites / favourites:
-                'favorites_count': result['favourites_count'],
-                'followers_count': result['followers_count'],
-                'friends_count': result['friends_count'],
-                'listed_count': result['listed_count'],
-                'statuses_count': result['statuses_count'],
+                'favorites_count': user['favourites_count'],
+                'followers_count': user['followers_count'],
+                'friends_count': user['friends_count'],
+                'listed_count': user['listed_count'],
+                'statuses_count': user['statuses_count'],
             }
         )
 
-        return user
+        return user_obj
 
 
 class FetchForAccount(object):
@@ -180,6 +183,7 @@ class FetchForAccount(object):
     """
 
     def __init__(self, account):
+
         self.account = account
 
         # Will be the Twython object for calling the Twitter API.
@@ -252,6 +256,9 @@ class VerifyForAccount(UserMixin, FetchForAccount):
     data for that single Account.
     """
 
+    def __init__(self, account):
+        super(VerifyForAccount, self).__init__(account)
+
     def _call_api(self):
         """Sets self.results to data for a single Twitter User."""
         self.results = self.api.verify_credentials()
@@ -265,12 +272,15 @@ class VerifyForAccount(UserMixin, FetchForAccount):
         In other sibling classes this would loop through results and save each
         in turn, but here we only have a single result.
         """
-        user = self.save_user(self.results)
+        user = self.save_user(self.results, self.fetch_time)
         self.objects = [user]
 
 
 class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
     """For fetching recent tweets by a single Account."""
+
+    def __init__(self, *args, **kwargs):
+        super(RecentTweetsForAccount, self).__init__(*args, **kwargs)
 
     def _call_api(self):
         """Sets self.results to be the timeline of tweets for this Account."""
@@ -294,12 +304,16 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         Adds each new Tweet object to self.objects.
         """
         for tweet in self.results:
-            user = self.save_user(tweet['user'])
-            tw = self.save_tweet(tweet, extra={'user': user})
+            user = self.save_user(tweet['user'], self.fetch_time)
+            tw = self.save_tweet(tweet, self.fetch_time, user)
             self.objects.append(tw)
+
 
 class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
     """For fetching tweets favorited by a single Account."""
+
+    def __init__(self, *args, **kwargs):
+        super(FavoriteTweetsForAccount, self).__init__(*args, **kwargs)
 
     def _call_api(self):
         """Sets self.results to be recent tweets favorited by this Account."""
@@ -324,8 +338,10 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         TODO: Associate each favorited tweet with self.account.
         """
         for tweet in self.results:
-            user = self.save_user(tweet['user'])
-            tw = self.save_tweet(tweet, extra={'user': user})
+            user = self.save_user(tweet['user'], self.fetch_time)
+            tw = self.save_tweet(tweet, self.fetch_time, user)
+            # Associate this tweet with the Account's user:
+            self.account.user.favorites.add(tw)
             self.objects.append(tw)
 
 

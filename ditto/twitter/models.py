@@ -198,6 +198,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
 
+    favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
+
     def __str__(self):
         return self.screen_name
 
