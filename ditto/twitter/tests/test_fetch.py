@@ -71,7 +71,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         user_mixin = UserMixin()
         user = user_mixin.save_user(tweet_data['user'], fetch_time)
 
-        #Send the JSON, and our new User object, to try and save the tweet:
+        # Send the JSON, and our new User object, to try and save the tweet:
         mixin = TweetMixin()
         saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
 
@@ -84,7 +84,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.latitude, Decimal('40.05701649'))
         self.assertEqual(tweet.longitude, Decimal('-75.14310264'))
-        self.assertEqual(tweet.is_private, False)
+        self.assertFalse(tweet.is_private)
         self.assertEqual(tweet.fetch_time, fetch_time)
         self.assertEqual(tweet.permalink,
                     'https://twitter.com/philgyford/status/629377146222419968')
@@ -108,6 +108,26 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.place_country, 'United States')
         self.assertEqual(tweet.source, u'<a href="http://tapbots.com/tweetbot" rel="nofollow">Tweetbot for iΟS</a>')
 
+    def test_saves_private_tweets_correctly(self):
+        """If the user is protected, their tweets should be marked private."""
+
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        # Get the JSON for a single tweet.
+        tweets_data = json.loads(self.make_response_body())
+        tweet_data = tweets_data[0]
+        tweet_data['user']['protected'] = True
+
+        user_mixin = UserMixin()
+        user = user_mixin.save_user(tweet_data['user'], fetch_time)
+
+        mixin = TweetMixin()
+        saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
+
+        # Load that saved tweet from the DB:
+        tweet = Tweet.objects.get(twitter_id=629377146222419968)
+        self.assertTrue(tweet.is_private)
+
 
 class UserMixinTestCase(FetchTwitterTestCase):
 
@@ -118,7 +138,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
 
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        # Get the JSON for a single tweet.
+        # Get the JSON for a single user.
         raw_json = self.make_response_body()
         user_data = json.loads(raw_json)
 
@@ -146,6 +166,26 @@ class UserMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(user.friends_count, 309)
         self.assertEqual(user.listed_count, 138)
         self.assertEqual(user.statuses_count, 16428)
+
+    def test_saves_alternate_data(self):
+        """Check some different data to in the main user test."""
+
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        # Get the JSON for a single user.
+        raw_json = self.make_response_body()
+        user_data = json.loads(raw_json)
+
+        user_data['protected'] = True
+        user_data['verified'] = True
+
+        user_mixin = UserMixin()
+        saved_user = user_mixin.save_user(user_data, fetch_time)
+
+        user = User.objects.get(twitter_id=12552)
+
+        self.assertTrue(user.is_private)
+        self.assertTrue(user.is_verified)
 
 
 class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
