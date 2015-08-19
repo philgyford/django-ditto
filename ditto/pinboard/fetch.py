@@ -221,44 +221,31 @@ class FetchBookmarks(object):
         fetch_time -- The UTC time at which these bookmarks were fetched.
         """
         for bookmark in bookmarks_data:
-            try:
-                # Update.
-                b = Bookmark.objects.get(
-                                        account=account, url=bookmark['href'])
-                b.title = bookmark['description']
-                b.is_private = not bookmark['shared']
-                b.raw = bookmark['json']
-                b.description = bookmark['extended']
-                b.to_read = bookmark['toread']
-                # post_time won't change
-                # account won't change
-                # url won't change
-                if b.has_changed or not b.slugs_match_tags(bookmark['tags']):
-                    # Only update it if something's changed.
-                    b.fetch_time = fetch_time
-                    b.save()
-                    # Saves the bookmark's tags:
-                    b.tags.set( *bookmark['tags'] )
+            self._save_bookmark(bookmark, fetch_time, account)
 
-            except Bookmark.DoesNotExist:
-                # Create.
-                b = Bookmark(
-                    title = bookmark['description'],
-                    is_private = not bookmark['shared'],
-                    raw = bookmark['json'],
-                    description = bookmark['extended'],
-                    to_read = bookmark['toread'],
-                    fetch_time = fetch_time,
-                    post_time = bookmark['time'],
-                    account = account,
-                    url = bookmark['href']
-                    #permalink not used
-                    #summary made by Bookmark::save()
-                )
-                b.save()
+    def _save_bookmark(self, bookmark, fetch_time, account):
+        """Takes data for a single bookmark from the API response and creates
+        or updates the Bookmark object.
 
-                # Bookmark needs an ID before we add its tags.
-                if len(bookmark['tags']) > 0:
-                    # This saves the bookmark's tags too:
-                    b.tags.set(*bookmark['tags'])
+        Keyword arguments:
+        bookmark_data -- A list, each one data to create a single Bookmark.
+        fetch_time -- The UTC time at which these bookmarks were fetched.
+        account -- The Account object to add these bookmarks for.
+        """
+
+        bookmark_obj, created = Bookmark.objects.update_or_create(
+            account=account,
+            url=bookmark['href'],
+            defaults={
+                'title': bookmark['description'],
+                'is_private': not bookmark['shared'],
+                'raw': bookmark['json'],
+                'description': bookmark['extended'],
+                'to_read': bookmark['toread'],
+                'fetch_time': fetch_time,
+                'post_time': bookmark['time'],
+            }
+        )
+
+        bookmark_obj.tags.set(*bookmark['tags'])
 

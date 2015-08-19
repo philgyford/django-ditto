@@ -307,18 +307,18 @@ class FetchTypesSaveTestCase(TestCase):
 
         bookmarks = Bookmark.objects.all()
 
-        self.assertEqual(bookmarks[0].title, 'Fontello - icon fonts generator')
-        self.assertFalse(bookmarks[0].is_private)
-        self.assertFalse(bookmarks[0].to_read)
-        self.assertEqual(bookmarks[0].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
+        self.assertEqual(bookmarks[1].title, 'Fontello - icon fonts generator')
+        self.assertFalse(bookmarks[1].is_private)
+        self.assertFalse(bookmarks[1].to_read)
+        self.assertEqual(bookmarks[1].description, 'Create your own icon font using only the icons you need, select from Font Awesome and other free libraries.')
         # This should be updated to now, as we've changed things:
-        self.assertEqual(bookmarks[0].fetch_time, datetime.datetime.strptime(
+        self.assertEqual(bookmarks[1].fetch_time, datetime.datetime.strptime(
                             '2015-07-01 12:00:00',
                             '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
 
-        self.assertEqual(len(bookmarks[0].tags.all()), 4)
-        self.assertIsInstance(bookmarks[0].tags.first(), Tag)
-        self.assertEqual(sorted(list(bookmarks[0].tags.slugs()))[0], 'fonts')
+        self.assertEqual(len(bookmarks[1].tags.all()), 4)
+        self.assertIsInstance(bookmarks[1].tags.first(), Tag)
+        self.assertEqual(sorted(list(bookmarks[1].tags.slugs()))[0], 'fonts')
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
     def test_no_update_bookmarks(self):
