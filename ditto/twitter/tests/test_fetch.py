@@ -15,7 +15,6 @@ from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetche
 from ..models import Account, Tweet, User
 
 
-
 class FetchTwitterTestCase(TestCase):
     """Parent class with commomn things."""
 

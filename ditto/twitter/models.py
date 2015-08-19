@@ -95,11 +95,12 @@ class Tweet(DittoItemModel):
 
     created_at = models.DateTimeField(null=False, blank=False,
         help_text="UTC time when this Tweet was created on Twitter")
-    favorite_count = models.PositiveIntegerField(null=False, blank=False,
-        default=0,
+
+    # Favorite and Retweet Count not present in tweets ingested from a
+    # downloaded archive, hence null=True:
+    favorite_count = models.PositiveIntegerField(null=True, blank=True,
         help_text="Approximately how many times this had been favorited when fetched")
-    retweet_count = models.PositiveIntegerField(null=False, blank=False,
-        default=0,
+    retweet_count = models.PositiveIntegerField(null=True, blank=True,
         help_text="Number of times this had been retweeted when fetched")
 
     in_reply_to_screen_name = models.CharField(null=False, blank=True,
@@ -158,7 +159,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="Username, eg, 'samuelpepys'")
     name = models.CharField(null=False, blank=False, max_length=30,
         help_text="eg, 'Samuel Pepys'")
-    url = models.URLField(null=False, blank=True,
+    url = models.URLField(null=False, blank=True, default='',
         help_text="A URL provided by the user as part of their profile")
     # Inverse of Twitter's 'protected', to be similar to DittoItemModel:
     is_private = models.BooleanField(null=False, default=False,

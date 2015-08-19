@@ -66,8 +66,7 @@ class FetchTwitterTweetsOutput(TestCase):
         "Responds correctly when there was an error fetching recent tweets"
         # What the mocked method will return:
         fetch_method.side_effect = [
-                [{'account': 'philgyford', 'success': False,
-                    'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
         ]
         out = StringIO()
         out_err = StringIO()
@@ -77,8 +76,7 @@ class FetchTwitterTweetsOutput(TestCase):
                                                             out_err.getvalue())
 
 
-
-class FetchUsers(TestCase):
+class FetchAccounts(TestCase):
 
     @patch('ditto.twitter.management.commands.fetch_accounts.VerifyFetcher.fetch')
     def test_success_output(self, fetch_method):
@@ -104,4 +102,49 @@ class FetchUsers(TestCase):
         call_command('fetch_accounts', stdout=out, stderr=out_err)
         self.assertIn('Could not fetch @philgyford: It broke',
                                                             out_err.getvalue())
+
+
+class ImportTweets(TestCase):
+
+    def test_fails_with_no_args(self):
+        "Fails when no arguments are provided"
+        with self.assertRaises(CommandError):
+            call_command('import_tweets')
+
+    def test_fails_with_invalid_directory(self):
+        with patch('os.path.isdir', return_value=False):
+            with self.assertRaises(CommandError):
+                call_command('import_tweets', path='/wrong/path')
+
+    @patch('ditto.twitter.management.commands.import_tweets.TweetIngester.ingest')
+    def test_calls_ingest_method(self, ingest_mock):
+        out = StringIO()
+        with patch('os.path.isdir', return_value=True):
+            call_command('import_tweets', path='/right/path', stdout=out)
+            ingest_mock.assert_called_once_with(
+                                        directory='/right/path/data/js/tweets')
+
+    @patch('ditto.twitter.management.commands.import_tweets.TweetIngester.ingest')
+    def test_success_output(self, ingest_mock):
+        """Outputs the correct response if ingesting succeeds."""
+        ingest_mock.return_value = {
+            'success': True, 'tweets': 12345, 'files': 21
+        }
+        out = StringIO()
+        with patch('os.path.isdir', return_value=True):
+            call_command('import_tweets', path='/right/path', stdout=out)
+            self.assertIn('Imported 12345 tweets from 21 files', out.getvalue())
+
+    @patch('ditto.twitter.management.commands.import_tweets.TweetIngester.ingest')
+    def test_error_output(self, ingest_mock):
+        """Outputs the correct error if ingesting fails."""
+        ingest_mock.return_value = {
+            'success': False, 'message': 'Something went wrong',
+        }
+        out = StringIO()
+        out_err = StringIO()
+        with patch('os.path.isdir', return_value=True):
+            call_command('import_tweets', path='/right/path',
+                                                    stdout=out, stderr=out_err)
+            self.assertIn('Something went wrong', out_err.getvalue())
 

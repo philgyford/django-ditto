@@ -44,18 +44,19 @@ class TwitterItemMixin(object):
     def __init__(self, *args, **kwargs):
         super(TwitterItemMixin, self).__init__(*args, **kwargs)
 
-    def _api_time_to_datetime(self, api_time):
+    def _api_time_to_datetime(self, api_time, time_format='%a %b %d %H:%M:%S +0000 %Y'):
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like 'Wed Nov 15 16:55:59 +0000 2006'.
         """
-        return datetime.datetime.strptime(
-                                        api_time,
-                                        '%a %b %d %H:%M:%S +0000 %Y'
-                                    ).replace(tzinfo=pytz.utc)
+        return datetime.datetime.strptime(api_time, time_format).replace(
+                                                            tzinfo=pytz.utc)
 
 
 class TweetMixin(TwitterItemMixin):
-    "Provides a method for creating/updating a Tweet using data from the API."
+    """Provides a method for creating/updating a Tweet using data from the API.
+    Also used by ingest.TweetIngester()
+    """
+
     def __init__(self, *args, **kwargs):
         super(TweetMixin, self).__init__(*args, **kwargs)
 
@@ -73,40 +74,63 @@ class TweetMixin(TwitterItemMixin):
         """
         raw_json = json.dumps(tweet)
 
+        try:
+            created_at = self._api_time_to_datetime(tweet['created_at'])
+        except ValueError:
+            # Because the tweets imported from a downloaded archive have a
+            # different format for created_at. Of course. Why not?!
+            created_at = self._api_time_to_datetime(tweet['created_at'], time_format='%Y-%m-%d %H:%M:%S +0000')
+
         defaults = {
             'fetch_time':       fetch_time,
             'raw':              raw_json,
             'user':             user,
+            'created_at':       created_at,
             'permalink':        'https://twitter.com/%s/status/%s' % (
                                             user.screen_name, tweet['id']),
             'title':            tweet['text'].replace('\n', ' ').replace('\r', ' '),
             'summary':          tweet['text'],
             'text':             tweet['text'],
             'twitter_id':       tweet['id'],
-            'created_at':       self._api_time_to_datetime(tweet['created_at']),
-            'favorite_count':   tweet['favorite_count'],
-            'retweet_count':    tweet['retweet_count'],
-            'language':         tweet['lang'],
             'source':           tweet['source']
         }
 
         if user.is_private:
-            tweet['is_private'] = True
+            defaults['is_private'] = True
         else:
-            tweet['is_private'] = False
+            defaults['is_private'] = False
 
-        if tweet['coordinates'] and 'type' in tweet['coordinates']:
+        # Some of these are only present in tweets from the API (not in the
+        # tweets from the downloaded archive).
+        # Some are just not always present, such as coordinates and place stuff.
+
+        if 'favorite_count' in tweet:
+            defaults['favorite_count'] = tweet['favorite_count']
+
+        if 'retweet_count' in tweet:
+            defaults['retweet_count'] = tweet['retweet_count']
+
+        if 'lang' in tweet:
+            defaults['language'] = tweet['lang']
+
+        if 'coordinates' in tweet and tweet['coordinates'] and 'type' in tweet['coordinates']:
             if tweet['coordinates']['type'] == 'Point':
                 defaults['latitude'] = tweet['coordinates']['coordinates'][1]
                 defaults['longitude'] = tweet['coordinates']['coordinates'][0]
             # TODO: Handle Polygons?
 
-        if tweet['in_reply_to_screen_name']:
+        if 'in_reply_to_screen_name' in tweet and tweet['in_reply_to_screen_name']:
             defaults['in_reply_to_screen_name'] =  tweet['in_reply_to_screen_name']
+        else:
+            defaults['in_reply_to_screen_name'] = ''
+
+        if 'in_reply_to_status_id' in tweet:
             defaults['in_reply_to_status_id'] = tweet['in_reply_to_status_id']
+
+        if 'in_reply_to_user_id' in tweet:
             defaults['in_reply_to_user_id'] = tweet['in_reply_to_user_id']
 
-        if tweet['place'] is not None:
+        if 'place' in tweet and tweet['place'] is not None:
             if 'attributes' in tweet['place'] and 'street_address' in tweet['place']['attributes']:
                 defaults['place_attribute_street_address'] = tweet['place']['attributes']['street_address']
             if 'full_name' in tweet['place']:

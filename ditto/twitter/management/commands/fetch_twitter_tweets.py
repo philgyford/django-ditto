@@ -24,6 +24,7 @@ class Command(BaseCommand):
     Fetch recent tweets favorited by one account:
     ./manage.py fetch_twitter_tweets --favorites --account=philgyford
     """
+
     help = "Fetches recent and favorited tweets from Twitter"
 
     def add_arguments(self, parser):

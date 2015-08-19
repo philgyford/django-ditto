@@ -16,6 +16,8 @@ class Command(BaseCommand):
     ./manage.py fetch_accounts
     """
 
+    help = "Fetches and updates data about Accounts' Twitter Users"
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--account',
