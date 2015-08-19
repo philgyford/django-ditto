@@ -12,7 +12,7 @@ from taggit.models import Tag
 from django.test import TestCase
 
 from .. import factories
-from ..fetch import FetchBookmarks
+from ..fetch import FetchBookmarks, FetchError
 from ..models import Account, Bookmark
 
 
@@ -104,11 +104,9 @@ class FetchTypesTestRemoteCase(TestCase):
     @patch('ditto.pinboard.fetch.FetchBookmarks._fetch')
     def test_fetch_date_invalid(self, fetch_method):
         """Correctly reacts to an invalid date"""
-        result = FetchBookmarks().fetch_date('2015-06-99')
+        with self.assertRaises(FetchError):
+            result = FetchBookmarks().fetch_date('2015-06-99')
         assert not fetch_method.called
-        self.assertFalse(result[0]['success'])
-        self.assertEqual(result[0]['message'],
-                                        "Invalid date format ('2015-06-99')")
 
 
     # Check multiple accounts.
@@ -145,39 +143,34 @@ class FetchTypesTestRemoteCase(TestCase):
         for error, message in errors:
             exception = error(message)
             self.add_response(body=exception)
-            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+            with self.assertRaises(FetchError):
+                result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                     username='philgyford')
-            self.assertFalse(result[0]['success'])
-            self.assertEqual(result[0]['message'], message)
             responses.reset()
 
     @responses.activate
     def test_it_handles_404s(self):
         """Correctly reacts to a 404 when fetching bookmarks"""
         self.add_response(body='<h1>Not found</h1>', status=404)
-        result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+        with self.assertRaises(FetchError):
+            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                 username='philgyford')
-        self.assertFalse(result[0]['success'])
-        self.assertEqual(result[0]['message'], 'HTTP Error: 404')
 
     @responses.activate
     def test_it_handles_429s(self):
         """Correctly reacts to a 429 when fetching bookmarks"""
         self.add_response(body='<h1>Too Many Requests</h1>', status=429)
-        result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+        with self.assertRaises(FetchError):
+            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                 username='philgyford')
-        self.assertFalse(result[0]['success'])
-        self.assertEqual(result[0]['message'], 'HTTP Error: 429')
 
     @responses.activate
     def test_it_handles_500s(self):
         """Correctly reacts to a 500 error when fetching bookmarks"""
         self.add_response(body='<h1>Error</h1>', status=500)
-        result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+        with self.assertRaises(FetchError):
+            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
                                                 username='philgyford')
-        self.assertFalse(result[0]['success'])
-        self.assertEqual(result[0]['message'], 'HTTP Error: 500')
-
 
 class FetchTypesSaveTestCase(TestCase):
     """Ignoring the stuff for fetching remote data, given some successfully-

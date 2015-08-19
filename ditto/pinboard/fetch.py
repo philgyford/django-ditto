@@ -13,6 +13,11 @@ PINBOARD_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 PINBOARD_ALTERNATE_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 PINBOARD_DATE_FORMAT = "%Y-%m-%d"
 
+
+class FetchError(Exception):
+    pass
+
+
 class FetchBookmarks(object):
 
     def fetch_all(self, username=None):
@@ -31,14 +36,16 @@ class FetchBookmarks(object):
         Keyword arguments:
         post_date -- date to fetch in a "YYYY-MM-DD" format string.
         username -- the username of the one Account to fetch (or None for all).
+
+        Raises:
+        FetchError if the date format is invalid.
         """
         try:
             dt = datetime.datetime.strptime(post_date, '%Y-%m-%d')
         except ValueError:
-            return [{'success': False,
-                        'message': "Invalid date format ('%s')" % post_date}]
-
-        return self._fetch(
+            raise FetchError("Invalid date format ('%s')" % post_date)
+        else:
+            return self._fetch(
                     fetch_type='date', params={'dt': dt}, username=username)
 
     def fetch_recent(self, num=10, username=None):
@@ -121,6 +128,9 @@ class FetchBookmarks(object):
         fetch_type -- 'all', 'date', 'recent' or 'url'.
         params -- Any params needed for this type. eg 'dt':datetime.
         api_token -- Pinboard API token for the account to fetch from.
+
+        Raises:
+        FetchError if there was an HTTP error.
         """
 
         url_parts = ['posts']
@@ -162,7 +172,7 @@ class FetchBookmarks(object):
                 error_message = "Something unusual went wrong."
 
         if error_message:
-            return {'success': False, 'message': error_message}
+            raise FetchError(error_message)
         else:
             return {'success': True, 'json': response.text}
 
