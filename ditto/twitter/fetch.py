@@ -166,6 +166,17 @@ class UserMixin(TwitterItemMixin):
         """
         raw_json = json.dumps(user)
 
+        # If there's a URL it will be a t.co shortened one.
+        # So we go through the entities to find its expanded version.
+        if user['url']:
+            user_url = user['url']
+            if 'url' in user['entities'] and 'urls' in user['entities']['url']:
+                for url in user['entities']['url']['urls']:
+                    if url['url'] == user['url']:
+                        user_url = url['expanded_url']
+        else:
+            user_url = ''
+
         user_obj, created = User.objects.update_or_create(
             twitter_id=user['id'],
             defaults={
@@ -173,7 +184,7 @@ class UserMixin(TwitterItemMixin):
                 'raw': raw_json,
                 'screen_name': user['screen_name'],
                 'name': user['name'],
-                'url': user['url'] if user['url'] else '',
+                'url': user_url,
                 'is_private': user['protected'],
                 'is_verified': user['verified'],
                 'created_at': self._api_time_to_datetime(user['created_at']),

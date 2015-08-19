@@ -150,7 +150,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(user.fetch_time, fetch_time)
         self.assertEqual(user.raw, json.dumps(user_data))
         self.assertEqual(user.screen_name, 'philgyford')
-        self.assertEqual(user.url, 'http://t.co/UEs0CCkdrl')
+        self.assertEqual(user.url, 'http://www.gyford.com/')
         self.assertFalse(user.is_private)
         self.assertFalse(user.is_verified)
         self.assertEqual(user.created_at, datetime.datetime.strptime(
