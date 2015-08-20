@@ -321,12 +321,17 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         super(RecentTweetsForAccount, self).__init__(*args, **kwargs)
 
     def _call_api(self):
-        """Sets self.results to be the timeline of tweets for this Account."""
+        """Sets self.results to be the timeline of tweets for this Account.
+        If the account's `last_recent_id` is set, we fetch tweets from that ID
+        onwards, up to 200.
+        Otherwise we fetch the most recent 200.
+        """
         # account.last_recent_id might be None, in which case it's not used in
         # the API call:
         self.results = self.api.get_user_timeline(
                                 user_id=self.account.user.twitter_id,
                                 include_rts=True,
+                                count=200,
                                 since_id=self.account.last_recent_id)
 
     def _post_save(self):

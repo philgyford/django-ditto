@@ -122,6 +122,10 @@ to a single account add `--account` with the Twitter username. eg::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent --account=philgyford
 
+Fetching recent and favorite tweets will fetch the 200 most recent on the first
+go. Subsequent fetches will get tweets newer since the last time, up to
+a maximum of 200.
+
 
 Other things
 ############
