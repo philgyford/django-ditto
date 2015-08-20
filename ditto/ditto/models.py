@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.db import models
 from django.forms.models import model_to_dict
-from django.utils.encoding import python_2_unicode_compatible
 
 from ditto.ditto.utils import truncate_string
 from .managers import PublicItemManager
@@ -72,7 +71,6 @@ class DiffModelMixin(object):
                              self._meta.fields])
 
 
-@python_2_unicode_compatible
 class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """
     A content item on whatever service we're copying.
@@ -124,6 +122,4 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
         description.
         """
         return 'This child class should define its own summary_source() method!'
-
-
 

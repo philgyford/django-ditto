@@ -1,11 +1,9 @@
 # coding: utf-8
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
-@python_2_unicode_compatible
 class Account(TimeStampedModelMixin, models.Model):
     """The Twitter User Accounts with which we fetch data from the API.
     Each one is connected to a User object, so we only need to store API

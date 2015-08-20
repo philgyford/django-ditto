@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.core.validators import URLValidator
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from taggit.managers import TaggableManager
 
@@ -9,7 +8,6 @@ from .managers import _BookmarkTaggableManager
 from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
 
 
-@python_2_unicode_compatible
 class Account(TimeStampedModelMixin, models.Model):
     username = models.CharField(null=False, blank=False, max_length=30,
                 unique=True,
