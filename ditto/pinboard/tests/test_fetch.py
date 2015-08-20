@@ -2,7 +2,7 @@
 import datetime
 import json
 
-from mock import patch
+from unittest.mock import patch
 from freezegun import freeze_time
 import pytz
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects

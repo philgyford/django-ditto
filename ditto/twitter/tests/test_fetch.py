@@ -2,7 +2,7 @@
 import datetime
 from decimal import Decimal
 import json
-from mock import call, patch
+from unittest.mock import call, patch
 
 import pytz
 import responses

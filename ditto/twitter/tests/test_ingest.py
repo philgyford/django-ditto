@@ -1,5 +1,5 @@
 # coding: utf-8
-from mock import call, mock_open, patch
+from unittest.mock import call, mock_open, patch
 
 from django.test import TestCase
 
