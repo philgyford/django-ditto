@@ -354,11 +354,16 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         super(FavoriteTweetsForAccount, self).__init__(*args, **kwargs)
 
     def _call_api(self):
-        """Sets self.results to be recent tweets favorited by this Account."""
+        """Sets self.results to be recent tweets favorited by this Account.
+        If the account has `last_favorite_id` set, all the favorites since
+        that ID are fetched (up to 200).
+        Otherwise, the most recent 200 are fetched.
+        """
         # account.last_favorite_id might be None, in which case it's not used in
         # the API call:
         self.results = self.api.get_favorites(
                                 user_id=self.account.user.twitter_id,
+                                count=200,
                                 since_id=self.account.last_favorite_id)
 
     def _post_save(self):
@@ -372,8 +377,6 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         """Takes the list of tweet data from the API and creates or updates the
         Tweet objects and the posters' User objects.
         Adds each new Tweet object to self.objects.
-
-        TODO: Associate each favorited tweet with self.account.
         """
         for tweet in self.results:
             user = self.save_user(tweet['user'], self.fetch_time)
