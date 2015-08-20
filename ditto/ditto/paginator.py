@@ -250,7 +250,7 @@ class DiggPaginator(ExPaginator):
                 else:
                     main_range = [min(num_pages-body+1, max(number-padding, main_range[0])), num_pages]
             else:
-                trailing = range(num_pages-tail+1, num_pages+1)
+                trailing = list(range(num_pages-tail+1, num_pages+1))
 
         # finally, normalize values that are out of bound; this basically
         # fixes all the things the above code screwed up in the simple case

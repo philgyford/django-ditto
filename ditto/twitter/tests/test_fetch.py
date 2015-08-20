@@ -274,14 +274,14 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.account_1.save()
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
-        self.assertTrue('since_id=9876543210' in responses.calls[0][0].url)
+        self.assertIn('since_id=9876543210', responses.calls[0][0].url)
 
     @responses.activate
     def test_omits_last_recent_id_from_response(self):
         "If an account has no last_recent_id, it is not used in the request"
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
-        self.assertFalse('since_id=9876543210' in responses.calls[0][0].url)
+        self.assertNotIn('since_id=9876543210', responses.calls[0][0].url)
 
     @responses.activate
     def test_updates_last_recent_id(self):
@@ -309,7 +309,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
                             status=429)
         result = RecentTweetsFetcher(screen_name='jill').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Rate limit exceeded' in result[0]['message'])
+        self.assertIn('Rate limit exceeded', result[0]['message'])
 
     @responses.activate
     def test_returns_error_if_no_creds(self):
@@ -319,7 +319,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Account has no API credentials' in result[0]['message'])
+        self.assertIn('Account has no API credentials', result[0]['message'])
 
     @responses.activate
     def test_saves_tweets(self):
@@ -408,7 +408,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
                             status=429)
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Rate limit exceeded' in result[0]['message'])
+        self.assertIn('Rate limit exceeded', result[0]['message'])
 
     @responses.activate
     def test_returns_error_if_no_creds(self):
@@ -418,7 +418,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Account has no API credentials' in result[0]['message'])
+        self.assertIn('Account has no API credentials', result[0]['message'])
 
     @responses.activate
     def test_saves_tweets(self):
@@ -493,7 +493,7 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
                             status=429)
         result = VerifyFetcher(screen_name='jill').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Rate limit exceeded' in result[0]['message'])
+        self.assertIn('Rate limit exceeded', result[0]['message'])
 
     @responses.activate
     def test_returns_error_if_no_creds(self):
@@ -503,7 +503,7 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
-        self.assertTrue('Account has no API credentials' in result[0]['message'])
+        self.assertIn('Account has no API credentials', result[0]['message'])
 
     @responses.activate
     def test_saves_users(self):

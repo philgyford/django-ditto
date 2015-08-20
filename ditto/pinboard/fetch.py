@@ -145,7 +145,7 @@ class FetchBookmarks(object):
 
         params['format'] = "json"
         params['auth_token'] = api_token
-        query_string = urllib.urlencode(params)
+        query_string = urllib.parse.urlencode(params)
 
         final_url = "{}?{}".format(url, query_string)
 

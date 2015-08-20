@@ -114,7 +114,9 @@ class PinboardBookmarkTestCase(TestCase):
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 3)
         self.assertIsInstance(bookmark_reloaded.tags.first(), Tag)
-        self.assertEqual(bookmark_reloaded.tags.first().name, 'cherry')
+        self.assertEqual(bookmark_reloaded.tags.names().first(), 'apple')
+        self.assertEqual(bookmark_reloaded.tags.all()[0].name, 'apple')
+        self.assertEqual(bookmark_reloaded.tags.all()[2].name, 'cherry')
 
     def test_tags_private(self):
         "Doesn't fetch private tags"
@@ -122,8 +124,9 @@ class PinboardBookmarkTestCase(TestCase):
         bookmark.tags.set('ispublic', '.isprivate', 'alsopublic')
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 2)
-        self.assertEqual(bookmark_reloaded.tags.all()[0].name, 'ispublic')
-        self.assertEqual(bookmark_reloaded.tags.all()[1].name, 'alsopublic')
+        self.assertEqual(bookmark_reloaded.tags.names().first(), 'alsopublic')
+        self.assertEqual(bookmark_reloaded.tags.all()[0].name, 'alsopublic')
+        self.assertEqual(bookmark_reloaded.tags.all()[1].name, 'ispublic')
 
     def test_slugs_match_tags_true(self):
         "Returns true if a list of slugs is the same to bookmark's tags"

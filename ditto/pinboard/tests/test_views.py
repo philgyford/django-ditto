@@ -22,8 +22,8 @@ class PinboardViewTests(TestCase):
         bookmarks_2 = factories.BookmarkFactory.create_batch(
                                                     5, account=accounts[1])
         response = self.client.get(reverse('pinboard:index'))
-        self.assertTrue('account_list' in response.context)
-        self.assertTrue('bookmark_list' in response.context)
+        self.assertIn('account_list', response.context)
+        self.assertIn('bookmark_list', response.context)
         # Three accounts, only two of which have bookmarks:
         self.assertEqual(
             [account.pk for account in response.context['account_list']],
@@ -66,9 +66,9 @@ class PinboardViewTests(TestCase):
                                                         3, account=account_2)
         response = self.client.get(reverse('pinboard:account_detail',
                                     kwargs={'username': account_1.username}))
-        self.assertTrue('account' in response.context)
+        self.assertIn('account', response.context)
         self.assertEqual(account_1.pk, response.context['account'].pk)
-        self.assertTrue('bookmark_list' in response.context)
+        self.assertIn('bookmark_list', response.context)
         self.assertEqual(len(response.context['bookmark_list']), 3)
         self.assertEqual(
             [bookmark.pk for bookmark in response.context['bookmark_list']],
@@ -108,7 +108,7 @@ class PinboardViewTests(TestCase):
         bookmark = factories.BookmarkFactory.create()
         response = self.client.get(reverse('pinboard:bookmark_detail',
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
-        self.assertTrue('bookmark' in response.context)
+        self.assertIn('bookmark', response.context)
         self.assertEqual(bookmark.pk, response.context['bookmark'].pk)
 
     def test_bookmark_detail_privacy(self):
@@ -125,9 +125,9 @@ class PinboardViewTests(TestCase):
         response = self.client.get(reverse('pinboard:bookmark_detail',
             kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
         # The private/public logic happens in the templates, so check output:
-        self.assertTrue('publictag' in response.content)
-        self.assertTrue('alsopublic' in response.content)
-        self.assertFalse('.notpublic' in response.content)
+        self.assertIn('publictag', response.content.decode('utf8'))
+        self.assertIn('alsopublic', response.content.decode('utf8'))
+        self.assertNotIn('.notpublic', response.content.decode('utf8'))
 
     def test_bookmark_detail_fails(self):
         "Returns a 404 if a non-existent bookmark's page is requested"
@@ -152,7 +152,7 @@ class PinboardViewTests(TestCase):
         bookmark_2 = factories.BookmarkFactory.create()
         bookmark_2.tags.set('fish', 'cod')
         response = self.client.get(reverse('pinboard:tag_list'))
-        self.assertTrue('tag_list' in response.context)
+        self.assertIn('tag_list', response.context)
         self.assertEqual(len(response.context['tag_list']), 3)
 
     def test_tag_list_privacy_bookmarks(self):
@@ -195,14 +195,14 @@ class PinboardViewTests(TestCase):
         response = self.client.get(reverse('pinboard:tag_detail',
                                                     kwargs={'slug': 'fish'}))
 
-        self.assertTrue('account_list' in response.context)
+        self.assertIn('account_list', response.context)
         self.assertEqual(
             [account.pk for account in response.context['account_list']],
             [1,2,3]
         )
-        self.assertTrue('tag' in response.context)
+        self.assertIn('tag', response.context)
         self.assertEqual(response.context['tag'].name, 'Fish')
-        self.assertTrue('bookmark_list' in response.context)
+        self.assertIn('bookmark_list', response.context)
         self.assertEqual(len(response.context['bookmark_list']), 2)
         self.assertEqual(response.context['bookmark_list'][0].title, 'Cod')
         self.assertEqual(response.context['bookmark_list'][1].title, 'Carp')
@@ -251,11 +251,11 @@ class PinboardViewTests(TestCase):
         response = self.client.get(reverse('pinboard:account_tag_detail',
                 kwargs={'username': account_1.username, 'tag_slug': 'fish'}))
 
-        self.assertTrue('account' in response.context)
+        self.assertIn('account', response.context)
         self.assertEqual(account_1.pk, response.context['account'].pk)
-        self.assertTrue('tag' in response.context)
+        self.assertIn('tag', response.context)
         self.assertEqual(response.context['tag'].name, 'Fish')
-        self.assertTrue('bookmark_list' in response.context)
+        self.assertIn('bookmark_list', response.context)
         self.assertEqual(len(response.context['bookmark_list']), 2)
         self.assertEqual(
             [bookmark.pk for bookmark in response.context['bookmark_list']],

@@ -9,7 +9,6 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from .. import factories
-from ..managers import UserManager
 from ..models import Account, Tweet, User
 
 
@@ -132,7 +131,7 @@ class TwitterAccountTestCase(TestCase):
                 '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
                 responses.calls[0].request.url)
         self.assertFalse(result['success'])
-        self.assertTrue('Could not authenticate you' in result['message'])
+        self.assertIn('Could not authenticate you', result['message'])
 
     def test_has_credentials_true(self):
         self.add_response(body=self.make_verify_credentials_body(),

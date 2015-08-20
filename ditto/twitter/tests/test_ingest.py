@@ -48,7 +48,7 @@ class TweetIngesterTestCase(TestCase):
     #       m = mock_open(read_data=file_content)
 
     # Patch open() with our mocked version:
-    #       with patch('__builtin__.open', m):
+    #       with patch('builtins.open', m):
 
     # Set the return of readlines() on our mocked open() to be a list of
     # lines from our fixture content:
@@ -65,7 +65,7 @@ class TweetIngesterTestCase(TestCase):
         file_content = self.get_tweet_data()
         with patch('os.listdir', return_value=files):
             m = mock_open(read_data=file_content)
-            with patch('__builtin__.open', m):
+            with patch('builtins.open', m):
                 m.return_value.readlines.return_value = file_content.splitlines()
                 ingester = TweetIngester()
                 result = ingester.ingest(directory='/good/dir')
@@ -83,7 +83,7 @@ class TweetIngesterTestCase(TestCase):
         file_content = self.get_tweet_data()
         with patch('os.listdir', return_value=files):
             m = mock_open(read_data=file_content)
-            with patch('__builtin__.open', m):
+            with patch('builtins.open', m):
                 m.return_value.readlines.return_value = file_content.splitlines()
                 result = TweetIngester().ingest(directory='/good/dir')
         # We load three dummy files; our results have three tweets in each:
@@ -95,7 +95,7 @@ class TweetIngesterTestCase(TestCase):
         file_content = self.get_tweet_data()
         with patch('os.listdir', return_value=files):
             m = mock_open(read_data=file_content)
-            with patch('__builtin__.open', m):
+            with patch('builtins.open', m):
                 m.return_value.readlines.return_value = file_content.splitlines()
                 with self.assertRaises(IngestError):
                     result = TweetIngester().ingest(directory='/good/dir')
@@ -107,7 +107,7 @@ class TweetIngesterTestCase(TestCase):
         file_content = self.get_tweet_data()
         with patch('os.listdir', return_value=files):
             m = mock_open(read_data=file_content)
-            with patch('__builtin__.open', m):
+            with patch('builtins.open', m):
                 m.return_value.readlines.return_value = file_content.splitlines()
                 result = TweetIngester().ingest(directory='/good/dir')
         self.assertTrue(result['success'])
@@ -120,7 +120,7 @@ class TweetIngesterTestCase(TestCase):
         file_content = "Dummy line\n[]\n"
         with patch('os.listdir', return_value=files):
             m = mock_open(read_data=file_content)
-            with patch('__builtin__.open', m):
+            with patch('builtins.open', m):
                 m.return_value.readlines.return_value = file_content.splitlines()
                 result = TweetIngester().ingest(directory='/good/dir')
         self.assertFalse(result['success'])

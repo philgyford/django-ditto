@@ -23,7 +23,13 @@ class _BookmarkTaggableManager(_TaggableManager):
     def all(self):
         """Overriding the default self.all() so we can exclude the private tags
         Pinboard uses, ie, tags that start with '.'.
+        And order the tags alphabetically.
+
         Use like `Bookmark.tags.all()`.
         """
-        return self.get_queryset().exclude(name__startswith='.')
+        return self.get_queryset().exclude(name__startswith='.').order_by('name')
+
+    def names(self):
+        """Override default so we order by name."""
+        return self.get_queryset().exclude(name__startswith='.').order_by('name').values_list('name', flat=True)
 
