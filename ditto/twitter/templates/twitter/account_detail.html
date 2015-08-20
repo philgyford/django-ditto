@@ -1,0 +1,23 @@
+{% extends 'twitter/base.html' %}
+{% load l10n %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
+    <li class="active">{{ account.user.name }} ({{ account.user.screen_name }})</li>
+{% endblock %}
+
+{% block content %}
+    <h1>{% block title %}Tweets by {{ account.user.name }} (@{{ account.user.screen_name }}){% endblock %}</h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}<br>
+            <a href="{{ account.user.permalink }}">View {{ account.user.name }} on Twitter</a>
+        </div>
+    </div>
+
+    {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
+
+{% endblock content %}
+

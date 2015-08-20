@@ -40,9 +40,12 @@ class Account(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['user__screen_name']
 
-    #def get_absolute_url(self):
-        #from django.core.urlresolvers import reverse
-        #return reverse('twitter:account_detail', kwargs={''})
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        if self.user:
+            return reverse('twitter:account_detail', kwargs={'screen_name': self.user.screen_name})
+        else:
+            return ''
 
     def updateUserFromTwitter(self):
         """Calls the Twitter API to fetch the user details for this account.
@@ -232,8 +235,4 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     @property
     def permalink(self):
         return 'https://twitter.com/%s' % self.screen_name
-
-    #def get_absolute_url(self):
-        #from django.core.urlresolvers import reverse
-        #return reverse('twitter:account_detail', kwargs={''})
 

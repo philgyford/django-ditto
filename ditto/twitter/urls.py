@@ -9,7 +9,7 @@ urlpatterns = [
         name='index'
     ),
     url(
-        regex=r"^(?P<username>\w+)$",
+        regex=r"^(?P<screen_name>\w+)$",
         view=views.AccountDetail.as_view(),
         name='account_detail'
     ),
