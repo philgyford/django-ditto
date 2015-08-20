@@ -43,7 +43,8 @@ class Account(TimeStampedModelMixin, models.Model):
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         if self.user:
-            return reverse('twitter:account_detail', kwargs={'screen_name': self.user.screen_name})
+            return reverse('twitter:account_detail',
+                        kwargs={'screen_name': self.user.screen_name})
         else:
             return ''
 

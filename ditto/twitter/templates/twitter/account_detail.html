@@ -4,15 +4,30 @@
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
-    <li class="active">{{ account.user.name }} ({{ account.user.screen_name }})</li>
+    <li class="active">{{ account.user.name }}</li>
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}Tweets by {{ account.user.name }} (@{{ account.user.screen_name }}){% endblock %}</h1>
+    <h1>{% block title %}Tweets by {{ account.user.name }} <small class="text-muted">@{{ account.user.screen_name }}</small>{% endblock %}</h1>
 
     <div class="panel panel-default">
         <div class="panel-body">
-            {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}<br>
+            {% if account.user.description %}
+                {{ account.user.description }}<br>
+            {% endif %}
+            {% if account.user.url %}
+                <a href="{{ account.user.url }}" rel="external nofollow">{{ account.user.url }}</a><br>
+            {% endif %}
+            {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}
+            •
+            Following {{ account.user.friends_count }}
+            •
+            {{ account.user.followers_count }} Follower{{ account.user.followers_count|pluralize }}
+            •
+            {{ account.user.favorites_count }} Favorite{{ account.user.favorites_count|pluralize }}
+            •
+            On {{ account.user.listed_count }} List{{ account.user.listed_count|pluralize }}
+            <br>
             <a href="{{ account.user.permalink }}">View {{ account.user.name }} on Twitter</a>
         </div>
     </div>

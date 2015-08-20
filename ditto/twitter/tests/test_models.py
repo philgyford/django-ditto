@@ -5,6 +5,7 @@ import json
 import pytz
 import responses
 
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -144,6 +145,16 @@ class TwitterAccountTestCase(TestCase):
     def test_has_credentials_false(self):
         account = factories.AccountFactory.build(user=None)
         self.assertFalse(account.hasCredentials())
+
+    def test_get_absolute_url_with_user(self):
+        user = factories.UserFactory(screen_name='bill')
+        account = factories.AccountFactory(user=user)
+        self.assertEqual(account.get_absolute_url(),
+            reverse('twitter:account_detail', kwargs={'screen_name': 'bill'}))
+
+    def test_get_absolute_url_no_user(self):
+        account = factories.AccountFactory(user=None)
+        self.assertEqual(account.get_absolute_url(), '')
 
 
 class TwitterTweetTestCase(TestCase):
