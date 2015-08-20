@@ -15,7 +15,7 @@ class Home(PaginatedListView):
     queryset = Bookmark.public_objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(Home, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['account_list'] = Account.objects.all()
         return context
 
@@ -28,10 +28,10 @@ class AccountDetail(SingleObjectMixin, PaginatedListView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Account.objects.all())
-        return super(AccountDetail, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(AccountDetail, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['account'] = self.object
         context['bookmark_list'] = context['object_list']
         return context
@@ -62,10 +62,10 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Tag.objects.all())
-        return super(TagDetail, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(TagDetail, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['tag'] = self.object
         context['account_list'] = Account.objects.all()
         context['bookmark_list'] = context['object_list']
@@ -86,7 +86,7 @@ class AccountTagDetail(SingleObjectMixin, PaginatedListView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Account.objects.all())
         self.tag_object = self.get_tag_object()
-        return super(AccountTagDetail, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_tag_object(self):
         """Custom method for fetching the Tag."""
@@ -97,7 +97,7 @@ class AccountTagDetail(SingleObjectMixin, PaginatedListView):
         return obj
 
     def get_context_data(self, **kwargs):
-        context = super(AccountTagDetail, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['account'] = self.object
         context['tag'] = self.tag_object
         context['bookmark_list'] = context['object_list']

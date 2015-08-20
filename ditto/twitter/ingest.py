@@ -108,7 +108,7 @@ class TweetIngester(TweetMixin, object):
         """
         if len(self.tweets_data) == 0:
             return
-        
+
         user_twitter_id = self.tweets_data[0]['user']['id']
 
         try:

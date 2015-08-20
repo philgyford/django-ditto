@@ -31,7 +31,7 @@ class Account(TimeStampedModelMixin, models.Model):
         if self.user is None:
             result = self.updateUserFromTwitter()
             # Quietly ignoring errors. Sorry.
-        super(Account, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.user:
@@ -136,7 +136,7 @@ class Tweet(DittoItemModel):
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"
         self.is_private = self.user.is_private
-        super(Tweet, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     #def get_absolute_url(self):
         #from django.core.urlresolvers import reverse
@@ -229,7 +229,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         """
         if self.get_field_diff('is_private') is not None:
             Tweet.objects.filter(user=self).update(is_private=self.is_private)
-        super(User, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def permalink(self):

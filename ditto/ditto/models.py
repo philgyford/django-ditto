@@ -33,7 +33,7 @@ class DiffModelMixin(object):
     """
 
     def __init__(self, *args, **kwargs):
-        super(DiffModelMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__initial = self._dict
 
     @property
@@ -63,7 +63,7 @@ class DiffModelMixin(object):
 
     def save(self, *args, **kwargs):
         "Saves model and set initial state."
-        super(DiffModelMixin, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         self.__initial = self._dict
 
     @property
@@ -116,7 +116,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def save(self, *args, **kwargs):
         self.summary = truncate_string(self.summary_source(), strip_html=True,
                 chars=255, truncate=u'…', at_word_boundary=True)
-        super(DittoItemModel, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def summary_source(self):
         """In child classes, this should return the text to be used, in

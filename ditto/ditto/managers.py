@@ -7,5 +7,5 @@ class PublicItemManager(models.Manager):
     Should be used on ALL public pages of the site.
     """
     def get_queryset(self):
-        return super(PublicItemManager, self).get_queryset().filter(is_private=False)
+        return super().get_queryset().filter(is_private=False)
 
