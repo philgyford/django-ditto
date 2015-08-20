@@ -172,8 +172,11 @@ class PinboardViewTests(TestCase):
         bookmark.tags.set('ispublic', '.notpublic', 'alsopublic')
         response = self.client.get(reverse('pinboard:tag_list'))
         self.assertEqual(len(response.context['tag_list']), 2)
-        self.assertEqual(response.context['tag_list'][0].name, 'ispublic')
-        self.assertEqual(response.context['tag_list'][1].name, 'alsopublic')
+        # Tags on this page are ordered by popularity, so can't be sure
+        # which is 'alsopublic' and which is 'ispublic':
+        tag_names = [tag.name for tag in response.context['tag_list']]
+        self.assertIn('alsopublic', tag_names)
+        self.assertIn('ispublic', tag_names)
 
     def test_tag_detail_templates(self):
         "Uses the correct templates"
