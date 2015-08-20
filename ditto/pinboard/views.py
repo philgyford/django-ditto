@@ -5,18 +5,14 @@ from django.views.generic.detail import SingleObjectMixin
 
 from taggit.models import Tag
 
-from ..ditto.paginator import DiggPaginator
+from ..ditto.views import PaginatedListView
 from .models import Account, Bookmark
 
 
-class Home(ListView):
+class Home(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
     template_name = 'pinboard/index.html'
-    model = Bookmark
     queryset = Bookmark.public_objects.all()
-    paginator_class = DiggPaginator
-    paginate_by = 50
-    page_kwarg = 'p'
 
     def get_context_data(self, **kwargs):
         context = super(Home, self).get_context_data(**kwargs)
@@ -24,14 +20,11 @@ class Home(ListView):
         return context
 
 
-class AccountDetail(SingleObjectMixin, ListView):
-    "A single Pinboard Account"
+class AccountDetail(SingleObjectMixin, PaginatedListView):
+    "A single Pinboard Account and its Bookmarks."
     template_name = 'pinboard/account_detail.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
-    paginator_class = DiggPaginator
-    paginate_by = 50
-    page_kwarg = 'p'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Account.objects.all())
@@ -62,12 +55,9 @@ class TagList(ListView):
         return Bookmark.tags.most_common()
 
 
-class TagDetail(SingleObjectMixin, ListView):
+class TagDetail(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain tag from all Accounts"
     template_name = 'pinboard/tag_detail.html'
-    paginator_class = DiggPaginator
-    paginate_by = 50
-    page_kwarg = 'p'
     allow_empty = False
 
     def get(self, request, *args, **kwargs):
@@ -86,14 +76,11 @@ class TagDetail(SingleObjectMixin, ListView):
         return Bookmark.public_objects.filter(tags__slug__in=[self.object.slug])
 
 
-class AccountTagDetail(SingleObjectMixin, ListView):
+class AccountTagDetail(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain Tag from one Account"
     template_name = 'pinboard/account_tag_detail.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
-    paginator_class = DiggPaginator
-    paginate_by = 50
-    page_kwarg = 'p'
     allow_empty = False
 
     def get(self, request, *args, **kwargs):

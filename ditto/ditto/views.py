@@ -3,7 +3,18 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from taggit.models import Tag
 
+from .paginator import DiggPaginator
 from ..pinboard.models import Bookmark
+
+
+class PaginatedListView(ListView):
+    """Use this instead of ListView to provide standardised pagination."""
+    paginator_class = DiggPaginator
+    paginate_by = 50
+    page_kwarg = 'p'
+
+    def __init__(self, **kwargs):
+        return super(PaginatedListView, self).__init__(**kwargs)
 
 
 class Home(TemplateView):

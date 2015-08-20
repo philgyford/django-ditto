@@ -40,7 +40,7 @@ class Account(TimeStampedModelMixin, models.Model):
             return '%d' % self.pk
 
     class Meta:
-        ordering = ['-time_created']
+        ordering = ['user__screen_name']
 
     #def get_absolute_url(self):
         #from django.core.urlresolvers import reverse
@@ -142,6 +142,22 @@ class Tweet(DittoItemModel):
         #from django.core.urlresolvers import reverse
         #return reverse('pinboard:bookmark_detail',
                     #kwargs={'username': self.account.username, 'pk': self.id})
+
+    @property
+    def is_reply(self):
+        if self.in_reply_to_screen_name == '':
+            return False
+        else:
+            return True
+
+    @property
+    def in_reply_to_url(self):
+        "If it's a reply, the link to the tweet replied to."
+        if self.is_reply:
+            return 'https://twitter.com/%s/status/%s' % (
+                    self.in_reply_to_screen_name, self.in_reply_to_status_id)
+        else:
+            return ''
 
     def summary_source(self):
         "The text that will be truncated to make a summary for this Tweet"

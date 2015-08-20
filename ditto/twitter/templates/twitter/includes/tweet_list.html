@@ -1,0 +1,27 @@
+{% comment %}
+
+Expects:
+ * tweet_list, a queryset of Tweets.
+ * page_obj, a DiggPaginator instance or False.
+ * show_user, boolean - True (default) if we should show the 'By Phil Gyford'
+                            bit on Tweets, False otherwise.
+{% endcomment %}
+
+{% if page_obj == False or page_obj.paginator.count > 0 %}
+    {% if page_obj and page_obj.number > 1 %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+    {% endif %}
+
+    <ul class="media-list">
+        {% for tweet in tweet_list %}
+            <li class="media">
+                {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user only %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if page_obj %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+    {% endif %}
+{% endif %}
+

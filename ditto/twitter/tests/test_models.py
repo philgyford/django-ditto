@@ -55,9 +55,11 @@ class TwitterAccountTestCase(TestCase):
         self.assertEqual(account.__str__(), user.screen_name)
 
     def test_ordering(self):
-        """Multiple accounts are by creation time descending"""
-        account_1 = factories.AccountFactory()
-        account_2 = factories.AccountFactory()
+        """Multiple accounts are by user.screen_name time ascending"""
+        user_1 = factories.UserFactory(screen_name='terry')
+        user_2 = factories.UserFactory(screen_name='june')
+        account_1 = factories.AccountFactory(user=user_1)
+        account_2 = factories.AccountFactory(user=user_2)
         accounts = Account.objects.all()
         self.assertEqual(accounts[0].pk, account_2.pk)
 
@@ -203,6 +205,12 @@ class TwitterTweetTestCase(TestCase):
         user = factories.UserFactory(is_private=True)
         tweet = factories.TweetFactory(user=user)
         self.assertTrue(tweet.is_private)
+
+    def test_is_reply(self):
+        tweet_1 = factories.TweetFactory(in_reply_to_screen_name='bob')
+        self.assertTrue(tweet_1.is_reply)
+        tweet_2 = factories.TweetFactory(in_reply_to_screen_name='')
+        self.assertFalse(tweet_2.is_reply)
 
 
 class TwitterUserTestCase(TestCase):

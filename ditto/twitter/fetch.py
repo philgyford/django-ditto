@@ -73,7 +73,6 @@ class TweetMixin(TwitterItemMixin):
         The Tweet object that was created or updated.
         """
         raw_json = json.dumps(tweet)
-
         try:
             created_at = self._api_time_to_datetime(tweet['created_at'])
         except ValueError:
