@@ -17,5 +17,12 @@
         <p><a href="{% url 'pinboard:index' %}">More Pinboard bookmarks</a></p>
     {% endif %}
 
+    {% if twitter_tweet_list|length > 0%}
+        <h2>Tweets</h2>
+
+        {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_tweet_list show_user=True page_obj=False only %}
+
+        <p><a href="{% url 'twitter:index' %}">More Tweets</a></p>
+    {% endif %}
 {% endblock %}
 

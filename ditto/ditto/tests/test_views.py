@@ -1,9 +1,11 @@
 from unittest.mock import patch
 
+from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from ...pinboard import factories as pinboardfactories
+from ...twitter import factories as twitterfactories
 
 
 class DittoViewTests(TestCase):
@@ -15,17 +17,18 @@ class DittoViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_home_context(self):
-        "Overall home page sends correct data to templates"
-        pinboard_accounts = pinboardfactories.AccountFactory.create_batch(3)
-        pinboard_bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
-                                            6, account=pinboard_accounts[0])
-        pinboard_bookmarks_2 = pinboardfactories.BookmarkFactory.create_batch(
-                                            6, account=pinboard_accounts[1])
-        pinboard_bookmark_private = pinboardfactories.BookmarkFactory.create(
-                                            account=pinboard_accounts[1],
+    def test_home_context_pinboard(self):
+        "Overall home page sends correct Pinboard data to templates"
+        accounts = pinboardfactories.AccountFactory.create_batch(3)
+        bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
+                                            6, account=accounts[0])
+        bookmarks_2 = pinboardfactories.BookmarkFactory.create_batch(
+                                            6, account=accounts[1])
+        bookmark_private = pinboardfactories.BookmarkFactory.create(
+                                            account=accounts[1],
                                             title='Private bookmark',
                                             is_private=True)
+
         response = self.client.get(reverse('ditto:index'))
 
         self.assertTrue('pinboard_bookmark_list' in response.context)
@@ -35,6 +38,23 @@ class DittoViewTests(TestCase):
         self.assertNotEqual(
                         response.context['pinboard_bookmark_list'][0].title,
                         'Private bookmark')
+
+    def test_home_context_twitter(self):
+        "Overall home page sends correct Twitter data to templates"
+        accounts = twitterfactories.AccountFactory.create_batch(3)
+        tweets_1 = twitterfactories.TweetFactory.create_batch(
+                                                    3, user=accounts[0].user)
+        tweets_2 = twitterfactories.TweetFactory.create_batch(
+                                                    3, user=accounts[1].user)
+
+        response = self.client.get(reverse('ditto:index'))
+
+        self.assertIn('twitter_tweet_list', response.context)
+        # Tweets for both accounts that have them:
+        self.assertEqual(
+            [tweet.pk for tweet in response.context['twitter_tweet_list']],
+            [6,5,4,3,2]
+        )
 
     def test_home_privacy(self):
         "Overall home page does not display private Bookmarks etc"
@@ -47,15 +67,26 @@ class DittoViewTests(TestCase):
                                                             public_bookmark.pk)
 
     def test_home_no_pinboard(self):
-        """Shouldn't try to get pinboard bookmarks if pinboard app isn't
-        installed
-        """
-        from django.apps import apps
+        "Shouldn't try to get bookmarks if pinboard app isn't installed"
         with patch.object(apps, 'is_installed') as mock_method:
             # Fake it so it looks like ditto.pinboard isn't installed:
-            mock_method.side_effect = lambda x: {'ditto.pinboard': False}[x]
+            mock_method.side_effect = lambda x: {
+                'ditto.pinboard': False,
+                'ditto.twitter': True,
+            }[x]
             response = self.client.get(reverse('ditto:index'))
             self.assertFalse('pinboard_bookmark_list' in response.context)
+
+    def test_home_no_twitter(self):
+        "Shouldn't try to get tweets if twitter app isn't installed"
+        with patch.object(apps, 'is_installed') as mock_method:
+            # Fake it so it looks like ditto.twitter isn't installed:
+            mock_method.side_effect = lambda x: {
+                'ditto.pinboard': True,
+                'ditto.twitter': False,
+            }[x]
+            response = self.client.get(reverse('ditto:index'))
+            self.assertFalse('twitter_tweet_list' in response.context)
 
     def test_tag_list_templates(self):
         "Uses the correct templates"
