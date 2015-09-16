@@ -52,6 +52,7 @@ To use Ditto's views you can include each app's URLs in your project's own
 
         # If you're using the ditto.pinbaord app:
         url(r'^ditto/pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
+
         # To include the overall, aggregated views:
         url(r'ditto/', include('ditto.ditto.urls', namespace='ditto')),
     ]
@@ -67,7 +68,9 @@ Services
 Pinboard
 ********
 
-In the Django admin, add your Pinboard account(s) with API token from https://pinboard.in/settings/password . Then import all of your bookmarks::
+In the Django admin, add your Pinboard account(s) with API token from https://pinboard.in/settings/password .
+
+Import all of your bookmarks::
 
     $ ./demo/manage.py fetch_pinboard_bookmarks --all
 
@@ -85,7 +88,7 @@ of a particular bookmark you've alread fetched)::
     $ ./demo/manage.py fetch_pinboard_bookmarks --url=http://new-aesthetic.tumblr.com/
 
 The above fetch those bookmark(s) for all Accounts you've added. To restrict to
-a single account use `--account`, eg::
+a single account use ``--account``, eg::
 
     $ ./demo/manage.py fetch_pinboard_bookmarks --all --account=philgyford
 
@@ -95,14 +98,16 @@ Be aware of the rate limits: https://pinboard.in/api/#limits
 Twitter
 *******
 
-In the Django admin, add a new Account, with Twitter API credentials. Then do::
+In the Django admin, add a new Account, with Twitter API credentials.
+
+Then you *must* do::
 
     $ ./demo/manage.py fetch_accounts
 
 which will fetch the data for that account's Twitter user.
 
-Request your Twitter archive at https://twitter.com/settings/account . When you
-have it do::
+Request your Twitter archive at https://twitter.com/settings/account . When
+you've downloaded it, do::
 
     $ ./demo/manage.py import_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 
@@ -113,7 +118,7 @@ Run this periodically to fetch the most recent tweets::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent
 
-And this to fetch recent tweets your accounts have favorited::
+And this to fetch recent tweets that your accounts have favorited::
 
     $ ./demo/manage.py fetch_twitter_tweets --favorites
 
