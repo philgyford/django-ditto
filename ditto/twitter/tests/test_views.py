@@ -85,9 +85,60 @@ class TwitterViewTests(TestCase):
         "It does not show private Tweets"
         user = factories.UserFactory.create(is_private=True)
         account = factories.AccountFactory.create(user=user)
-        tweets_1 = factories.TweetFactory.create_batch(3, user=user)
+        tweets = factories.TweetFactory.create_batch(3, user=user)
         response = self.client.get(reverse('twitter:account_detail',
                                     kwargs={'screen_name': user.screen_name}))
         self.assertIn('account', response.context)
         self.assertEqual(len(response.context['tweet_list']), 0)
+
+    def test_tweet_detail_templates(self):
+        "Uses the correct templates"
+        account = factories.AccountFactory.create()
+        tweets = factories.TweetFactory.create_batch(3, user=account.user)
+        response = self.client.get(reverse('twitter:tweet_detail',
+            kwargs={'screen_name': account.user.screen_name,
+                    'twitter_id': tweets[1].twitter_id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'twitter/tweet_detail.html')
+        self.assertTemplateUsed(response, 'twitter/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_tweet_detail_context(self):
+        "Sends the correct data to templates"
+        account = factories.AccountFactory.create()
+        tweets = factories.TweetFactory.create_batch(3, user=account.user)
+        response = self.client.get(reverse('twitter:tweet_detail',
+            kwargs={'screen_name': account.user.screen_name,
+                    'twitter_id': tweets[1].twitter_id}))
+        self.assertIn('account', response.context)
+        self.assertEqual(account.pk, response.context['account'].pk)
+        self.assertIn('user', response.context)
+        self.assertEqual(account.user.pk, response.context['user'].pk)
+        self.assertIn('tweet', response.context)
+        self.assertEqual(tweets[1].pk, response.context['tweet'].pk)
+
+    def test_tweet_detail_context_no_account(self):
+        "Sends correct data to templates when showing a tweet with no account"
+        user = factories.UserFactory.create()
+        tweets = factories.TweetFactory.create_batch(3, user=user)
+        response = self.client.get(reverse('twitter:tweet_detail',
+            kwargs={'screen_name': user.screen_name,
+                    'twitter_id': tweets[1].twitter_id}))
+        self.assertIn('account', response.context)
+        self.assertIsNone(response.context['account'])
+        self.assertIn('user', response.context)
+        self.assertEqual(user.pk, response.context['user'].pk)
+        self.assertIn('tweet', response.context)
+        self.assertEqual(tweets[1].pk, response.context['tweet'].pk)
+
+    def test_tweet_detail_privacy(self):
+        "It does not show private Tweets"
+        user = factories.UserFactory.create(is_private=True)
+        account = factories.AccountFactory.create(user=user)
+        tweets = factories.TweetFactory.create_batch(3, user=user)
+        response = self.client.get(reverse('twitter:tweet_detail',
+            kwargs={'screen_name': account.user.screen_name,
+                    'twitter_id': tweets[1].twitter_id}))
+        self.assertIn('tweet', response.context)
+        self.assertIsNone(response.context['tweet'])
 

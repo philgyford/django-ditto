@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
@@ -43,17 +44,30 @@ class AccountDetail(SingleObjectMixin, PaginatedListView):
     def get_object(self, queryset=None):
         "Get the Account that has the user with the screen_name from the URL"
         slug = self.kwargs.get(self.slug_url_kwarg)
-        try:
-            obj = Account.objects.get(user__screen_name=slug)
-        except Account.DoesNotExist:
-            raise Http404(_("No %(verbose_name)s found matching the query") %
-                      {'verbose_name': queryset.model._meta.verbose_name})
-        return obj
+        return get_object_or_404(Account, user__screen_name=slug)
 
     def get_queryset(self):
         "All public tweets from this Account."
         return Tweet.public_objects.filter(user=self.object.user)
 
 class TweetDetail(DetailView):
+    """Show a single tweet. It might be posted by one of the Accounts, or might
+    be a tweet by someone else, favorited.
+    """
     model = Tweet
+    slug_field = 'twitter_id'
+    slug_url_kwarg = 'twitter_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = context['tweet'].user
+        if context['user'].is_private:
+            # If private, we don't even send the Tweet to the template.
+            context['tweet'] = None
+        # We can show favorited tweets; they won't have an associated Account.
+        try:
+            context['account'] = Account.objects.get(user=context['user'])
+        except Account.DoesNotExist:
+            context['account'] = None
+        return context
 

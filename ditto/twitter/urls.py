@@ -14,7 +14,7 @@ urlpatterns = [
         name='account_detail'
     ),
     url(
-        regex=r"^(?P<username>\w+)/(?P<twitter_id>\d+)$",
+        regex=r"^(?P<screen_name>\w+)/(?P<twitter_id>\d+)$",
         view=views.TweetDetail.as_view(),
         name='tweet_detail'
     ),

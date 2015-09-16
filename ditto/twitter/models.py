@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
@@ -41,7 +42,6 @@ class Account(TimeStampedModelMixin, models.Model):
         ordering = ['user__screen_name']
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
         if self.user:
             return reverse('twitter:account_detail',
                         kwargs={'screen_name': self.user.screen_name})
@@ -140,10 +140,13 @@ class Tweet(DittoItemModel):
         self.is_private = self.user.is_private
         super().save(*args, **kwargs)
 
-    #def get_absolute_url(self):
-        #from django.core.urlresolvers import reverse
-        #return reverse('pinboard:bookmark_detail',
-                    #kwargs={'username': self.account.username, 'pk': self.id})
+    def get_absolute_url(self):
+        if self.user:
+            return reverse('twitter:tweet_detail',
+                        kwargs={'screen_name': self.user.screen_name,
+                                            'twitter_id': self.twitter_id})
+        else:
+            return ''
 
     @property
     def is_reply(self):

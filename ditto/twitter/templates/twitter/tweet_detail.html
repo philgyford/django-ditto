@@ -1,0 +1,34 @@
+{% extends 'twitter/base.html' %}
+{% load l10n %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
+    <li>
+        {% if account == None %}
+            {{ user.name }}
+        {% else %}
+            <a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user.name }}</a>
+        {% endif %}
+    </li>
+    <li class="active">Tweet</li>
+{% endblock %}
+
+{% block content %}
+    <h1>{% block title %}A Tweet by {{ user.name }} <small class="text-muted">@{{ user.screen_name }}</small>{% endblock %}</h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a href="{{ user.permalink }}">View {{ user.name }} on Twitter</a>
+        </div>
+    </div>
+
+    {% if user.is_private %}
+        {# The `tweet` object will be None, too. #}}
+        <p>This user is private.</p>
+    {% else %}
+        {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False only %}
+    {% endif %}
+
+{% endblock content %}
+
