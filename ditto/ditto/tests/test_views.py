@@ -42,18 +42,32 @@ class DittoViewTests(TestCase):
     def test_home_context_twitter(self):
         "Overall home page sends correct Twitter data to templates"
         accounts = twitterfactories.AccountFactory.create_batch(3)
-        tweets_1 = twitterfactories.TweetFactory.create_batch(
+
+        favoritable_tweets = twitterfactories.TweetFactory.create_batch(6)
+        for tweet in favoritable_tweets:
+            accounts[0].user.favorites.add(tweet)
+
+        recent_tweets_1 = twitterfactories.TweetFactory.create_batch(
                                                     3, user=accounts[0].user)
-        tweets_2 = twitterfactories.TweetFactory.create_batch(
+        recent_tweets_2 = twitterfactories.TweetFactory.create_batch(
                                                     3, user=accounts[1].user)
 
         response = self.client.get(reverse('ditto:index'))
 
-        self.assertIn('twitter_tweet_list', response.context)
-        # Tweets for both accounts that have them:
+        self.assertIn('twitter_recent_tweet_list', response.context)
+        self.assertIn('twitter_favorite_tweet_list', response.context)
+
         self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_tweet_list']],
-            [6,5,4,3,2]
+            [tweet.pk for tweet in response.context['twitter_recent_tweet_list']],
+            [recent_tweets_2[2].pk,recent_tweets_2[1].pk,recent_tweets_2[0].pk,
+            recent_tweets_1[2].pk,recent_tweets_1[1].pk]
+        )
+
+        self.assertEqual(
+            [tweet.pk for tweet in response.context['twitter_favorite_tweet_list']],
+            [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
+            favoritable_tweets[3].pk, favoritable_tweets[2].pk,
+            favoritable_tweets[1].pk]
         )
 
     def test_home_privacy(self):

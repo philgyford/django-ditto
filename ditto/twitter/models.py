@@ -2,6 +2,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from .managers import FavoritesManager, PublicFavoritesManager
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
@@ -79,8 +80,21 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return False
 
+class ExtraTweetManagers(models.Model):
+    """Managers to use in the Tweet model, in addition to the defaults defined
+    in DittoItemModel.
+    These need to be here, rather than in the Tweet model, or they will
+    override those in DittoItemModel.
+    """
+    # For Tweets favorited by any Account:
+    favorite_objects = FavoritesManager()
+    public_favorite_objects = PublicFavoritesManager()
 
-class Tweet(DittoItemModel):
+    class Meta:
+        abstract = True
+
+
+class Tweet(DittoItemModel, ExtraTweetManagers):
     """We don't replicate all of the possible Tweet attributes here, only
     enough to display the most useful things. Given we save the raw JSON
     about this tweet, we could add more attributes in future, even if original

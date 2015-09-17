@@ -30,7 +30,8 @@ class Home(TemplateView):
         if apps.is_installed('ditto.pinboard'):
             context['pinboard_bookmark_list'] = Bookmark.public_objects.all()[:5]
         if apps.is_installed('ditto.twitter'):
-            context['twitter_tweet_list'] = Tweet.public_objects.all()[:5]
+            context['twitter_recent_tweet_list'] = Tweet.public_objects.all()[:5]
+            context['twitter_favorite_tweet_list'] = Tweet.public_favorite_objects.all()[:5]
         return context
 
 
