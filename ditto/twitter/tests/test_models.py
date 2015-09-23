@@ -53,7 +53,7 @@ class TwitterAccountTestCase(TestCase):
         "Has the correct string represntation when it has a user"
         user = factories.UserFactory()
         account = factories.AccountFactory(user=user)
-        self.assertEqual(account.__str__(), user.screen_name)
+        self.assertEqual(account.__str__(), '@%s' % user.screen_name)
 
     def test_ordering(self):
         """Multiple accounts are by user.screen_name time ascending"""
@@ -257,7 +257,7 @@ class TwitterUserTestCase(TestCase):
     def test_str(self):
         "Has the correct string represntation"
         user = factories.UserFactory(screen_name='bill')
-        self.assertEqual(user.__str__(), 'bill')
+        self.assertEqual(user.__str__(), '@bill')
 
     def test_ordering(self):
         """Multiple users are sorted by screen_name"""
