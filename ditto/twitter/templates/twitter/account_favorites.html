@@ -3,18 +3,14 @@
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
-    <li><a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">@{{ account.user.screen_name }}</a></li>
+    <li><a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a></li>
     <li class="active">Favorites</li>
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}Tweets favorited by {{ account.user.name }} <small class="text-muted">@{{ account.user.screen_name }}</small>{% endblock %}</h1>
+    <h1>{% block title %}Tweets favorited by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>{% endblock %}</h1>
 
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {% include 'twitter/includes/user.html' with user=account.user only %}
-        </div>
-    </div>
+    {% include 'twitter/includes/user.html' with user=account.user only %}
 
     <ul class="nav nav-tabs">
         <li role="presentation"><a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">Tweets</a></li>

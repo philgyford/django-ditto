@@ -9,6 +9,11 @@ urlpatterns = [
         name='index'
     ),
     url(
+        regex=r"^favorites$",
+        view=views.Favorites.as_view(),
+        name='favorites'
+    ),
+    url(
         regex=r"^(?P<screen_name>\w+)$",
         view=views.AccountDetail.as_view(),
         name='account_detail'

@@ -23,7 +23,25 @@ class Home(PaginatedListView):
         users = User.objects.filter(pk__in=user_ids)
 
         # Use select_related to fetch user details too. Could be nasty...
-        return Tweet.public_objects.filter(user=users).select_related().all()
+        return Tweet.public_objects.filter(user=users).select_related()
+
+
+class Favorites(PaginatedListView):
+    template_name = 'twitter/favorites.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account_list'] = Account.objects.all()
+        return context
+
+    def get_queryset(self):
+        "Get Tweets by all of the Accounts that have Users."
+        # Need to get the User for each Account that has one:
+        accounts = Account.objects.exclude(user__isnull=True)
+        user_ids = [account.user.id for account in accounts]
+
+        return Tweet.public_favorite_objects.filter(
+                                favoriting_users__in=user_ids).select_related()
 
 
 class AccountDetailMixin(SingleObjectMixin):
@@ -55,7 +73,8 @@ class AccountDetail(AccountDetailMixin, PaginatedListView):
 
     def get_queryset(self):
         "All public tweets from this Account."
-        return Tweet.public_objects.filter(user=self.object.user)
+        return Tweet.public_objects.filter(
+                                        user=self.object.user).select_related()
 
 
 class AccountFavorites(AccountDetailMixin, PaginatedListView):
@@ -65,7 +84,7 @@ class AccountFavorites(AccountDetailMixin, PaginatedListView):
     def get_queryset(self):
         "All public favorites from this Account."
         return Tweet.public_favorite_objects.filter(
-                                    favoriting_users__in=[self.object.user])
+                    favoriting_users__in=[self.object.user]).select_related()
 
 
 class TweetDetail(DetailView):

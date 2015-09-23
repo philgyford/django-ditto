@@ -35,7 +35,7 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def __str__(self):
         if self.user:
-            return self.user.screen_name
+            return str(self.user)
         else:
             return '%d' % self.pk
 
@@ -237,7 +237,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
 
     def __str__(self):
-        return self.screen_name
+        return '@%s' % self.screen_name
 
     class Meta:
         ordering = ['screen_name']

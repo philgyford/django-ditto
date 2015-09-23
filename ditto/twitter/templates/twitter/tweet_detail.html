@@ -6,22 +6,18 @@
     <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
     <li>
         {% if account == None %}
-            {{ user.name }}
+            {{ user }}
         {% else %}
-            <a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user.name }}</a>
+            <a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a>
         {% endif %}
     </li>
     <li class="active">Tweet</li>
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}A Tweet by {{ user.name }} <small class="text-muted">@{{ user.screen_name }}</small>{% endblock %}</h1>
+    <h1>{% block title %}A Tweet by {{ user.name }} <small class="text-muted">{{ user }}</small>{% endblock %}</h1>
 
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <a href="{{ user.permalink }}">View {{ user.name }} on Twitter</a>
-        </div>
-    </div>
+    {% include 'twitter/includes/user.html' with user=user only %}
 
     {% if user.is_private %}
         {# The `tweet` object will be None, too. #}}
