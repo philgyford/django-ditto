@@ -26,6 +26,7 @@ def tweet(value):
     value = re.sub(r'@(?P<username>\w+)',
             '<a href="https://twitter.com/\g<username>" rel="external">@\g<username></a>',
             value)
+    value = re.sub(r'\n', '<br>', value.strip())
     return mark_safe(value)
 
 

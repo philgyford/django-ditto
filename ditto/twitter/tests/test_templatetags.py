@@ -23,3 +23,12 @@ class TemplateTagTests(TestCase):
         self.assertEqual(twitter_tags.tweet(tweet),
             'This <a href="http://example.org/blah" rel="external nofollow">http://example.org/blah</a> here')
 
+    def test_tweet_linebreaks(self):
+        "Should replace <br> tags with linebreaks"
+        tweet = """   First line.
+Second line.
+Final line.
+"""
+        self.assertEqual(twitter_tags.tweet(tweet),
+            'First line.<br>Second line.<br>Final line.')
+
