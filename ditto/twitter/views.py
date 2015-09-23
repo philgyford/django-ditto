@@ -97,13 +97,14 @@ class TweetDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user'] = context['tweet'].user
-        if context['user'].is_private:
+        context['twitter_user'] = context['tweet'].user
+        if context['twitter_user'].is_private:
             # If private, we don't even send the Tweet to the template.
             context['tweet'] = None
         # We can show favorited tweets; they won't have an associated Account.
         try:
-            context['account'] = Account.objects.get(user=context['user'])
+            context['account'] = Account.objects.get(
+                                                user=context['twitter_user'])
         except Account.DoesNotExist:
             context['account'] = None
         return context

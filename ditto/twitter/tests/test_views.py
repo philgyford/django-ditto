@@ -213,8 +213,8 @@ class TwitterViewTests(TestCase):
                     'twitter_id': tweets[1].twitter_id}))
         self.assertIn('account', response.context)
         self.assertEqual(account.pk, response.context['account'].pk)
-        self.assertIn('user', response.context)
-        self.assertEqual(account.user.pk, response.context['user'].pk)
+        self.assertIn('twitter_user', response.context)
+        self.assertEqual(account.user.pk, response.context['twitter_user'].pk)
         self.assertIn('tweet', response.context)
         self.assertEqual(tweets[1].pk, response.context['tweet'].pk)
 
@@ -227,8 +227,8 @@ class TwitterViewTests(TestCase):
                     'twitter_id': tweets[1].twitter_id}))
         self.assertIn('account', response.context)
         self.assertIsNone(response.context['account'])
-        self.assertIn('user', response.context)
-        self.assertEqual(user.pk, response.context['user'].pk)
+        self.assertIn('twitter_user', response.context)
+        self.assertEqual(user.pk, response.context['twitter_user'].pk)
         self.assertIn('tweet', response.context)
         self.assertEqual(tweets[1].pk, response.context['tweet'].pk)
 
