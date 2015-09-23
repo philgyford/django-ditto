@@ -46,6 +46,7 @@ class DittoViewTests(TestCase):
         favoritable_tweets = twitterfactories.TweetFactory.create_batch(6)
         for tweet in favoritable_tweets:
             accounts[0].user.favorites.add(tweet)
+            accounts[2].user.favorites.add(tweet)
 
         recent_tweets_1 = twitterfactories.TweetFactory.create_batch(
                                                     3, user=accounts[0].user)
@@ -55,7 +56,7 @@ class DittoViewTests(TestCase):
         response = self.client.get(reverse('ditto:index'))
 
         self.assertIn('twitter_recent_tweet_list', response.context)
-        self.assertIn('twitter_favorite_tweet_list', response.context)
+        self.assertIn('twitter_favorites_tweet_list', response.context)
 
         self.assertEqual(
             [tweet.pk for tweet in response.context['twitter_recent_tweet_list']],
@@ -64,14 +65,14 @@ class DittoViewTests(TestCase):
         )
 
         self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_favorite_tweet_list']],
+            [tweet.pk for tweet in response.context['twitter_favorites_tweet_list']],
             [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
             favoritable_tweets[3].pk, favoritable_tweets[2].pk,
             favoritable_tweets[1].pk]
         )
 
-    def test_home_privacy(self):
-        "Overall home page does not display private Bookmarks etc"
+    def test_home_privacy_pinboard(self):
+        "Overall home page does not display private Bookmarks"
         public_bookmark = pinboardfactories.BookmarkFactory(is_private=False)
         private_bookmark = pinboardfactories.BookmarkFactory(is_private=True)
         response = self.client.get(reverse('ditto:index'))
@@ -79,6 +80,45 @@ class DittoViewTests(TestCase):
         self.assertEqual(len(response.context['pinboard_bookmark_list']), 1)
         self.assertTrue(response.context['pinboard_bookmark_list'][0].pk,
                                                             public_bookmark.pk)
+
+    def test_home_privacy_twitter_recent(self):
+        "Overall home page does not display private Tweets"
+        private_user = twitterfactories.UserFactory(is_private=True)
+        public_user = twitterfactories.UserFactory(is_private=False)
+
+        private_account = twitterfactories.AccountFactory(user=private_user)
+        public_account = twitterfactories.AccountFactory(user=public_user)
+
+        public_tweet_1 = twitterfactories.TweetFactory(user=public_user)
+        private_tweet = twitterfactories.TweetFactory(user=private_user)
+        public_tweet_2 = twitterfactories.TweetFactory(user=public_user)
+
+        response = self.client.get(reverse('ditto:index'))
+
+        tweets = response.context['twitter_recent_tweet_list']
+        self.assertEqual(len(tweets), 2)
+        self.assertEqual(tweets[0].pk, public_tweet_2.pk)
+        self.assertEqual(tweets[1].pk, public_tweet_1.pk)
+
+    def test_home_privacy_twitter_favorites(self):
+        "Overall home page does not display private favorited Tweets"
+        private_user = twitterfactories.UserFactory(is_private=True)
+        public_users = twitterfactories.UserFactory.create_batch(2,
+                                                            is_private=False)
+
+        favoriting_account = twitterfactories.AccountFactory(
+                                                       user=public_users[0])
+        private_tweet = twitterfactories.TweetFactory(user=private_user)
+        public_tweet = twitterfactories.TweetFactory(user=public_users[1])
+
+        favoriting_account.user.favorites.add(private_tweet)
+        favoriting_account.user.favorites.add(public_tweet)
+
+        response = self.client.get(reverse('ditto:index'))
+
+        tweets = response.context['twitter_favorites_tweet_list']
+        self.assertEqual(len(tweets), 1)
+        self.assertEqual(tweets[0].pk, public_tweet.pk)
 
     def test_home_no_pinboard(self):
         "Shouldn't try to get bookmarks if pinboard app isn't installed"

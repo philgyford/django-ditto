@@ -25,9 +25,11 @@ class Home(PaginatedListView):
         # Use select_related to fetch user details too. Could be nasty...
         return Tweet.public_objects.filter(user=users).select_related().all()
 
-class AccountDetail(SingleObjectMixin, PaginatedListView):
-    "A single Twitter Account and its Tweets."
-    template_name = 'twitter/account_detail.html'
+
+class AccountDetailMixin(SingleObjectMixin):
+    """Used for views that need data about an Account based on screen_name in
+    the URL, and a list of some tweets.
+    """
     slug_field = 'screen_name'
     slug_url_kwarg = 'screen_name'
 
@@ -46,9 +48,25 @@ class AccountDetail(SingleObjectMixin, PaginatedListView):
         slug = self.kwargs.get(self.slug_url_kwarg)
         return get_object_or_404(Account, user__screen_name=slug)
 
+
+class AccountDetail(AccountDetailMixin, PaginatedListView):
+    "A single Twitter Account and its Tweets."
+    template_name = 'twitter/account_detail.html'
+
     def get_queryset(self):
         "All public tweets from this Account."
         return Tweet.public_objects.filter(user=self.object.user)
+
+
+class AccountFavorites(AccountDetailMixin, PaginatedListView):
+    "A single Twitter Account and its Favorites."
+    template_name = 'twitter/account_favorites.html'
+
+    def get_queryset(self):
+        "All public favorites from this Account."
+        return Tweet.public_favorite_objects.filter(
+                                    favoriting_users__in=[self.object.user])
+
 
 class TweetDetail(DetailView):
     """Show a single tweet. It might be posted by one of the Accounts, or might

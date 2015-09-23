@@ -4,7 +4,7 @@
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
-    <li class="active">{{ account.user.name }}</li>
+    <li class="active">@{{ account.user.screen_name }}</li>
 {% endblock %}
 
 {% block content %}
@@ -12,25 +12,14 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            {% if account.user.description %}
-                {{ account.user.description }}<br>
-            {% endif %}
-            {% if account.user.url %}
-                <a href="{{ account.user.url }}" rel="external nofollow">{{ account.user.url }}</a><br>
-            {% endif %}
-            {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}
-            •
-            Following {{ account.user.friends_count }}
-            •
-            {{ account.user.followers_count }} Follower{{ account.user.followers_count|pluralize }}
-            •
-            {{ account.user.favorites_count }} Favorite{{ account.user.favorites_count|pluralize }}
-            •
-            On {{ account.user.listed_count }} List{{ account.user.listed_count|pluralize }}
-            <br>
-            <a href="{{ account.user.permalink }}">View {{ account.user.name }} on Twitter</a>
+            {% include 'twitter/includes/user.html' with user=account.user only %}
         </div>
     </div>
+
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
+        <li role="presentation"><a href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Favorites</a></li>
+    </ul>
 
     {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
 

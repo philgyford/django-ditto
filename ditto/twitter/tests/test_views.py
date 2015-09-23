@@ -91,6 +91,57 @@ class TwitterViewTests(TestCase):
         self.assertIn('account', response.context)
         self.assertEqual(len(response.context['tweet_list']), 0)
 
+    def test_account_favorites_templates(self):
+        "Uses the correct templates"
+        account = factories.AccountFactory.create()
+        response = self.client.get(reverse('twitter:account_favorites',
+                            kwargs={'screen_name': account.user.screen_name}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'twitter/account_favorites.html')
+        self.assertTemplateUsed(response, 'twitter/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_account_favorites_context(self):
+        "Sends the correct data to templates"
+        accounts = factories.AccountFactory.create_batch(3)
+
+        favoritable_tweets = factories.TweetFactory.create_batch(6)
+        for tweet in favoritable_tweets:
+            accounts[0].user.favorites.add(tweet)
+            accounts[2].user.favorites.add(tweet)
+
+        response = self.client.get(reverse('twitter:account_favorites',
+                        kwargs={'screen_name': accounts[0].user.screen_name}))
+
+        self.assertIn('account', response.context)
+        self.assertEqual(accounts[0].pk, response.context['account'].pk)
+
+        self.assertEqual(
+            [tweet.pk for tweet in response.context['tweet_list']],
+            [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
+                favoritable_tweets[3].pk, favoritable_tweets[2].pk,
+                favoritable_tweets[1].pk, favoritable_tweets[0].pk]
+        )
+
+    def test_account_favorites_privacy(self):
+        "It does not show private Tweets"
+        private_user = factories.UserFactory(is_private=True)
+        public_users = factories.UserFactory.create_batch(2, is_private=False)
+
+        favoriting_account = factories.AccountFactory(user=public_users[0])
+        private_tweet = factories.TweetFactory(user=private_user)
+        public_tweet = factories.TweetFactory(user=public_users[1])
+
+        favoriting_account.user.favorites.add(private_tweet)
+        favoriting_account.user.favorites.add(public_tweet)
+
+        response = self.client.get(reverse('twitter:account_favorites',
+                kwargs={'screen_name': favoriting_account.user.screen_name}))
+
+        tweets = response.context['tweet_list']
+        self.assertEqual(len(tweets), 1)
+        self.assertEqual(tweets[0].pk, public_tweet.pk)
+
     def test_tweet_detail_templates(self):
         "Uses the correct templates"
         account = factories.AccountFactory.create()

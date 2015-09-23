@@ -1,0 +1,23 @@
+{# Display information about a Twitter user. #}
+{# Expects a single `user` which is a User object. #}
+
+{% load l10n %}
+
+{% if user.description %}
+	{{ user.description }}<br>
+{% endif %}
+{% if user.url %}
+	<a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a><br>
+{% endif %}
+{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}
+•
+Following {{ user.friends_count }}
+•
+{{ user.followers_count }} Follower{{ user.followers_count|pluralize }}
+•
+{{ user.favorites_count }} Favorite{{ user.favorites_count|pluralize }}
+•
+On {{ user.listed_count }} List{{ user.listed_count|pluralize }}
+<br>
+<a href="{{ user.permalink }}">View {{ user.name }} on Twitter</a>
+
