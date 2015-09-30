@@ -234,7 +234,7 @@ class DiggPaginator(ExPaginator):
             main_range = [1, max(body, min(number+padding, main_range[1]))]
             main_range[0] = 1
         else:
-            leading = range(1, tail+1)
+            leading = list(range(1, tail+1))
         # basically same for trailing range, but not in ``left_align`` mode
         if self.align_left:
             trailing = []
