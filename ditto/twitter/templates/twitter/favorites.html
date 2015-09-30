@@ -17,12 +17,7 @@
         <li role="presentation" class="active"><a href="{% url 'twitter:favorites' %}">Favorites</a></li>
     </ul>
 
-    {# We only show the 'By Phil Gyford' bit on tweets if we're showing more than one Account on this page. #}
-    {% if account_list|length > 1  %}
-        {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True only %}
-    {% else %}
-        {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
-    {% endif %}
+	{% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True only %}
 
 {% endblock content %}
 
