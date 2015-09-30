@@ -17,7 +17,7 @@
         <li role="presentation" class="active"><a href="{% url 'twitter:favorites' %}">Favorites</a></li>
     </ul>
 
-	{% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True only %}
+    {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True only %}
 
 {% endblock content %}
 
