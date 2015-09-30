@@ -146,21 +146,31 @@ class UserMixinTestCase(FetchTwitterTestCase):
 
     api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
 
+    def make_user_data(self, custom={}):
+        """Get the JSON for a single user.
+        custom is a dict of attributes to override on the default data.
+        eg, {'protected': True}
+        """
+        raw_json = self.make_response_body()
+        user_data = json.loads(raw_json)
+        for key, value in custom.items():
+            user_data[key] = value
+        return user_data
+
+    def make_user_object(self, user_data):
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        user_mixin = UserMixin()
+        saved_user = user_mixin.save_user(user_data, fetch_time)
+        return User.objects.get(twitter_id=12552)
+
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_saves_correct_user_data(self):
 
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        user_data = self.make_user_data()
+        user = self.make_user_object(user_data)
 
-        # Get the JSON for a single user.
-        raw_json = self.make_response_body()
-        user_data = json.loads(raw_json)
-
-        user_mixin = UserMixin()
-        saved_user = user_mixin.save_user(user_data, fetch_time)
-
-        user = User.objects.get(twitter_id=12552)
-
-        self.assertEqual(user.fetch_time, fetch_time)
+        self.assertEqual(user.fetch_time,
+                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
         self.assertEqual(user.raw, json.dumps(user_data))
         self.assertEqual(user.screen_name, 'philgyford')
         self.assertEqual(user.url, 'http://www.gyford.com/')
@@ -183,22 +193,21 @@ class UserMixinTestCase(FetchTwitterTestCase):
     def test_saves_alternate_data(self):
         """Check some different data to in the main user test."""
 
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-        # Get the JSON for a single user.
-        raw_json = self.make_response_body()
-        user_data = json.loads(raw_json)
-
-        user_data['protected'] = True
-        user_data['verified'] = True
-
-        user_mixin = UserMixin()
-        saved_user = user_mixin.save_user(user_data, fetch_time)
-
-        user = User.objects.get(twitter_id=12552)
-
+        user_data = self.make_user_data({'protected': True, 'verified': True})
+        user = self.make_user_object(user_data)
         self.assertTrue(user.is_private)
         self.assertTrue(user.is_verified)
+
+    def test_handles_missing_expanded_url(self):
+        """Test fix for when expanded_url is None, as here:
+            {'indices': [0, 28], 'url': 'http://www.benhammersley.com', 'expanded_url': None}
+        """
+        entities = {'url':{'urls':[
+            {'indices': [0, 22], 'url': 'http://t.co/UEs0CCkdrl', 'expanded_url': None}
+        ]}}
+        user_data = self.make_user_data({'entities': entities})
+        user = self.make_user_object(user_data)
+        self.assertEqual(user.url, 'http://t.co/UEs0CCkdrl')
 
 
 class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
