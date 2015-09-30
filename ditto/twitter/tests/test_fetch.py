@@ -35,18 +35,28 @@ class FetchTwitterTestCase(TestCase):
         json_file.close()
         return json_data
 
-    def add_response(self, body, status=200):
+    def add_response(self, body, status=200, querystring={}, match_querystring=False):
         """Add a Twitter API response.
 
         Keyword arguments:
         body -- The JSON string representing the body of the response.
-        status -- Int, HTTP response status
+        status -- Int, HTTP response status.
+        querystring -- eg {'count': 200, 'user_id': 123}
+        match_querystring -- You probably want this to be True if you've set
+                             a querystring.
         """
+        url = '%s/%s.json' % (self.api_url, self.api_call)
+
+        if len(querystring):
+            qs = '&'.join("%s=%s" % (key, querystring[key])
+                                                for key in querystring.keys())
+            url = '%s?%s' % (url, qs)
+
         responses.add(
             responses.GET,
-            '%s/%s.json' % (self.api_url, self.api_call),
+            url,
             status=status,
-            match_querystring=False,
+            match_querystring=match_querystring,
             body=body,
             content_type='application/json; charset=utf-8'
         )
@@ -55,6 +65,8 @@ class FetchTwitterTestCase(TestCase):
 class TweetMixinTestCase(FetchTwitterTestCase):
     """Testing the TweetMixin"""
 
+    # Note that we've changed the id and id_str of each Tweet in this fixture
+    # to something much shorter, and easier to test with.
     api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
@@ -76,7 +88,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
 
         # Load that saved tweet from the DB:
-        tweet = Tweet.objects.get(twitter_id=629377146222419968)
+        tweet = Tweet.objects.get(twitter_id=300)
 
         #And check it's all there:
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
@@ -87,13 +99,13 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertFalse(tweet.is_private)
         self.assertEqual(tweet.fetch_time, fetch_time)
         self.assertEqual(tweet.permalink,
-                    'https://twitter.com/philgyford/status/629377146222419968')
+                                'https://twitter.com/philgyford/status/300')
 
         tweets = json.loads(self.make_response_body())
         self.assertEqual(tweet.raw, json.dumps(tweets[0]))
 
         self.assertEqual(tweet.user.screen_name, 'philgyford')
-        self.assertEqual(tweet.twitter_id, 629377146222419968)
+        self.assertEqual(tweet.twitter_id, 300)
         self.assertEqual(tweet.created_at, datetime.datetime.strptime(
                                     '2015-08-06 19:42:59', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))
@@ -107,6 +119,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.place_full_name, 'Twitter HQ, San Francisco')
         self.assertEqual(tweet.place_country, 'United States')
         self.assertEqual(tweet.source, u'<a href="http://tapbots.com/tweetbot" rel="nofollow">Tweetbot for iΟS</a>')
+
 
     def test_saves_private_tweets_correctly(self):
         """If the user is protected, their tweets should be marked private."""
@@ -125,7 +138,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
 
         # Load that saved tweet from the DB:
-        tweet = Tweet.objects.get(twitter_id=629377146222419968)
+        tweet = Tweet.objects.get(twitter_id=300)
         self.assertTrue(tweet.is_private)
 
 
@@ -230,10 +243,15 @@ class TwitterFetcherTestCase(FetchTwitterTestCase):
     api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
 
     def setUp(self):
-        user_1 = factories.UserFactory(screen_name='jill')
-        user_2 = factories.UserFactory(screen_name='debs')
-        self.account_1 = factories.AccountWithCredentialsFactory(user=user_1)
-        self.account_2 = factories.AccountWithCredentialsFactory(user=user_2)
+        """We add the last_recent_id and last_favorite_id to prevent the
+        fetcher fetching multiple pages of tweets. Keeps things simpler.
+        """
+        user_1 = factories.UserFactory(screen_name='jill', twitter_id=1)
+        user_2 = factories.UserFactory(screen_name='debs', twitter_id=2)
+        self.account_1 = factories.AccountWithCredentialsFactory(
+                        user=user_1, last_recent_id=100, last_favorite_id=100)
+        self.account_2 = factories.AccountWithCredentialsFactory(
+                        user=user_2, last_recent_id=100, last_favorite_id=100)
 
     def test_raises_error_with_invalid_screen_name(self):
         user = factories.UserFactory(screen_name='goodname')
@@ -270,18 +288,19 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_includes_last_recent_id_in_response(self):
         "If an account has a last_recent_id, use it in the request"
-        self.account_1.last_recent_id = 9876543210
-        self.account_1.save()
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
-        self.assertIn('since_id=9876543210', responses.calls[0][0].url)
+        self.assertIn('since_id=100', responses.calls[0][0].url)
 
     @responses.activate
     def test_omits_last_recent_id_from_response(self):
         "If an account has no last_recent_id, it is not used in the request"
-        self.add_response(body=self.make_response_body())
+        self.account_1.last_recent_id = None
+        self.account_1.save()
+        # Stop us fetching multiple pages of results:
+        self.add_response(body='[]')
         result = RecentTweetsFetcher(screen_name='jill').fetch()
-        self.assertNotIn('since_id=9876543210', responses.calls[0][0].url)
+        self.assertNotIn('since_id=100', responses.calls[0][0].url)
 
     @responses.activate
     def test_updates_last_recent_id(self):
@@ -291,7 +310,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
         self.account_1.refresh_from_db()
-        self.assertEqual(self.account_1.last_recent_id, 629377146222419968)
+        self.assertEqual(self.account_1.last_recent_id, 300)
 
     @responses.activate
     def test_returns_correct_success_response(self):
@@ -340,6 +359,21 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         result = RecentTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(save_tweet.call_count, 3)
 
+    @responses.activate
+    def test_fetches_multiple_pages(self):
+        """Fetches subsequent pages until no results are returned."""
+        self.account_1.last_recent_id = 10
+        self.account_1.save()
+        qs = {'user_id': self.account_1.user.twitter_id,
+                'include_rts': 'true', 'count': 200, 'since_id': 10}
+        self.add_response(body=self.make_response_body(),
+                            querystring=qs, match_querystring=True)
+        qs['max_id'] = 99
+        self.add_response(body='[]',
+                            querystring=qs, match_querystring=True)
+        result = RecentTweetsFetcher(screen_name='jill').fetch()
+        self.assertEqual(2, len(responses.calls))
+
 
 class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     """Testing the FavoriteTweetsFetcher class."""
@@ -369,16 +403,15 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_includes_last_favorite_id_in_response(self):
         "If an account has a last_favorite_id, use it in the request"
-        self.account_1.last_favorite_id = 9876543210
-        self.account_1.save()
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
-        self.assertTrue('since_id=9876543210' in responses.calls[0][0].url)
+        self.assertTrue('since_id=100' in responses.calls[0][0].url)
 
     @responses.activate
     def test_omits_last_favorite_id_from_response(self):
         "If an account has no last_favorite_id, it is not used in the request"
-        self.add_response(body=self.make_response_body())
+        # Stop us fetching multiple pages of results:
+        self.add_response(body='[]')
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertFalse('since_id=9876543210' in responses.calls[0][0].url)
 
@@ -390,7 +423,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.account_1.refresh_from_db()
-        self.assertEqual(self.account_1.last_favorite_id, 629377146222419968)
+        self.assertEqual(self.account_1.last_favorite_id, 300)
 
     @responses.activate
     def test_returns_correct_success_response(self):
@@ -449,7 +482,22 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         jills_faves = jill.favorites.all()
         self.assertEqual(len(jills_faves), 3)
         self.assertIsInstance(jills_faves[0], Tweet)
-        self.assertEqual(jills_faves[0].twitter_id, 629377146222419968)
+        self.assertEqual(jills_faves[0].twitter_id, 300)
+
+    @responses.activate
+    def test_fetches_multiple_pages(self):
+        """Fetches subsequent pages until no results are returned."""
+        self.account_1.last_favorite_id = 10
+        self.account_1.save()
+        qs = {'user_id': self.account_1.user.twitter_id,
+                'count': 200, 'since_id': 10}
+        self.add_response(body=self.make_response_body(),
+                            querystring=qs, match_querystring=True)
+        qs['max_id'] = 99
+        self.add_response(body='[]',
+                            querystring=qs, match_querystring=True)
+        result = FavoriteTweetsFetcher(screen_name='jill').fetch()
+        self.assertEqual(2, len(responses.calls))
 
 
 class VerifyFetcherTestCase(TwitterFetcherTestCase):

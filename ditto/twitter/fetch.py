@@ -2,6 +2,7 @@
 import datetime
 import json
 import pytz
+import time
 
 from twython import Twython, TwythonError
 
@@ -42,7 +43,7 @@ class FetchError(Exception):
 class TwitterItemMixin(object):
 
     def __init__(self, *args, **kwargs):
-        super(TwitterItemMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _api_time_to_datetime(self, api_time, time_format='%a %b %d %H:%M:%S +0000 %Y'):
         """Change a text datetime from the API to a datetime with timezone.
@@ -58,7 +59,7 @@ class TweetMixin(TwitterItemMixin):
     """
 
     def __init__(self, *args, **kwargs):
-        super(TweetMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save_tweet(self, tweet, fetch_time, user):
         """Takes a dict of tweet data from the API and creates or updates a
@@ -151,7 +152,7 @@ class UserMixin(TwitterItemMixin):
     "Provides a method for creating/updating a User using data from the API."
 
     def __init__(self, *args, **kwargs):
-        super(UserMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save_user(self, user, fetch_time, extra={}):
         """With Twitter user data from the API, it creates or updates the User
@@ -170,9 +171,9 @@ class UserMixin(TwitterItemMixin):
         if user['url']:
             user_url = user['url']
             if 'url' in user['entities'] and 'urls' in user['entities']['url']:
-                for url in user['entities']['url']['urls']:
-                    if url['url'] == user['url']:
-                        user_url = url['expanded_url']
+                for url_dict in user['entities']['url']['urls']:
+                    if url_dict['url'] == user['url'] and url_dict['expanded_url'] is not None:
+                        user_url = url_dict['expanded_url']
         else:
             user_url = ''
 
@@ -212,6 +213,7 @@ class FetchForAccount(object):
         _save_results()
     and optionally:
         _post_save()
+        _post_fetch()
 
     Use it like:
         account = Account.objects.get(pk=1)
@@ -237,6 +239,18 @@ class FetchForAccount(object):
         # What we'll return for each account:
         self.return_value = {}
 
+        # When fetching Tweets, after a query, this will be set as the max_id
+        # to use for the next query.
+        self.max_id = None
+
+        # When fetching Tweets, this will be set as the highest ID fetched,
+        # so it can be used to set account.last_recent_id or
+        # account.last_favorite_id when we're done.
+        self.last_id = None
+
+        # When fetching Tweets this will be the total amount fetched.
+        self.results_count = 0
+
     def fetch(self):
         if self.account.user:
             self.return_value['account'] = self.account.user.screen_name
@@ -249,34 +263,62 @@ class FetchForAccount(object):
             self.api = Twython(
                 self.account.consumer_key, self.account.consumer_secret,
                 self.account.access_token, self.account.access_token_secret)
-
-            try:
-                self._call_api()
-            except TwythonError as e:
-                self.return_value['success'] = False
-                self.return_value['message'] = 'Error when calling API: %s' % e
-            else:
-                if (len(self.results) > 0):
-                    self._save_results()
-                    self._post_save()
-                self.return_value['success'] = True
-                self.return_value['fetched'] = len(self.results)
+            self._fetch_pages()
+            self._post_fetch()
         else:
             self.return_value['success'] = False
             self.return_value['message'] = 'Account has no API credentials'
 
+        self.return_value['fetched'] = self.results_count
+
         return self.return_value
+
+    def _fetch_pages(self):
+        try:
+            self._call_api()
+        except TwythonError as e:
+            self.return_value['success'] = False
+            self.return_value['message'] = 'Error when calling API: %s' % e
+        else:
+            # If we've got to the last 'page' of tweet results, we'll receive
+            # an empty list from the API.
+            if (len(self.results) > 0):
+                self._save_results()
+                self._post_save()
+                if isinstance(self.results, list):
+                    # This is nasty. But we only want to do all this stuff
+                    # when fetching tweets, rather than verifying credentials.
+                    # The former return a list, the latter a dict.
+                    if self.last_id is None:
+                        self.last_id = self.results[0]['id']
+                    # The max_id for the next 'page' of tweets:
+                    self.max_id = self.results[-1]['id'] - 1
+                    self.results_count += len(self.results)
+                    if self._since_id() is None or self.max_id > self._since_id():
+                        time.sleep(0.5)
+                        self._fetch_pages()
+            self.return_value['success'] = True
+        return
+
+    def _since_id(self):
+        return None
 
     def _call_api(self):
         """Define in child classes.
         Should call self.api.a_function_name() and set self.results with the
         results.
         """
-        pass
+        raise FetchError("Children of the FetchForAccount class should define their own _call_api() method.")
 
     def _post_save(self):
         """Can optionally be defined in child classes.
-        Do any extra things that need to be done after saving the data.
+        Do any extra things that need to be done after saving a page of data.
+        """
+        pass
+
+    def _post_fetch(self):
+        """Can optionally be defined in child classes.
+        Do any extra things that need to be done after we've fetched all data.
         """
         pass
 
@@ -294,7 +336,7 @@ class VerifyForAccount(UserMixin, FetchForAccount):
     """
 
     def __init__(self, account):
-        super(VerifyForAccount, self).__init__(account)
+        super().__init__(account)
 
     def _call_api(self):
         """Sets self.results to data for a single Twitter User."""
@@ -317,7 +359,10 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
     """For fetching recent tweets by a single Account."""
 
     def __init__(self, *args, **kwargs):
-        super(RecentTweetsForAccount, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+    def _since_id(self):
+        return self.account.last_recent_id
 
     def _call_api(self):
         """Sets self.results to be the timeline of tweets for this Account.
@@ -331,14 +376,16 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
                                 user_id=self.account.user.twitter_id,
                                 include_rts=True,
                                 count=200,
-                                since_id=self.account.last_recent_id)
+                                max_id=self.max_id,
+                                since_id=self._since_id())
 
-    def _post_save(self):
+    def _post_fetch(self):
         """Set the last_recent_id of our Account to the most recent Tweet we
         fetched.
         """
-        self.account.last_recent_id = self.results[0]['id']
-        self.account.save()
+        if self.last_id is not None:
+            self.account.last_recent_id = self.last_id
+            self.account.save()
 
     def _save_results(self):
         """Takes the list of tweet data from the API and creates or updates the
@@ -355,7 +402,10 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
     """For fetching tweets favorited by a single Account."""
 
     def __init__(self, *args, **kwargs):
-        super(FavoriteTweetsForAccount, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+    def _since_id(self):
+        return self.account.last_favorite_id
 
     def _call_api(self):
         """Sets self.results to be recent tweets favorited by this Account.
@@ -368,14 +418,16 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         self.results = self.api.get_favorites(
                                 user_id=self.account.user.twitter_id,
                                 count=200,
-                                since_id=self.account.last_favorite_id)
+                                max_id=self.max_id,
+                                since_id=self._since_id())
 
-    def _post_save(self):
+    def _post_fetch(self):
         """Set the last_favorite_id of our Account to the most recent Tweet we
         fetched.
         """
-        self.account.last_favorite_id = self.results[0]['id']
-        self.account.save()
+        if self.last_id is not None:
+            self.account.last_favorite_id = self.last_id
+            self.account.save()
 
     def _save_results(self):
         """Takes the list of tweet data from the API and creates or updates the
