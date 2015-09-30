@@ -12,7 +12,7 @@ from taggit.models import Tag
 from django.test import TestCase
 
 from .. import factories
-from ..fetch import FetchBookmarks, FetchError
+from ..fetch import BookmarksFetcher, AllBookmarksFetcher, DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher, FetchError
 from ..models import Account, Bookmark
 
 
@@ -63,7 +63,7 @@ class FetchTypesTestRemoteCase(TestCase):
                 method='all',
                 body=self.make_success_body(method='all', num_posts=12)
             )
-        result = FetchBookmarks().fetch_all(username='philgyford')
+        result = AllBookmarksFetcher().fetch(username='philgyford')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertTrue(result[0]['success'])
         self.assertEqual(result[0]['fetched'], 12)
@@ -72,7 +72,7 @@ class FetchTypesTestRemoteCase(TestCase):
     def test_fetch_date_success(self):
         """Successfully fetches bookmarks for a particular date"""
         self.add_response(body=self.make_success_body(num_posts=4))
-        result = FetchBookmarks().fetch_date(
+        result = DateBookmarksFetcher().fetch(
                                 post_date='2015-06-18', username='philgyford')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertTrue(result[0]['success'])
@@ -82,7 +82,7 @@ class FetchTypesTestRemoteCase(TestCase):
     def test_fetch_url_success(self):
         """Sucessfully fetches the one bookmark for a URL"""
         self.add_response(body=self.make_success_body(num_posts=1))
-        result = FetchBookmarks().fetch_url(
+        result = UrlBookmarksFetcher().fetch(
                                 url='http://foo.com', username='philgyford')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertTrue(result[0]['success'])
@@ -93,7 +93,7 @@ class FetchTypesTestRemoteCase(TestCase):
         """Successfully fetches recent bookmarks"""
         self.add_response(method='recent',
                                     body=self.make_success_body(num_posts=5))
-        result = FetchBookmarks().fetch_recent(num=5, username='philgyford')
+        result = RecentBookmarksFetcher().fetch(num=5, username='philgyford')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertTrue(result[0]['success'])
         self.assertEqual(result[0]['fetched'], 5)
@@ -101,11 +101,11 @@ class FetchTypesTestRemoteCase(TestCase):
 
     # Check responses when bad data is supplied to interface methods.
 
-    @patch('ditto.pinboard.fetch.FetchBookmarks._fetch')
+    @patch('ditto.pinboard.fetch.BookmarksFetcher._fetch')
     def test_fetch_date_invalid(self, fetch_method):
         """Correctly reacts to an invalid date"""
         with self.assertRaises(FetchError):
-            result = FetchBookmarks().fetch_date('2015-06-99')
+            result = DateBookmarksFetcher().fetch('2015-06-99')
         assert not fetch_method.called
 
 
@@ -116,13 +116,13 @@ class FetchTypesTestRemoteCase(TestCase):
         """Successfully fetches bookmarks when there are multiple accounts."""
         # TODO: Because the actual URL of both these requests is the same,
         # only the first is used when the two requests get made in
-        # FetchBookmarks()._send_request(). So this test isn't *really*
+        # BookmarksFetcher()._send_request(). So this test isn't *really*
         # working properly. Not sure how to fix it.
         self.add_response(body=self.make_success_body(
                                         num_posts=3, username='philgyford'))
         self.add_response(body=self.make_success_body(
                                         num_posts=3, username='testuser'))
-        result = FetchBookmarks().fetch_date(post_date='2015-06-18')
+        result = DateBookmarksFetcher().fetch(post_date='2015-06-18')
         self.assertEqual(result[0]['account'], 'philgyford')
         self.assertEqual(result[0]['fetched'], 3)
         self.assertEqual(result[1]['account'], 'testuser')
@@ -144,7 +144,7 @@ class FetchTypesTestRemoteCase(TestCase):
             exception = error(message)
             self.add_response(body=exception)
             with self.assertRaises(FetchError):
-                result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+                result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                     username='philgyford')
             responses.reset()
 
@@ -153,7 +153,7 @@ class FetchTypesTestRemoteCase(TestCase):
         """Correctly reacts to a 404 when fetching bookmarks"""
         self.add_response(body='<h1>Not found</h1>', status=404)
         with self.assertRaises(FetchError):
-            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                 username='philgyford')
 
     @responses.activate
@@ -161,7 +161,7 @@ class FetchTypesTestRemoteCase(TestCase):
         """Correctly reacts to a 429 when fetching bookmarks"""
         self.add_response(body='<h1>Too Many Requests</h1>', status=429)
         with self.assertRaises(FetchError):
-            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                 username='philgyford')
 
     @responses.activate
@@ -169,7 +169,7 @@ class FetchTypesTestRemoteCase(TestCase):
         """Correctly reacts to a 500 error when fetching bookmarks"""
         self.add_response(body='<h1>Error</h1>', status=500)
         with self.assertRaises(FetchError):
-            result = FetchBookmarks().fetch_date(post_date='2015-06-18',
+            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                 username='philgyford')
 
 class FetchTypesSaveTestCase(TestCase):
@@ -191,7 +191,7 @@ class FetchTypesSaveTestCase(TestCase):
         """
         json_file = open(self.api_fixture)
         json_data = json_file.read()
-        bookmarks_data = FetchBookmarks()._parse_response('date', json_data)
+        bookmarks_data = BookmarksFetcher()._parse_response('date', json_data)
         json_file.close()
 
         return {'json': json_data,
@@ -244,7 +244,7 @@ class FetchTypesSaveTestCase(TestCase):
 
         raw_bookmark = json.dumps(json.loads(json_data)['posts'][0])
 
-        FetchBookmarks()._save_bookmarks(
+        BookmarksFetcher()._save_bookmarks(
                             account=account,
                             bookmarks_data=bookmarks_data,
                             fetch_time=fetch_time)
@@ -298,7 +298,7 @@ class FetchTypesSaveTestCase(TestCase):
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json['bookmarks']
 
-        FetchBookmarks()._save_bookmarks(
+        BookmarksFetcher()._save_bookmarks(
                             account=account,
                             bookmarks_data=bookmarks_data,
                             fetch_time=fetch_time)
@@ -341,7 +341,7 @@ class FetchTypesSaveTestCase(TestCase):
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json['bookmarks']
 
-        FetchBookmarks()._save_bookmarks(
+        BookmarksFetcher()._save_bookmarks(
                             account=account,
                             bookmarks_data=bookmarks_data,
                             fetch_time=fetch_time)

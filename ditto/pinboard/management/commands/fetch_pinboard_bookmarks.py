@@ -3,7 +3,7 @@ import argparse
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch import FetchBookmarks
+from ...fetch import AllBookmarksFetcher, DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher
 
 
 class Command(BaseCommand):
@@ -65,18 +65,18 @@ class Command(BaseCommand):
         account = options['account'] if options['account'] else None;
 
         if options['all']:
-            results = FetchBookmarks().fetch_all(username=account)
+            results = AllBookmarksFetcher().fetch(username=account)
 
         elif options['date']:
-            results = FetchBookmarks().fetch_date(post_date=options['date'],
+            results = DateBookmarksFetcher().fetch(post_date=options['date'],
                                                             username=account)
 
         elif options['recent']:
-            results = FetchBookmarks().fetch_recent(num=options['recent'],
+            results = RecentBookmarksFetcher().fetch(num=options['recent'],
                                                             username=account)
 
         elif options['url']:
-            results = FetchBookmarks().fetch_url(url=options['url'],
+            results = UrlBookmarksFetcher().fetch(url=options['url'],
                                                             username=account)
 
         elif options['account']:

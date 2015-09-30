@@ -18,57 +18,13 @@ class FetchError(Exception):
     pass
 
 
-class FetchBookmarks(object):
+class BookmarksFetcher(object):
+    """The parent class containing common methods.
+    Use one of the child classes to fetch a particular set of Bookmarks.
+    """
 
-    def fetch_all(self, username=None):
-        """Fetches all of the Bookmarks for all or one Accounts.
-        Creates/updates the Bookmark objects.
-
-        Keyword arguments:
-        username -- the username of the one Account to fetch (or None for all).
-        """
-        return self._fetch(fetch_type='all', username=username)
-
-    def fetch_date(self, post_date, username=None):
-        """Fetches Bookmarks for all or one Accounts on a particular day.
-        Creates/updates the Bookmark objects.
-
-        Keyword arguments:
-        post_date -- date to fetch in a "YYYY-MM-DD" format string.
-        username -- the username of the one Account to fetch (or None for all).
-
-        Raises:
-        FetchError if the date format is invalid.
-        """
-        try:
-            dt = datetime.datetime.strptime(post_date, '%Y-%m-%d')
-        except ValueError:
-            raise FetchError("Invalid date format ('%s')" % post_date)
-        else:
-            return self._fetch(
-                    fetch_type='date', params={'dt': dt}, username=username)
-
-    def fetch_recent(self, num=10, username=None):
-        """Fetches the most recent Bookmarks for all or one Accounts.
-        Creates/updates the Bookmark objects.
-
-        Keyword arguments:
-        num -- the number of most recent Bookmarks to fetch.
-        username -- the username of the one Account to fetch (or None for all).
-        """
-        return self._fetch(
-            fetch_type='recent', params={'count': int(num)}, username=username)
-
-    def fetch_url(self, url, username=None):
-        """Fetches a single Bookmark (by URL) for all or one Accounts.
-        Creates/updates the Bookmark objects.
-
-        Keyword arguments:
-        url -- the URL of the Bookmark to fetch.
-        username -- the username of the one Account to fetch (or None for all).
-        """
-        return self._fetch(
-                    fetch_type='url', params={'url': url}, username=username)
+    def fetch(self):
+        raise FetchError('Call a child class like AllBookmarksFetcher or RecentBookmarksFetcher')
 
 
     def _fetch(self, fetch_type, params={}, username=None):
@@ -248,4 +204,67 @@ class FetchBookmarks(object):
         )
 
         bookmark_obj.tags.set(*bookmark['tags'])
+
+
+class AllBookmarksFetcher(BookmarksFetcher):
+
+    def fetch(self, username=None):
+        """Fetches all of the Bookmarks for all or one Accounts.
+        Creates/updates the Bookmark objects.
+
+        Keyword arguments:
+        username -- the username of the one Account to fetch (or None for all).
+        """
+        return self._fetch(fetch_type='all', username=username)
+
+
+class DateBookmarksFetcher(BookmarksFetcher):
+
+    def fetch(self, post_date, username=None):
+        """Fetches Bookmarks for all or one Accounts on a particular day.
+        Creates/updates the Bookmark objects.
+
+        Keyword arguments:
+        post_date -- date to fetch in a "YYYY-MM-DD" format string.
+        username -- the username of the one Account to fetch (or None for all).
+
+        Raises:
+        FetchError if the date format is invalid.
+        """
+        try:
+            dt = datetime.datetime.strptime(post_date, '%Y-%m-%d')
+        except ValueError:
+            raise FetchError("Invalid date format ('%s')" % post_date)
+        else:
+            return self._fetch(
+                    fetch_type='date', params={'dt': dt}, username=username)
+
+
+class RecentBookmarksFetcher(BookmarksFetcher):
+
+    def fetch(self, num=10, username=None):
+        """Fetches the most recent Bookmarks for all or one Accounts.
+        Creates/updates the Bookmark objects.
+
+        Keyword arguments:
+        num -- the number of most recent Bookmarks to fetch.
+        username -- the username of the one Account to fetch (or None for all).
+        """
+        return self._fetch(
+            fetch_type='recent', params={'count': int(num)}, username=username)
+
+
+class UrlBookmarksFetcher(BookmarksFetcher):
+
+    def fetch(self, url, username=None):
+        """Fetches a single Bookmark (by URL) for all or one Accounts.
+        Creates/updates the Bookmark objects.
+
+        Keyword arguments:
+        url -- the URL of the Bookmark to fetch.
+        username -- the username of the one Account to fetch (or None for all).
+        """
+        return self._fetch(
+                    fetch_type='url', params={'url': url}, username=username)
+
 
