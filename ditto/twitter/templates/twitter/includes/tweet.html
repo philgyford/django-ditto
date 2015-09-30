@@ -18,7 +18,7 @@ Expects:
         <p>{{ tweet.text|tweet }}</p>
         <p class="text-muted">
             {% if show_user %}
-                By {{ tweet.user.name }} ({{ tweet.user.screen_name }}) •
+                By {{ tweet.user.name }} ({{ tweet.user }}) •
             {% endif %}
             {% if tweet.is_reply %}
                 <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to @{{ tweet.in_reply_to_screen_name }}</a> •
