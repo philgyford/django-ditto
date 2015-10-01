@@ -15,7 +15,7 @@ Expects:
         <img class="media-object" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar">
     </div>
     <div class="media-body">
-        <p>{{ tweet.text|tweet }}</p>
+        <p class="m-b-0 lead">{{ tweet.text|tweet }}</p>
         <p class="text-muted">
             {% if show_user %}
                 By {{ tweet.user.name }} ({{ tweet.user }}) •

@@ -8,9 +8,18 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}Pinboard Bookmark{% endblock %}</h1>
 
-    {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True only %}
+    <h1 class="display-4 m-y-md">
+        {% block title %}
+            Pinboard bookmark
+        {% endblock %}
+    </h1>
+
+    <div class="card">
+        <div class="card-block">
+            {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True only %}
+        </div>
+    </div>
 
 {% endblock content %}
 

@@ -7,27 +7,32 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}Pinboard bookmarks{% endblock %}</h1>
 
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
-            {% if account_list|length == 1 %}
-                by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a>
-            {% else %}
-                by {{ account_list|length }} user{{ account_list|length|pluralize }}:
+    <h1 class="display-4 m-y-md">
+        {% block title %}
+            Pinboard bookmarks
+        {% endblock %}
+    </h1>
+
+    <div class="card m-b-md">
+        <div class="card-block">
+            <p class="card-text">
+                {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+                {% if account_list|length == 1 %}
+                    by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a>
+                {% else %}
+                    by {{ account_list|length }} user{{ account_list|length|pluralize }}:
+                {% endif %}
+            </p>
+
+            {% if account_list|length > 1 %}
+                {% for account in account_list %}
+                    <a class="card-link" href="{{ account.get_absolute_url }}">
+                        {{ account.username }}
+                    </a>
+                {% endfor %}
             {% endif %}
         </div>
-
-        {% if account_list|length > 1 %}
-            <ul class="list-group">
-                {% for account in account_list %}
-                    <li class="list-group-item">
-                        <a href="{{ account.get_absolute_url }}">{{ account.username }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
     </div>
 
     {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}

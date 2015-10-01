@@ -6,13 +6,22 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}Twitter{% endblock %}</h1>
+
+    <h1 class="display-4 m-y-md">
+		{% block title %}
+			Twitter
+		{% endblock %}
+	</h1>
 
     {% include 'twitter/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='recent' only %}
 
-    <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="{% url 'twitter:index' %}">Tweets</a></li>
-        <li role="presentation"><a href="{% url 'twitter:favorites' %}">Favorites</a></li>
+    <ul class="nav nav-tabs m-b-md">
+        <li class="nav-item">
+			<a class="nav-link active" href="{% url 'twitter:index' %}">Tweets</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" href="{% url 'twitter:favorites' %}">Favorites</a>
+		</li>
     </ul>
 
     {# We only show the 'By Phil Gyford' bit on tweets if we're showing more than one Account on this page. #}

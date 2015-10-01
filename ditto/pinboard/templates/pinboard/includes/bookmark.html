@@ -9,13 +9,15 @@ Expects:
 
 
 {% if detail %}
-    <h2>{{ bookmark.title }}</h2>
+    <h2 class="card-title">{{ bookmark.title }}</h2>
 {% else %}
     <h2 class="h4 media-heading"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
 {% endif %}
 
 {% if bookmark.description %}
-    <p>{{ bookmark.description }}</p>
+    <p class="{% if detail %}card-text{% else %}m-b-0{% endif %}">
+        {{ bookmark.description }}
+    </p>
 {% endif %}
 
 {% if bookmark.tags.all|length %}

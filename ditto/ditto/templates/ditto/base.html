@@ -1,33 +1,24 @@
-<!doctype html>
-<html lang="">
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>{% block head_title %}{% block title %}{% endblock %} (Ditto){% endblock %}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+        {% load staticfiles %}
+        <link rel="stylesheet" href="{% static "bootstrap.css" %}">
     </head>
     <body>
 
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#ditto-navbar" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="{% url 'ditto:index' %}">Ditto</a>
-                </div>
+        <nav class="navbar navbar-dark bg-inverse m-b">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'ditto:index' %}">Ditto</a>
 
-                <div class="collapse navbar-collapse" id="ditto-navbar">
-                    <ul class="nav navbar-nav">
-                        <li class="{% block pinboard_nav_active %}{% endblock %}"><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
-                        <li class="{% block twitter_nav_active %}{% endblock %}"><a href="{% url 'twitter:index' %}">Twitter</a></li>
-                    </ul>
-                </div>
+                <ul class="nav navbar-nav">
+                    <li class="nav-item {% block pinboard_nav_active %}{% endblock %}"><a class="nav-link" href="{% url 'pinboard:index' %}">Pinboard</a></li>
+                    <li class="nav-item {% block twitter_nav_active %}{% endblock %}"><a class="nav-link" href="{% url 'twitter:index' %}">Twitter</a></li>
+                </ul>
             </div>
         </nav>
 

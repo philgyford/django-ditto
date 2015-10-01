@@ -1,37 +1,56 @@
 {# Expects page_obj to be a DiggPaginator instance. #}
 
-{% if page_obj.paginator.num_pages > 0 %}
+{% if page_obj.paginator.num_pages > 1 %}
     <nav>
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li>
-                    <a href="?p={{ page_obj.previous_page_number }}" title="Previous page">&larr;</a>
+                    <a href="?p={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&larr;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
                 </li>
             {% else %}
                 <li class="disabled">
-                    <span><span aria-hidden="true">&larr;</span></span>
+                    <span aria-label="Previous">
+                        <span aria-hidden="true">&larr;</span>
+                        <span class="sr-only">Previous</span>
+                    </span>
                 </li>
             {% endif %}
 
-                {% for p in page_obj.page_range %}
-                    {% if not p %}
-                        <li class="disabled">
-                            <span><span aria-hidden="true">…</span></span>
-                        </li>
-                    {% else %}
-                        <li{% if p == page_obj.number %} class="active"{% endif %}>
-                            <a href="?p={{ p }}">{{ p }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
+            {% for p in page_obj.page_range %}
+                {% if not p %}
+                    <li class="disabled">
+                        <span>
+                            <span aria-hidden="true">…</span>
+                            <span class="sr-only">(more pages)</span>
+                        </span>
+                    </li>
+                {% elif p == page_obj.number %}
+                    <li class="active">
+                        <a href="#">{{ p }} <span class="sr-only">(current)</span></a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="?p={{ p }}">{{ p }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
 
             {% if page_obj.has_next %}
                 <li>
-                    <a href="?p={{ page_obj.next_page_number }}" title="Next page">&rarr;</a>
+                    <a href="?p={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&rarr;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
                 </li>
             {% else %}
                 <li class="disabled">
-                    <span><span aria-hidden="true">&rarr;</span></span>
+                    <span aria-label="Next">
+                        <span aria-hidden="true">&rarr;</span>
+                        <span class="sr-only">Next</span>
+                    </span>
                 </li>
             {% endif %}
         </ul>

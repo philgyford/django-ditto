@@ -15,7 +15,13 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% block title %}A Tweet by {{ twitter_user.name }} <small class="text-muted">{{ twitter_user }}</small>{% endblock %}</h1>
+
+    <h1 class="display-4 m-y-md">
+        {% block title %}
+            A Tweet by {{ twitter_user.name }}
+            <small class="text-muted">{{ twitter_user }}</small>
+        {% endblock %}
+    </h1>
 
     {% include 'twitter/includes/user.html' with user=twitter_user only %}
 

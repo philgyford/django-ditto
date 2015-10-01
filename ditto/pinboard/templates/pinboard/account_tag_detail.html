@@ -10,17 +10,20 @@
 
 {% block content %}
 
-    <h1>{% block title %}Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”{% endblock %}</h1>
+    <h1 class="display-4 m-y-md">
+        {% block title %}
+            Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”
+        {% endblock %}
+    </h1>
 
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="card m-b-md">
+        <div class="card-block">
             {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
             <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
         </div>
     </div>
 
     {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
-
 
 {% endblock content %}
 
