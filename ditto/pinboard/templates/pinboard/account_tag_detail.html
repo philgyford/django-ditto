@@ -12,14 +12,15 @@
 
     <h1 class="display-4 m-y-md">
         {% block title %}
-            Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”
+            Bookmarks by {{ account.username }}
         {% endblock %}
     </h1>
 
     <div class="card m-b-md">
         <div class="card-block">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
-            <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
+            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”<br>
+            <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a><br>
+            <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
         </div>
     </div>
 

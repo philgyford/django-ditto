@@ -9,6 +9,21 @@ from ..ditto.views import PaginatedListView
 from .models import Account, Bookmark
 
 
+class SingleAccountMixin(SingleObjectMixin):
+    "For views which list bookmarks and also need an Account object."
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Account.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account'] = self.object
+        return context
+
+
 class Home(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
     template_name = 'pinboard/index.html'
@@ -20,25 +35,42 @@ class Home(PaginatedListView):
         return context
 
 
-class AccountDetail(SingleObjectMixin, PaginatedListView):
-    "A single Pinboard Account and its Bookmarks."
-    template_name = 'pinboard/account_detail.html'
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Account.objects.all())
-        return super().get(request, *args, **kwargs)
+class ToreadList(PaginatedListView):
+    template_name = 'pinboard/toread_list.html'
+    queryset = Bookmark.public_toread_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account'] = self.object
+        context['account_list'] = Account.objects.all()
+        return context
+
+
+class AccountDetail(SingleAccountMixin, PaginatedListView):
+    "A single Pinboard Account and its Bookmarks."
+    template_name = 'pinboard/account_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['bookmark_list'] = context['object_list']
         return context
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this account."
         return Bookmark.public_objects.filter(account=self.object)
+
+
+class AccountToread(SingleAccountMixin, PaginatedListView):
+    "A single Pinboard Account and its 'to read' Bookmarks."
+    template_name = 'pinboard/account_toread.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bookmark_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        "Show all the public Bookmarks associated with this account."
+        return Bookmark.public_toread_objects.filter(account=self.object)
 
 
 class BookmarkDetail(DetailView):
@@ -75,16 +107,12 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
         "Show all the public Bookmarks associated with this tag."
         return Bookmark.public_objects.filter(tags__slug__in=[self.object.slug])
 
-
-class AccountTagDetail(SingleObjectMixin, PaginatedListView):
+class AccountTagDetail(SingleAccountMixin, PaginatedListView):
     "All Bookmarks with a certain Tag from one Account"
     template_name = 'pinboard/account_tag_detail.html'
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
     allow_empty = False
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Account.objects.all())
         self.tag_object = self.get_tag_object()
         return super().get(request, *args, **kwargs)
 
@@ -98,7 +126,6 @@ class AccountTagDetail(SingleObjectMixin, PaginatedListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account'] = self.object
         context['tag'] = self.tag_object
         context['bookmark_list'] = context['object_list']
         return context

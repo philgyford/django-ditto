@@ -10,18 +10,18 @@
 
     <h1 class="display-4 m-y-md">
         {% block title %}
-            Pinboard bookmarks
+            Pinboard bookmarks marked “to read”
         {% endblock %}
     </h1>
 
-    {% include 'pinboard/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='recent' only %}
+    {% include 'pinboard/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='toread' only %}
 
     <ul class="nav nav-tabs m-b-md">
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'pinboard:index' %}">All bookmarks</a>
+            <a class="nav-link" href="{% url 'pinboard:index' %}">All bookmarks</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'pinboard:toread' %}">To read</a>
+            <a class="nav-link active" href="{% url 'pinboard:toread' %}">To read</a>
         </li>
     </ul>
 

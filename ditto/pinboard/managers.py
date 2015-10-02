@@ -3,6 +3,20 @@ from django.db import models
 from taggit.managers import _TaggableManager
 
 
+class PublicToreadManager(models.Manager):
+    """Returns public Bookmarks from any of the Accounts marked 'to_read'."""
+    def get_queryset(self):
+        return super().get_queryset().filter(is_private=False).filter(to_read=True)
+
+
+class ToreadManager(models.Manager):
+    """Returns public AND PRIVATE Bookmarks from any of the Accounts marked
+    'to_read'.
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(to_read=True)
+
+
 class _BookmarkTaggableManager(_TaggableManager):
     """Providing some extra features related to private Bookmarks and tags."""
 

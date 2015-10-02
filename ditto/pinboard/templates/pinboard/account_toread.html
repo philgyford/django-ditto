@@ -4,7 +4,8 @@
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
-    <li class="active">{{ account.username }}</li>
+    <li><a href="{% url 'pinboard:account_detail' username=account.username %}">{{ account.username }}</a></li>
+    <li class="active">To read</li>
 {% endblock %}
 
 {% block content %}
@@ -17,17 +18,17 @@
 
     <div class="card m-b-md">
         <div class="card-block">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
+            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to read”<br>
             <a href="{{ account.url }}">View {{ account.username }} on Pinboard</a>
         </div>
     </div>
 
     <ul class="nav nav-tabs m-b-md">
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'pinboard:account_detail' username=account.username %}">All bookmarks</a>
+            <a class="nav-link" href="{% url 'pinboard:account_detail' username=account.username %}">All bookmarks</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'pinboard:account_toread' username=account.username %}">To read</a>
+            <a class="nav-link active" href="{% url 'pinboard:account_toread' username=account.username %}">To read</a>
         </li>
     </ul>
 

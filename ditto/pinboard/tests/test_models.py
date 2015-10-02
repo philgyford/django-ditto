@@ -156,3 +156,33 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
+
+
+class PinboardToreadManagersTestCase(TestCase):
+    "The two 'to read' managers."
+
+    def setUp(self):
+        accounts = factories.AccountFactory.create_batch(3)
+        self.bookmarks_1 = factories.BookmarkFactory.create_batch(2,
+                                                        account=accounts[0])
+        self.bookmarks_2 = factories.BookmarkFactory.create_batch(2,
+                                                        account=accounts[1])
+
+        self.bookmarks_1[0].to_read = True
+        self.bookmarks_1[0].is_private = True
+        self.bookmarks_1[0].save()
+        self.bookmarks_2[1].to_read = True
+        self.bookmarks_2[1].save()
+
+    def test_toread_manager(self):
+        "Only includes 'to read' bookmarks"
+        bookmarks = Bookmark.toread_objects.all()
+        self.assertEqual(len(bookmarks), 2)
+        self.assertEqual(bookmarks[0].pk, self.bookmarks_2[1].pk)
+        self.assertEqual(bookmarks[1].pk, self.bookmarks_1[0].pk)
+
+    def test_public_toread_manager(self):
+        "Only includes public 'to read' bookmarks"
+        bookmarks = Bookmark.public_toread_objects.all()
+        self.assertEqual(len(bookmarks), 1)
+        self.assertEqual(bookmarks[0].pk, self.bookmarks_2[1].pk)

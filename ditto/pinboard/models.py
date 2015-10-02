@@ -4,7 +4,7 @@ from django.db import models
 
 from taggit.managers import TaggableManager
 
-from .managers import _BookmarkTaggableManager
+from .managers import _BookmarkTaggableManager, PublicToreadManager, ToreadManager
 from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
 
 
@@ -31,7 +31,20 @@ class Account(TimeStampedModelMixin, models.Model):
         return reverse('pinboard:account_detail', kwargs={'username': self.username})
 
 
-class Bookmark(DittoItemModel):
+class ExtraBookmarkManagers(models.Model):
+    """Managers to use in the Bookmark model, in addition to the defaults
+    defined in DittoItemModel.
+    These need to be here, rather than in the Pinboard model, or they will
+    override those in DittoItemModel.
+    """
+    toread_objects = ToreadManager()
+    public_toread_objects = PublicToreadManager()
+
+    class Meta:
+        abstract = True
+
+
+class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:

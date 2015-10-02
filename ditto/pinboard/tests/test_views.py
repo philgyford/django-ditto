@@ -46,6 +46,47 @@ class PinboardViewTests(TestCase):
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
 
+    ## TO READ
+
+    def test_to_read_templates(self):
+        "The Pinboard 'to read' page uses the correct templates"
+        response = self.client.get(reverse('pinboard:toread'))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pinboard/toread_list.html')
+        self.assertTemplateUsed(response, 'pinboard/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_to_read_context(self):
+        """The Pinboard 'to read' page sends the correct data to templates.
+        Also tests privacy."""
+        accounts = factories.AccountFactory.create_batch(3)
+        bookmarks_1 = factories.BookmarkFactory.create_batch(
+                                                    2, account=accounts[0])
+        bookmarks_2 = factories.BookmarkFactory.create_batch(
+                                                    2, account=accounts[1])
+        bookmarks_1[0].to_read = True
+        bookmarks_1[0].save()
+        bookmarks_1[1].to_read = True
+        bookmarks_1[1].is_private = True
+        bookmarks_1[1].save()
+        bookmarks_2[1].to_read = True
+        bookmarks_2[1].save()
+        response = self.client.get(reverse('pinboard:toread'))
+        self.assertIn('account_list', response.context)
+        self.assertIn('bookmark_list', response.context)
+        # Three accounts, only two of which have bookmarks:
+        self.assertEqual(
+            [account.pk for account in response.context['account_list']],
+            [1,2,3]
+        )
+        # Bookmarks for both accounts that have them:
+        self.assertEqual(
+            [bookmark.pk for bookmark in response.context['bookmark_list']],
+            [bookmarks_2[1].pk, bookmarks_1[0].pk,]
+        )
+
+    ## ACCOUNT DETAIL
+
     def test_account_detail_templates(self):
         "Uses the correct templates"
         account = factories.AccountFactory.create()
@@ -95,6 +136,44 @@ class PinboardViewTests(TestCase):
                                         kwargs={'username': 'doesnotexist'}))
         self.assertEquals(response.status_code, 404)
 
+    ## ACCOUNT TO READ
+
+    def test_account_toread_templates(self):
+        "Uses the correct templates"
+        account = factories.AccountFactory.create()
+        response = self.client.get(reverse('pinboard:account_toread',
+                                        kwargs={'username': account.username}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pinboard/account_toread.html')
+        self.assertTemplateUsed(response, 'pinboard/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_account_detail_context(self):
+        "Sends the correct data to templates. Also tests privacy."
+        accounts = factories.AccountFactory.create_batch(2)
+        bookmarks_1 = factories.BookmarkFactory.create_batch(
+                                                        2, account=accounts[0])
+        bookmarks_2 = factories.BookmarkFactory.create_batch(
+                                                        2, account=accounts[1])
+        bookmarks_1[0].to_read = True
+        bookmarks_1[0].save()
+        bookmarks_1[1].to_read = True
+        bookmarks_1[1].is_private = True
+        bookmarks_1[1].save()
+        bookmarks_2[1].to_read = True
+        bookmarks_2[1].save()
+
+        response = self.client.get(reverse('pinboard:account_toread',
+                                    kwargs={'username': accounts[0].username}))
+        self.assertIn('account', response.context)
+        self.assertEqual(accounts[0].pk, response.context['account'].pk)
+        self.assertIn('bookmark_list', response.context)
+        self.assertEqual(len(response.context['bookmark_list']), 1)
+        self.assertEqual(response.context['bookmark_list'][0].pk,
+                                                            bookmarks_1[0].pk)
+
+    ## BOOKMARK DETAIL
+
     def test_bookmark_detail_templates(self):
         "Uses the correct templates"
         bookmark = factories.BookmarkFactory.create()
@@ -135,6 +214,8 @@ class PinboardViewTests(TestCase):
         response = self.client.get(reverse('pinboard:bookmark_detail',
                     kwargs={'username': bookmark.account.username, 'pk':2}))
         self.assertEquals(response.status_code, 404)
+
+    ## TAG LIST
 
     def test_tag_list_templates(self):
         "Uses the correct templates"
@@ -177,6 +258,8 @@ class PinboardViewTests(TestCase):
         tag_names = [tag.name for tag in response.context['tag_list']]
         self.assertIn('alsopublic', tag_names)
         self.assertIn('ispublic', tag_names)
+
+    ## TAG DETAIL
 
     def test_tag_detail_templates(self):
         "Uses the correct templates"
@@ -223,6 +306,8 @@ class PinboardViewTests(TestCase):
         response = self.client.get(reverse('pinboard:tag_detail',
                                                     kwargs={'slug': 'fish'}))
         self.assertEquals(response.status_code, 404)
+
+    ## ACCOUNT TAG DETAIL
 
     def test_account_tag_detail_templates(self):
         "Uses the correct templates"

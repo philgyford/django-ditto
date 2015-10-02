@@ -2,9 +2,7 @@ from django.db import models
 
 
 class PublicFavoritesManager(models.Manager):
-    """
-    Returns public Tweets favorited by any of the Accounts.
-    """
+    """Returns public Tweets favorited by any of the Accounts."""
     def get_queryset(self):
         from .models import User
         # All Users associated with Accounts:
@@ -13,9 +11,7 @@ class PublicFavoritesManager(models.Manager):
 
 
 class FavoritesManager(models.Manager):
-    """
-    Returns public AND PRIVATE Tweets favorited by any of the Accounts.
-    """
+    """Returns public AND PRIVATE Tweets favorited by any of the Accounts."""
     def get_queryset(self):
         from .models import User
         # All Users associated with Accounts:
