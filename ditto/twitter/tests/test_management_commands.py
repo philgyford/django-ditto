@@ -50,6 +50,10 @@ class FetchTwitterTweetsArgs(TestCase):
 
 class FetchTwitterTweetsOutput(TestCase):
 
+    def setUp(self):
+        user = factories.UserFactory(screen_name='philgyford')
+        self.account = factories.AccountFactory(user=user, is_active=True)
+
     @patch('ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher.fetch')
     def test_success_output(self, fetch_method):
         "Responds correctly when recent tweets were successfully fetched"
@@ -78,6 +82,10 @@ class FetchTwitterTweetsOutput(TestCase):
 
 class FetchAccounts(TestCase):
 
+    def setUp(self):
+        user = factories.UserFactory(screen_name='philgyford')
+        self.account = factories.AccountFactory(user=user, is_active=True)
+
     @patch('ditto.twitter.management.commands.fetch_accounts.VerifyFetcher.fetch')
     def test_success_output(self, fetch_method):
         "Responds correctly when users were successfully fetched"
@@ -91,7 +99,7 @@ class FetchAccounts(TestCase):
 
     @patch('ditto.twitter.management.commands.fetch_accounts.VerifyFetcher.fetch')
     def test_error_output(self, fetch_method):
-        "Responds correctly when there was an error fetching useres"
+        "Responds correctly when there was an error fetching users"
         # What the mocked method will return:
         fetch_method.side_effect = [
                 [{'account': 'philgyford', 'success': False,

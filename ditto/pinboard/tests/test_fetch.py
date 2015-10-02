@@ -17,8 +17,8 @@ from ..models import Account, Bookmark
 
 
 class FetchTypesTestRemoteCase(TestCase):
-    """Testing the various interface methods for fetching remote Bookmarks
-    data: fetch_all(), fetch_date(), fetch_recent() and fetch_url()
+    """Testing the various classes for fetching remote Bookmarks
+    data: AllBookmarksFetcher, DateBookmarksFetcher, etc.
     """
 
     # ./demo/manage.py dumpdata pinboard.Account --indent 4 > ditto/pinboard/fixtures/fetch_bookmarks_test.json
@@ -98,7 +98,6 @@ class FetchTypesTestRemoteCase(TestCase):
         self.assertTrue(result[0]['success'])
         self.assertEqual(result[0]['fetched'], 5)
 
-
     # Check responses when bad data is supplied to interface methods.
 
     @patch('ditto.pinboard.fetch.BookmarksFetcher._fetch')
@@ -171,6 +170,26 @@ class FetchTypesTestRemoteCase(TestCase):
         with self.assertRaises(FetchError):
             result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                 username='philgyford')
+
+
+class FetchInactiveAccountsTestCase(TestCase):
+
+    def test_only_inactive_account(self):
+        "Correctly reacts if only an inactive Account is tried"
+        account = factories.AccountFactory(
+                                        username='philgyford', is_active=False)
+        with self.assertRaises(FetchError):
+            result = RecentBookmarksFetcher().fetch(username='philgyford')
+
+    def test_inactive_accounts(self):
+        "Correctly reacts fetching all accounts but all are inactive"
+        account_1 = factories.AccountFactory(
+                                        username='philgyford', is_active=False)
+        account_2 = factories.AccountFactory(
+                                        username='testuser', is_active=False)
+        with self.assertRaises(FetchError):
+            result = RecentBookmarksFetcher().fetch()
+
 
 class FetchTypesSaveTestCase(TestCase):
     """Ignoring the stuff for fetching remote data, given some successfully-

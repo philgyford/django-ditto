@@ -41,11 +41,7 @@ class BookmarksFetcher(object):
         # {'username':'philgyford', 'success':True, 'fetched':12}
         result = []
 
-        if username is not None:
-            # Fetching for only one account.
-            accounts = [Account.objects.get(username=username)]
-        else:
-            accounts = Account.objects.all()
+        accounts = self._get_accounts(username)
 
         for account in accounts:
             fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -72,6 +68,23 @@ class BookmarksFetcher(object):
 
         return result
 
+    def _get_accounts(self, username):
+        """Get all or one active accounts.
+        username is None or a username.
+        Raises FetchError if we find that none of the required accounts are
+        marked as is_active.
+        """
+        if username is None:
+            accounts = Account.objects.filter(is_active=True)
+            if len(accounts) == 0:
+                raise FetchError("No active accounts were found to fetch.")
+        else:
+            account = Account.objects.get(username=username)
+            if account.is_active:
+                accounts = [account]
+            else:
+                raise FetchError("The account %s is curently marked as inactive." % username)
+        return accounts
 
     def _send_request(self, fetch_type, params, api_token):
         """Sends a request to the Pinboard API, returns the raw response.

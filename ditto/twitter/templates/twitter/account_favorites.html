@@ -14,7 +14,7 @@
         {% endblock %}
     </h1>
 
-    {% include 'twitter/includes/user.html' with user=account.user only %}
+    {% include 'twitter/includes/user.html' with user=account.user account=account only %}
 
     <ul class="nav nav-tabs m-b-md">
         <li class="nav-item">

@@ -1,5 +1,6 @@
 {# Display information about a Twitter user. #}
 {# Expects a single `user` which is a User object. #}
+{# And an optional 'account' if this user has an Account here. #}
 
 {% load l10n %}
 
@@ -20,8 +21,10 @@
         {{ user.favorites_count }} Favorite{{ user.favorites_count|pluralize }}
         •
         On {{ user.listed_count }} List{{ user.listed_count|pluralize }}
-        <br>
-        <a href="{{ user.permalink }}">View {{ user }} on Twitter</a>
+        {% if account == None or account.is_active %}
+            <br>
+            <a href="{{ user.permalink }}">View {{ user }} on Twitter</a>
+        {% endif %}
     </div>
 </div>
 

@@ -17,8 +17,11 @@
 
     <div class="card m-b-md">
         <div class="card-block">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}<br>
-            <a href="{{ account.url }}">View {{ account.username }} on Pinboard</a>
+            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+            {% if account.is_active %}
+                <br>
+                <a href="{{ account.url }}">View {{ account.username }} on Pinboard</a>
+            {% endif %}
         </div>
     </div>
 

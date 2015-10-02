@@ -507,15 +507,21 @@ class TwitterFetcher(object):
         screen_name -- of the one Account to get, or None for all Accounts.
 
         Raises:
-        FetchError if passed a screen_name there is no Account for.
+        FetchError if passed a screen_name there is no Account for, or if none
+            of the requested account(s) are marked as is_active.
         """
         if screen_name is None:
-            accounts = Account.objects.all()
+            accounts = Account.objects.filter(is_active=True)
+            if (len(accounts) == 0):
+                raise FetchError("No active Accounts were found to fetch.")
         else:
             try:
                 accounts = [Account.objects.get(user__screen_name=screen_name)]
             except Account.DoesNotExist:
                 raise FetchError("There is no Account in the database with a screen_name of '%s'" % screen_name)
+            else:
+                if accounts[0].is_active == False:
+                    raise FetchError("The '%s' Account is marked as inactive." % screen_name)
 
         self.accounts = accounts
 

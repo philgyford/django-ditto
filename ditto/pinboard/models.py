@@ -19,6 +19,8 @@ class Account(TimeStampedModelMixin, models.Model):
     # 21 characters for ':12345...'.
     api_token = models.CharField(null=False, blank=False, max_length=51,
                     help_text='From https://pinboard.in/settings/password eg, "philgyford:1234567890ABCDEFGHIJ"')
+    is_active = models.BooleanField(default=True, null=False, blank=False,
+                        help_text="If false, new Bookmarks won't be fetched.")
 
     def __str__(self):
         return self.username

@@ -240,10 +240,29 @@ class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
         self.assertIsInstance(accounts[1], Account)
         self.assertEqual(accounts[1].user.screen_name, 'jill')
 
-    def test_set_accounts_raises_error(self):
+    def test_set_accounts_bad_screen_name(self):
         "It raises FetchError when passed a non-existent screen_name"
         with self.assertRaises(FetchError):
             self.fetcher._set_accounts('percy')
+
+
+class TwitterFetcherInactiveAccountsTestCase(FetchTwitterTestCase):
+
+    def setUp(self):
+        user_1 = factories.UserFactory(screen_name='jill')
+        user_2 = factories.UserFactory(screen_name='debs')
+        account_1 = factories.AccountFactory(user=user_1, is_active=False)
+        account_2 = factories.AccountFactory(user=user_2, is_active=False)
+
+    def test_set_account_inactive_account(self):
+        "It raises FetchError if we try one inactive account."
+        with self.assertRaises(FetchError):
+            fetcher = TwitterFetcher(screen_name='jill')
+
+    def test_set_account_inactive_all_accounts(self):
+        "It raises FetchError if we try accounts and all are inactive."
+        with self.assertRaises(FetchError):
+            fetcher = TwitterFetcher(screen_name=None)
 
 
 class TwitterFetcherTestCase(FetchTwitterTestCase):

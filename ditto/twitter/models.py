@@ -27,6 +27,9 @@ class Account(TimeStampedModelMixin, models.Model):
     last_favorite_id = models.BigIntegerField(null=True, blank=True,
             help_text="The Twitter ID of the most recent favorited Tweet fetched.")
 
+    is_active = models.BooleanField(default=True, null=False, blank=False,
+                        help_text="If false, new Tweets won't be fetched.")
+
     def save(self, *args, **kwargs):
         if self.user is None:
             result = self.updateUserFromTwitter()

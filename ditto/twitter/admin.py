@@ -7,11 +7,12 @@ from .models import Account, Tweet, User
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('user', 'has_credentials', 'time_created', 'time_modified',)
+    list_display = ('user', 'has_credentials', 'is_active',
+                    'time_created', 'time_modified',)
 
     fieldsets = (
         (None, {
-            'fields': ('user',)
+            'fields': ('user', 'is_active', )
         }),
         ('API', {
             'fields': ('consumer_key', 'consumer_secret', 'access_token', 'access_token_secret',),

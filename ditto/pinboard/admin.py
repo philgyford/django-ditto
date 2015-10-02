@@ -10,9 +10,11 @@ from .models import Account, Bookmark
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
+    list_display = ('username', 'is_active', 'time_created', 'time_modified', )
+
     fieldsets = (
         (None, {
-            'fields': ('username', 'url', 'api_token',)
+            'fields': ('username', 'url', 'api_token', 'is_active', )
         }),
         ('Data', {
             'fields': ('time_created', 'time_modified',)
