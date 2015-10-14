@@ -1,6 +1,8 @@
 # coding: utf-8
 import re
 
+from django.utils.html import urlize
+
 
 def htmlify_tweet(json_data):
     """Passed the raw JSON data about a Tweet from Twitter's API, it returns
@@ -26,6 +28,10 @@ def htmlify_tweet(json_data):
             text = text.replace(url['url'],
                             '<a href="%s" rel="external">%s</a>' % (
                                     url['expanded_url'], url['display_url']))
+    else:
+        # Older Tweets might contain links in but no 'urls' entities.
+        # So just make their links into clickable links:
+        text = urlize(text)
 
     if 'user_mentions' in ents and len(ents['user_mentions']):
         for user in ents['user_mentions']:
