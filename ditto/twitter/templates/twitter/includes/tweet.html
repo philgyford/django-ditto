@@ -10,11 +10,11 @@ Expects:
 
 {% if tweet %}
     <div class="media-left">
-        <img class="media-object" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar">
+        <img class="media-object twitter-tweet-avatar" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar">
     </div>
     <div class="media-body">
-        <p class="m-b-0 lead">{{ tweet.text_html|safe }}</p>
-        <p class="text-muted">
+        <p class="m-b-0 lead twitter-tweet-text">{{ tweet.text_html|safe }}</p>
+        <p class="text-muted twitter-tweet-about">
             {% if show_user %}
                 By {{ tweet.user.name }} ({{ tweet.user }}) •
             {% endif %}

@@ -9,26 +9,26 @@ Expects:
 
 
 {% if detail %}
-    <h2 class="card-title">{{ bookmark.title }}</h2>
+    <h2 class="card-title pinboard-bookmark-title">{{ bookmark.title }}</h2>
 {% else %}
-    <h2 class="h4 media-heading"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
+    <h2 class="h4 media-heading pinboard-bookmark-title"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
 {% endif %}
 
 {% if bookmark.description %}
-    <p class="{% if detail %}card-text{% else %}m-b-0{% endif %}">
+    <p class="{% if detail %}card-text{% else %}m-b-0{% endif %} pinboard-bookmark-description">
         {{ bookmark.description }}
     </p>
 {% endif %}
 
 {% if bookmark.tags.all|length %}
-    <ul class="list-inline">
+    <ul class="list-inline pinboard-bookmark-tags">
         {% for tag in bookmark.tags.all %}
-            <li><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
+            <li class="pinboard-bookmark-tag"><a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a></li>
         {% endfor %}
     </ul>
 {% endif %}
 
-<p class="text-muted">
+<p class="text-muted pinboard-bookmark-about">
     By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
     <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
     {% if not detail %}
