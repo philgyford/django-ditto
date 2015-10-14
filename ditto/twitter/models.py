@@ -3,7 +3,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from .managers import FavoritesManager, PublicFavoritesManager
+from .utils import htmlify_tweet
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+
+import json
 
 
 class Account(TimeStampedModelMixin, models.Model):
@@ -110,6 +113,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     user = models.ForeignKey('User')
 
     text = models.TextField(null=False, blank=False, max_length=140)
+    text_html = models.TextField(null=False, blank=True,
+        help_text="An HTMLified version of the Tweet's text")
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
 
     created_at = models.DateTimeField(null=False, blank=False,
@@ -155,6 +160,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"
         self.is_private = self.user.is_private
+        result = self.make_text_html()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -184,6 +190,17 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     def summary_source(self):
         "The text that will be truncated to make a summary for this Tweet"
         return self.text
+
+    def make_text_html(self):
+        """Uses the raw JSON for the tweet to set self.text_html to a nice
+        HTML version of the tweet.
+        """
+        try:
+            json_data = json.loads(self.raw)
+        except ValueError as error:
+            return False
+        self.text_html = htmlify_tweet(json_data)
+        return True
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):

@@ -47,7 +47,7 @@ class TweetAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'text', 'title', 'summary', 'created_at', 'is_private',
+            'fields': ('user', 'text', 'text_html', 'title', 'summary', 'created_at', 'is_private',
                 'twitter_id', 'permalink', )
         }),
         (None, {
@@ -81,7 +81,7 @@ class TweetAdmin(admin.ModelAdmin):
             }
         )},
     }
-    readonly_fields = ('time_created', 'time_modified',)
+    readonly_fields = ('text_html', 'time_created', 'time_modified',)
     search_fields = ('text', )
 
 

@@ -156,3 +156,32 @@ class ImportTweets(TestCase):
                                                     stdout=out, stderr=out_err)
             self.assertIn('Something went wrong', out_err.getvalue())
 
+
+class GenerateTweetHtml(TestCase):
+
+    def setUp(self):
+        user_1 = factories.UserFactory(screen_name='terry')
+        user_2 = factories.UserFactory(screen_name='bob')
+        tweets_1 = factories.TweetFactory.create_batch(2, user=user_1)
+        tweets_2 = factories.TweetFactory.create_batch(3, user=user_2)
+        account_1 = factories.AccountFactory(user=user_1)
+        account_2 = factories.AccountFactory(user=user_2)
+
+    @patch('ditto.twitter.models.Tweet.save')
+    def test_with_all_accounts(self, save_method):
+        out = StringIO()
+        call_command('generate_tweet_html', stdout=out)
+        self.assertEqual(save_method.call_count, 5)
+        self.assertIn('Generated HTML for 5 Tweets', out.getvalue())
+
+    @patch('ditto.twitter.models.Tweet.save')
+    def test_with_one_account(self, save_method):
+        out = StringIO()
+        call_command('generate_tweet_html', account='terry', stdout=out)
+        self.assertEqual(save_method.call_count, 2)
+        self.assertIn('Generated HTML for 2 Tweets', out.getvalue())
+
+    def test_with_invalid_account(self):
+        with self.assertRaises(CommandError):
+            call_command('generate_tweet_html', account='thelma')
+

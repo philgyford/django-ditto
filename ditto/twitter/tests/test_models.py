@@ -1,6 +1,7 @@
 # coding: utf-8
 import datetime
 import json
+from unittest.mock import patch
 
 import pytz
 import responses
@@ -251,6 +252,15 @@ class TwitterTweetTestCase(TestCase):
         tweet_2 = factories.TweetFactory(in_reply_to_screen_name='')
         self.assertFalse(tweet_2.is_reply)
 
+    @patch('ditto.twitter.models.htmlify_tweet')
+    def test_makes_text_html(self, htmlify_method):
+        "When save() is called, text_html should be created from the raw JSON"
+        htmlify_method.return_value = 'my test text'
+        tweet = factories.TweetFactory()
+        tweet.raw = '{"text":"my test text"}'
+        tweet.save()
+        htmlify_method.assert_called_once_with({'text': 'my test text'})
+        self.assertEqual(tweet.text_html, 'my test text')
 
 class TwitterUserTestCase(TestCase):
 
