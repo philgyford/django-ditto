@@ -19,31 +19,25 @@ def htmlify_tweet(json_data):
     try:
         ents = json_data['entities']
     except KeyError:
-        return text
+        ents = {}
 
     if 'urls' in ents and len(ents['urls']):
         for url in ents['urls']:
             text = text.replace(url['url'],
-                            '<a href="%s">%s</a>' % (
-                                        url['expanded_url'], url['display_url']
-                                    )
-                    )
+                            '<a href="%s" rel="external">%s</a>' % (
+                                    url['expanded_url'], url['display_url']))
 
     if 'user_mentions' in ents and len(ents['user_mentions']):
         for user in ents['user_mentions']:
             text = text.replace('@%s' % user['screen_name'],
-                            '<a href="https://twitter.com/%s">@%s</a>' % (
-                                    user['screen_name'], user['screen_name']
-                                )
-                    )
+                '<a href="https://twitter.com/%s" rel="external">@%s</a>' % (
+                                    user['screen_name'], user['screen_name']))
 
     if 'hashtags' in ents and len(ents['hashtags']):
         for tag in ents['hashtags']:
             text = text.replace('#%s' % tag['text'],
-                        '<a href="https://twitter.com/hashtag/%s">#%s</a>' % (
-                                                    tag['text'], tag['text']
-                                                )
-                    )
+                '<a href="https://twitter.com/hashtag/%s" rel="external">#%s</a>'
+                                            % (tag['text'], tag['text']))
 
     return text
 

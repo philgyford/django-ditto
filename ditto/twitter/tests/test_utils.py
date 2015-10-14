@@ -16,18 +16,18 @@ class UtilsTestCase(TestCase):
 
     def test_links_users(self):
         tweet_html = htmlify_tweet(self.json_data)
-        self.assertTrue('with <a href="http://www.bbc.co.uk/news/business-34505593">bbc.co.uk/news/business-…</a>' in tweet_html)
-        self.assertTrue('and <a href="http://www.wired.com/2015/10/meet-walking-dead-hp-cisco-dell-emc-ibm-oracle/">wired.com/2015/10/meet-w…</a>' in tweet_html)
+        self.assertTrue('with <a href="http://www.bbc.co.uk/news/business-34505593" rel="external">bbc.co.uk/news/business-…</a>' in tweet_html)
+        self.assertTrue('and <a href="http://www.wired.com/2015/10/meet-walking-dead-hp-cisco-dell-emc-ibm-oracle/" rel="external">wired.com/2015/10/meet-w…</a>' in tweet_html)
 
     def test_links_urls(self):
         tweet_html = htmlify_tweet(self.json_data)
-        self.assertTrue('for <a href="https://twitter.com/philgyford">@philgyford</a>' in tweet_html)
-        self.assertTrue('and <a href="https://twitter.com/samuelpepys">@samuelpepys</a>' in tweet_html)
+        self.assertTrue('for <a href="https://twitter.com/philgyford" rel="external">@philgyford</a>' in tweet_html)
+        self.assertTrue('and <a href="https://twitter.com/samuelpepys" rel="external">@samuelpepys</a>' in tweet_html)
 
     def test_links_hashtags(self):
         tweet_html = htmlify_tweet(self.json_data)
-        self.assertTrue(' <a href="https://twitter.com/hashtag/testing">#testing</a> and' in tweet_html)
-        self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag">#hashtag</a> ' in tweet_html)
+        self.assertTrue(' <a href="https://twitter.com/hashtag/testing" rel="external">#testing</a> and' in tweet_html)
+        self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a> ' in tweet_html)
 
     def test_linebreaks(self):
         tweet_html = htmlify_tweet(self.json_data)
