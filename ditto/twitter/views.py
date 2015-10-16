@@ -18,9 +18,7 @@ class Home(PaginatedListView):
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
         # Need to get the User for each Account that has one:
-        accounts = Account.objects.exclude(user__isnull=True)
-        user_ids = [account.user.id for account in accounts]
-        users = User.objects.filter(pk__in=user_ids)
+        users = User.objects_with_accounts.all()
 
         # Use select_related to fetch user details too. Could be nasty...
         return Tweet.public_objects.filter(user=users).select_related()
@@ -36,12 +34,7 @@ class Favorites(PaginatedListView):
 
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
-        # Need to get the User for each Account that has one:
-        accounts = Account.objects.exclude(user__isnull=True)
-        user_ids = [account.user.id for account in accounts]
-
-        return Tweet.public_favorite_objects.filter(
-                                favoriting_users__in=user_ids).select_related()
+        return Tweet.public_favorite_objects.all().select_related()
 
 
 class AccountDetailMixin(SingleObjectMixin):

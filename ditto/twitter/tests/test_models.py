@@ -325,3 +325,13 @@ class TwitterUserTestCase(TestCase):
         self.assertEqual(faves[0].text, 'Tweet 2')
         self.assertEqual(faves[1].text, 'Tweet 1')
 
+    def test_with_accounts_manager(self):
+        "Only returns Users with Accounts"
+        users = factories.UserFactory.create_batch(4)
+        account_1 = factories.AccountFactory(user=users[0])
+        account_2 = factories.AccountFactory(user=users[2])
+        users_with_accounts = User.objects_with_accounts.all()
+        self.assertEqual(2, len(users_with_accounts))
+        self.assertEqual(users_with_accounts[0].pk, users[0].pk)
+        self.assertEqual(users_with_accounts[1].pk, users[2].pk)
+

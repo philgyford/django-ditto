@@ -2,7 +2,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from .managers import FavoritesManager, PublicFavoritesManager
+from .managers import FavoritesManager, PublicFavoritesManager, WithAccountsManager
 from .utils import htmlify_tweet
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
@@ -255,6 +255,10 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     help_text="eg, the raw JSON from the API.")
 
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
+
+    objects = models.Manager()
+    # All Users that have Accounts:
+    objects_with_accounts = WithAccountsManager()
 
     def __str__(self):
         return '@%s' % self.screen_name
