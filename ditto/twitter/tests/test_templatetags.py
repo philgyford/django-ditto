@@ -1,3 +1,6 @@
+import datetime
+import pytz
+
 from django.test import TestCase
 
 from .. templatetags import twitter
@@ -83,4 +86,47 @@ class TemplatetagsRecentFavoritesTestCase(TestCase):
         "Doesn't return favorites by a private account"
         tweets = twitter.recent_favorites(screen_name='thelma')
         self.assertEqual(len(tweets), 0)
+
+
+class TemplatetagsDayTweetsTestCase(TestCase):
+
+    def setUp(self):
+        user_1 = UserFactory(screen_name='terry')
+        user_2 = UserFactory(screen_name='bob')
+        user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
+        account_3 = AccountFactory(user=user_3)
+        self.tweets_1 = TweetFactory.create_batch(2, user=user_1)
+        self.tweets_2 = TweetFactory.create_batch(2, user=user_2)
+        self.tweets_3 = TweetFactory.create_batch(2, user=user_3)
+
+        post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(
+                                                            tzinfo=pytz.utc)
+        self.tweets_1[0].created_at = post_time
+        self.tweets_1[0].save()
+        self.tweets_2[1].created_at = post_time + datetime.timedelta(hours=1)
+        self.tweets_2[1].save()
+        self.tweets_3[0].created_at = post_time
+        self.tweets_3[0].save()
+
+    def test_day_tweets(self):
+        "Returns only public Tweets from the date"
+        tweets = twitter.day_tweets(datetime.date(2015, 3, 18))
+        self.assertEqual(2, len(tweets))
+        self.assertEqual(tweets[0].pk, self.tweets_2[1].pk)
+        self.assertEqual(tweets[1].pk, self.tweets_1[0].pk)
+
+    def test_day_tweets_public_account(self):
+        "Returns only Tweets from the day if it's a public account"
+        tweets = twitter.day_tweets(
+                            datetime.date(2015, 3, 18), screen_name='terry')
+        self.assertEqual(1, len(tweets))
+        self.assertEqual(tweets[0].pk, self.tweets_1[0].pk)
+
+    def test_day_tweets_private_account(self):
+        "Doesn't return Tweets from the day if it's a private account"
+        tweets = twitter.day_tweets(
+                            datetime.date(2015, 3, 18), screen_name='thelma')
+        self.assertEqual(0, len(tweets))
 

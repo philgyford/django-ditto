@@ -1,10 +1,12 @@
+import datetime
+import pytz
+
 from django import template
 
 from ..models import Tweet, User
 
 
 register = template.Library()
-
 
 @register.assignment_tag
 def recent_tweets(screen_name=None, limit=10):
@@ -30,7 +32,7 @@ def recent_favorites(screen_name=None, limit=10):
 
     Keyword arguments:
     screen_name -- A Twitter user's screen_name. If not supplied, we fetch
-                    Tweets favorited by all Accounts.
+                    Tweets favorited by all public Accounts.
     limit -- Maximum number to fetch. Default is 10.
     """
     if screen_name is None:
@@ -42,4 +44,27 @@ def recent_favorites(screen_name=None, limit=10):
         else:
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
     return tweets.select_related()[:limit]
+
+@register.assignment_tag
+def day_tweets(date, screen_name=None):
+    """Returns a QuerySet of Tweets posted on a specific date.
+
+    Arguments:
+    date -- A date object.
+
+    Keyword arguments:
+    screen_name -- A Twitter user's screen_name. If not supplied, we fetch
+                    all public Tweets.
+    """
+    start = datetime.datetime.combine(date, datetime.time.min).replace(
+                                                            tzinfo=pytz.utc)
+    end   = datetime.datetime.combine(date, datetime.time.max).replace(
+                                                            tzinfo=pytz.utc)
+    tweets = Tweet.public_objects.filter(created_at__range=[start, end])
+    if screen_name is None:
+        users = User.objects_with_accounts.all()
+        tweets = tweets.filter(user=users)
+    else:
+        tweets = tweets.filter(user__screen_name=screen_name)
+    return tweets
 
