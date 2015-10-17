@@ -47,7 +47,8 @@ def recent_favorites(screen_name=None, limit=10):
 
 @register.assignment_tag
 def day_tweets(date, screen_name=None):
-    """Returns a QuerySet of Tweets posted on a specific date.
+    """Returns a QuerySet of Tweets posted on a specific date by public
+    Accounts.
 
     Arguments:
     date -- A date object.
@@ -66,5 +67,38 @@ def day_tweets(date, screen_name=None):
         tweets = tweets.filter(user=users)
     else:
         tweets = tweets.filter(user__screen_name=screen_name)
+    return tweets
+
+@register.assignment_tag
+def day_favorites(date, screen_name=None):
+    """Returns a QuerySet of Tweets posted on a specific date that have been
+    favorited by public Accounts.
+
+    NOTE: It is not the date on which the Tweets were favorited.
+          The Twitter API doesn't supply that.
+
+    Arguments:
+    date -- A date object.
+
+    Keyword arguments:
+    screen_name -- A Twitter user's screen_name. If not supplied, we fetch
+                    all public Tweets.
+    """
+    start = datetime.datetime.combine(date, datetime.time.min).replace(
+                                                            tzinfo=pytz.utc)
+    end   = datetime.datetime.combine(date, datetime.time.max).replace(
+                                                            tzinfo=pytz.utc)
+    tweets = Tweet.public_favorite_objects.filter(
+                                                created_at__range=[start, end])
+    if screen_name is None:
+        tweets = Tweet.public_favorite_objects.filter(
+                                                created_at__range=[start, end])
+    else:
+        user = User.objects.get(screen_name=screen_name)
+        if user.is_private:
+            tweets = Tweet.objects.none()
+        else:
+            tweets = Tweet.public_favorite_objects.filter(
+                created_at__range=[start, end]).filter(favoriting_users=user)
     return tweets
 

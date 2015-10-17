@@ -107,7 +107,7 @@ class TemplatetagsDayTweetsTestCase(TestCase):
         self.tweets_1[0].save()
         self.tweets_2[1].created_at = post_time + datetime.timedelta(hours=1)
         self.tweets_2[1].save()
-        self.tweets_3[0].created_at = post_time
+        self.tweets_3[0].created_at = post_time + datetime.timedelta(hours=2)
         self.tweets_3[0].save()
 
     def test_day_tweets(self):
@@ -127,6 +127,57 @@ class TemplatetagsDayTweetsTestCase(TestCase):
     def test_day_tweets_private_account(self):
         "Doesn't return Tweets from the day if it's a private account"
         tweets = twitter.day_tweets(
+                            datetime.date(2015, 3, 18), screen_name='thelma')
+        self.assertEqual(0, len(tweets))
+
+
+class TemplatetagsDayFavoritesTestCase(TestCase):
+
+    def setUp(self):
+        user_1 = UserFactory(screen_name='terry')
+        user_2 = UserFactory(screen_name='bob')
+        user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
+        account_3 = AccountFactory(user=user_3)
+
+        self.tweets = TweetFactory.create_batch(6)
+        # One of the tweets is private:
+        self.tweets[0].user.is_private = True
+        self.tweets[0].user.save()
+
+        post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(
+                                                            tzinfo=pytz.utc)
+        self.tweets[0].created_at = post_time
+        self.tweets[0].save()
+        self.tweets[1].created_at = post_time + datetime.timedelta(hours=1)
+        self.tweets[1].save()
+        self.tweets[5].created_at = post_time + datetime.timedelta(hours=2)
+        self.tweets[5].save()
+
+        account_1.user.favorites.add(self.tweets[0]) # private tweet
+        account_1.user.favorites.add(self.tweets[1])
+        account_1.user.favorites.add(self.tweets[2])
+        account_1.user.favorites.add(self.tweets[3])
+        account_2.user.favorites.add(self.tweets[4])
+        account_3.user.favorites.add(self.tweets[5]) # private user favoriting
+
+    def test_day_favorites(self):
+        "Returns only favorited Tweets from the date, favorited by public Accounts"
+        tweets = twitter.day_favorites(datetime.date(2015, 3, 18))
+        self.assertEqual(1, len(tweets))
+        self.assertEqual(tweets[0].pk, self.tweets[1].pk)
+
+    def test_day_favorites_public_account(self):
+        "Returns only favorited Tweets from the date, favorited by a public Account"
+        tweets = twitter.day_favorites(
+                            datetime.date(2015, 3, 18), screen_name='terry')
+        self.assertEqual(1, len(tweets))
+        self.assertEqual(tweets[0].pk, self.tweets[1].pk)
+
+    def test_day_favorites_private_account(self):
+        "Doesn't return Tweets favorited by a public Account"
+        tweets = twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='thelma')
         self.assertEqual(0, len(tweets))
 
