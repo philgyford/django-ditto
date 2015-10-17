@@ -43,21 +43,44 @@ class TemplatetagsRecentTweetsTestCase(TestCase):
         self.assertEqual(tweets[4].pk, self.tweets_1[1].pk)
 
 
-#class TemplatetagsRecentFavoritesTestCase(TestCase):
+class TemplatetagsRecentFavoritesTestCase(TestCase):
 
-    #def setUp(self):
-        #user_1 = UserFactory(screen_name='terry')
-        #user_2 = UserFactory(screen_name='bob')
-        #account_1 = AccountFactory(user=user_1)
-        #account_2 = AccountFactory(user=user_2)
+    def setUp(self):
+        user_1 = UserFactory(screen_name='terry')
+        user_2 = UserFactory(screen_name='bob')
+        user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
+        account_3 = AccountFactory(user=user_3)
 
-        #tweets = TweetFactory.create_batch(6)
-        #account_1.user.favorites.add(tweets[1])
-        #account_1.user.favorites.add(tweets[3])
-        #account_2.user.favorites.add(tweets[5])
+        tweets = TweetFactory.create_batch(6)
+        # One of the tweets is private:
+        tweets[0].user.is_private = True
+        tweets[0].user.save()
 
-    #def test_recent_favorites(self):
-        #"Returns recent favorites from all accounts"
-        #"UGH, just realised we shouldn't show tweets favorited by private accounts"
-        #"Not sure we check for that ANYWHERE..."
-        #pass
+        account_1.user.favorites.add(tweets[0])
+        account_1.user.favorites.add(tweets[1])
+        account_1.user.favorites.add(tweets[3])
+        account_2.user.favorites.add(tweets[5])
+        # Private user favoriting public tweets:
+        account_3.user.favorites.add(tweets[5])
+
+    def test_recent_favorites(self):
+        "Returns recent public tweets favorited by any account."
+        tweets = twitter.recent_favorites()
+        self.assertEqual(len(tweets), 3)
+
+    def test_recent_favorites_account(self):
+        "Returns recent public tweets favorited by one account"
+        tweets = twitter.recent_favorites(screen_name='terry')
+        self.assertEqual(len(tweets), 2)
+
+    def test_recent_favorites_limit(self):
+        tweets = twitter.recent_favorites(limit=2)
+        self.assertEqual(len(tweets), 2)
+
+    def test_recent_favorites_private_account(self):
+        "Doesn't return favorites by a private account"
+        tweets = twitter.recent_favorites(screen_name='thelma')
+        self.assertEqual(len(tweets), 0)
+
