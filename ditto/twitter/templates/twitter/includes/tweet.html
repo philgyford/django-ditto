@@ -9,24 +9,46 @@ Expects:
 {% endcomment %}
 
 {% if tweet %}
+    {% if detail %}
+        <hr>
+    {% endif %}
     <div class="media-left">
         <img class="media-object twitter-tweet-avatar" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar">
     </div>
     <div class="media-body">
-        <p class="m-b-0 lead twitter-tweet-text">{{ tweet.text_html|safe }}</p>
-        <p class="text-muted twitter-tweet-about">
+        <p class="m-b-0 twitter-tweet-about">
             {% if show_user %}
-                By {{ tweet.user.name }} ({{ tweet.user }}) •
+                <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
+                <span class="text-muted"><small>
+                    <span class="twitter-tweet-screenname">{{ tweet.user }}</span> •
+            {% else %}
+                <span class="text-muted"><small>
             {% endif %}
+            {% if detail %}
+                <a href="{{ tweet.permalink }}" title="View on Twitter">
+            {% else %}
+                <a href="{{ tweet.get_absolute_url }}" title="View only this Tweet">
+            {% endif %}
+                <time datetime="{{ tweet.created_at|date:'Y-m-d H:i:s' }}">{{ tweet.created_at|date:'j M Y, g:i A' }}</time>
+            </a>
             {% if tweet.is_reply %}
-                <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to @{{ tweet.in_reply_to_screen_name }}</a> •
+                • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
             {% endif %}
-            <time datetime="{{ tweet.created_at|date:'Y-m-d H:i:s' }}">{{ tweet.created_at|date:'j M Y, g:i A' }}</time>
-            {% if not detail %}
-                • <a href="{{ tweet.get_absolute_url }}">#</a>
-            {% endif %}
-                • <a href="{{ tweet.permalink }}">View on Twitter</a>
+            </small>
         </p>
+        <p class="m-b-0{% if detail %} lead{% endif %} twitter-tweet-text">{{ tweet.text_html|safe }}</p>
+        {% if tweet.place %}
+            <p class="m-b-0 text-muted twitter-tweet-place">
+                <small>
+                    {% if tweet.latitude %}
+                        <a href="https://maps.google.com/maps/place/{{ tweet.latitude }},{{ tweet.longitude }}/@{{ tweet.latitude }},{{ tweet.longitude }},14z" title="See on Google Maps">{{ tweet.place }}</a>
+                    {% else %}
+                        {{ tweet.place }}
+                    {% endif %}
+                </small>
+            </p>
+        {% endif %}
     </div>
+    <hr>
 {% endif %}
 

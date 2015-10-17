@@ -187,6 +187,14 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         else:
             return ''
 
+    @property
+    def place(self):
+        return ', '.join(filter(None, (
+                self.place_attribute_street_address,
+                self.place_full_name,
+                self.place_country,
+            )))
+
     def summary_source(self):
         "The text that will be truncated to make a summary for this Tweet"
         return self.text

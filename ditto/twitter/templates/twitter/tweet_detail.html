@@ -26,10 +26,12 @@
     {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
 
     {% if twitter_user.is_private %}
-        {# The `tweet` object will be None, too. #}}
+        {# The `tweet` object will be None, too. #}
         <p>This user is private.</p>
     {% else %}
-        {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False only %}
+        <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
+            {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False only %}
+        </div>
     {% endif %}
 
 {% endblock content %}

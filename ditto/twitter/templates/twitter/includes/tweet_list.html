@@ -14,7 +14,7 @@ Expects:
 
     <ul class="media-list twitter-tweets">
         {% for tweet in tweet_list %}
-            <li class="media twitter-tweet">
+            <li class="media m-t-0 twitter-tweet">
                 {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user only %}
             </li>
         {% endfor %}
