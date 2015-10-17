@@ -43,21 +43,21 @@ class TemplatetagsRecentTweetsTestCase(TestCase):
         self.assertEqual(tweets[4].pk, self.tweets_1[1].pk)
 
 
-class TemplatetagsRecentFavoritesTestCase(TestCase):
+#class TemplatetagsRecentFavoritesTestCase(TestCase):
 
-    def setUp(self):
-        user_1 = UserFactory(screen_name='terry')
-        user_2 = UserFactory(screen_name='bob')
-        account_1 = AccountFactory(user=user_1)
-        account_2 = AccountFactory(user=user_2)
+    #def setUp(self):
+        #user_1 = UserFactory(screen_name='terry')
+        #user_2 = UserFactory(screen_name='bob')
+        #account_1 = AccountFactory(user=user_1)
+        #account_2 = AccountFactory(user=user_2)
 
-        tweets = TweetFactory.create_batch(6)
-        account_1.user.favorites.add(tweets[1])
-        account_1.user.favorites.add(tweets[3])
-        account_2.user.favorites.add(tweets[5])
+        #tweets = TweetFactory.create_batch(6)
+        #account_1.user.favorites.add(tweets[1])
+        #account_1.user.favorites.add(tweets[3])
+        #account_2.user.favorites.add(tweets[5])
 
-    def test_recent_favorites(self):
-        "Returns recent favorites from all accounts"
-        "UGH, just realised we shouldn't show tweets favorited by private accounts"
-        "Not sure we check for that ANYWHERE..."
-        pass
+    #def test_recent_favorites(self):
+        #"Returns recent favorites from all accounts"
+        #"UGH, just realised we shouldn't show tweets favorited by private accounts"
+        #"Not sure we check for that ANYWHERE..."
+        #pass
