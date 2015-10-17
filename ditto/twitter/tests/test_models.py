@@ -218,8 +218,8 @@ class TwitterTweetTestCase(TestCase):
         self.assertEqual(favorites[0].pk, tweets[4].pk)
         self.assertEqual(favorites[1].pk, tweets[2].pk)
 
-    def test_public_favorites_manager(self):
-        "Should contain recent PUBLIC tweets favorited by any account."
+    def test_public_favorites_tweets_manager(self):
+        "Should contain recent PUBLIC tweets favorited the Accounts"
         accounts = factories.AccountFactory.create_batch(2)
         public_user = factories.UserFactory(is_private=False)
         private_user = factories.UserFactory(is_private=True)
@@ -233,6 +233,23 @@ class TwitterTweetTestCase(TestCase):
         favorites = Tweet.public_favorite_objects.all()
         self.assertEqual(len(favorites), 1)
         self.assertEqual(favorites[0].pk, public_tweet.pk)
+
+    def test_public_favorites_accounts_manager(self):
+        "Should only show tweets favorited by public Accounts"
+        public_user = factories.UserFactory(is_private=False)
+        private_user = factories.UserFactory(is_private=True)
+        account_1 = factories.AccountFactory(user=public_user)
+        account_2 = factories.AccountFactory(user=private_user)
+        tweets = factories.TweetFactory.create_batch(5)
+        account_1.user.favorites.add(tweets[0])
+        account_1.user.favorites.add(tweets[3])
+        account_2.user.favorites.add(tweets[1])
+        account_2.user.favorites.add(tweets[3])
+
+        favorites = Tweet.public_favorite_objects.all()
+        self.assertEqual(len(favorites), 2)
+        self.assertEqual(favorites[0].pk, tweets[3].pk)
+        self.assertEqual(favorites[1].pk, tweets[0].pk)
 
     def test_is_public(self):
         "Tweet should be public if tweet's user is public"

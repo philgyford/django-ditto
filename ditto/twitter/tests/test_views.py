@@ -84,7 +84,7 @@ class TwitterViewTests(TestCase):
                 favoritable_tweets[1].pk, favoritable_tweets[0].pk]
         )
 
-    def test_favorites_privacy(self):
+    def test_favorites_privacy_tweets(self):
         "Only public Tweets should appear."
         private_user = factories.UserFactory(is_private=True)
         public_users = factories.UserFactory.create_batch(2, is_private=False)
@@ -101,6 +101,20 @@ class TwitterViewTests(TestCase):
         tweets = response.context['tweet_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
+
+    def test_favorites_privacy_accounts(self):
+        "Only Tweets favorited by Accounts with public Users should appear."
+        user = factories.UserFactory(is_private=True)
+        account = factories.AccountFactory(user=user)
+        tweet = factories.TweetFactory()
+        account.user.favorites.add(tweet)
+        # Check it is there:
+        self.assertEqual(account.user.favorites.count(), 1)
+
+        response = self.client.get(reverse('twitter:favorites'))
+        tweets = response.context['tweet_list']
+        # Check it doesn't appear on the page:
+        self.assertEqual(len(tweets), 0)
 
     def test_account_detail_templates(self):
         "Uses the correct templates"
@@ -173,7 +187,7 @@ class TwitterViewTests(TestCase):
                 favoritable_tweets[1].pk, favoritable_tweets[0].pk]
         )
 
-    def test_account_favorites_privacy(self):
+    def test_account_favorites_privacy_tweets(self):
         "It does not show private Tweets"
         private_user = factories.UserFactory(is_private=True)
         public_users = factories.UserFactory.create_batch(2, is_private=False)
@@ -191,6 +205,20 @@ class TwitterViewTests(TestCase):
         tweets = response.context['tweet_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
+
+    def test_account_favorites_privacy_account(self):
+        "It does not show favorites if the account's user is private"
+        user = factories.UserFactory(is_private=True)
+        account = factories.AccountFactory(user=user)
+        tweet = factories.TweetFactory()
+        account.user.favorites.add(tweet)
+        # Check it is there:
+        self.assertEqual(account.user.favorites.count(), 1)
+        response = self.client.get(reverse('twitter:account_favorites',
+                kwargs={'screen_name': account.user.screen_name}))
+        tweets = response.context['tweet_list']
+        # Check it doesn't appear on the page:
+        self.assertEqual(len(tweets), 0)
 
     def test_tweet_detail_templates(self):
         "Uses the correct templates"

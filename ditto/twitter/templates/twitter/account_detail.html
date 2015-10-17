@@ -25,6 +25,10 @@
         </li>
     </ul>
 
+    {% if account.user.is_private %}
+        <p>This user is private.</p>
+    {% endif %}
+
     {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
 
 {% endblock content %}

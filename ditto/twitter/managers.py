@@ -2,11 +2,11 @@ from django.db import models
 
 
 class PublicFavoritesManager(models.Manager):
-    "Returns public Tweets favorited by any of the Accounts."
+    "Returns public Tweets favorited by any public Accounts."
     def get_queryset(self):
         from .models import User
-        # All Users associated with Accounts:
-        users = User.objects.filter(account__isnull=False)
+        # All public Users associated with Accounts:
+        users = User.objects.filter(account__isnull=False).filter(is_private=False)
         return super().get_queryset().filter(is_private=False).filter(favoriting_users__in=users).distinct()
 
 
