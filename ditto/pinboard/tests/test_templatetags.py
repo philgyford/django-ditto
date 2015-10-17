@@ -22,7 +22,7 @@ class TemplatetagsRecentBookmarksTestCase(TestCase):
         "Returns recent public bookmarks from all accounts."
         bookmarks = pinboard.recent_bookmarks()
         self.assertEqual(10, len(bookmarks))
-        # bookmarks[6] would be bookmarks_1[5] if [5] wasn't private.
+        # bookmarks[6] would be self.bookmarks_1[5] if [5] wasn't private.
         self.assertEqual(bookmarks[6].pk, self.bookmarks_1[4].pk)
 
     def test_recent_bookmarks_account(self):

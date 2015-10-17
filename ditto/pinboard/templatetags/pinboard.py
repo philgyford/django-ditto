@@ -15,7 +15,7 @@ def recent_bookmarks(account=None, limit=10):
 
     Keyword arguments:
     account -- An account username, 'philgyford', or None to fetch for all.
-    limit -- Maximum amount to fetch. Default is 10.
+    limit -- Maximum number to fetch. Default is 10.
     """
     bookmarks = Bookmark.public_objects.all()
     if account is not None:
