@@ -170,7 +170,7 @@ class DittoViewTests(TestCase):
         response = self.client.get(reverse('ditto:tag_detail',
                                                     kwargs={'slug': 'fish'}))
         self.assertTrue('tag' in response.context)
-        self.assertEqual(response.context['tag'].name, 'Fish')
+        self.assertEqual(response.context['tag'], 'fish')
         self.assertTrue('bookmark_list' in response.context)
         self.assertEqual(len(response.context['bookmark_list']), 2)
         self.assertEqual(response.context['bookmark_list'][0].title, 'Cod')

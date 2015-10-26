@@ -14,7 +14,7 @@ urlpatterns = [
         name='tag_list'
     ),
     url(
-        regex=r"^tags/(?P<slug>[-_\w]+)$",
+        regex=r"^tags/(?P<slug>[^/]+)$",
         view=views.TagDetail.as_view(),
         name='tag_detail'
     ),

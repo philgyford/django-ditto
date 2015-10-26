@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from .. import factories
-from ..models import Account, Bookmark
+from ..models import Account, Bookmark, BookmarkTag
 
 
 class PinboardAccountTestCase(TestCase):
@@ -108,12 +108,11 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_tags(self):
         "Can save and recall tags"
-        from taggit.models import Tag
         bookmark = factories.BookmarkFactory()
         bookmark.tags.set('banana', 'cherry', 'apple')
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 3)
-        self.assertIsInstance(bookmark_reloaded.tags.first(), Tag)
+        self.assertIsInstance(bookmark_reloaded.tags.first(), BookmarkTag)
         self.assertEqual(bookmark_reloaded.tags.names().first(), 'apple')
         self.assertEqual(bookmark_reloaded.tags.all()[0].name, 'apple')
         self.assertEqual(bookmark_reloaded.tags.all()[2].name, 'cherry')
@@ -156,6 +155,65 @@ class PinboardBookmarkTestCase(TestCase):
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
+
+
+class PinboardBookmarkTagSlugsTestCase(TestCase):
+    """Ensuring slugs for tags matches what Pinboard does. ie, Not ASCII.
+    https://pinboard.in/u:philgyford/t:testbookmark/
+    """
+
+    def test_standard(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('normal')
+        self.assertEqual(bookmark.tags.first().slug, 'normal')
+
+    def test_hyphens(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('one-tag')
+        self.assertEqual(bookmark.tags.first().slug, 'one-tag')
+
+    def test_underscores(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('one_tag')
+        self.assertEqual(bookmark.tags.first().slug, 'one_tag')
+
+    def test_private(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('.private')
+        self.assertEqual(bookmark.tags.first().slug, '.private')
+
+    def test_capitals(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('CAPITALtags')
+        self.assertEqual(bookmark.tags.first().slug, 'capitaltags')
+
+    def test_special_characters_1(self):
+        "Characters that don't change"
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set("!$()*:;=@[]-.^_`{|}")
+        self.assertEqual(bookmark.tags.first().slug, '!$()*:;=@[]-.^_`{|}')
+
+    def test_special_characters_2(self):
+        "Characters that do change"
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set("#-&-'-+-/-?-\"-%-<->-\\")
+        self.assertEqual(bookmark.tags.first().slug,
+                        '%23-%2526-%27-%252B-%252f-%3f-%22-%25-%3C-%3E-%5c')
+
+    def test_accents(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('Àddîñg-áçćèńtš-tô-Éñgłïśh-íš-śīłłÿ!')
+        self.assertEqual(bookmark.tags.first().slug, 'àddîñg-áçćèńtš-tô-éñgłïśh-íš-śīłłÿ!')
+
+    def test_musical_notes(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('♬♫♪♩')
+        self.assertEqual(bookmark.tags.first().slug, '♬♫♪♩')
+
+    def test_chinese(self):
+        bookmark = factories.BookmarkFactory()
+        bookmark.tags.set('美国')
+        self.assertEqual(bookmark.tags.first().slug, '美国')
 
 
 class PinboardToreadManagersTestCase(TestCase):

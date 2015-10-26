@@ -8,12 +8,11 @@ import pytz
 from requests.exceptions import ConnectionError, RequestException, Timeout, TooManyRedirects
 import responses
 
-from taggit.models import Tag
 from django.test import TestCase
 
 from .. import factories
 from ..fetch import BookmarksFetcher, AllBookmarksFetcher, DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher, FetchError
-from ..models import Account, Bookmark
+from ..models import Account, Bookmark, BookmarkTag
 
 
 class FetchTypesTestRemoteCase(TestCase):
@@ -294,7 +293,7 @@ class FetchTypesSaveTestCase(TestCase):
 
         self.assertEqual(len(bookmarks[1].tags.all()), 4)
         self.assertEqual(len(bookmarks[0].tags.all()), 2)
-        self.assertIsInstance(bookmarks[1].tags.first(), Tag)
+        self.assertIsInstance(bookmarks[1].tags.first(), BookmarkTag)
         self.assertEqual(sorted(list(bookmarks[1].tags.slugs()))[0], 'fonts')
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
@@ -336,7 +335,7 @@ class FetchTypesSaveTestCase(TestCase):
                             '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc))
 
         self.assertEqual(len(bookmarks[1].tags.all()), 4)
-        self.assertIsInstance(bookmarks[1].tags.first(), Tag)
+        self.assertIsInstance(bookmarks[1].tags.first(), BookmarkTag)
         self.assertEqual(sorted(list(bookmarks[1].tags.slugs()))[0], 'fonts')
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)

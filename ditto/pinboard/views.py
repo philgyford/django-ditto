@@ -3,10 +3,8 @@ from django.utils.translation import ugettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
-from taggit.models import Tag
-
 from ..ditto.views import PaginatedListView
-from .models import Account, Bookmark
+from .models import Account, Bookmark, BookmarkTag
 
 
 class SingleAccountMixin(SingleObjectMixin):
@@ -82,9 +80,10 @@ class BookmarkDetail(DetailView):
 
 class TagList(ListView):
     template_name = 'pinboard/tag_list.html'
+    context_object_name = 'tag_list'
 
     def get_queryset(self):
-        return Bookmark.tags.most_common()
+        return Bookmark.tags.most_common()[:100]
 
 
 class TagDetail(SingleObjectMixin, PaginatedListView):
@@ -93,7 +92,7 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
     allow_empty = False
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Tag.objects.all())
+        self.object = self.get_object(queryset=BookmarkTag.objects.all())
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -119,8 +118,8 @@ class AccountTagDetail(SingleAccountMixin, PaginatedListView):
     def get_tag_object(self):
         """Custom method for fetching the Tag."""
         try:
-            obj = Tag.objects.get(slug=self.kwargs['tag_slug'])
-        except Tag.DoesNotExist:
+            obj = BookmarkTag.objects.get(slug=self.kwargs['tag_slug'])
+        except BookmarkTag.DoesNotExist:
             raise Http404(_("No Tags found matching the query"))
         return obj
 

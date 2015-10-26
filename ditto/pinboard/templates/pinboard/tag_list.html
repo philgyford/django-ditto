@@ -17,16 +17,17 @@
     {% if tag_list|length == 0 %}
         <p>There are no tags in use.</p>
     {% else %}
-        <ul>
+        {% load l10n %}
+        <ol>
             {% for tag in tag_list %}
                 <li>
                     <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
                         {{ tag.name }}
                     </a>
-                    ({{ tag.num_times }})
+                    <small>({{ tag.num_times|localize }})</small>
                 </li>
             {% endfor %}
-        </ul>
+        </ol>
     {% endif %}
 
 {% endblock content %}

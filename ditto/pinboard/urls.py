@@ -19,7 +19,7 @@ urlpatterns = [
         name='tag_list'
     ),
     url(
-        regex=r"^tags/(?P<slug>[-_\w]+)$",
+        regex=r"^tags/(?P<slug>[^/]+)$",
         view=views.TagDetail.as_view(),
         name='tag_detail'
     ),
@@ -34,7 +34,7 @@ urlpatterns = [
         name='account_toread'
     ),
     url(
-        regex=r"^(?P<username>\w+)/tag/(?P<tag_slug>[-_\w]+)$",
+        regex=r"^(?P<username>\w+)/tag/(?P<tag_slug>[^/]+)$",
         view=views.AccountTagDetail.as_view(),
         name='account_tag_detail'
     ),

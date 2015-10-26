@@ -3,6 +3,7 @@ from django.core.validators import URLValidator
 from django.db import models
 
 from taggit.managers import TaggableManager
+from taggit.models import GenericTaggedItemBase, TagBase
 
 from .managers import _BookmarkTaggableManager, PublicToreadManager, ToreadManager
 from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
@@ -46,6 +47,58 @@ class ExtraBookmarkManagers(models.Model):
         abstract = True
 
 
+class BookmarkTag(TimeStampedModelMixin, TagBase):
+    "Our custom version of a Taggit Tag model, for use with Bookmarks."
+
+    class Meta:
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
+
+    def slugify(self, tag, i=None):
+        """Pinboard's slugs for tags don't encode many things. Most unicode
+        characters are allowed as-is, and only a few special characters
+        are URL encoded. This may not be an exhaustive list.
+
+        We also lowercase the slugs. Which isn't exactly what Pinboard does,
+        but it makes it much easier for us to show related Bookmarks, no matter
+        if they're tagged with 'Fish' or 'fish'.
+
+        This is inherited from TagBase.
+
+        `tag` is a string, like 'mytag'
+        """
+        tag = tag.lower()
+        tag = tag.replace('%', '%25')
+        replace = {
+                '#':    '%23',
+                '&':    '%2526',
+                "'":    '%27',
+                '+':    '%252B',
+                '/':    '%252f',
+                '?':    '%3f',
+                '"':    '%22',
+                '<':    '%3C',
+                '>':    '%3E',
+                '\\':   '%5c',
+                # These shouldn't be in the tag name, but just in case:
+                ',':    '',
+                ' ':    '-',
+        }
+
+        for f, r in replace.items():
+            tag = tag.replace(f, r)
+
+        if i is not None:
+            tag += "_%d" % i
+
+        return tag
+
+
+class TaggedBookmark(TimeStampedModelMixin, GenericTaggedItemBase):
+    tag = models.ForeignKey(BookmarkTag,
+                            related_name="%(app_label)s_%(class)s_items")
+
+
 class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     account = models.ForeignKey(Account, null=False, blank=False)
 
@@ -71,7 +124,8 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     # Up to 100 tags
     # Up to 255 chars each. No commas or whitespace.
     # Private tags start with a period.
-    tags = TaggableManager(manager=_BookmarkTaggableManager)
+    tags = TaggableManager(manager=_BookmarkTaggableManager,
+                                                        through=TaggedBookmark)
 
     class Meta:
         ordering = ['-post_time']

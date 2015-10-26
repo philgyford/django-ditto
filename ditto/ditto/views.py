@@ -1,8 +1,6 @@
 from django.apps import apps
 from django.views.generic import DetailView, ListView, TemplateView
 
-from taggit.models import Tag
-
 from .paginator import DiggPaginator
 
 if apps.is_installed('ditto.pinboard'):
@@ -40,15 +38,15 @@ class TagList(TemplateView):
     template_name = 'ditto/tag_list.html'
 
 
-class TagDetail(DetailView):
+class TagDetail(TemplateView):
     "All items with a certain tag"
     template_name = 'ditto/tag_detail.html'
-    model = Tag
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['tag'] = kwargs['slug']
         if apps.is_installed('ditto.pinboard'):
             context['bookmark_list'] = Bookmark.public_objects.filter(
-                                            tags__slug__in=[self.object.slug])
+                                            tags__slug__in=[kwargs['slug']])
         return context
 
