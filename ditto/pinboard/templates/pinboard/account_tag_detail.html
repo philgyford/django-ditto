@@ -10,25 +10,32 @@
 
 {% block content %}
 
-    <h1 class="display-1 m-y-md">
+    <h1 class="m-y-md">
         {% block title %}
             Bookmarks by {{ account.username }}
         {% endblock %}
     </h1>
 
-    <div class="card m-b-md">
-        <div class="card-block">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
-            {% if account.is_active %}
-                <br>
-                <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
-            {% endif %}
-            <br>
-            <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
-        </div>
-    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card m-b-md">
+                <div class="card-block">
+                    {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
+                    {% if account.is_active %}
+                        <br>
+                        <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
+                    {% endif %}
+                    <br>
+                    <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
+                </div>
+            </div>
+        </div> <!-- .col -->
 
-    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+        <div class="col-md-9">
+            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
 
 {% endblock content %}
 

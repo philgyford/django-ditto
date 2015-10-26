@@ -8,27 +8,33 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="display-1 m-y-md">
+    <h1 class="m-y-md">
         {% block title %}
             Tweets favorited by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>
         {% endblock %}
     </h1>
 
-    {% include 'twitter/includes/user.html' with user=account.user account=account only %}
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'twitter/includes/user.html' with user=account.user account=account only %}
+        </div> <!-- .col -->
 
-    <ul class="nav nav-tabs m-b-md">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Favorites</a>
-        </li>
-    </ul>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs m-b-md">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Favorites</a>
+                </li>
+            </ul>
 
-    {% if account.user.is_private %}
-        <p>This user is private.</p>
-    {% endif %}
+            {% if account.user.is_private %}
+                <p>This user is private.</p>
+            {% endif %}
 
-    {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
+            {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 

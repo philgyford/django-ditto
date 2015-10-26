@@ -16,23 +16,29 @@
 
 {% block content %}
 
-    <h1 class="display-1 m-y-md">
+    <h1 class="m-y-md">
         {% block title %}
             A Tweet by {{ twitter_user.name }}
             <small class="text-muted">{{ twitter_user }}</small>
         {% endblock %}
     </h1>
 
-    {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
+    <div class="row">
+        <div class="col-md-3 col-md-push-9">
+            {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
+        </div> <!-- .col -->
 
-    {% if twitter_user.is_private %}
-        {# The `tweet` object will be None, too. #}
-        <p>This user is private.</p>
-    {% else %}
-        <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
-            {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False only %}
-        </div>
-    {% endif %}
+        <div class="col-md-9 col-md-pull-3">
+            {% if twitter_user.is_private %}
+                {# The `tweet` object will be None, too. #}
+                <p>This user is private.</p>
+            {% else %}
+                <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
+                    {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False only %}
+                </div>
+            {% endif %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 

@@ -8,24 +8,30 @@
 
 {% block content %}
 
-    <h1 class="display-1 m-y-md">
+    <h1 class="m-y-md">
         {% block title %}
             Pinboard bookmarks marked “to read”
         {% endblock %}
     </h1>
 
-    {% include 'pinboard/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='toread' only %}
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'pinboard/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='toread' only %}
+        </div> <!-- .col -->
 
-    <ul class="nav nav-tabs m-b-md">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'pinboard:index' %}">All bookmarks</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'pinboard:toread' %}">To read</a>
-        </li>
-    </ul>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs m-b-md">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pinboard:index' %}">All bookmarks</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'pinboard:toread' %}">To read</a>
+                </li>
+            </ul>
 
-    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 
