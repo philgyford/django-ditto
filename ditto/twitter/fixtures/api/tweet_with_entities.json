@@ -125,124 +125,14 @@
       }
     ],
     "media":[
-      {
-        "type":"photo",
-        "url":"http://t.co/2lUYwmpDI7",
-        "media_url":"http://pbs.twimg.com/media/CRIquUMXAAExP2w.jpg",
-        "sizes":{
-          "thumb":{
-            "w":150,
-            "resize":"crop",
-            "h":150
-          },
-          "medium":{
-            "w":600,
-            "resize":"fit",
-            "h":380
-          },
-          "large":{
-            "w":1024,
-            "resize":"fit",
-            "h":650
-          },
-          "small":{
-            "w":340,
-            "resize":"fit",
-            "h":215
-          }
-        },
-        "indices":[
-          113,
-          135
-        ],
-        "media_url_https":"https://pbs.twimg.com/media/CRIquUMXAAExP2w.jpg",
-        "id":653631871105040385,
-        "display_url":"pic.twitter.com/2lUYwmpDI7",
-        "id_str":"653631871105040385",
-        "expanded_url":"http://twitter.com/philgyfordtest/status/653631878646378496/photo/1"
-      }
     ]
   },
-  "text":"A\ntest for @philgyford and @samuelpepys with http://t.co/cOu05x0Chi #testing and http://t.co/S9fH3CkgV4 #hashtag http://t.co/2lUYwmpDI7",
+  "text":"A\ntest for @philgyford and @samuelpepys with http://t.co/cOu05x0Chi #testing and http://t.co/S9fH3CkgV4 #hashtag",
   "coordinates":null,
   "place":null,
   "favorite_count":1,
   "truncated":false,
   "extended_entities":{
-    "media":[
-      {
-        "type":"photo",
-        "url":"http://t.co/2lUYwmpDI7",
-        "media_url":"http://pbs.twimg.com/media/CRIquUMXAAExP2w.jpg",
-        "sizes":{
-          "thumb":{
-            "w":150,
-            "resize":"crop",
-            "h":150
-          },
-          "medium":{
-            "w":600,
-            "resize":"fit",
-            "h":380
-          },
-          "large":{
-            "w":1024,
-            "resize":"fit",
-            "h":650
-          },
-          "small":{
-            "w":340,
-            "resize":"fit",
-            "h":215
-          }
-        },
-        "indices":[
-          113,
-          135
-        ],
-        "media_url_https":"https://pbs.twimg.com/media/CRIquUMXAAExP2w.jpg",
-        "id":653631871105040385,
-        "display_url":"pic.twitter.com/2lUYwmpDI7",
-        "id_str":"653631871105040385",
-        "expanded_url":"http://twitter.com/philgyfordtest/status/653631878646378496/photo/1"
-      },
-      {
-        "type":"photo",
-        "url":"http://t.co/2lUYwmpDI7",
-        "media_url":"http://pbs.twimg.com/media/CRIqur-WsAArAPn.jpg",
-        "sizes":{
-          "small":{
-            "w":340,
-            "resize":"fit",
-            "h":254
-          },
-          "medium":{
-            "w":600,
-            "resize":"fit",
-            "h":448
-          },
-          "large":{
-            "w":1024,
-            "resize":"fit",
-            "h":765
-          },
-          "thumb":{
-            "w":150,
-            "resize":"crop",
-            "h":150
-          }
-        },
-        "indices":[
-          113,
-          135
-        ],
-        "media_url_https":"https://pbs.twimg.com/media/CRIqur-WsAArAPn.jpg",
-        "id":653631877488750592,
-        "display_url":"pic.twitter.com/2lUYwmpDI7",
-        "id_str":"653631877488750592",
-        "expanded_url":"http://twitter.com/philgyfordtest/status/653631878646378496/photo/1"
-      }
-    ]
   },
   "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
   "favorited":true

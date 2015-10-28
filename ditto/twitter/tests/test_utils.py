@@ -39,7 +39,7 @@ class UtilsHtmlifyTestCase(TestCase):
         "Makes 'hashtags' entities into clickable #links."
         tweet_html = htmlify_tweet(self.json_data)
         self.assertTrue(' <a href="https://twitter.com/hashtag/testing" rel="external">#testing</a> and' in tweet_html)
-        self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a> ' in tweet_html)
+        self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a>' in tweet_html)
 
     def test_linebreaks(self):
         "Turns linebreaks into <br>s"

@@ -10,8 +10,8 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 
-from .. import factories
-from ..models import Account, Tweet, User
+from ..factories import AccountFactory, AccountWithCredentialsFactory, PhotoFactory, TweetFactory, UserFactory
+from ..models import Account, Photo, Tweet, User
 
 
 class TwitterAccountTestCase(TestCase):
@@ -47,21 +47,21 @@ class TwitterAccountTestCase(TestCase):
 
     def test_str_1(self):
         "Has the correct string represntation when it has no user"
-        account = factories.AccountFactory(user=None)
+        account = AccountFactory(user=None)
         self.assertEqual(account.__str__(), '%d' % account.pk)
 
     def test_str_2(self):
         "Has the correct string represntation when it has a user"
-        user = factories.UserFactory()
-        account = factories.AccountFactory(user=user)
+        user = UserFactory()
+        account = AccountFactory(user=user)
         self.assertEqual(account.__str__(), '@%s' % user.screen_name)
 
     def test_ordering(self):
         """Multiple accounts are by user.screen_name time ascending"""
-        user_1 = factories.UserFactory(screen_name='terry')
-        user_2 = factories.UserFactory(screen_name='june')
-        account_1 = factories.AccountFactory(user=user_1)
-        account_2 = factories.AccountFactory(user=user_2)
+        user_1 = UserFactory(screen_name='terry')
+        user_2 = UserFactory(screen_name='june')
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
         accounts = Account.objects.all()
         self.assertEqual(accounts[0].pk, account_2.pk)
 
@@ -70,7 +70,7 @@ class TwitterAccountTestCase(TestCase):
         "Should fetch user from API on save if it has no user"
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
-        account = factories.AccountWithCredentialsFactory(user=None)
+        account = AccountWithCredentialsFactory(user=None)
         self.assertIsInstance(account.user, User)
         self.assertEqual(account.user.screen_name, 'philgyford')
         self.assertEqual(1, len(responses.calls))
@@ -83,8 +83,8 @@ class TwitterAccountTestCase(TestCase):
         "Shouldn't fetch user from API on save if it already has a user"
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
-        user = factories.UserFactory(twitter_id=12552, screen_name='oldname')
-        account = factories.AccountWithCredentialsFactory(user=user)
+        user = UserFactory(twitter_id=12552, screen_name='oldname')
+        account = AccountWithCredentialsFactory(user=user)
         self.assertIsInstance(account.user, User)
         # Screen name is not changed to the one in our mocked API response:
         self.assertEqual(account.user.screen_name, 'oldname')
@@ -96,7 +96,7 @@ class TwitterAccountTestCase(TestCase):
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
         # Not saving (as that generates another request):
-        account = factories.AccountFactory.build(user=None)
+        account = AccountFactory.build(user=None)
         result = account.updateUserFromTwitter()
         self.assertEqual(result, False)
         self.assertEqual(0, len(responses.calls))
@@ -107,7 +107,7 @@ class TwitterAccountTestCase(TestCase):
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
         # Not saving (as that generates another request):
-        account = factories.AccountWithCredentialsFactory.build(user=None)
+        account = AccountWithCredentialsFactory.build(user=None)
 
         result = account.updateUserFromTwitter()
         self.assertTrue(result['success'])
@@ -127,7 +127,7 @@ class TwitterAccountTestCase(TestCase):
             call='account/verify_credentials',
             status=401)
         # Not saving (as that generates another request):
-        account = factories.AccountWithCredentialsFactory.build(user=None)
+        account = AccountWithCredentialsFactory.build(user=None)
 
         result = account.updateUserFromTwitter()
         self.assertEqual(1, len(responses.calls))
@@ -140,67 +140,123 @@ class TwitterAccountTestCase(TestCase):
     def test_has_credentials_true(self):
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
-        account = factories.AccountWithCredentialsFactory.build(user=None)
+        account = AccountWithCredentialsFactory.build(user=None)
         self.assertTrue(account.hasCredentials())
 
     def test_has_credentials_false(self):
-        account = factories.AccountFactory.build(user=None)
+        account = AccountFactory.build(user=None)
         self.assertFalse(account.hasCredentials())
 
     def test_get_absolute_url_with_user(self):
-        user = factories.UserFactory(screen_name='bill')
-        account = factories.AccountFactory(user=user)
+        user = UserFactory(screen_name='bill')
+        account = AccountFactory(user=user)
         self.assertEqual(account.get_absolute_url(),
             reverse('twitter:account_detail', kwargs={'screen_name': 'bill'}))
 
     def test_get_absolute_url_no_user(self):
-        account = factories.AccountFactory(user=None)
+        account = AccountFactory(user=None)
         self.assertEqual(account.get_absolute_url(), '')
 
+
+class TwitterPhotoTestCase(TestCase):
+
+    def test_str(self):
+        photo = PhotoFactory()
+        self.assertEqual(photo.__str__(), '%d' % photo.id)
+
+    def test_ordering(self):
+        """Multiple accounts are sorted by time_created ascending"""
+        time_now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        photo_1 = PhotoFactory(
+                        time_created=time_now - datetime.timedelta(minutes=1))
+        photo_2 = PhotoFactory(time_created=time_now)
+        photos = Photo.objects.all()
+        self.assertEqual(photos[0].pk, photo_1.pk)
+
+    def test_unique_twitter_id(self):
+        "Ensures twitter_id is unique"
+        photo_1 = PhotoFactory(twitter_id=123)
+        with self.assertRaises(IntegrityError):
+            photo_2 = PhotoFactory(twitter_id=123)
+
+    def test_default_manager(self):
+        "Default Manager shows both private and public photos"
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        public_tweet = TweetFactory(user=public_user)
+        private_tweet = TweetFactory(user=private_user)
+        public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
+        private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
+        self.assertEqual(len(Photo.objects.all()), 3)
+
+    def test_public_manager(self):
+        "Public Manager shows only public photos"
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        public_tweet = TweetFactory(user=public_user)
+        private_tweet = TweetFactory(user=private_user)
+        public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
+        private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
+        photos = Photo.public_objects.all()
+        self.assertEqual(len(photos), 2)
+        self.assertEqual(photos[0].pk, public_photos[0].pk)
+        self.assertEqual(photos[1].pk, public_photos[1].pk)
+
+    def test_is_public(self):
+        "Photo should be public if photo's tweet is public"
+        user = UserFactory(is_private=False)
+        tweet = TweetFactory(user=user)
+        photo = PhotoFactory(tweet=tweet)
+        self.assertFalse(tweet.is_private)
+
+    def test_is_private(self):
+        "Photo should be private if photo's tweet is private"
+        user = UserFactory(is_private=True)
+        tweet = TweetFactory(user=user)
+        photo = PhotoFactory(tweet=tweet)
+        self.assertTrue(tweet.is_private)
 
 class TwitterTweetTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"
-        tweet = factories.TweetFactory(title='My tweet text')
+        tweet = TweetFactory(title='My tweet text')
         self.assertEqual(tweet.__str__(), 'My tweet text')
 
     def test_ordering(self):
-        """Multiple accounts are sorted by created_at descending"""
+        """Multiple tweets are sorted by created_at descending"""
         time_now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        tweet_1 = factories.TweetFactory(
+        tweet_1 = TweetFactory(
                         created_at=time_now - datetime.timedelta(minutes=1))
-        tweet_2 = factories.TweetFactory(created_at=time_now)
+        tweet_2 = TweetFactory(created_at=time_now)
         tweets = Tweet.objects.all()
         self.assertEqual(tweets[0].pk, tweet_2.pk)
 
     def test_unique_twitter_id(self):
         "Ensures twitter_id is unique"
-        tweet_1 = factories.TweetFactory(twitter_id=123)
+        tweet_1 = TweetFactory(twitter_id=123)
         with self.assertRaises(IntegrityError):
-            tweet_2 = factories.TweetFactory(twitter_id=123)
+            tweet_2 = TweetFactory(twitter_id=123)
 
     def test_summary_creation(self):
         "Creates the Tweet's summary correctly on save"
-        tweet = factories.TweetFactory(text='This is my tweet text')
+        tweet = TweetFactory(text='This is my tweet text')
         self.assertEqual(tweet.summary, 'This is my tweet text')
 
     def test_default_manager_recent(self):
         "The default manager includes tweets from public AND private users"
-        public_user = factories.UserFactory(is_private=False)
-        private_user = factories.UserFactory(is_private=True)
-        public_tweets = factories.TweetFactory.create_batch(
-                                                        2, user=public_user)
-        private_tweet = factories.TweetFactory(user=private_user)
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        public_tweets = TweetFactory.create_batch(2, user=public_user)
+        private_tweet = TweetFactory(user=private_user)
         self.assertEqual(len(Tweet.objects.all()), 3)
 
     def test_public_manager(self):
         "The public manager ONLY includes tweets from public users"
-        public_user = factories.UserFactory(is_private=False)
-        private_user = factories.UserFactory(is_private=True)
-        public_tweets = factories.TweetFactory.create_batch(
-                                                        2, user=public_user)
-        private_tweet = factories.TweetFactory(user=private_user)
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        public_tweets = TweetFactory.create_batch(2, user=public_user)
+        private_tweet = TweetFactory(user=private_user)
         tweets = Tweet.public_objects.all()
         self.assertEqual(len(tweets), 2)
         self.assertEqual(tweets[0].pk, public_tweets[1].pk)
@@ -208,8 +264,8 @@ class TwitterTweetTestCase(TestCase):
 
     def test_favorites_manager(self):
         "Should contain recent tweets favorited by any account."
-        accounts = factories.AccountFactory.create_batch(2)
-        tweets = factories.TweetFactory.create_batch(5)
+        accounts = AccountFactory.create_batch(2)
+        tweets = TweetFactory.create_batch(5)
         accounts[0].user.favorites.add(tweets[2])
         accounts[0].user.favorites.add(tweets[4])
         accounts[1].user.favorites.add(tweets[2])
@@ -220,11 +276,11 @@ class TwitterTweetTestCase(TestCase):
 
     def test_public_favorites_tweets_manager(self):
         "Should contain recent PUBLIC tweets favorited the Accounts"
-        accounts = factories.AccountFactory.create_batch(2)
-        public_user = factories.UserFactory(is_private=False)
-        private_user = factories.UserFactory(is_private=True)
-        public_tweet = factories.TweetFactory(user=public_user)
-        private_tweet = factories.TweetFactory(user=private_user)
+        accounts = AccountFactory.create_batch(2)
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        public_tweet = TweetFactory(user=public_user)
+        private_tweet = TweetFactory(user=private_user)
 
         accounts[0].user.favorites.add(private_tweet)
         accounts[0].user.favorites.add(public_tweet)
@@ -236,11 +292,11 @@ class TwitterTweetTestCase(TestCase):
 
     def test_public_favorites_accounts_manager(self):
         "Should only show tweets favorited by public Accounts"
-        public_user = factories.UserFactory(is_private=False)
-        private_user = factories.UserFactory(is_private=True)
-        account_1 = factories.AccountFactory(user=public_user)
-        account_2 = factories.AccountFactory(user=private_user)
-        tweets = factories.TweetFactory.create_batch(5)
+        public_user = UserFactory(is_private=False)
+        private_user = UserFactory(is_private=True)
+        account_1 = AccountFactory(user=public_user)
+        account_2 = AccountFactory(user=private_user)
+        tweets = TweetFactory.create_batch(5)
         account_1.user.favorites.add(tweets[0])
         account_1.user.favorites.add(tweets[3])
         account_2.user.favorites.add(tweets[1])
@@ -253,27 +309,27 @@ class TwitterTweetTestCase(TestCase):
 
     def test_is_public(self):
         "Tweet should be public if tweet's user is public"
-        user = factories.UserFactory(is_private=False)
-        tweet = factories.TweetFactory(user=user)
+        user = UserFactory(is_private=False)
+        tweet = TweetFactory(user=user)
         self.assertFalse(tweet.is_private)
 
     def test_is_private(self):
         "Tweet should be private if tweet's user is private"
-        user = factories.UserFactory(is_private=True)
-        tweet = factories.TweetFactory(user=user)
+        user = UserFactory(is_private=True)
+        tweet = TweetFactory(user=user)
         self.assertTrue(tweet.is_private)
 
     def test_is_reply(self):
-        tweet_1 = factories.TweetFactory(in_reply_to_screen_name='bob')
+        tweet_1 = TweetFactory(in_reply_to_screen_name='bob')
         self.assertTrue(tweet_1.is_reply)
-        tweet_2 = factories.TweetFactory(in_reply_to_screen_name='')
+        tweet_2 = TweetFactory(in_reply_to_screen_name='')
         self.assertFalse(tweet_2.is_reply)
 
     @patch('ditto.twitter.models.htmlify_tweet')
     def test_makes_text_html(self, htmlify_method):
         "When save() is called, text_html should be created from the raw JSON"
         htmlify_method.return_value = 'my test text'
-        tweet = factories.TweetFactory()
+        tweet = TweetFactory()
         tweet.raw = '{"text":"my test text"}'
         tweet.save()
         htmlify_method.assert_called_once_with({'text': 'my test text'})
@@ -283,32 +339,32 @@ class TwitterUserTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"
-        user = factories.UserFactory(screen_name='bill')
+        user = UserFactory(screen_name='bill')
         self.assertEqual(user.__str__(), '@bill')
 
     def test_ordering(self):
         """Multiple users are sorted by screen_name"""
-        user_1 = factories.UserFactory(screen_name='bill')
-        user_2 = factories.UserFactory(screen_name='alice')
+        user_1 = UserFactory(screen_name='bill')
+        user_2 = UserFactory(screen_name='alice')
         users = User.objects.all()
         self.assertEqual(users[0].pk, user_2.pk)
 
     def test_permalink(self):
         "Generates the correct permalink"
-        user = factories.UserFactory(screen_name='bill')
+        user = UserFactory(screen_name='bill')
         self.assertEqual(user.permalink, 'https://twitter.com/bill')
 
     def test_unique_twitter_id(self):
         "Ensures twitter_id is unique"
-        user_1 = factories.UserFactory(twitter_id=123)
+        user_1 = UserFactory(twitter_id=123)
         with self.assertRaises(IntegrityError):
-            user_2 = factories.UserFactory(twitter_id=123)
+            user_2 = UserFactory(twitter_id=123)
 
     def test_going_private(self):
         "Makes the user's tweets private if they go private"
         # Start off public:
-        user = factories.UserFactory(is_private=False)
-        tweet = factories.TweetFactory(user=user)
+        user = UserFactory(is_private=False)
+        tweet = TweetFactory(user=user)
         self.assertFalse(tweet.is_private)
         # Now change to private:
         user.is_private = True
@@ -320,8 +376,8 @@ class TwitterUserTestCase(TestCase):
     def test_going_public(self):
         "Makes the user's tweets public if they go public"
         # Start off private:
-        user = factories.UserFactory(is_private=True)
-        tweet = factories.TweetFactory(user=user)
+        user = UserFactory(is_private=True)
+        tweet = TweetFactory(user=user)
         self.assertTrue(tweet.is_private)
         # Now change to public:
         user.is_private = False
@@ -331,9 +387,9 @@ class TwitterUserTestCase(TestCase):
         self.assertFalse(tweet.is_private)
 
     def test_favorites(self):
-        user = factories.UserFactory(screen_name='bill')
-        tweet_1 = factories.TweetFactory(text ='Tweet 1')
-        tweet_2 = factories.TweetFactory(text ='Tweet 2')
+        user = UserFactory(screen_name='bill')
+        tweet_1 = TweetFactory(text ='Tweet 1')
+        tweet_2 = TweetFactory(text ='Tweet 2')
         user.favorites.add(tweet_1)
         user.favorites.add(tweet_2)
         faves = User.objects.get(screen_name='bill').favorites.all()
@@ -344,9 +400,9 @@ class TwitterUserTestCase(TestCase):
 
     def test_with_accounts_manager(self):
         "Only returns Users with Accounts"
-        users = factories.UserFactory.create_batch(4)
-        account_1 = factories.AccountFactory(user=users[0])
-        account_2 = factories.AccountFactory(user=users[2])
+        users = UserFactory.create_batch(4)
+        account_1 = AccountFactory(user=users[0])
+        account_2 = AccountFactory(user=users[2])
         users_with_accounts = User.objects_with_accounts.all()
         self.assertEqual(2, len(users_with_accounts))
         self.assertEqual(users_with_accounts[0].pk, users[0].pk)

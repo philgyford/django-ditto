@@ -41,8 +41,6 @@ class AccountWithCredentialsFactory(AccountFactory):
     access_token_secret = 'TESTACCESSTOKENSECRET'
 
 
-
-
 class TweetFactory(factory.DjangoModelFactory):
 
     class Meta:
@@ -58,4 +56,21 @@ class TweetFactory(factory.DjangoModelFactory):
                     )
     source = 'web'
 
+
+class PhotoFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = models.Photo
+
+    tweet = factory.SubFactory(TweetFactory)
+    twitter_id = factory.Sequence(lambda n: (n * 10000000))
+    url = factory.Sequence(lambda n: 'http://pbs.twimg.com/media/%d.jpg' % n)
+    large_w = 938
+    large_h = 397
+    medium_w = 600
+    medium_h = 253
+    small_w = 340
+    small_h = 143
+    thumb_w = 150
+    thumb_h = 150
 

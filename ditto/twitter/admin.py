@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
 
-from .models import Account, Tweet, User
+from .models import Account, Photo, Tweet, User
 
 
 @admin.register(Account)
@@ -39,11 +39,20 @@ class AccountAdmin(admin.ModelAdmin):
     has_credentials.boolean = True
 
 
+class PhotoInline(admin.TabularInline):
+    model = Photo
+    extra = 0
+
+
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
     list_display = ('user','is_private', 'title', 'created_at', )
     list_display_links = ('title', )
     list_filter = ('user', 'created_at',)
+
+    inlines = [
+        PhotoInline,
+    ]
 
     fieldsets = (
         (None, {
@@ -51,8 +60,9 @@ class TweetAdmin(admin.ModelAdmin):
                 'twitter_id', 'permalink', )
         }),
         (None, {
-            'fields': ('favorite_count', 'retweet_count', 'language',
-                'source', 'in_reply_to_screen_name', 'in_reply_to_status_id',
+            'fields': ('favorite_count', 'retweet_count', 'photos_count',
+                'language', 'source',
+                'in_reply_to_screen_name', 'in_reply_to_status_id',
                 'in_reply_to_user_id', 'quoted_status_id', )
         }),
         ('Location', {

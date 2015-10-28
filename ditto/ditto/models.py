@@ -7,9 +7,7 @@ from .managers import PublicItemManager
 
 
 class TimeStampedModelMixin(models.Model):
-    """
-    Should be mixed in to all models.
-    """
+    "Should be mixed in to all models."
     time_created = models.DateTimeField(auto_now_add=True,
                 help_text="The time this item was created in the database.")
     time_modified = models.DateTimeField(auto_now=True,
@@ -86,7 +84,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     summary = models.CharField(null=False, blank=True, max_length=255,
         help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
     is_private = models.BooleanField(default=False, null=False, blank=False,
-        help_text="If set, this item will not be shown on public-facing pages.")
+        help_text="If true, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
         help_text="The time the item's data was last fetched, and was new or changed.")
 

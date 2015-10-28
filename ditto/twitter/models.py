@@ -4,6 +4,7 @@ from django.db import models
 
 from .managers import FavoritesManager, PublicFavoritesManager, WithAccountsManager
 from .utils import htmlify_tweet
+from ..ditto.managers import PublicItemManager
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 import json
@@ -86,6 +87,74 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return False
 
+
+class Photo(TimeStampedModelMixin, models.Model):
+    """An individual photo that was attached to a Tweet.
+    A Tweet could have zero, one or more Photos.
+    """
+    tweet = models.ForeignKey('Tweet')
+    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
+    url = models.URLField(null=False, blank=False,
+                                        help_text="URL of the image itself")
+
+    is_private = models.BooleanField(default=False, null=False, blank=False,
+        help_text="If true, this item will not be shown on public-facing pages.")
+
+    large_w = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Large width")
+    large_h = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Large height")
+    medium_w = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Medium width")
+    medium_h = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Medium height")
+    small_w = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Small width")
+    small_h = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Small height")
+    thumb_w = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Thumbnail width")
+    thumb_h = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                verbose_name="Thumbnail height")
+
+    # All Items (eg, used in Admin):
+    objects = models.Manager()
+
+    # All Items which aren't private. Should ALWAYS be used for public pages:
+    public_objects = PublicItemManager()
+
+    def __str__(self):
+        return '%d' % self.id
+
+    class Meta:
+        ordering = ['time_created']
+
+    def save(self, *args, **kwargs):
+        """Privacy depends on the tweet (which depends on its user), so ensure
+        it's set correctly.
+        """
+        self.is_private = self.tweet.is_private
+        super().save(*args, **kwargs)
+
+    @property
+    def large_url(self):
+        return '%s:large' % self.url
+
+    @property
+    def medium_url(self):
+        return '%s:medium' % self.url
+
+    @property
+    def small_url(self):
+        return '%s:small' % self.url
+
+    @property
+    def thumb_url(self):
+        return '%s:thumb' % self.url
+
+
+
+
 class ExtraTweetManagers(models.Model):
     """Managers to use in the Tweet model, in addition to the defaults defined
     in DittoItemModel.
@@ -150,6 +219,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     source = models.CharField(null=False, blank=True, max_length=255,
                                 help_text="Utility used to post the Tweet")
+    photos_count = models.PositiveSmallIntegerField(null=False, blank=True,
+            default=0, help_text="Number of Photos attached to this Tweet")
 
     def __str__(self):
         return self.title

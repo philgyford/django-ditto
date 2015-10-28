@@ -1,5 +1,4 @@
 {% extends 'twitter/base.html' %}
-{% load l10n %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
@@ -24,11 +23,7 @@
     </h1>
 
     <div class="row">
-        <div class="col-md-3 col-md-push-9">
-            {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
-        </div> <!-- .col -->
-
-        <div class="col-md-9 col-md-pull-3">
+        <div class="col-md-9">
             {% if twitter_user.is_private %}
                 {# The `tweet` object will be None, too. #}
                 <p>This user is private.</p>
@@ -37,6 +32,10 @@
                     {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False perms=perms only %}
                 </div>
             {% endif %}
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+            {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

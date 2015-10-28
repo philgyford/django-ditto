@@ -12,7 +12,7 @@ from django.test import TestCase
 
 from .. import factories
 from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, VerifyFetcher, VerifyForAccount
-from ..models import Account, Tweet, User
+from ..models import Account, Photo, Tweet, User
 
 
 class FetchTwitterTestCase(TestCase):
@@ -111,6 +111,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
                                 ).replace(tzinfo=pytz.utc))
         self.assertEqual(tweet.favorite_count, 2)
         self.assertEqual(tweet.retweet_count, 1)
+        self.assertEqual(tweet.photos_count, 0)
         self.assertEqual(tweet.in_reply_to_screen_name, 'flaneur')
         self.assertEqual(tweet.in_reply_to_status_id, 629375876216528896)
         self.assertEqual(tweet.in_reply_to_user_id, 1859981)
@@ -140,6 +141,48 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         # Load that saved tweet from the DB:
         tweet = Tweet.objects.get(twitter_id=300)
         self.assertTrue(tweet.is_private)
+
+class TweetMixinPhotosTestCase(FetchTwitterTestCase):
+    """Testing the save_photos() method of the TweetMixin"""
+
+    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'
+
+    def test_saves_photos(self):
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        tweet_data = json.loads(self.make_response_body())
+
+        # A bit horrid; need to rely on UserMixin working so we can make a
+        # User object correctly, so we can then make the tweet:
+        user_mixin = UserMixin()
+        user = user_mixin.save_user(tweet_data['user'], fetch_time)
+
+        # Send the JSON, and our new User object, to try and save the tweet:
+        mixin = TweetMixin()
+        saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
+
+        # Load that saved tweet from the DB:
+        tweet = Tweet.objects.get(twitter_id=659380084269273088)
+
+        self.assertEqual(tweet.photos_count, 3)
+
+        photos = Photo.objects.filter(tweet=tweet)
+
+        self.assertEqual(len(photos), 3)
+
+        photo = photos[1]
+
+        self.assertEqual(photo.twitter_id, 659380083099086848)
+        self.assertEqual(photo.url, "https://pbs.twimg.com/media/CSaWsSkWsAA-yXb.jpg")
+        self.assertEqual(photo.is_private, tweet.is_private)
+        self.assertEqual(photo.large_w, 935)
+        self.assertEqual(photo.large_h, 397)
+        self.assertEqual(photo.medium_w, 600)
+        self.assertEqual(photo.medium_h, 254)
+        self.assertEqual(photo.small_w, 340)
+        self.assertEqual(photo.small_h, 144)
+        self.assertEqual(photo.thumb_w, 150)
+        self.assertEqual(photo.thumb_h, 150)
 
 
 class UserMixinTestCase(FetchTwitterTestCase):

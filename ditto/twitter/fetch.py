@@ -6,7 +6,7 @@ import time
 
 from twython import Twython, TwythonError
 
-from .models import Account, Tweet, User
+from .models import Account, Photo, Tweet, User
 
 
 # CLASSES HERE:
@@ -61,6 +61,54 @@ class TweetMixin(TwitterItemMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def save_photos(self, tweet):
+        """Takes a Tweet object and creates or updates any photos based on the
+        JSON data in its `raw` field.
+
+        Keyword arguments:
+        tweet -- The Tweet object. Must have been saved as we need its id.
+
+        Returns:
+        Total number of photos for this Tweet (regardless of whether they were
+            created or updated).
+        """
+        photos_count = 0
+
+        try:
+            json_data = json.loads(tweet.raw)
+        except ValueError as error:
+            return photos_count
+
+        try:
+            media = json_data['extended_entities']['media']
+        except KeyError:
+            media = []
+
+        for item in media:
+            if 'type' in item and item['type'] == 'photo':
+                defaults = {
+                    'tweet':        tweet,
+                    'twitter_id':   item['id'],
+                    'url':          item['media_url_https'],
+                    'is_private':   tweet.is_private,
+                }
+
+                for size in ['large', 'medium', 'small', 'thumb']:
+                    if size in item['sizes']:
+                        defaults[size+'_w'] = item['sizes'][size]['w']
+                        defaults[size+'_h'] = item['sizes'][size]['h']
+                    else:
+                        defaults[size+'_w'] = None
+                        defaults[size+'_h'] = None
+
+                photo_obj, created = Photo.objects.update_or_create(
+                        twitter_id=item['id'],
+                        defaults=defaults
+                    )
+                photos_count += 1
+
+        return photos_count
+
     def save_tweet(self, tweet, fetch_time, user):
         """Takes a dict of tweet data from the API and creates or updates a
         Tweet object.
@@ -85,6 +133,7 @@ class TweetMixin(TwitterItemMixin):
             'fetch_time':       fetch_time,
             'raw':              raw_json,
             'user':             user,
+            'is_private':       user.is_private,
             'created_at':       created_at,
             'permalink':        'https://twitter.com/%s/status/%s' % (
                                             user.screen_name, tweet['id']),
@@ -94,11 +143,6 @@ class TweetMixin(TwitterItemMixin):
             'twitter_id':       tweet['id'],
             'source':           tweet['source']
         }
-
-        if user.is_private:
-            defaults['is_private'] = True
-        else:
-            defaults['is_private'] = False
 
         # Some of these are only present in tweets from the API (not in the
         # tweets from the downloaded archive).
@@ -145,6 +189,11 @@ class TweetMixin(TwitterItemMixin):
                 twitter_id=tweet['id'],
                 defaults=defaults
             )
+
+        # Create/update any Photos, and update the Tweet's photo_count:
+        tweet_obj.photos_count = self.save_photos(tweet=tweet_obj)
+        tweet_obj.save()
+
         return tweet_obj
 
 

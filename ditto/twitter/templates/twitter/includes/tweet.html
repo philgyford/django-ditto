@@ -40,7 +40,24 @@ Expects:
             {% endif %}
             </small>
         </p>
-        <p class="m-b-0{% if detail %} lead{% endif %} twitter-tweet-text">{{ tweet.text_html|safe }}</p>
+
+        <p class="{% if tweet.photos_count == 0 %}m-b-0{% endif %}{% if detail %} lead{% endif %} twitter-tweet-text">
+            {{ tweet.text_html|safe }}
+        </p>
+
+        {% if tweet.photos_count > 0 %}
+            <ul class="m-b-0 {% if detail %}list-unstyled{% else %}list-inline{% endif %}">
+                {% for photo in tweet.photo_set.all %}
+                    {% if detail %}
+                        <li><p><a href="{{ photo.url }}"><img src="{{ photo.large_url }}" width="{{ photo.large_w|safe }}" height="{{ photo.large_h|safe }}" alt="" class="img-responsive"></a></p></li>
+
+                    {% else %}
+                        <li><img src="{{ photo.thumb_url }}" width="{{ photo.thumb_w }}" height="{{ photo.thumb_h }}" alt=""></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         {% if tweet.place %}
             <p class="m-b-0 text-muted twitter-tweet-place">
                 <small>
