@@ -5,6 +5,7 @@ Expects:
  * page_obj, a DiggPaginator instance or False.
  * show_user, boolean - True (default) if we should show the 'By Phil Gyford'
                             bit on Tweets, False otherwise.
+ * perms - The Django perms object.
 {% endcomment %}
 
 {% if page_obj == False or page_obj.paginator.count > 0 %}
@@ -15,7 +16,7 @@ Expects:
     <ul class="media-list twitter-tweets">
         {% for tweet in tweet_list %}
             <li class="media m-t-0 twitter-tweet">
-                {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user only %}
+                {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user perms=perms only %}
             </li>
         {% endfor %}
     </ul>

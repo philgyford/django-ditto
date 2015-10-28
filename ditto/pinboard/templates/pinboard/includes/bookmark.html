@@ -4,6 +4,7 @@ Expects:
  * bookmark, a Bookmark object.
  * detail, boolean - True if this we're showing a single bookmark, False if
                         this bookmark is in a list.
+ * perms - The Django perms object.
 
 {% endcomment %}
 
@@ -30,9 +31,15 @@ Expects:
 
 <p class="text-muted pinboard-bookmark-about">
     By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
+    {% if not detail %}
+        <a href="{{ bookmark.get_absolute_url }}" title="See only this bookmark">
+    {% endif %}
     <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">{{ bookmark.post_time|date:'j M Y, g:i A' }}</time>
     {% if not detail %}
-        • <a href="{{ bookmark.get_absolute_url }}">#</a>
+        </a>
+    {% endif %}
+    {% if perms.pinboard.can_change_bookmark %}
+        • <a href="{% url 'admin:pinboard_bookmark_change' bookmark.id %}">Edit</a>
     {% endif %}
 </p>
 

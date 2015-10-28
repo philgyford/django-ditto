@@ -30,7 +30,7 @@
                 </li>
             </ul>
 
-            {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True only %}
+            {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

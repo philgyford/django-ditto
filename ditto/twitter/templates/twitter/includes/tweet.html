@@ -6,6 +6,7 @@ Expects:
                         Tweet is in a list.
  * show_user, boolean - True if we should show the 'By Phil Gyford' bit, False
                         otherwise.
+ * perms - The Django perms object.
 {% endcomment %}
 
 {% if tweet %}
@@ -25,14 +26,17 @@ Expects:
                 <span class="text-muted"><small>
             {% endif %}
             {% if detail %}
-                <a href="{{ tweet.permalink }}" title="View on Twitter">
+                <a href="{{ tweet.permalink }}" title="See on Twitter">
             {% else %}
-                <a href="{{ tweet.get_absolute_url }}" title="View only this Tweet">
+                <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">
             {% endif %}
                 <time datetime="{{ tweet.created_at|date:'Y-m-d H:i:s' }}">{{ tweet.created_at|date:'j M Y, g:i A' }}</time>
             </a>
             {% if tweet.is_reply %}
                 • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
+            {% endif %}
+            {% if perms.twitter.can_change_tweet %}
+                • <a href="{% url 'admin:twitter_tweet_change' tweet.id %}">Edit</a>
             {% endif %}
             </small>
         </p>

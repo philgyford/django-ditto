@@ -23,7 +23,7 @@
         On {{ user.listed_count }} List{{ user.listed_count|pluralize }}
         {% if account == None or account.is_active %}
             <br>
-            <a href="{{ user.permalink }}">View {{ user }} on Twitter</a>
+            <a href="{{ user.permalink }}">{{ user }} on Twitter</a>
         {% endif %}
     </div>
 </div>

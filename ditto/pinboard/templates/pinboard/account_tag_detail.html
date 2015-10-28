@@ -23,7 +23,7 @@
                     {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
                     {% if account.is_active %}
                         <br>
-                        <a href="{{ account.url }}/t:{{ tag.slug }}">View {{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
+                        <a href="{{ account.url }}/t:{{ tag.slug }}">{{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
                     {% endif %}
                     <br>
                     <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
@@ -32,7 +32,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj only %}
+            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 
