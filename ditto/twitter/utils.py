@@ -23,13 +23,26 @@ def htmlify_tweet(json_data):
     except KeyError:
         ents = {}
 
-    if 'urls' in ents and len(ents['urls']):
-        for url in ents['urls']:
-            text = text.replace(url['url'],
+    # Try to work out if we're going to deal with linkifying URLs using the
+    # entities['urls'] and entities['media'] elements, or if there aren't any.
+    url_count = 0
+    if 'urls' in ents and 'media' in ents:
+        url_count = len(ents['urls']) + len(ents['media'])
+
+    if url_count > 0:
+        if len(ents['urls']):
+            for url in ents['urls']:
+                text = text.replace(url['url'],
                             '<a href="%s" rel="external">%s</a>' % (
                                     url['expanded_url'], url['display_url']))
+
+        if len(ents['media']):
+            # Remove any media links, as we'll make the photos/movies visible in
+            # the page. All being well.
+            for item in ents['media']:
+                text = text.replace(item['url'], '')
     else:
-        # Older Tweets might contain links in but no 'urls' entities.
+        # Older Tweets might contain links but have no 'urls'/'media' entities.
         # So just make their links into clickable links:
         text = urlize(text)
 
@@ -44,6 +57,8 @@ def htmlify_tweet(json_data):
             text = text.replace('#%s' % tag['text'],
                 '<a href="https://twitter.com/hashtag/%s" rel="external">#%s</a>'
                                             % (tag['text'], tag['text']))
+
+    text = text.strip()
 
     return text
 
