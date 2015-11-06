@@ -5,7 +5,7 @@ import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 
-from .. import factories
+from ..factories import AccountFactory, BookmarkFactory
 from ..models import Account, Bookmark, BookmarkTag
 
 
@@ -13,38 +13,38 @@ class PinboardAccountTestCase(TestCase):
 
     def test_str(self):
         """The string representation of the Account is correct"""
-        account = factories.AccountFactory(username='bill')
+        account = AccountFactory(username='bill')
         self.assertEqual(account.__str__(), 'bill')
 
     def test_unique_username(self):
         """Ensures that usernames are unique"""
-        account_1 = factories.AccountFactory(username='billy')
+        account_1 = AccountFactory(username='billy')
         with self.assertRaises(IntegrityError):
-            account_2 = factories.AccountFactory(username='billy')
+            account_2 = AccountFactory(username='billy')
 
     def test_unique_url(self):
         """Ensures that Account URLs at Pinboard are unique"""
-        account_1 = factories.AccountFactory(url='https://pinboard.in/u:billy')
+        account_1 = AccountFactory(url='https://pinboard.in/u:billy')
         with self.assertRaises(IntegrityError):
-            account_2 = factories.AccountFactory(
+            account_2 = AccountFactory(
                                             url='https://pinboard.in/u:billy')
     def test_get_absolute_url(self):
         """Has the correct URL on this site"""
-        account = factories.AccountFactory(username='billy')
+        account = AccountFactory(username='billy')
         self.assertEqual(account.get_absolute_url(), '/pinboard/billy')
 
     def test_ordering(self):
         """Multiple accounts are ordered alphabetically"""
-        account_1 = factories.AccountFactory(username='billy')
-        account_2 = factories.AccountFactory(username='amanda')
+        account_1 = AccountFactory(username='billy')
+        account_2 = AccountFactory(username='amanda')
         accounts = Account.objects.all()
         self.assertEqual(accounts[0].username, 'amanda')
 
     def test_public_bookmarks_count(self):
-        account = factories.AccountFactory()
-        public_bookmarks = factories.BookmarkFactory.create_batch(3,
+        account = AccountFactory()
+        public_bookmarks = BookmarkFactory.create_batch(3,
                                             account=account, is_private=False)
-        private_bookmarks = factories.BookmarkFactory.create_batch(2,
+        private_bookmarks = BookmarkFactory.create_batch(2,
                                            account=account, is_private=True)
         self.assertEqual(account.public_bookmarks_count, 3)
 
@@ -53,30 +53,30 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_save(self):
         """Calls the parent save() method when saving, so it actually saves"""
-        bookmark = factories.BookmarkFactory(title='My title')
+        bookmark = BookmarkFactory(title='My title')
         bookmark.save()
         b = Bookmark.objects.get(title='My title')
         self.assertEqual(b.pk, bookmark.pk)
 
     def test_url_constraint(self):
         """Ensures bookmarks have unique URLs within an Account"""
-        account = factories.AccountFactory()
-        bookmark_1 = factories.BookmarkFactory(
+        account = AccountFactory()
+        bookmark_1 = BookmarkFactory(
                                 account=account, url='http://www.example.com')
         bookmark_1.save()
         with self.assertRaises(IntegrityError):
-            bookmark_2 = factories.BookmarkFactory(
+            bookmark_2 = BookmarkFactory(
                                 account=account, url='http://www.example.com')
 
     def test_url_unconstrained(self):
         """URLs do not have to be unique for different Accounts' Bookmarks"""
-        account_1 = factories.AccountFactory()
-        bookmark_1 = factories.BookmarkFactory(
+        account_1 = AccountFactory()
+        bookmark_1 = BookmarkFactory(
                             account=account_1, url='http://www.example.com')
         bookmark_1.save()
-        account_2 = factories.AccountFactory()
+        account_2 = AccountFactory()
         try:
-            bookmark_2 = factories.BookmarkFactory(
+            bookmark_2 = BookmarkFactory(
                             account=account_2, url='http://www.example.com')
         except IntegrityError:
             self.fail("It looks like there's a Unique constraint on Bookmark.url, which there shouldn't be.")
@@ -85,7 +85,7 @@ class PinboardBookmarkTestCase(TestCase):
         "Creates the Bookmark's summary correctly"
 
         self.maxDiff = None
-        bookmark = factories.BookmarkFactory(description="""<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus.</p>
+        bookmark = BookmarkFactory(description="""<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus.</p>
 
         <p>Fusce ullamcorper nunc vitae tincidunt sodales. Vestibulum sit amet lacus at sem porta porta. Donec fringilla laoreet orci eu porta. Aenean non lacus hendrerit, semper odio a, feugiat orci. Suspendisse potenti.</p>""")
 
@@ -93,20 +93,20 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_get_absolute_url(self):
         "Has the correct URL on this site"
-        account = factories.AccountFactory(username='billy')
-        bookmark = factories.BookmarkFactory(account=account)
+        account = AccountFactory(username='billy')
+        bookmark = BookmarkFactory(account=account)
         self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1')
 
     def test_ordering(self):
         "Bookmarks are ordered correctly, most-recently-posted first"
-        account = factories.AccountFactory(username='billy')
+        account = AccountFactory(username='billy')
         post_time = datetime.datetime.strptime(
                                     '2015-01-01 12:00:00', "%Y-%m-%d %H:%M:%S"
                     ).replace(tzinfo=pytz.utc)
-        bookmark_1 = factories.BookmarkFactory(
+        bookmark_1 = BookmarkFactory(
                             account=account,
                             post_time=post_time)
-        bookmark_2 = factories.BookmarkFactory(
+        bookmark_2 = BookmarkFactory(
                             account=account,
                             post_time=(post_time + datetime.timedelta(days=1)))
         bookmarks = Bookmark.objects.all()
@@ -116,7 +116,7 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_tags(self):
         "Can save and recall tags"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('banana', 'cherry', 'apple')
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 3)
@@ -127,7 +127,7 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_tags_private(self):
         "Doesn't fetch private tags"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('ispublic', '.isprivate', 'alsopublic')
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 2)
@@ -137,28 +137,28 @@ class PinboardBookmarkTestCase(TestCase):
 
     def test_slugs_match_tags_true(self):
         "Returns true if a list of slugs is the same to bookmark's tags"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('banana', 'cherry')
         self.assertTrue(bookmark.slugs_match_tags(['cherry', 'banana']))
 
     def test_slugs_match_tags_false(self):
         "Returns false if a list of slugs is different to bookmark's tags"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('banana', 'cherry')
         self.assertFalse(bookmark.slugs_match_tags(['banana', 'apple']))
 
     def test_default_manager(self):
         "The default manager includes public AND private bookmarks"
-        public_bookmark_1 = factories.BookmarkFactory(is_private=False)
-        private_bookmark = factories.BookmarkFactory(is_private=True)
-        public_bookmark_2 = factories.BookmarkFactory(is_private=False)
+        public_bookmark_1 = BookmarkFactory(is_private=False)
+        private_bookmark = BookmarkFactory(is_private=True)
+        public_bookmark_2 = BookmarkFactory(is_private=False)
         self.assertEqual(len(Bookmark.objects.all()), 3)
 
     def test_public_manager(self):
         "The public manager does NOT include private bookmarks"
-        public_bookmark_1 = factories.BookmarkFactory(is_private=False)
-        private_bookmark = factories.BookmarkFactory(is_private=True)
-        public_bookmark_2 = factories.BookmarkFactory(is_private=False)
+        public_bookmark_1 = BookmarkFactory(is_private=False)
+        private_bookmark = BookmarkFactory(is_private=True)
+        public_bookmark_2 = BookmarkFactory(is_private=False)
         bookmarks = Bookmark.public_objects.all()
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
@@ -171,55 +171,55 @@ class PinboardBookmarkTagSlugsTestCase(TestCase):
     """
 
     def test_standard(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('normal')
         self.assertEqual(bookmark.tags.first().slug, 'normal')
 
     def test_hyphens(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('one-tag')
         self.assertEqual(bookmark.tags.first().slug, 'one-tag')
 
     def test_underscores(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('one_tag')
         self.assertEqual(bookmark.tags.first().slug, 'one_tag')
 
     def test_private(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('.private')
         self.assertEqual(bookmark.tags.first().slug, '.private')
 
     def test_capitals(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('CAPITALtags')
         self.assertEqual(bookmark.tags.first().slug, 'capitaltags')
 
     def test_special_characters_1(self):
         "Characters that don't change"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set("!$()*:;=@[]-.^_`{|}")
         self.assertEqual(bookmark.tags.first().slug, '!$()*:;=@[]-.^_`{|}')
 
     def test_special_characters_2(self):
         "Characters that do change"
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set("#-&-'-+-/-?-\"-%-<->-\\")
         self.assertEqual(bookmark.tags.first().slug,
                         '%23-%2526-%27-%252B-%252f-%3f-%22-%25-%3C-%3E-%5c')
 
     def test_accents(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('Àddîñg-áçćèńtš-tô-Éñgłïśh-íš-śīłłÿ!')
         self.assertEqual(bookmark.tags.first().slug, 'àddîñg-áçćèńtš-tô-éñgłïśh-íš-śīłłÿ!')
 
     def test_musical_notes(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('♬♫♪♩')
         self.assertEqual(bookmark.tags.first().slug, '♬♫♪♩')
 
     def test_chinese(self):
-        bookmark = factories.BookmarkFactory()
+        bookmark = BookmarkFactory()
         bookmark.tags.set('美国')
         self.assertEqual(bookmark.tags.first().slug, '美国')
 
@@ -228,11 +228,9 @@ class PinboardToreadManagersTestCase(TestCase):
     "The two 'to read' managers."
 
     def setUp(self):
-        accounts = factories.AccountFactory.create_batch(3)
-        self.bookmarks_1 = factories.BookmarkFactory.create_batch(2,
-                                                        account=accounts[0])
-        self.bookmarks_2 = factories.BookmarkFactory.create_batch(2,
-                                                        account=accounts[1])
+        accounts = AccountFactory.create_batch(3)
+        self.bookmarks_1 = BookmarkFactory.create_batch(2, account=accounts[0])
+        self.bookmarks_2 = BookmarkFactory.create_batch(2, account=accounts[1])
 
         self.bookmarks_1[0].to_read = True
         self.bookmarks_1[0].is_private = True
