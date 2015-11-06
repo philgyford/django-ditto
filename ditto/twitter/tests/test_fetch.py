@@ -12,7 +12,7 @@ from django.test import TestCase
 
 from .. import factories
 from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, VerifyFetcher, VerifyForAccount
-from ..models import Account, Photo, Tweet, User
+from ..models import Account, Media, Tweet, User
 
 
 class FetchTwitterTestCase(TestCase):
@@ -111,7 +111,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
                                 ).replace(tzinfo=pytz.utc))
         self.assertEqual(tweet.favorite_count, 2)
         self.assertEqual(tweet.retweet_count, 1)
-        self.assertEqual(tweet.photos_count, 0)
+        self.assertEqual(tweet.media_count, 0)
         self.assertEqual(tweet.in_reply_to_screen_name, 'flaneur')
         self.assertEqual(tweet.in_reply_to_status_id, 629375876216528896)
         self.assertEqual(tweet.in_reply_to_user_id, 1859981)
@@ -142,12 +142,15 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         tweet = Tweet.objects.get(twitter_id=300)
         self.assertTrue(tweet.is_private)
 
-class TweetMixinPhotosTestCase(FetchTwitterTestCase):
-    """Testing the save_photos() method of the TweetMixin"""
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'
+class TweetMixinMediaTestCase(FetchTwitterTestCase):
+    "Parent class for testing the save_media() method of the TweetMixin."
 
-    def test_saves_photos(self):
+    # Child classes should have an api_fixture property.
+
+    def setUp(self):
+        "Save a tweet using the api_fixture's data."
+
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
         tweet_data = json.loads(self.make_response_body())
@@ -162,19 +165,28 @@ class TweetMixinPhotosTestCase(FetchTwitterTestCase):
         saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
 
         # Load that saved tweet from the DB:
-        tweet = Tweet.objects.get(twitter_id=659380084269273088)
+        self.tweet = Tweet.objects.get(twitter_id=9876543210)
 
-        self.assertEqual(tweet.photos_count, 3)
 
-        photos = Photo.objects.filter(tweet=tweet)
+class TweetMixinPhotosTestCase(TweetMixinMediaTestCase):
+    "Testing that photos are saved correctly."
+
+    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'
+
+    def test_saves_photos(self):
+        self.assertEqual(self.tweet.media_count, 3)
+
+        photos = Media.objects.filter(tweet=self.tweet)
 
         self.assertEqual(len(photos), 3)
 
         photo = photos[1]
 
-        self.assertEqual(photo.twitter_id, 659380083099086848)
-        self.assertEqual(photo.url, "https://pbs.twimg.com/media/CSaWsSkWsAA-yXb.jpg")
-        self.assertEqual(photo.is_private, tweet.is_private)
+        self.assertEqual(photo.media_type, 'photo')
+        self.assertEqual(photo.twitter_id, 1234567890)
+        self.assertEqual(photo.image_url,
+                            "https://pbs.twimg.com/media/CSaWsSkWsAA-yXb.jpg")
+        self.assertEqual(photo.is_private, self.tweet.is_private)
         self.assertEqual(photo.large_w, 935)
         self.assertEqual(photo.large_h, 397)
         self.assertEqual(photo.medium_w, 600)
@@ -183,6 +195,46 @@ class TweetMixinPhotosTestCase(FetchTwitterTestCase):
         self.assertEqual(photo.small_h, 144)
         self.assertEqual(photo.thumb_w, 150)
         self.assertEqual(photo.thumb_h, 150)
+
+
+class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
+    "Testing that videos are saved correctly."
+
+    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_video.json'
+
+    def test_saves_videos(self):
+        self.assertEqual(self.tweet.media_count, 1)
+
+        videos = Media.objects.filter(tweet=self.tweet)
+        self.assertEqual(len(videos), 1)
+
+        video = videos[0]
+
+        self.assertEqual(video.media_type, 'video')
+        self.assertEqual(video.twitter_id, 1234567890)
+        self.assertEqual(video.image_url, "https://pbs.twimg.com/ext_tw_video_thumb/661601811007188992/pu/img/gcxHGl7EA08a-Gps.jpg")
+        self.assertEqual(video.is_private, self.tweet.is_private)
+        self.assertEqual(video.large_w, 640)
+        self.assertEqual(video.large_h, 360)
+        self.assertEqual(video.medium_w, 600)
+        self.assertEqual(video.medium_h, 338)
+        self.assertEqual(video.small_w, 340)
+        self.assertEqual(video.small_h, 191)
+        self.assertEqual(video.thumb_w, 150)
+        self.assertEqual(video.thumb_h, 150)
+
+        self.assertEqual(video.aspect_ratio, '16:9')
+        self.assertEqual(video.duration, 20000)
+        self.assertEqual(video.mp4_url_1, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/320x180/UfbIvNT9mNTY-hTg.mp4')
+        self.assertEqual(video.mp4_bitrate_1, 320000)
+        self.assertEqual(video.mp4_url_2, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.mp4')
+        self.assertEqual(video.mp4_bitrate_2, 832000)
+        self.assertEqual(video.mp4_url_3, None)
+        self.assertEqual(video.mp4_bitrate_3, None)
+        self.assertEqual(video.webm_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.webm')
+        self.assertEqual(video.webm_bitrate, 832000)
+        self.assertEqual(video.dash_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.mpd')
+        self.assertEqual(video.xmpeg_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8')
 
 
 class UserMixinTestCase(FetchTwitterTestCase):

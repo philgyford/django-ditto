@@ -88,13 +88,22 @@ class Account(TimeStampedModelMixin, models.Model):
             return False
 
 
-class Photo(TimeStampedModelMixin, models.Model):
-    """An individual photo that was attached to a Tweet.
-    A Tweet could have zero, one or more Photos.
+class Media(TimeStampedModelMixin, models.Model):
+    """Photos and Videos.
+
+    They have a bunch of common fields, and then some extra for Videos.
+    A Tweet could have zero, one or more Medias.
     """
+    MEDIA_TYPES = (
+        ('photo', 'Photo'),
+        ('video', 'Video'),
+    )
+    media_type = models.CharField(null=False, blank=False, max_length=8,
+                                                        choices=MEDIA_TYPES)
+
     tweet = models.ForeignKey('Tweet')
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    url = models.URLField(null=False, blank=False,
+    image_url = models.URLField(null=False, blank=False,
                                         help_text="URL of the image itself")
 
     is_private = models.BooleanField(default=False, null=False, blank=False,
@@ -117,6 +126,38 @@ class Photo(TimeStampedModelMixin, models.Model):
     thumb_h = models.PositiveSmallIntegerField(null=True, blank=True,
                                                 verbose_name="Thumbnail height")
 
+    # VIDEO-ONLY PROPERTIES.
+
+    # These will be in order from lowest bitrate to highest.
+    mp4_url_1 = models.URLField(null=True, blank=True,
+                                                    verbose_name='MP4 URL (1)')
+    mp4_url_2 = models.URLField(null=True, blank=True,
+                                                    verbose_name='MP4 URL (2)')
+    mp4_url_3 = models.URLField(null=True, blank=True,
+                                                    verbose_name='MP4 URL (3)')
+
+    mp4_bitrate_1 = models.PositiveIntegerField(null=True, blank=True,
+                                                verbose_name='MP4 Bitrate (1)')
+    mp4_bitrate_2 = models.PositiveIntegerField(null=True, blank=True,
+                                                verbose_name='MP4 Bitrate (2)')
+    mp4_bitrate_3 = models.PositiveIntegerField(null=True, blank=True,
+                                                verbose_name='MP4 Bitrate (3)')
+
+    webm_url = models.URLField(null=True, blank=True, verbose_name='WebM URL')
+    webm_bitrate = models.PositiveIntegerField(null=True, blank=True,
+                                                verbose_name='WebM Bitrate')
+    dash_url = models.URLField(null=True, blank=True,
+                                                verbose_name='MPEG-DASH URL')
+    xmpeg_url = models.URLField(null=True, blank=True,
+                                                    verbose_name='X-MPEG URL')
+
+    aspect_ratio = models.CharField(max_length=5,
+                                            help_text='eg, "4:3" or "16:9"')
+    duration = models.PositiveIntegerField(null=True, blank=True,
+                                                help_text="In milliseconds")
+    # END VIDEO-ONLY PROPERTIES
+
+
     # All Items (eg, used in Admin):
     objects = models.Manager()
 
@@ -124,10 +165,12 @@ class Photo(TimeStampedModelMixin, models.Model):
     public_objects = PublicItemManager()
 
     def __str__(self):
-        return '%d' % self.id
+        return '%s %d' % (self.get_media_type_display(), self.id)
 
     class Meta:
         ordering = ['time_created']
+        verbose_name = 'Media item'
+        verbose_name_plural = 'Media items'
 
     def save(self, *args, **kwargs):
         """Privacy depends on the tweet (which depends on its user), so ensure
@@ -138,21 +181,19 @@ class Photo(TimeStampedModelMixin, models.Model):
 
     @property
     def large_url(self):
-        return '%s:large' % self.url
+        return '%s:large' % self.image_url
 
     @property
     def medium_url(self):
-        return '%s:medium' % self.url
+        return '%s:medium' % self.image_url
 
     @property
     def small_url(self):
-        return '%s:small' % self.url
+        return '%s:small' % self.image_url
 
     @property
     def thumb_url(self):
-        return '%s:thumb' % self.url
-
-
+        return '%s:thumb' % self.image_url
 
 
 class ExtraTweetManagers(models.Model):
@@ -219,8 +260,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     source = models.CharField(null=False, blank=True, max_length=255,
                                 help_text="Utility used to post the Tweet")
-    photos_count = models.PositiveSmallIntegerField(null=False, blank=True,
-            default=0, help_text="Number of Photos attached to this Tweet")
+    media_count = models.PositiveSmallIntegerField(null=False, blank=True,
+        default=0, help_text="Number of Photos/Videos attached to this Tweet")
 
     def __str__(self):
         return self.title

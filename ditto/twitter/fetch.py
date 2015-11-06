@@ -6,7 +6,7 @@ import time
 
 from twython import Twython, TwythonError
 
-from .models import Account, Photo, Tweet, User
+from .models import Account, Media, Tweet, User
 
 
 # CLASSES HERE:
@@ -61,53 +61,108 @@ class TweetMixin(TwitterItemMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def save_photos(self, tweet):
-        """Takes a Tweet object and creates or updates any photos based on the
-        JSON data in its `raw` field.
+    def save_media(self, tweet):
+        """Takes a Tweet object and creates or updates any photos and videos
+        based on the JSON data in its `raw` field.
 
         Keyword arguments:
         tweet -- The Tweet object. Must have been saved as we need its id.
 
         Returns:
-        Total number of photos for this Tweet (regardless of whether they were
+        Total number of items for this Tweet (regardless of whether they were
             created or updated).
         """
-        photos_count = 0
+        import itertools
+
+        # What we'll return:
+        media_count = 0
 
         try:
             json_data = json.loads(tweet.raw)
         except ValueError as error:
-            return photos_count
+            return media_count
 
         try:
             media = json_data['extended_entities']['media']
         except KeyError:
-            media = []
+            return media_count
 
         for item in media:
-            if 'type' in item and item['type'] == 'photo':
-                defaults = {
-                    'tweet':        tweet,
-                    'twitter_id':   item['id'],
-                    'url':          item['media_url_https'],
-                    'is_private':   tweet.is_private,
-                }
+            # Things common to photos and videos.
 
-                for size in ['large', 'medium', 'small', 'thumb']:
-                    if size in item['sizes']:
-                        defaults[size+'_w'] = item['sizes'][size]['w']
-                        defaults[size+'_h'] = item['sizes'][size]['h']
-                    else:
-                        defaults[size+'_w'] = None
-                        defaults[size+'_h'] = None
+            defaults = {
+                'tweet':        tweet,
+                'media_type':   'photo',
+                'twitter_id':   item['id'],
+                'image_url':    item['media_url_https'],
+                'is_private':   tweet.is_private,
+            }
 
-                photo_obj, created = Photo.objects.update_or_create(
-                        twitter_id=item['id'],
-                        defaults=defaults
-                    )
-                photos_count += 1
+            for size in ['large', 'medium', 'small', 'thumb']:
+                if size in item['sizes']:
+                    defaults[size+'_w'] = item['sizes'][size]['w']
+                    defaults[size+'_h'] = item['sizes'][size]['h']
+                else:
+                    defaults[size+'_w'] = None
+                    defaults[size+'_h'] = None
 
-        return photos_count
+            # Adding things ony used for videos:
+            if 'type' in item and item['type'] == 'video' and 'video_info' in item:
+                defaults['media_type'] = 'video'
+
+                info = item['video_info']
+
+                # eg, '16:9'
+                defaults['aspect_ratio'] = '%s:%s' % (
+                        info['aspect_ratio'][0], info['aspect_ratio'][1])
+
+                defaults['duration'] = info['duration_millis']
+
+                # Group the variants into a dict with keys like 'video/mp4'
+                # and values being a list of dicts. Each of those dicts
+                # being a single variant.
+                # [
+                #   {'video/mp4': [{'url':'...', 'bitrate':320000},
+                #                  {'url':'...', 'bitrate':832000},]
+                #   },
+                # ]
+
+                # Sort the list of dicts by 'content_type'.
+                # Need to do this for the next grouping stage.
+                sorted_variants = sorted(
+                            info['variants'], key=lambda k: k['content_type'])
+                grouped_variants = {}
+
+                for key, variants in itertools.groupby(sorted_variants, lambda k: k['content_type']):
+                    #grouped_variants[key] = sorted(
+                                    #list(items), key=lambda k: k['bitrate'])
+                    grouped_variants[key] = list(variants)
+
+                if 'application/dash+xml' in grouped_variants:
+                    defaults['dash_url'] = grouped_variants['application/dash+xml'][0]['url']
+                if 'application/x-mpegURL' in grouped_variants:
+                    defaults['xmpeg_url'] = grouped_variants['application/x-mpegURL'][0]['url']
+                if 'video/webm' in grouped_variants:
+                    defaults['webm_url'] = grouped_variants['video/webm'][0]['url']
+                    defaults['webm_bitrate'] = grouped_variants['video/webm'][0]['bitrate']
+
+                if 'video/mp4' in grouped_variants:
+                    # Sort them by bitrate:
+                    mp4s = sorted(grouped_variants['video/mp4'],
+                                                    key=lambda k: k['bitrate'])
+
+                    for idx, mp4 in enumerate(mp4s):
+                        if idx < 3:
+                            defaults['mp4_url_%s' % (idx+1)] = mp4['url']
+                            defaults['mp4_bitrate_%s' % (idx+1)] = mp4['bitrate']
+
+            media_obj, created = Media.objects.update_or_create(
+                    twitter_id=item['id'],
+                    defaults=defaults
+                )
+            media_count += 1
+
+        return media_count
 
     def save_tweet(self, tweet, fetch_time, user):
         """Takes a dict of tweet data from the API and creates or updates a
@@ -191,7 +246,9 @@ class TweetMixin(TwitterItemMixin):
             )
 
         # Create/update any Photos, and update the Tweet's photo_count:
-        tweet_obj.photos_count = self.save_photos(tweet=tweet_obj)
+        media_count = self.save_media(tweet=tweet_obj)
+        tweet_obj.media_count = media_count
+
         tweet_obj.save()
 
         return tweet_obj

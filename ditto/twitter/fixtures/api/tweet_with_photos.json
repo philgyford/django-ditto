@@ -105,8 +105,8 @@
     "verified":false
   },
   "geo":null,
-  "id":659380084269273088,
-  "id_str":"659380084269273088",
+  "id":9876543210,
+  "id_str":"9876543210",
   "contributors":null,
   "in_reply_to_user_id":null,
   "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
@@ -180,8 +180,8 @@
             "resize":"fit"
           }
         },
-        "id":659380083099086848,
-        "id_str":"659380083099086848",
+        "id":1234567890,
+        "id_str":"1234567890",
         "url":"https://t.co/vb9AvmzZsu",
         "type":"photo"
       },

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
 
-from .models import Account, Photo, Tweet, User
+from .models import Account, Media, Tweet, User
 
 
 @admin.register(Account)
@@ -39,9 +39,35 @@ class AccountAdmin(admin.ModelAdmin):
     has_credentials.boolean = True
 
 
-class PhotoInline(admin.TabularInline):
-    model = Photo
+class MediaInline(admin.StackedInline):
+    model = Media
     extra = 0
+
+    fieldsets = (
+        (None, {
+            'fields': ('media_type', 'twitter_id', 'image_url', 'is_private', )
+        }),
+        ('Sizes', {
+            'classes': ('collapse',),
+            'fields': ('large_w', 'large_h', 'medium_w', 'medium_h', 'small_w', 'small_h', 'thumb_w', 'thumb_h', )
+        }),
+        ('Video', {
+            'classes': ('collapse',),
+            'fields': ('aspect_ratio', 'duration',
+                        'mp4_url_1', 'mp4_bitrate_1',
+                        'mp4_url_2', 'mp4_bitrate_2',
+                        'mp4_url_3', 'mp4_bitrate_3',
+                        'webm_url', 'webm_bitrate',
+                        'dash_url',
+                        'xmpeg_url',)
+        }),
+        ('Data', {
+            'classes': ('collapse',),
+            'fields': ('time_created', 'time_modified',)
+        }),
+    )
+
+    readonly_fields = ('time_created', 'time_modified',)
 
 
 @admin.register(Tweet)
@@ -51,7 +77,7 @@ class TweetAdmin(admin.ModelAdmin):
     list_filter = ('user', 'created_at',)
 
     inlines = [
-        PhotoInline,
+        MediaInline,
     ]
 
     fieldsets = (
@@ -60,7 +86,7 @@ class TweetAdmin(admin.ModelAdmin):
                 'twitter_id', 'permalink', )
         }),
         (None, {
-            'fields': ('favorite_count', 'retweet_count', 'photos_count',
+            'fields': ('favorite_count', 'retweet_count', 'media_count',
                 'language', 'source',
                 'in_reply_to_screen_name', 'in_reply_to_status_id',
                 'in_reply_to_user_id', 'quoted_status_id', )
@@ -106,8 +132,7 @@ class UserAdmin(admin.ModelAdmin):
                 'is_private', 'is_verified',
                 'profile_image_url', 'profile_image_url_https',
                 'url', 'description', 'location', 'time_zone',
-                'twitter_id', 'created_at',
-            )
+                'twitter_id', 'created_at', )
         }),
         ('Data', {
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)

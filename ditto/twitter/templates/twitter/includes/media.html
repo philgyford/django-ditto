@@ -1,0 +1,37 @@
+{% comment %}
+A single Tweet Media item (ie, a photo or video).
+
+Expects:
+ * media, a Media object.
+ * detail, boolean - True if this we're showing a single Tweet, False if the 
+                        containing Tweet is in a list.
+{% endcomment %}
+
+<li class="m-b">
+	{% if media.media_type == 'video' %}
+		{% if detail %}
+			<video width="{{ media.large_w|safe }}" height="{{ media.large_h|safe }}" controls preload="none" class="img-responsive">
+		{% else %}
+			<video width="{{ media.small_w|safe }}" height="{{ media.small_h|safe }}" controls preload="none">
+		{% endif %}
+			{% if media.mp4_url_3 %}
+				<source src="{{ media.mp4_url_3 }}" type="video/mp4">
+			{% elif media.mp4_url_2 %}
+				<source src="{{ media.mp4_url_2 }}" type="video/mp4">
+			{% elif media.mp4_url_1 %}
+				<source src="{{ media.mp4_url_1 }}" type="video/mp4">
+			{% endif %}
+			{% if media.webm_url %}
+				<source src="{{ media.webm_url }}" type="video/webm">
+			{% endif %}
+		</video>
+	{% else %}
+		{# Photo #}
+		{% if detail %}
+			<a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|safe }}" height="{{ media.large_h|safe }}" alt="" class="img-responsive"></a>
+		{% else %}
+			<img src="{{ media.small_url }}" width="{{ media.small_w|safe }}" height="{{ media.small_h|safe }}" alt="">
+		{% endif %}
+	{% endif %}
+</li>
+

@@ -10,8 +10,8 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 
-from ..factories import AccountFactory, AccountWithCredentialsFactory, PhotoFactory, TweetFactory, UserFactory
-from ..models import Account, Photo, Tweet, User
+from ..factories import AccountFactory, AccountWithCredentialsFactory, PhotoFactory, TweetFactory, UserFactory, VideoFactory
+from ..models import Account, Media, Tweet, User
 
 
 class TwitterAccountTestCase(TestCase):
@@ -159,10 +159,15 @@ class TwitterAccountTestCase(TestCase):
 
 
 class TwitterPhotoTestCase(TestCase):
+    "Testing things like ordering, privacy. Not individual properties. Sorry."
 
     def test_str(self):
         photo = PhotoFactory()
-        self.assertEqual(photo.__str__(), '%d' % photo.id)
+        self.assertEqual(photo.__str__(), 'Photo %d' % photo.id)
+
+    def test_media_type(self):
+        photo = PhotoFactory()
+        self.assertEqual(photo.media_type, 'photo')
 
     def test_ordering(self):
         """Multiple accounts are sorted by time_created ascending"""
@@ -170,7 +175,7 @@ class TwitterPhotoTestCase(TestCase):
         photo_1 = PhotoFactory(
                         time_created=time_now - datetime.timedelta(minutes=1))
         photo_2 = PhotoFactory(time_created=time_now)
-        photos = Photo.objects.all()
+        photos = Media.objects.all()
         self.assertEqual(photos[0].pk, photo_1.pk)
 
     def test_unique_twitter_id(self):
@@ -187,7 +192,7 @@ class TwitterPhotoTestCase(TestCase):
         private_tweet = TweetFactory(user=private_user)
         public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
         private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
-        self.assertEqual(len(Photo.objects.all()), 3)
+        self.assertEqual(len(Media.objects.all()), 3)
 
     def test_public_manager(self):
         "Public Manager shows only public photos"
@@ -197,7 +202,7 @@ class TwitterPhotoTestCase(TestCase):
         private_tweet = TweetFactory(user=private_user)
         public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
         private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
-        photos = Photo.public_objects.all()
+        photos = Media.public_objects.all()
         self.assertEqual(len(photos), 2)
         self.assertEqual(photos[0].pk, public_photos[0].pk)
         self.assertEqual(photos[1].pk, public_photos[1].pk)
@@ -215,6 +220,26 @@ class TwitterPhotoTestCase(TestCase):
         tweet = TweetFactory(user=user)
         photo = PhotoFactory(tweet=tweet)
         self.assertTrue(tweet.is_private)
+
+    def test_size_urls(self):
+        url = 'http://www.example.org/image.jpg'
+        photo = PhotoFactory(image_url=url)
+        self.assertEqual(photo.large_url,  '%s:large' % url)
+        self.assertEqual(photo.medium_url, '%s:medium' % url)
+        self.assertEqual(photo.small_url,  '%s:small' % url)
+        self.assertEqual(photo.thumb_url,  '%s:thumb' % url)
+
+class TwitterVideoTestCase(TestCase):
+    "Most things are the same for photos and videos, so not re-testing here."
+
+    def test_str(self):
+        video = VideoFactory()
+        self.assertEqual(video.__str__(), 'Video %d' % video.id)
+
+    def test_media_type(self):
+        video = VideoFactory()
+        self.assertEqual(video.media_type, 'video')
+
 
 class TwitterTweetTestCase(TestCase):
 
