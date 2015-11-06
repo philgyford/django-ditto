@@ -20,26 +20,30 @@ class UtilsHtmlifyTestCase(TestCase):
 class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
     "Linkify URLs from entities: urls, screen_names, hashtags."
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
-
-    def setUp(self):
-        self.json_data = self.getJson(self.api_fixture)
-
     def test_links_urls(self):
         "Makes 'urls' entities into clickable links."
-        tweet_html = htmlify_tweet(self.json_data)
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertTrue('with <a href="http://www.bbc.co.uk/news/business-34505593" rel="external">bbc.co.uk/news/business-…</a>' in tweet_html)
         self.assertTrue('and <a href="http://www.wired.com/2015/10/meet-walking-dead-hp-cisco-dell-emc-ibm-oracle/" rel="external">wired.com/2015/10/meet-w…</a>' in tweet_html)
 
     def test_links_users(self):
         "Makes 'user_mentions' entities into clickable @links."
-        tweet_html = htmlify_tweet(self.json_data)
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertTrue('for <a href="https://twitter.com/philgyford" rel="external">@philgyford</a>' in tweet_html)
         self.assertTrue('and <a href="https://twitter.com/samuelpepys" rel="external">@samuelpepys</a>' in tweet_html)
 
+    def test_links_users_with_entities(self):
+        "It was trying to run urlize() on the tweet after linking the user mention."
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_users_no_urls.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
+        self.assertEqual('<a href="https://twitter.com/genmon" rel="external">@genmon</a> lovely, on my way.', tweet_html)
+
     def test_links_hashtags(self):
         "Makes 'hashtags' entities into clickable #links."
-        tweet_html = htmlify_tweet(self.json_data)
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertTrue(' <a href="https://twitter.com/hashtag/testing" rel="external">#testing</a> and' in tweet_html)
         self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a>' in tweet_html)
 
