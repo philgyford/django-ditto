@@ -19,7 +19,7 @@ Expects:
             {% if account_list|length == 1 %}
                 by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a>
             {% else %}
-                by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}:
+                by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}
             {% endif %}
         </p>
     </div>
