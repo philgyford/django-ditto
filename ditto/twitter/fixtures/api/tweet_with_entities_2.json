@@ -1,0 +1,117 @@
+{  
+  "id":648680009381511168,
+  "favorited":true,
+  "created_at":"Tue Sep 29 02:05:40 +0000 2015",
+  "favorite_count":816,
+  "in_reply_to_user_id":null,
+  "lang":"en",
+  "in_reply_to_screen_name":null,
+  "possibly_sensitive":false,
+  "is_quote_status":false,
+  "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+  "place":null,
+  "id_str":"648680009381511168",
+  "retweeted":false,
+  "entities":{  
+    "hashtags":[  
+
+    ],
+    "symbols":[  
+
+    ],
+    "urls":[  
+      {  
+        "display_url":"daveaddey.com/postfiles/ecoa\u2026",
+        "indices":[  
+          115,
+          137
+        ],
+        "expanded_url":"http://daveaddey.com/postfiles/ecoatm.jpg",
+        "url":"http://t.co/0qKg68wHjQ"
+      }
+    ],
+    "user_mentions":[  
+      {  
+        "id_str":"47440030",
+        "id":47440030,
+        "indices":[  
+          64,
+          74
+        ],
+        "screen_name":"daveaddey",
+        "name":"Dave Addey"
+      }
+    ]
+  },
+  "retweet_count":945,
+  "truncated":false,
+  "user":{  
+    "id":1919231,
+    "screen_name":"cabel",
+    "created_at":"Thu Mar 22 18:25:28 +0000 2007",
+    "friends_count":498,
+    "profile_background_image_url_https":"https://pbs.twimg.com/profile_background_images/634340846/x581956eda62360f7bbdddf51c9d9495.png",
+    "lang":"en",
+    "profile_sidebar_fill_color":"C1EC97",
+    "utc_offset":-28800,
+    "url":"http://t.co/G5zGGNdiVj",
+    "description":"A businessmanish co-founder of Panic Inc (Mac/iOS apps) \u22c6 Publisher of upcoming video game Firewatch \u22c6 Let's talk about things we love",
+    "profile_image_url_https":"https://pbs.twimg.com/profile_images/427993224708255744/l8BZAOcH_normal.jpeg",
+    "profile_banner_url":"https://pbs.twimg.com/profile_banners/1919231/1348897003",
+    "profile_link_color":"C78181",
+    "is_translation_enabled":false,
+    "id_str":"1919231",
+    "followers_count":66345,
+    "default_profile_image":false,
+    "profile_background_tile":true,
+    "profile_text_color":"75D1A3",
+    "is_translator":false,
+    "profile_background_color":"FF8269",
+    "favourites_count":9596,
+    "following":false,
+    "time_zone":"Pacific Time (US & Canada)",
+    "listed_count":1790,
+    "profile_use_background_image":true,
+    "protected":false,
+    "statuses_count":19408,
+    "location":"Portland",
+    "contributors_enabled":false,
+    "profile_sidebar_border_color":"FFFFFF",
+    "has_extended_profile":false,
+    "profile_image_url":"http://pbs.twimg.com/profile_images/427993224708255744/l8BZAOcH_normal.jpeg",
+    "profile_background_image_url":"http://pbs.twimg.com/profile_background_images/634340846/x581956eda62360f7bbdddf51c9d9495.png",
+    "verified":false,
+    "notifications":false,
+    "entities":{  
+      "url":{  
+        "urls":[  
+          {  
+            "display_url":"panic.com",
+            "indices":[  
+              0,
+              22
+            ],
+            "expanded_url":"http://panic.com/",
+            "url":"http://t.co/G5zGGNdiVj"
+          }
+        ]
+      },
+      "description":{  
+        "urls":[  
+
+        ]
+      }
+    },
+    "geo_enabled":true,
+    "default_profile":false,
+    "follow_request_sent":false,
+    "name":"Cabel Sasser"
+  },
+  "text":"From a \"cash for phones\" ATM in the mall (in maintenance mode): @daveaddey finds the most amazing UI ever created. http://t.co/0qKg68wHjQ \ud83d\ude27",
+  "contributors":null,
+  "in_reply_to_user_id_str":null,
+  "coordinates":null,
+  "in_reply_to_status_id":null,
+  "geo":null,
+  "in_reply_to_status_id_str":null
+}

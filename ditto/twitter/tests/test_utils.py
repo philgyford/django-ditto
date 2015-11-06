@@ -10,16 +10,20 @@ class UtilsHtmlifyTestCase(TestCase):
     # Define in child classes.
     api_fixture = None
 
-    def setUp(self):
-        json_file = open(self.api_fixture)
-        self.json_data = json.loads(json_file.read())
+    def getJson(self, filepath):
+        json_file = open(filepath)
+        json_data = json.loads(json_file.read())
         json_file.close()
+        return json_data
 
 
 class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
-    "Linkify URLs from entities, screen_names, hashtags."
+    "Linkify URLs from entities: urls, screen_names, hashtags."
 
     api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
+
+    def setUp(self):
+        self.json_data = self.getJson(self.api_fixture)
 
     def test_links_urls(self):
         "Makes 'urls' entities into clickable links."
@@ -44,6 +48,9 @@ class UtilsHtmlifyFormattingTestCase(UtilsHtmlifyTestCase):
 
     api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
 
+    def setUp(self):
+        self.json_data = self.getJson(self.api_fixture)
+
     def test_linebreaks(self):
         "Turns linebreaks into <br>s"
         tweet_html = htmlify_tweet(self.json_data)
@@ -58,23 +65,32 @@ class UtilsHtmlifyFormattingTestCase(UtilsHtmlifyTestCase):
         self.assertEqual('Y', tweet_html[-1])
 
 
-class UtilsHtmlifyLinksTestCase(UtilsHtmlifyTestCase): 
-    """Old Tweets included in the downloaded archive files don't have 'entities'
-    elements, so we need to manually link any URLs in their tweets.
-    """
+class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
+    "Further tests for specific problems with URLs."
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweet_from_archive_2006.json'
-
-    def test_links_old_urls(self):
-        tweet_html = htmlify_tweet(self.json_data)
+    def test_urls_in_archived_tweets(self):
+        """Old Tweets included in the downloaded archive files don't have 'entities'
+        elements, so we need to manually link any URLs in their tweets.
+        """
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_from_archive_2006.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertEqual(tweet_html,
             'Made a little Twitter thing: <a href="http://www.gyford.com/phil/writing/2006/12/02/quick_twitter.php">http://www.gyford.com/phil/writing/2006/12/02/quick_twitter.php</a>')
 
+    def test_urls_with_no_media(self):
+        """The 'entities' element has no 'media'."""
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities_2.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
+        self.assertTrue('created. <a href="http://daveaddey.com/postfiles/ecoatm.jpg" rel="external">daveaddey.com/postfiles/ecoa…</a>' in tweet_html)
 
-class UtilsHtmlifyPhotosTestCase(UtilsHtmlifyTestCase): 
+
+class UtilsHtmlifyPhotosTestCase(UtilsHtmlifyTestCase):
     "Remove links to photos in the tweet text."
 
     api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'
+
+    def setUp(self):
+        self.json_data = self.getJson(self.api_fixture)
 
     def test_removes_photo_links(self):
         tweet_html = htmlify_tweet(self.json_data)

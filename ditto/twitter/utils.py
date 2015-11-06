@@ -25,18 +25,17 @@ def htmlify_tweet(json_data):
 
     # Try to work out if we're going to deal with linkifying URLs using the
     # entities['urls'] and entities['media'] elements, or if there aren't any.
-    url_count = 0
-    if 'urls' in ents and 'media' in ents:
-        url_count = len(ents['urls']) + len(ents['media'])
+    urls_count = len(ents['urls']) if 'urls' in ents else 0
+    media_count = len(ents['media']) if 'media' in ents else 0
 
-    if url_count > 0:
-        if len(ents['urls']):
+    if (urls_count + media_count) > 0:
+        if urls_count > 0:
             for url in ents['urls']:
                 text = text.replace(url['url'],
                             '<a href="%s" rel="external">%s</a>' % (
                                     url['expanded_url'], url['display_url']))
 
-        if len(ents['media']):
+        if media_count > 0:
             # Remove any media links, as we'll make the photos/movies visible in
             # the page. All being well.
             for item in ents['media']:
