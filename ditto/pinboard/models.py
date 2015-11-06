@@ -33,6 +33,10 @@ class Account(TimeStampedModelMixin, models.Model):
         from django.core.urlresolvers import reverse
         return reverse('pinboard:account_detail', kwargs={'username': self.username})
 
+    @property
+    def public_bookmarks_count(self):
+        return Bookmark.public_objects.count()
+
 
 class ExtraBookmarkManagers(models.Model):
     """Managers to use in the Bookmark model, in addition to the defaults

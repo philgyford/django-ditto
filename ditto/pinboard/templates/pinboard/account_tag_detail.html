@@ -18,16 +18,22 @@
 
     <div class="row">
         <div class="col-md-3">
-            <div class="card m-b-md">
+            <div class="card">
                 <div class="card-block">
-                    {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
-                    {% if account.is_active %}
-                        <br>
-                        <a href="{{ account.url }}/t:{{ tag.slug }}">{{ account.username }}’s “{{ tag.name }}” tag on Pinboard</a>
-                    {% endif %}
-                    <br>
-                    <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
+                    <p class="card-text">
+                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
+                    </p>
                 </div>
+                <ul class="list-group list-group-flush">
+                    {% if account.is_active %}
+                        <li class="list-group-item">
+                            <a href="{{ account.url }}/t:{{ tag.slug }}">At Pinboard.in</a>
+                        </li>
+                    {% endif %}
+                    <li class="list-group-item">
+                        <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
+                    </li>
+                </ul>
             </div>
         </div> <!-- .col -->
 

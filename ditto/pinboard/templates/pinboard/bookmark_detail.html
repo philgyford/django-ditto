@@ -15,10 +15,17 @@
         {% endblock %}
     </h1>
 
-    <div class="card">
-        <div class="card-block">
-            {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True perms=perms only %}
-        </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="media m-t-0 pinboard-bookmark pinboard-bookmark-detail">
+                <hr>
+                {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True perms=perms only %}
+            </div>
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+            {% include 'pinboard/includes/account.html' with account=bookmark.account only %}
+        </div> <!-- .col -->
     </div>
 
 {% endblock content %}

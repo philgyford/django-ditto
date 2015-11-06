@@ -18,14 +18,17 @@
 
 	<div class="row">
 		<div class="col-md-3">
-			<div class="card m-b-md">
+			<div class="card">
 				<div class="card-block">
-					{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to read”
-					{% if account.is_active %}
-						<br>
-						<a href="{{ account.url }}">{{ account.username }} on Pinboard</a>
-					{% endif %}
+					{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to&nbsp;read”
 				</div>
+                {% if account.is_active %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a href="{{ account.url }}">At Pinboard.in</a>
+                        </li>
+                    </ul>
+                {% endif %}
 			</div>
 		</div> <!-- .col -->
 
@@ -39,7 +42,7 @@
 				</li>
 			</ul>
 
-			{% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
+            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
 		</div> <!-- .col -->
 	</div> <!-- .row -->
 

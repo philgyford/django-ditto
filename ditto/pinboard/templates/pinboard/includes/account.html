@@ -1,0 +1,21 @@
+{# Display information about a Pinboard account. #}
+{# Expects a single `account` object. #}
+
+{% load l10n %}
+
+<div class="card">
+    <div class="card-block">
+        <p class="card-text">
+            {% with count=account.public_bookmarks_count %}
+                {{ count|localize }} bookmark{{ count|pluralize }}
+            {% endwith %}
+        </p>
+    </div>
+    {% if account.is_active %}
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <a class="card-link" href="{{ account.url }}">At Pinboard.in</a>
+            </li>
+        </ul>
+    {% endif %}
+</div>

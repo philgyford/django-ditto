@@ -4,27 +4,30 @@
 
 {% load l10n %}
 
-<div class="card m-b-md">
-    <div class="card-block">
-        {% if user.description %}
-            {{ user.description }}<br>
-        {% endif %}
-        {% if user.url %}
-            <a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a><br>
-        {% endif %}
-        {{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}
-        •
-        Following {{ user.friends_count }}
-        •
-        {{ user.followers_count }} Follower{{ user.followers_count|pluralize }}
-        •
-        {{ user.favorites_count }} Like{{ user.favorites_count|pluralize }}
-        •
-        On {{ user.listed_count }} List{{ user.listed_count|pluralize }}
-        {% if account == None or account.is_active %}
-            <br>
-            <a href="{{ user.permalink }}">{{ user }} on Twitter</a>
-        {% endif %}
-    </div>
+<div class="card">
+    {% if user.description or user.url %}
+        <div class="card-block">
+            <p class="card-text">
+                {% if user.description %}
+                    {{ user.description }}<br>
+                {% endif %}
+                {% if user.url %}
+                    <a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a><br>
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.favorites_count }} Like{{ user.favorites_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.followers_count }} Follower{{ user.followers_count|pluralize }}</li>
+        <li class="list-group-item">Following {{ user.friends_count }}</li>
+        <li class="list-group-item">On {{ user.listed_count }} List{{ user.listed_count|pluralize }}</li>
+    </ul>
+    {% if account == None or account.is_active %}
+        <div class="card-block">
+            <a class="card-link" href="{{ user.permalink }}">At Twitter.com</a>
+        </div>
+    {% endif %}
 </div>
 

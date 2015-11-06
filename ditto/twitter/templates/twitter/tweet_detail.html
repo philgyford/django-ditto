@@ -29,6 +29,7 @@
                 <p>This user is private.</p>
             {% else %}
                 <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
+                    <hr>
                     {% include 'twitter/includes/tweet.html' with tweet=tweet detail=True whow_user=False perms=perms only %}
                 </div>
             {% endif %}

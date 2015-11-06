@@ -40,6 +40,14 @@ class PinboardAccountTestCase(TestCase):
         accounts = Account.objects.all()
         self.assertEqual(accounts[0].username, 'amanda')
 
+    def test_public_bookmarks_count(self):
+        account = factories.AccountFactory()
+        public_bookmarks = factories.BookmarkFactory.create_batch(3,
+                                            account=account, is_private=False)
+        private_bookmarks = factories.BookmarkFactory.create_batch(2,
+                                           account=account, is_private=True)
+        self.assertEqual(account.public_bookmarks_count, 3)
+
 
 class PinboardBookmarkTestCase(TestCase):
 

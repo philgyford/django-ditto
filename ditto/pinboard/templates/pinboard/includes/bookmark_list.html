@@ -12,12 +12,11 @@ Expects:
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 
+	<hr>
     <ul class="media-list pinboard-bookmarks">
         {% for bookmark in bookmark_list %}
-            <li class="media pinboard-bookmark">
-                <div class="media-body">
-                    {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False perms=perms only %}
-                </div>
+            <li class="media m-t-0 pinboard-bookmark">
+				{% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=False perms=perms only %}
             </li>
         {% endfor %}
     </ul>
@@ -25,5 +24,8 @@ Expects:
     {% if page_obj %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
+
+{% else %}
+	<p>There are no bookmarks to show.</p>
 {% endif %}
 
