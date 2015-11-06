@@ -83,6 +83,14 @@ class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
         tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertTrue('created. <a href="http://daveaddey.com/postfiles/ecoatm.jpg" rel="external">daveaddey.com/postfiles/ecoa…</a>' in tweet_html)
 
+    def test_urls_containing_user_mentions(self):
+        """A full URL that contains a user_mention. Which means we should parse
+        user_mentions before adding the full URLs.
+        """
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities_3.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
+        self.assertTrue('prototyping!  <a href="https://medium.com/@BuckleyWilliams/hello-from-buckley-williams-announcing-our-new-studio-c48e20c847d0" rel="external">medium.com/@BuckleyWillia…</a> h' in tweet_html)
+
 
 class UtilsHtmlifyPhotosTestCase(UtilsHtmlifyTestCase):
     "Remove links to photos in the tweet text."

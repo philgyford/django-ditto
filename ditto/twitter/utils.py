@@ -8,9 +8,9 @@ def htmlify_tweet(json_data):
     """Passed the raw JSON data about a Tweet from Twitter's API, it returns
     an HTMLified version of the Tweet's text. It:
     * Replaces linebreaks with '<br>'s.
-    * Replaces t.co URLs with clickable, full links.
     * Replaces @mentions with clickable @mentions.
     * Replaces #hashtags with clickable #hashtags.
+    * Replaces t.co URLs with clickable, full links.
     """
 
     text = json_data['text']
@@ -22,6 +22,20 @@ def htmlify_tweet(json_data):
         ents = json_data['entities']
     except KeyError:
         ents = {}
+
+    # We must do this before linkifying URLs, in case the URLs we put in
+    # contain a @usermention.
+    if 'user_mentions' in ents and len(ents['user_mentions']):
+        for user in ents['user_mentions']:
+            text = text.replace('@%s' % user['screen_name'],
+                '<a href="https://twitter.com/%s" rel="external">@%s</a>' % (
+                                    user['screen_name'], user['screen_name']))
+
+    if 'hashtags' in ents and len(ents['hashtags']):
+        for tag in ents['hashtags']:
+            text = text.replace('#%s' % tag['text'],
+                '<a href="https://twitter.com/hashtag/%s" rel="external">#%s</a>'
+                                            % (tag['text'], tag['text']))
 
     # Try to work out if we're going to deal with linkifying URLs using the
     # entities['urls'] and entities['media'] elements, or if there aren't any.
@@ -44,18 +58,6 @@ def htmlify_tweet(json_data):
         # Older Tweets might contain links but have no 'urls'/'media' entities.
         # So just make their links into clickable links:
         text = urlize(text)
-
-    if 'user_mentions' in ents and len(ents['user_mentions']):
-        for user in ents['user_mentions']:
-            text = text.replace('@%s' % user['screen_name'],
-                '<a href="https://twitter.com/%s" rel="external">@%s</a>' % (
-                                    user['screen_name'], user['screen_name']))
-
-    if 'hashtags' in ents and len(ents['hashtags']):
-        for tag in ents['hashtags']:
-            text = text.replace('#%s' % tag['text'],
-                '<a href="https://twitter.com/hashtag/%s" rel="external">#%s</a>'
-                                            % (tag['text'], tag['text']))
 
     text = text.strip()
 
