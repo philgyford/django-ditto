@@ -9,7 +9,7 @@ urlpatterns = [
         name='index'
     ),
     url(
-        regex=r"^favorites$",
+        regex=r"^likes$",
         view=views.Favorites.as_view(),
         name='favorites'
     ),
@@ -19,7 +19,7 @@ urlpatterns = [
         name='account_detail'
     ),
     url(
-        regex=r"^(?P<screen_name>\w+)/favorites$",
+        regex=r"^(?P<screen_name>\w+)/likes$",
         view=views.AccountFavorites.as_view(),
         name='account_favorites'
     ),

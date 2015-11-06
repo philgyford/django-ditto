@@ -14,7 +14,7 @@ Expects:
         <p class="card-text">
             {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}
             {% if list_type and list_type == 'favorites' %}
-                favorited
+                liked
             {% endif %}
             {% if account_list|length == 1 %}
                 by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0 }}</a>

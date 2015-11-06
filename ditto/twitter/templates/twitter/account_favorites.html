@@ -4,13 +4,13 @@
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
     <li><a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a></li>
-    <li class="active">Favorites</li>
+    <li class="active">Likes</li>
 {% endblock %}
 
 {% block content %}
     <h1 class="m-y-md">
         {% block title %}
-            Tweets favorited by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>
+            Tweets liked by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>
         {% endblock %}
     </h1>
 
@@ -24,7 +24,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Favorites</a>
+                    <a class="nav-link active" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Likes</a>
                 </li>
             </ul>
 
