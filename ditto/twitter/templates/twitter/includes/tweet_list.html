@@ -24,5 +24,8 @@ Expects:
     {% if page_obj %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
+{% else %}
+
+	<p>There are no Tweets to show.</p>
 {% endif %}
 
