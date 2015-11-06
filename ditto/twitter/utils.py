@@ -10,6 +10,7 @@ def htmlify_tweet(json_data):
     * Replaces linebreaks with '<br>'s.
     * Replaces @mentions with clickable @mentions.
     * Replaces #hashtags with clickable #hashtags.
+    * Replaces $symbols with clickable $symbols.
     * Replaces t.co URLs with clickable, full links.
     """
 
@@ -23,26 +24,35 @@ def htmlify_tweet(json_data):
     except KeyError:
         ents = {}
 
+    urls_count = len(ents['urls']) if 'urls' in ents else 0
+    media_count = len(ents['media']) if 'media' in ents else 0
+    hashtags_count = len(ents['hashtags']) if 'hashtags' in ents else 0
+    symbols_count = len(ents['symbols']) if 'symbols' in ents else 0
+    user_mentions_count = len(ents['user_mentions']) if 'user_mentions' in ents else 0
+
     # We must do this before linkifying URLs, in case the URLs we put in
     # contain a @usermention.
-    if 'user_mentions' in ents and len(ents['user_mentions']):
+    if user_mentions_count > 0:
         for user in ents['user_mentions']:
             text = text.replace('@%s' % user['screen_name'],
                 '<a href="https://twitter.com/%s" rel="external">@%s</a>' % (
                                     user['screen_name'], user['screen_name']))
 
-    if 'hashtags' in ents and len(ents['hashtags']):
+    if hashtags_count > 0:
         for tag in ents['hashtags']:
             text = text.replace('#%s' % tag['text'],
                 '<a href="https://twitter.com/hashtag/%s" rel="external">#%s</a>'
                                             % (tag['text'], tag['text']))
 
+    if symbols_count > 0:
+        # Just using the regex here:
+        # https://blog.twitter.com/2013/symbols-entities-for-tweets
+        text = re.sub(r'\$([a-zA-Z]{1,6}(?:[._][a-zA-Z]{1,2})?)\b',
+                    r'<a href="https://twitter.com/search?q=%24\1" rel="external">$\1</a>',
+                    text)
+
     # Try to work out if we're going to deal with linkifying URLs using the
     # entities['urls'] and entities['media'] elements, or if there aren't any.
-    urls_count = len(ents['urls']) if 'urls' in ents else 0
-    media_count = len(ents['media']) if 'media' in ents else 0
-    hashtags_count = len(ents['hashtags']) if 'hashtags' in ents else 0
-    user_mentions_count = len(ents['user_mentions']) if 'user_mentions' in ents else 0
 
     if (urls_count + media_count) > 0:
         if urls_count > 0:
@@ -56,7 +66,7 @@ def htmlify_tweet(json_data):
             # the page. All being well.
             for item in ents['media']:
                 text = text.replace(item['url'], '')
-    elif (urls_count + media_count + hashtags_count + user_mentions_count) == 0:
+    elif (urls_count + media_count + hashtags_count + symbols_count + user_mentions_count) == 0:
         # Older Tweets might contain links but have no 'urls'/'media' entities.
         # So just make their links into clickable links:
         # But don't do this for newer Tweets which have an entities element,

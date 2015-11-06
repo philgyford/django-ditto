@@ -47,6 +47,12 @@ class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
         self.assertTrue(' <a href="https://twitter.com/hashtag/testing" rel="external">#testing</a> and' in tweet_html)
         self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a>' in tweet_html)
 
+    def test_links_symbols(self):
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_symbols.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
+        self.assertEqual(tweet_html,
+            'Some symbols: <a href="https://twitter.com/search?q=%24AAPL" rel="external">$AAPL</a> and <a href="https://twitter.com/search?q=%24PEP" rel="external">$PEP</a> and $ANOTHER and <a href="https://twitter.com/search?q=%24A" rel="external">$A</a>.'
+        )
 
 class UtilsHtmlifyFormattingTestCase(UtilsHtmlifyTestCase):
 

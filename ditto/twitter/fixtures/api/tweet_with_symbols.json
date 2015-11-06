@@ -1,0 +1,105 @@
+{  
+  "created_at":"Fri Nov 06 18:15:46 +0000 2015",
+  "in_reply_to_user_id":null,
+  "is_quote_status":false,
+  "in_reply_to_user_id_str":null,
+  "contributors":null,
+  "retweet_count":0,
+  "truncated":false,
+  "in_reply_to_status_id":null,
+  "id":662694880657989632,
+  "source":"<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
+  "text":"Some symbols: $AAPL and $PEP and $ANOTHER and $A.",
+  "retweeted":false,
+  "geo":null,
+  "favorited":true,
+  "lang":"en",
+  "id_str":"662694880657989632",
+  "in_reply_to_status_id_str":null,
+  "in_reply_to_screen_name":null,
+  "favorite_count":1,
+  "place":null,
+  "entities":{  
+    "hashtags":[  
+
+    ],
+    "symbols":[  
+      {  
+        "text":"AAPL",
+        "indices":[  
+          14,
+          19
+        ]
+      },
+      {  
+        "text":"PEP",
+        "indices":[  
+          24,
+          28
+        ]
+      },
+      {  
+        "text":"A",
+        "indices":[  
+          46,
+          48
+        ]
+      }
+    ],
+    "user_mentions":[  
+
+    ],
+    "urls":[  
+
+    ]
+  },
+  "user":{  
+    "profile_background_color":"9AE4E8",
+    "verified":false,
+    "profile_image_url_https":"https://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
+    "default_profile":false,
+    "url":null,
+    "entities":{  
+      "description":{  
+        "urls":[  
+
+        ]
+      }
+    },
+    "profile_text_color":"000000",
+    "location":"",
+    "followers_count":8,
+    "profile_image_url":"http://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
+    "friends_count":18,
+    "profile_sidebar_fill_color":"E0FF92",
+    "has_extended_profile":false,
+    "listed_count":5,
+    "statuses_count":447,
+    "profile_use_background_image":true,
+    "description":"",
+    "profile_background_image_url":"http://abs.twimg.com/images/themes/theme1/bg.png",
+    "name":"Phil Gyford Test",
+    "time_zone":"London",
+    "id":2030131,
+    "following":true,
+    "profile_link_color":"0000FF",
+    "favourites_count":0,
+    "follow_request_sent":false,
+    "is_translation_enabled":false,
+    "screen_name":"philgyfordtest",
+    "protected":false,
+    "profile_background_tile":false,
+    "contributors_enabled":false,
+    "profile_background_image_url_https":"https://abs.twimg.com/images/themes/theme1/bg.png",
+    "geo_enabled":true,
+    "profile_sidebar_border_color":"000000",
+    "id_str":"2030131",
+    "created_at":"Fri Mar 23 16:56:52 +0000 2007",
+    "lang":"en",
+    "is_translator":false,
+    "notifications":false,
+    "utc_offset":0,
+    "default_profile_image":true
+  },
+  "coordinates":null
+}
