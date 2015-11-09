@@ -345,25 +345,46 @@ class FetchForAccount(object):
         # What we'll return for each account:
         self.return_value = {}
 
-        # When fetching Tweets, after a query, this will be set as the max_id
-        # to use for the next query.
+        # Will be either:
+        # 'new' (ie, all Tweets since previous fetch) or
+        # 'count' (ie, a certain number of Tweets).
+        self.fetch_type = 'new'
+
+        # When fetching 'new' Tweets, after a query, this will be set as the
+        # max_id to use for the next query.
         self.max_id = None
 
-        # When fetching Tweets, this will be set as the highest ID fetched,
-        # so it can be used to set account.last_recent_id or
+        # When fetching 'new' Tweets, this will be set as the highest ID
+        # fetched, so it can be used to set account.last_recent_id or
         # account.last_favorite_id when we're done.
         self.last_id = None
+
+        # When fetching a 'count' of Tweets, this will be the number
+        # still to fetch.
+        self.remaining_to_fetch = 0
 
         # When fetching Tweets this will be the total amount fetched.
         self.results_count = 0
 
-    def fetch(self):
+    def fetch(self, num='new'):
+        """
+        Keyword arguments:
+        num -- Either 'new' (to fetch all tweets since the last time), or a
+                number (eg, 100), to fetch that many of the most recent tweets,
+                per Account.
+        """
         if self.account.user:
             self.return_value['account'] = self.account.user.screen_name
         elif self.account.pk:
             self.return_value['account'] = 'Account: %s' % str(self.account)
         else:
             self.return_value['account'] = 'Unsaved Account'
+
+        if num == 'new':
+            self.fetch_type = 'new'
+        else:
+            self.fetch_type = 'count'
+            self.remaining_to_fetch = num
 
         if self.account.hasCredentials():
             self.api = Twython(
@@ -391,20 +412,47 @@ class FetchForAccount(object):
             if (len(self.results) > 0):
                 self._save_results()
                 self._post_save()
+
+                # This is nasty. But we only want to do all this stuff
+                # when fetching tweets, rather than verifying credentials.
+                # The former return a list, the latter a dict.
                 if isinstance(self.results, list):
-                    # This is nasty. But we only want to do all this stuff
-                    # when fetching tweets, rather than verifying credentials.
-                    # The former return a list, the latter a dict.
-                    if self.last_id is None:
-                        self.last_id = self.results[0]['id']
-                    # The max_id for the next 'page' of tweets:
-                    self.max_id = self.results[-1]['id'] - 1
+                    if self.fetch_type == 'new':
+                        if self.last_id is None:
+                            self.last_id = self.results[0]['id']
+                        # The max_id for the next 'page' of tweets:
+                        self.max_id = self.results[-1]['id'] - 1
+                    else: # 'count'
+                        self.remaining_to_fetch -= len(self.results)
+
                     self.results_count += len(self.results)
-                    if self._since_id() is None or self.max_id > self._since_id():
-                        time.sleep(0.5)
+
+                    if self._more_to_fetch():
+                        time.sleep(1.5)
                         self._fetch_pages()
+
             self.return_value['success'] = True
         return
+
+    def _more_to_fetch(self):
+        if self.fetch_type == 'new':
+            if self._since_id() is None or self.max_id > self._since_id():
+                return True
+            else:
+                return False
+        else:
+            # 'count'
+            if self.remaining_to_fetch > 0:
+                return True
+            else:
+                return False
+
+    def _tweets_to_fetch_in_query(self):
+        "How many Tweets to fetch in the current API query."
+        count = 200
+        if self.fetch_type == 'count' and self.remaining_to_fetch < 200:
+            count = self.remaining_to_fetch
+        return count
 
     def _since_id(self):
         return None
@@ -468,7 +516,10 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         super().__init__(*args, **kwargs)
 
     def _since_id(self):
-        return self.account.last_recent_id
+        if self.fetch_type == 'new':
+            return self.account.last_recent_id
+        else:
+            return None
 
     def _call_api(self):
         """Sets self.results to be the timeline of tweets for this Account.
@@ -481,7 +532,7 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         self.results = self.api.get_user_timeline(
                                 user_id=self.account.user.twitter_id,
                                 include_rts=True,
-                                count=200,
+                                count=self._tweets_to_fetch_in_query(),
                                 max_id=self.max_id,
                                 since_id=self._since_id())
 
@@ -511,7 +562,10 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         super().__init__(*args, **kwargs)
 
     def _since_id(self):
-        return self.account.last_favorite_id
+        if self.fetch_type == 'new':
+            return self.account.last_favorite_id
+        else:
+            return None
 
     def _call_api(self):
         """Sets self.results to be recent tweets favorited by this Account.
@@ -523,7 +577,7 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         # the API call:
         self.results = self.api.get_favorites(
                                 user_id=self.account.user.twitter_id,
-                                count=200,
+                                count=self._tweets_to_fetch_in_query(),
                                 max_id=self.max_id,
                                 since_id=self._since_id())
 
@@ -579,8 +633,13 @@ class TwitterFetcher(object):
         # [ {'account': 'thescreename', 'success': True, 'fetched': 200} ]
         self.return_values = []
 
-    def fetch(self):
+    def fetch(self, num='new'):
         """Fetch data for one or more Accounts.
+
+        Keyword arguments:
+        num -- Either 'new' (to fetch all tweets since the last time), or a
+                number (eg, 100), to fetch that many of the most recent tweets,
+                per Account.
 
         Returns:
         A list of dicts, one dict per Account, containing data about
@@ -588,7 +647,7 @@ class TwitterFetcher(object):
         """
         for account in self.accounts:
             accountFetcher = self._get_account_fetcher(account)
-            return_value = accountFetcher.fetch()
+            return_value = accountFetcher.fetch(num=num)
             self._add_to_return_values(return_value)
 
         return self.return_values

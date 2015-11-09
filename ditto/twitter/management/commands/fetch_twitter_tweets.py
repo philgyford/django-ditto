@@ -1,85 +1,26 @@
 # coding: utf-8
-import argparse
-
-from django.core.management.base import BaseCommand, CommandError
-
-from ...fetch import FavoriteTweetsFetcher, RecentTweetsFetcher
+from ._fetch_twitter import FetchTwitterCommand
+from ...fetch import RecentTweetsFetcher
 
 
-class Command(BaseCommand):
+class Command(FetchTwitterCommand):
     """Fetches tweets from Twitter.
 
     Fetch recent tweets since the last fetch, from all accounts:
-    ./manage.py fetch_twitter_tweets --recent
+    ./manage.py fetch_twitter_tweets --recent=new
 
-    Fetch recent tweets, from all accounts:
-    ./manage.py fetch_twitter_tweets --recent
+    Fetch 100 most recent tweets, from all accounts:
+    ./manage.py fetch_twitter_tweets --recent=100
 
     Fetch recent tweets since the last fetch, from one account:
-    ./manage.py fetch_twitter_tweets --recent --account=philgyford
-
-    Fetch recent tweets favorited by all accounts:
-    ./manage.py fetch_twitter_tweets --favorites
-
-    Fetch recent tweets favorited by one account:
-    ./manage.py fetch_twitter_tweets --favorites --account=philgyford
+    ./manage.py fetch_twitter_tweets --recent=new --account=philgyford
     """
 
-    help = "Fetches recent and favorited tweets from Twitter"
+    help = "Fetches recent Tweets from Twitter"
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--favorites',
-            action='store_true',
-            default=False,
-            help='Fetch the most recent favorited tweets.'
-        )
-        parser.add_argument(
-            '--recent',
-            action='store_true',
-            default=False,
-            help='Fetch the most recent tweets.'
-        )
-        parser.add_argument(
-            '--account',
-            action='store',
-            default=False,
-            help='Only fetch for one Twitter account.',
-        )
+    recent_help = 'Fetches the most recent Tweets, eg "100" or "new".'
 
-    def handle(self, *args, **options):
+    def fetch_tweets(self, account, num):
+        return RecentTweetsFetcher(screen_name=account).fetch(num=num)
 
-        # We might be fetching for a specific account or all (None).
-        account = options['account'] if options['account'] else None;
-
-        if options['favorites']:
-            results = FavoriteTweetsFetcher(screen_name=account).fetch()
-        elif options['recent']:
-            results = RecentTweetsFetcher(screen_name=account).fetch()
-        elif options['account']:
-            raise CommandError("Specify --recent or --favorites as well as --account.")
-        else:
-            raise CommandError("Specify --recent or --favorites.")
-
-        # results should be a list of dicts.
-        # Each dict is for one account.
-        # Each dict will look like either:
-        # { 'account': 'thescreename',
-        #   'success': True,
-        #   'fetched': 200, # The number of tweets fetched
-        # }
-        # or:
-        # { 'account': 'thescreename',
-        #   'success': False,
-        #   'message': 'There was an error fetching data because blah',
-        #}
-        for result in results:
-            if result['success']:
-                noun = 'tweet' if result['fetched'] == 1 else 'tweets'
-                self.stdout.write('%s: Fetched %s %s' % (
-                                result['account'], result['fetched'], noun))
-
-            else:
-                self.stderr.write('%s: Failed to fetch tweets: %s' % (
-                                        result['account'], result['message']))
 
