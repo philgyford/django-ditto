@@ -3,11 +3,12 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from .paginator import DiggPaginator
 
+
 if apps.is_installed('ditto.pinboard'):
     from ..pinboard.models import Bookmark
 
 if apps.is_installed('ditto.twitter'):
-    from ..twitter.models import Tweet
+    from ..twitter.models import Tweet, User as TwitterUser
 
 
 class PaginatedListView(ListView):
@@ -28,7 +29,9 @@ class Home(TemplateView):
         if apps.is_installed('ditto.pinboard'):
             context['pinboard_bookmark_list'] = Bookmark.public_objects.all()[:5]
         if apps.is_installed('ditto.twitter'):
-            context['twitter_recent_tweet_list'] = Tweet.public_objects.all().select_related()[:5]
+            twitter_users = TwitterUser.objects_with_accounts.all()
+            context['twitter_recent_tweet_list'] = Tweet.public_objects.filter(
+                                    user=twitter_users).select_related()[:5]
             context['twitter_favorites_tweet_list'] = Tweet.public_favorite_objects.all().select_related()[:5]
         return context
 

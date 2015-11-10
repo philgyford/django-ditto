@@ -43,15 +43,17 @@ class DittoViewTests(TestCase):
         "Overall home page sends correct Twitter data to templates"
         accounts = twitterfactories.AccountFactory.create_batch(3)
 
-        favoritable_tweets = twitterfactories.TweetFactory.create_batch(6)
-        for tweet in favoritable_tweets:
-            accounts[0].user.favorites.add(tweet)
-            accounts[2].user.favorites.add(tweet)
-
+        # Should be before we generate favoritable_tweets, so we can check
+        # twitter_recent_tweet_list only includes these.
         recent_tweets_1 = twitterfactories.TweetFactory.create_batch(
                                                     3, user=accounts[0].user)
         recent_tweets_2 = twitterfactories.TweetFactory.create_batch(
                                                     3, user=accounts[1].user)
+
+        favoritable_tweets = twitterfactories.TweetFactory.create_batch(6)
+        for tweet in favoritable_tweets:
+            accounts[0].user.favorites.add(tweet)
+            accounts[2].user.favorites.add(tweet)
 
         response = self.client.get(reverse('ditto:index'))
 
