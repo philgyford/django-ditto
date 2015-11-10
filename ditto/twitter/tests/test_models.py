@@ -360,6 +360,28 @@ class TwitterTweetTestCase(TestCase):
         htmlify_method.assert_called_once_with({'text': 'my test text'})
         self.assertEqual(tweet.text_html, 'my test text')
 
+    def test_get_quoted_tweet(self):
+        quoted_tweet = TweetFactory(text='The quote!', twitter_id=123)
+        tweet = TweetFactory(quoted_status_id=123)
+        self.assertEqual(tweet.get_quoted_tweet().text, 'The quote!')
+
+    def test_get_quoted_tweet_none(self):
+        tweet = TweetFactory(quoted_status_id=None)
+        self.assertIsNone(tweet.get_quoted_tweet())
+
+    @patch('ditto.twitter.models.Tweet.public_objects.get')
+    def test_get_quoted_tweet_caches(self, get_method):
+        "Should only fetch quoted Tweet from DB once."
+        quoted_tweet = TweetFactory(text='The quote!', twitter_id=123)
+        tweet = TweetFactory(quoted_status_id=123)
+        tweet.get_quoted_tweet()
+        tweet.get_quoted_tweet()
+        self.assertEqual(get_method.call_count, 1)
+
+
+
+
+
 class TwitterUserTestCase(TestCase):
 
     def test_str(self):
@@ -378,6 +400,15 @@ class TwitterUserTestCase(TestCase):
         "Generates the correct permalink"
         user = UserFactory(screen_name='bill')
         self.assertEqual(user.permalink, 'https://twitter.com/bill')
+
+    def test_profile_image_url(self):
+        url = 'https://twitter.com/tester.jpg'
+        user = UserFactory(profile_image_url_https=url)
+        self.assertEqual(user.profile_image_url, url)
+
+    def test_favorites_count(self):
+        user = UserFactory(favourites_count=37)
+        self.assertEqual(user.favorites_count, 37)
 
     def test_unique_twitter_id(self):
         "Ensures twitter_id is unique"

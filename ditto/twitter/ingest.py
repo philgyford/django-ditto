@@ -104,19 +104,11 @@ class TweetIngester(TweetMixin, object):
     def _save_tweets(self):
         """Go through the list of dicts that is self.tweets_data and
         create/update each tweet in the DB.
-        There must be a User in the DB matching the one who posted these tweets.
         """
         if len(self.tweets_data) == 0:
             return
 
-        user_twitter_id = self.tweets_data[0]['user']['id']
-
-        try:
-            user = User.objects.get(twitter_id=user_twitter_id)
-        except User.DoesNotExist:
-            raise IngestError("There should be a User with a twitter_id of %s before we import their tweets." % user_twitter_id)
-        else:
-            for tweet in self.tweets_data:
-                self.save_tweet(tweet, self.fetch_time, user)
-                self.tweet_count += 1
+        for tweet in self.tweets_data:
+            self.save_tweet(tweet, self.fetch_time)
+            self.tweet_count += 1
 

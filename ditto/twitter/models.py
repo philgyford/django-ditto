@@ -225,7 +225,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     text = models.TextField(null=False, blank=False, max_length=140)
     text_html = models.TextField(null=False, blank=True,
         help_text="An HTMLified version of the Tweet's text")
-    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
+    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True,
+                                                                db_index=True)
 
     created_at = models.DateTimeField(null=False, blank=False,
         help_text="UTC time when this Tweet was created on Twitter")
@@ -322,6 +323,22 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         self.text_html = htmlify_tweet(json_data)
         return True
 
+    def get_quoted_tweet(self):
+        # There's one we saved earlier, so use that.
+        if hasattr(self, '_quoted_tweet'):
+            return self._quoted_tweet
+
+        tweet = None
+        if self.quoted_status_id:
+            try:
+                tweet = Tweet.public_objects.get(
+                                            twitter_id=self.quoted_status_id)
+            except Tweet.DoesNotExist:
+                pass
+
+        # Save for later:
+        self._quoted_tweet = tweet
+        return tweet
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """A Twitter user.
@@ -341,18 +358,19 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="True if this user is 'protected'")
     is_verified = models.BooleanField(null=False, default=False)
 
-    created_at = models.DateTimeField(null=False, blank=False,
+    # User data in ingested archives don't have this:
+    created_at = models.DateTimeField(null=True, blank=True,
         help_text="UTC time when this account was created on Twitter")
 
     description = models.CharField(null=False, blank=True, max_length=255)
     location = models.CharField(null=False, blank=True, max_length=255)
     time_zone = models.CharField(null=False, blank=True, max_length=255)
 
-    profile_image_url = models.URLField(null=False, blank=True, max_length=255)
     profile_image_url_https = models.URLField(null=False, blank=True,
                                                                 max_length=255)
 
-    favorites_count = models.PositiveIntegerField(null=False, blank=False,
+    # This is how it's spelt in the API:
+    favourites_count = models.PositiveIntegerField(null=False, blank=False,
         default=0,
         help_text="The number of tweets this user has favorited in the account’s lifetime")
     followers_count = models.PositiveIntegerField(null=False, blank=False,
@@ -397,4 +415,12 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     @property
     def permalink(self):
         return 'https://twitter.com/%s' % self.screen_name
+
+    @property
+    def profile_image_url(self):
+        return self.profile_image_url_https
+
+    @property
+    def favorites_count(self):
+        return self.favourites_count
 

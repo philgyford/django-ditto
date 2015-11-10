@@ -14,8 +14,8 @@ from .models import Account, Media, Tweet, User
 # FetchError
 #
 # TwitterItemMixin
-#   TweetMixin
 #   UserMixin
+#     TweetMixin
 #
 # FetchForAccount
 #   VerifyForAccount
@@ -33,7 +33,7 @@ from .models import Account, Media, Tweet, User
 # The *Fetcher classes are the ones that should be used externally, like:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
-#   fetcher.fetch()
+#   fetcher.fetch(num=20)
 
 
 class FetchError(Exception):
@@ -53,9 +53,76 @@ class TwitterItemMixin(object):
                                                             tzinfo=pytz.utc)
 
 
-class TweetMixin(TwitterItemMixin):
-    """Provides a method for creating/updating a Tweet using data from the API.
-    Also used by ingest.TweetIngester()
+class UserMixin(TwitterItemMixin):
+    "Provides a method for creating/updating a User using data from the API."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save_user(self, user, fetch_time, extra={}):
+        """With Twitter user data from the API, it creates or updates the User
+        and returns the User object.
+
+        Keyword arguments:
+        user -- A dict of the data about a user from the API's JSON.
+        fetch_time -- A datetime.
+
+        Returns the User object.
+        """
+        raw_json = json.dumps(user)
+
+        defaults = {
+            'fetch_time': fetch_time,
+            'raw': raw_json,
+            'screen_name': user['screen_name'],
+            'name': user['name'],
+            'is_private': user['protected'],
+            'is_verified': user['verified'],
+            'profile_image_url_https': user['profile_image_url_https'],
+        }
+
+        # When ingesting tweets there are lots of fields the 'user' element
+        # doesn't have, compared to the API:
+
+        if 'created_at' in user:
+            defaults['created_at'] = self._api_time_to_datetime(user['created_at'])
+
+        # If there's a URL it will be a t.co shortened one.
+        # So we go through the entities to find its expanded version.
+        if 'url' in user and user['url']:
+            user_url = user['url']
+            if 'url' in user['entities'] and 'urls' in user['entities']['url']:
+                for url_dict in user['entities']['url']['urls']:
+                    if url_dict['url'] == user['url'] and url_dict['expanded_url'] is not None:
+                        user_url = url_dict['expanded_url']
+            defaults['url'] = user_url
+
+        if 'description' in user:
+            defaults['description'] = user['description'] if user['description'] else ''
+
+        if 'location' in user:
+            defaults['location'] = user['location'] if user['location'] else ''
+
+        if 'time_zone' in user:
+            defaults['time_zone'] = user['time_zone'] if user['time_zone'] else ''
+
+        if 'favourites_count' in user:
+            defaults['favourites_count'] = user['favourites_count']
+
+        for count in ['followers_count', 'friends_count', 'listed_count', 'statuses_count']:
+            if count in user:
+                defaults[count] = user[count]
+
+        user_obj, created = User.objects.update_or_create(
+            twitter_id=user['id'], defaults=defaults
+        )
+
+        return user_obj
+
+
+class TweetMixin(UserMixin):
+    """Provides a method for creating/updating a Tweet (and its User) using
+    data from the API. Also used by ingest.TweetIngester()
     """
 
     def __init__(self, *args, **kwargs):
@@ -164,14 +231,13 @@ class TweetMixin(TwitterItemMixin):
 
         return media_count
 
-    def save_tweet(self, tweet, fetch_time, user):
+    def save_tweet(self, tweet, fetch_time):
         """Takes a dict of tweet data from the API and creates or updates a
-        Tweet object.
+        Tweet object and its associated User object.
 
         Keyword arguments:
         tweet -- The tweet data.
         fetch_time -- A datetime.
-        user -- A User object for whichever User posted this tweet.
 
         Returns:
         The Tweet object that was created or updated.
@@ -183,6 +249,8 @@ class TweetMixin(TwitterItemMixin):
             # Because the tweets imported from a downloaded archive have a
             # different format for created_at. Of course. Why not?!
             created_at = self._api_time_to_datetime(tweet['created_at'], time_format='%Y-%m-%d %H:%M:%S +0000')
+
+        user = self.save_user(tweet['user'], fetch_time)
 
         defaults = {
             'fetch_time':       fetch_time,
@@ -239,6 +307,11 @@ class TweetMixin(TwitterItemMixin):
 
         if 'quoted_status_id' in tweet:
             defaults['quoted_status_id'] = tweet['quoted_status_id']
+            # We'll also create/update the quoted User object, and quoted Tweet.
+            quoted_user = self.save_user(
+                                    tweet['quoted_status']['user'], fetch_time)
+            quoted_tweet_obj = self.save_tweet(
+                                            tweet['quoted_status'], fetch_time)
 
         tweet_obj, created = Tweet.objects.update_or_create(
                 twitter_id=tweet['id'],
@@ -253,62 +326,6 @@ class TweetMixin(TwitterItemMixin):
 
         return tweet_obj
 
-
-class UserMixin(TwitterItemMixin):
-    "Provides a method for creating/updating a User using data from the API."
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def save_user(self, user, fetch_time, extra={}):
-        """With Twitter user data from the API, it creates or updates the User
-        and returns the User object.
-
-        Keyword arguments:
-        user -- A dict of the data about a user from the API's JSON.
-        fetch_time -- A datetime.
-
-        Returns the User object.
-        """
-        raw_json = json.dumps(user)
-
-        # If there's a URL it will be a t.co shortened one.
-        # So we go through the entities to find its expanded version.
-        if user['url']:
-            user_url = user['url']
-            if 'url' in user['entities'] and 'urls' in user['entities']['url']:
-                for url_dict in user['entities']['url']['urls']:
-                    if url_dict['url'] == user['url'] and url_dict['expanded_url'] is not None:
-                        user_url = url_dict['expanded_url']
-        else:
-            user_url = ''
-
-        user_obj, created = User.objects.update_or_create(
-            twitter_id=user['id'],
-            defaults={
-                'fetch_time': fetch_time,
-                'raw': raw_json,
-                'screen_name': user['screen_name'],
-                'name': user['name'],
-                'url': user_url,
-                'is_private': user['protected'],
-                'is_verified': user['verified'],
-                'created_at': self._api_time_to_datetime(user['created_at']),
-                'description': user['description'] if user['description'] else '',
-                'location': user['location'] if user['location'] else '',
-                'time_zone': user['time_zone'] if user['time_zone'] else '',
-                'profile_image_url': user['profile_image_url'],
-                'profile_image_url_https': user['profile_image_url_https'],
-                # Note favorites / favourites:
-                'favorites_count': user['favourites_count'],
-                'followers_count': user['followers_count'],
-                'friends_count': user['friends_count'],
-                'listed_count': user['listed_count'],
-                'statuses_count': user['statuses_count'],
-            }
-        )
-
-        return user_obj
 
 
 class FetchForAccount(object):
@@ -509,7 +526,7 @@ class VerifyForAccount(UserMixin, FetchForAccount):
         self.objects = [user]
 
 
-class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
+class RecentTweetsForAccount(TweetMixin, FetchForAccount):
     """For fetching recent tweets by a single Account."""
 
     def __init__(self, *args, **kwargs):
@@ -550,12 +567,11 @@ class RecentTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         Adds each new Tweet object to self.objects.
         """
         for tweet in self.results:
-            user = self.save_user(tweet['user'], self.fetch_time)
-            tw = self.save_tweet(tweet, self.fetch_time, user)
+            tw = self.save_tweet(tweet, self.fetch_time)
             self.objects.append(tw)
 
 
-class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
+class FavoriteTweetsForAccount(TweetMixin, FetchForAccount):
     """For fetching tweets favorited by a single Account."""
 
     def __init__(self, *args, **kwargs):
@@ -595,8 +611,7 @@ class FavoriteTweetsForAccount(TweetMixin, UserMixin, FetchForAccount):
         Adds each new Tweet object to self.objects.
         """
         for tweet in self.results:
-            user = self.save_user(tweet['user'], self.fetch_time)
-            tw = self.save_tweet(tweet, self.fetch_time, user)
+            tw = self.save_tweet(tweet, self.fetch_time)
             # Associate this tweet with the Account's user:
             self.account.user.favorites.add(tw)
             self.objects.append(tw)

@@ -65,30 +65,31 @@ class FetchTwitterTestCase(TestCase):
 class TweetMixinTestCase(FetchTwitterTestCase):
     """Testing the TweetMixin"""
 
-    # Note that we've changed the id and id_str of each Tweet in this fixture
-    # to something much shorter, and easier to test with.
+    # Note that we've changed the id and id_str of each Tweet in this
+    # fixture to something much shorter, and easier to test with.
     api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
 
-    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    def test_saves_correct_tweet_data(self):
-
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    def make_tweet(self, is_private=False):
+        self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
         # Get the JSON for a single tweet.
         tweets_data = json.loads(self.make_response_body())
         tweet_data = tweets_data[0]
 
-        # A bit horrid; need to rely on UserMixin working so we can make a
-        # User object correctly, so we can then make the tweet:
-        user_mixin = UserMixin()
-        user = user_mixin.save_user(tweet_data['user'], fetch_time)
+        if is_private:
+            tweet_data['user']['protected'] = True
 
         # Send the JSON, and our new User object, to try and save the tweet:
         mixin = TweetMixin()
-        saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
+        saved_tweet = mixin.save_tweet(tweet_data, self.fetch_time)
 
         # Load that saved tweet from the DB:
-        tweet = Tweet.objects.get(twitter_id=300)
+        return Tweet.objects.get(twitter_id=300)
+
+
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    def test_saves_correct_tweet_data(self):
+        tweet = self.make_tweet()
 
         #And check it's all there:
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
@@ -97,7 +98,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.latitude, Decimal('40.05701649'))
         self.assertEqual(tweet.longitude, Decimal('-75.14310264'))
         self.assertFalse(tweet.is_private)
-        self.assertEqual(tweet.fetch_time, fetch_time)
+        self.assertEqual(tweet.fetch_time, self.fetch_time)
         self.assertEqual(tweet.permalink,
                                 'https://twitter.com/philgyford/status/300')
 
@@ -121,26 +122,30 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.place_country, 'United States')
         self.assertEqual(tweet.source, u'<a href="http://tapbots.com/tweetbot" rel="nofollow">Tweetbot for iΟS</a>')
 
-
     def test_saves_private_tweets_correctly(self):
         """If the user is protected, their tweets should be marked private."""
+        tweet = self.make_tweet(is_private=True)
 
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-        # Get the JSON for a single tweet.
-        tweets_data = json.loads(self.make_response_body())
-        tweet_data = tweets_data[0]
-        tweet_data['user']['protected'] = True
-
-        user_mixin = UserMixin()
-        user = user_mixin.save_user(tweet_data['user'], fetch_time)
-
-        mixin = TweetMixin()
-        saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
-
-        # Load that saved tweet from the DB:
-        tweet = Tweet.objects.get(twitter_id=300)
         self.assertTrue(tweet.is_private)
+
+    def test_saves_user(self):
+        "Saving a Tweet should also save its user."
+        tweet = self.make_tweet()
+
+        self.assertEqual(tweet.user.twitter_id, 12552)
+        self.assertEqual(tweet.user.fetch_time, self.fetch_time)
+
+    def test_saves_quoted_tweets(self):
+        "Saving a Tweet that quotes another Tweet should save the quoted Tweet."
+        self.api_fixture = 'ditto/twitter/fixtures/api/tweets_with_quoted_tweet.json'
+        tweet = self.make_tweet()
+
+        self.assertEqual(tweet.text, 'Quoting a couple of tweets: https://t.co/HSaYtiWAbg and https://t.co/hpX1aGkWsv')
+        self.assertEqual(tweet.quoted_status_id, 663744897778872321)
+
+        quoted_tweet = Tweet.objects.get(twitter_id=663744897778872321)
+        self.assertEqual(quoted_tweet.text, 'Very quiet in the basement of #Innovate2015 come say hi and talk #iot')
+        self.assertEqual(quoted_tweet.user.screen_name, 'iotwatch')
 
 
 class TweetMixinMediaTestCase(FetchTwitterTestCase):
@@ -155,14 +160,9 @@ class TweetMixinMediaTestCase(FetchTwitterTestCase):
 
         tweet_data = json.loads(self.make_response_body())
 
-        # A bit horrid; need to rely on UserMixin working so we can make a
-        # User object correctly, so we can then make the tweet:
-        user_mixin = UserMixin()
-        user = user_mixin.save_user(tweet_data['user'], fetch_time)
-
         # Send the JSON, and our new User object, to try and save the tweet:
         mixin = TweetMixin()
-        saved_tweet = mixin.save_tweet(tweet_data, fetch_time, user)
+        saved_tweet = mixin.save_tweet(tweet_data, fetch_time)
 
         # Load that saved tweet from the DB:
         self.tweet = Tweet.objects.get(twitter_id=9876543210)
@@ -277,9 +277,8 @@ class UserMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(user.description, 'Good. Good to Firm in places.')
         self.assertEqual(user.location, 'London, UK')
         self.assertEqual(user.time_zone, 'London')
-        self.assertEqual(user.profile_image_url,'http://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg')
         self.assertEqual(user.profile_image_url_https, 'https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg')
-        self.assertEqual(user.favorites_count, 1389)
+        self.assertEqual(user.favourites_count, 1389)
         self.assertEqual(user.followers_count, 2435)
         self.assertEqual(user.friends_count, 309)
         self.assertEqual(user.listed_count, 138)
@@ -651,9 +650,8 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(User.objects.count(), 3)
 
     @responses.activate
-    @patch('ditto.twitter.fetch.UserMixin.save_user')
     @patch('ditto.twitter.fetch.TweetMixin.save_tweet')
-    def test_saves_correct_tweet_data(self, save_tweet, save_user):
+    def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
         save_tweet.side_effect = [factories.TweetFactory(),
@@ -661,7 +659,6 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(save_tweet.call_count, 3)
-        self.assertEqual(save_user.call_count, 3)
 
     @responses.activate
     def test_associates_users_with_favorites(self):
