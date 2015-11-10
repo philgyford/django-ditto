@@ -13,6 +13,7 @@ Expects:
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 
+    <hr>
     <ul class="media-list twitter-tweets">
         {% for tweet in tweet_list %}
             <li class="media m-t-0 twitter-tweet">
