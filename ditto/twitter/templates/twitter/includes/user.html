@@ -4,10 +4,16 @@
 
 {% load l10n %}
 
-<div class="card">
+<div class="card twitter-user">
     {% if user.description or user.url %}
         <div class="card-block">
-            <p class="card-text">
+            <h4 class="card-title twitter-user-name">
+                {{ user.name }}
+                <small class="text-muted twitter-user-screenname">
+                    <span class="twitter-tweet-screenname">{{ user }}</span>
+                </small>
+            </h4>
+            <p class="card-text twitter-user-description">
                 {% if user.description %}
                     {{ user.description }}<br>
                 {% endif %}
@@ -17,7 +23,7 @@
             </p>
         </div>
     {% endif %}
-    <ul class="list-group list-group-flush">
+    <ul class="list-group list-group-flush twitter-user-counts">
         <li class="list-group-item">{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}</li>
         <li class="list-group-item">{{ user.favorites_count }} Like{{ user.favorites_count|pluralize }}</li>
         <li class="list-group-item">{{ user.followers_count }} Follower{{ user.followers_count|pluralize }}</li>
