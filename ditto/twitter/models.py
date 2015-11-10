@@ -228,9 +228,6 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True,
                                                                 db_index=True)
 
-    created_at = models.DateTimeField(null=False, blank=False,
-        help_text="UTC time when this Tweet was created on Twitter")
-
     # Favorite and Retweet Count not present in tweets ingested from a
     # downloaded archive, hence null=True:
     favorite_count = models.PositiveIntegerField(null=True, blank=True,
@@ -268,7 +265,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         return self.title
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-post_time']
 
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"

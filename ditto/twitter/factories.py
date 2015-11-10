@@ -50,7 +50,7 @@ class TweetFactory(factory.DjangoModelFactory):
     text = factory.Sequence(lambda n: 'The text of tweet %d' % n)
     twitter_id = factory.Sequence(lambda n: (n * 10000000))
 
-    created_at = factory.LazyAttribute(lambda o:
+    post_time = factory.LazyAttribute(lambda o:
                         datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
                         - datetime.timedelta(weeks=4)
                     )

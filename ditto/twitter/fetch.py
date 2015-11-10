@@ -257,7 +257,7 @@ class TweetMixin(UserMixin):
             'raw':              raw_json,
             'user':             user,
             'is_private':       user.is_private,
-            'created_at':       created_at,
+            'post_time':        created_at,
             'permalink':        'https://twitter.com/%s/status/%s' % (
                                             user.screen_name, tweet['id']),
             'title':            tweet['text'].replace('\n', ' ').replace('\r', ' '),

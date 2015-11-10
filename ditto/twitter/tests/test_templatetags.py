@@ -103,11 +103,11 @@ class TemplatetagsDayTweetsTestCase(TestCase):
 
         post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(
                                                             tzinfo=pytz.utc)
-        self.tweets_1[0].created_at = post_time
+        self.tweets_1[0].post_time = post_time
         self.tweets_1[0].save()
-        self.tweets_2[1].created_at = post_time + datetime.timedelta(hours=1)
+        self.tweets_2[1].post_time = post_time + datetime.timedelta(hours=1)
         self.tweets_2[1].save()
-        self.tweets_3[0].created_at = post_time + datetime.timedelta(hours=2)
+        self.tweets_3[0].post_time = post_time + datetime.timedelta(hours=2)
         self.tweets_3[0].save()
 
     def test_day_tweets(self):
@@ -148,11 +148,11 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
 
         post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(
                                                             tzinfo=pytz.utc)
-        self.tweets[0].created_at = post_time
+        self.tweets[0].post_time = post_time
         self.tweets[0].save()
-        self.tweets[1].created_at = post_time + datetime.timedelta(hours=1)
+        self.tweets[1].post_time = post_time + datetime.timedelta(hours=1)
         self.tweets[1].save()
-        self.tweets[5].created_at = post_time + datetime.timedelta(hours=2)
+        self.tweets[5].post_time = post_time + datetime.timedelta(hours=2)
         self.tweets[5].save()
 
         account_1.user.favorites.add(self.tweets[0]) # private tweet

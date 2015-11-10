@@ -17,7 +17,7 @@ Expects:
         {% for tweet in tweet_list %}
             <li class="media m-t-0 twitter-tweet">
                 {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user perms=perms only %}
-				<hr>
+                <hr>
             </li>
         {% endfor %}
     </ul>
@@ -27,6 +27,6 @@ Expects:
     {% endif %}
 {% else %}
 
-	<p>There are no Tweets to show.</p>
+    <p>There are no Tweets to show.</p>
 {% endif %}
 

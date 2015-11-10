@@ -61,7 +61,7 @@ def day_tweets(date, screen_name=None):
                                                             tzinfo=pytz.utc)
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
-    tweets = Tweet.public_objects.filter(created_at__range=[start, end])
+    tweets = Tweet.public_objects.filter(post_time__range=[start, end])
     if screen_name is None:
         users = User.objects_with_accounts.all()
         tweets = tweets.filter(user=users)
@@ -89,16 +89,16 @@ def day_favorites(date, screen_name=None):
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
     tweets = Tweet.public_favorite_objects.filter(
-                                                created_at__range=[start, end])
+                                                post_time__range=[start, end])
     if screen_name is None:
         tweets = Tweet.public_favorite_objects.filter(
-                                                created_at__range=[start, end])
+                                                post_time__range=[start, end])
     else:
         user = User.objects.get(screen_name=screen_name)
         if user.is_private:
             tweets = Tweet.objects.none()
         else:
             tweets = Tweet.public_favorite_objects.filter(
-                created_at__range=[start, end]).filter(favoriting_users=user)
+                post_time__range=[start, end]).filter(favoriting_users=user)
     return tweets
 

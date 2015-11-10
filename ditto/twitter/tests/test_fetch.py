@@ -107,7 +107,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
 
         self.assertEqual(tweet.user.screen_name, 'philgyford')
         self.assertEqual(tweet.twitter_id, 300)
-        self.assertEqual(tweet.created_at, datetime.datetime.strptime(
+        self.assertEqual(tweet.post_time, datetime.datetime.strptime(
                                     '2015-08-06 19:42:59', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))
         self.assertEqual(tweet.favorite_count, 2)

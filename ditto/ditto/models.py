@@ -88,6 +88,9 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     fetch_time = models.DateTimeField(null=True, blank=True,
         help_text="The time the item's data was last fetched, and was new or changed.")
 
+    post_time = models.DateTimeField(null=True, blank=True,
+        help_text="The time the item was originally posted/created on its service.")
+
     # Obviously not relevant to some items, like Bookmarks.
     latitude = models.DecimalField(null=True, blank=True,
                                             max_digits=12, decimal_places=9)

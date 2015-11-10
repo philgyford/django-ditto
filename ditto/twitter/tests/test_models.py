@@ -249,11 +249,11 @@ class TwitterTweetTestCase(TestCase):
         self.assertEqual(tweet.__str__(), 'My tweet text')
 
     def test_ordering(self):
-        """Multiple tweets are sorted by created_at descending"""
+        """Multiple tweets are sorted by post_time descending"""
         time_now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
         tweet_1 = TweetFactory(
-                        created_at=time_now - datetime.timedelta(minutes=1))
-        tweet_2 = TweetFactory(created_at=time_now)
+                        post_time=time_now - datetime.timedelta(minutes=1))
+        tweet_2 = TweetFactory(post_time=time_now)
         tweets = Tweet.objects.all()
         self.assertEqual(tweets[0].pk, tweet_2.pk)
 

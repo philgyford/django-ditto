@@ -28,7 +28,7 @@ Expects:
             {% else %}
                 <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">
             {% endif %}
-                <time datetime="{{ tweet.created_at|date:'Y-m-d H:i:s' }}">{{ tweet.created_at|date:'j M Y, g:i A' }}</time>
+                <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">{{ tweet.post_time|date:'j M Y, g:i A' }}</time>
             </a>
             {% if tweet.is_reply %}
                 • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>

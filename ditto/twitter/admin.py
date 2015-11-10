@@ -72,9 +72,9 @@ class MediaInline(admin.StackedInline):
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
-    list_display = ('user','is_private', 'title', 'created_at', )
+    list_display = ('user','is_private', 'title', 'post_time', )
     list_display_links = ('title', )
-    list_filter = ('user', 'created_at',)
+    list_filter = ('user', 'post_time',)
 
     inlines = [
         MediaInline,
@@ -82,7 +82,7 @@ class TweetAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'text', 'text_html', 'title', 'summary', 'created_at', 'is_private',
+            'fields': ('user', 'text', 'text_html', 'title', 'summary', 'post_time', 'is_private',
                 'twitter_id', 'permalink', )
         }),
         (None, {
