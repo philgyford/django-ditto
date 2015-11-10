@@ -106,28 +106,39 @@ Then you *must* do::
 
 which will fetch the data for that account's Twitter user.
 
-Request your Twitter archive at https://twitter.com/settings/account . When
-you've downloaded it, do::
+If you have more than 3,200 Tweets, request your Twitter archive at https://twitter.com/settings/account . When you've downloaded it, do::
 
     $ ./demo/manage.py import_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 
 using the correct path to the directory you've downloaded and unzipped. This
-will import all of the tweets found in the archive.
+will import all of the Tweets found in the archive.
 
-Run this periodically to fetch the most recent tweets::
+Whether you've done that or not, then fetch all the Tweets possible from the
+API (which includes more complete data than the downloaded archive)::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent
+    $ ./demo/manage.py fetch_twitter_tweets --recent=3200
 
-And this to fetch recent tweets that your accounts have favorited::
+Run this periodically to fetch the most recent Tweets::
 
-    $ ./demo/manage.py fetch_twitter_tweets --favorites
+    $ ./demo/manage.py fetch_twitter_tweets --recent=new
 
-Those will both fetch tweets for all Accounts with API credentials. To restrict
-to a single account add `--account` with the Twitter username. eg::
+That will fetch all the Tweets since last time you fetched any. You might also,
+or instead, want to fetch more than that, eg::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent --account=philgyford
+    $ ./demo/manage.py fetch_twitter_tweets --recent=200
 
-Fetching recent and favorite tweets will fetch as many tweets as the API allows (currently around 3200). Subsequent fetches will get tweets newer since the last time.
+This would update data such as the retweet and like counts for all of the
+fetched Tweets, even if they're older than your last fetch.
+
+And one or both of these to fetch recent Tweets that your accounts have favorited::
+
+    $ ./demo/manage.py fetch_twitter_favorites --recent=new
+    $ ./demo/manage.py fetch_twitter_favorites --recent=200
+
+All of the above will fetch Tweets and favorites for all Accounts that have API credentials set. To restrict to a single Account add `--account` with the
+Twitter screen name. eg::
+
+    $ ./demo/manage.py fetch_twitter_tweets --recent=new --account=philgyford
 
 
 Other things
