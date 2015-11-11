@@ -30,9 +30,9 @@
 
             {# We only show the 'By Phil Gyford' bit on tweets if we're showing more than one Account on this page. #}
             {% if account_list|length > 1  %}
-                {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=True perms=perms only %}
+                {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj perms=perms only %}
             {% else %}
-                {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj show_user=False perms=perms only %}
+                {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj perms=perms only %}
             {% endif %}
         </div> <!-- .col -->
     </div> <!-- .row -->

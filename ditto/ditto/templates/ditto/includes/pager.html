@@ -1,0 +1,19 @@
+{# Might need to refactor or copy this for month/year pages? #}
+<nav>
+    <ul class="pager">
+        {% if previous %}
+            <li class="pager-prev">
+                <a href="{% url 'ditto:day_archive' year=previous|date:'Y' month=previous|date:'m' day=previous|date:'d' %}"{% if not previous %} class="disabled"{% endif %}>
+                    &larr; {{ previous|date:'j M Y' }}
+                </a>
+            </li>
+        {% endif %}
+        {% if next %}
+            <li class="pager-next">
+                <a href="{% url 'ditto:day_archive' year=next|date:'Y' month=next|date:'m' day=next|date:'d' %}">
+                    {{ next|date:'j M Y' }} &rarr;
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

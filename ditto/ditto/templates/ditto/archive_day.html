@@ -1,0 +1,30 @@
+{% extends 'ditto/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li class="active">{{ day|date:'j M Y' }}</li>
+{% endblock %}
+
+{% block content %}
+    <h1 class="m-y-md">
+        {% block title %}{{ day|date:'l, j F Y' }}{% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9">
+            {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}
+
+            {% if total_count > 0 %}
+                {% include 'ditto/includes/item_lists.html' with view='day' %}
+
+                {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}
+
+            {% else %}
+                <p>There is nothing to display for this day.</p>
+            {% endif %}
+        </div>
+    </div> <!-- .row -->
+
+
+{% endblock content %}
+

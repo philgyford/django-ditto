@@ -18,5 +18,10 @@ urlpatterns = [
         view=views.TagDetail.as_view(),
         name='tag_detail'
     ),
+    url(
+        regex=r"^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})$",
+        view=views.DayArchive.as_view(),
+        name='day_archive'
+    ),
 ]
 

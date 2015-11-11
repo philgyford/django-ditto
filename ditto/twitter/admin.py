@@ -130,7 +130,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('screen_name', 'name',
                 'is_private', 'is_verified',
-                'profile_image_url', 'profile_image_url_https',
+                'profile_image_url_https',
                 'url', 'description', 'location', 'time_zone',
                 'twitter_id', 'created_at', )
         }),

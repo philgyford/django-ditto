@@ -2,13 +2,12 @@
 
 Expects:
  * tweet_list, a queryset of Tweets.
- * page_obj, a DiggPaginator instance or False.
- * show_user, boolean - True (default) if we should show the 'By Phil Gyford'
-                            bit on Tweets, False otherwise.
  * perms - The Django perms object.
+ * page_obj, optional, a DiggPaginator instance or False (default).
+ * view - optional, 'detail' or 'day'.
 {% endcomment %}
 
-{% if page_obj == False or page_obj.paginator.count > 0 %}
+{% if tweet_list|length > 0 %}
     {% if page_obj and page_obj.number > 1 %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
@@ -17,13 +16,13 @@ Expects:
     <ul class="media-list twitter-tweets">
         {% for tweet in tweet_list %}
             <li class="media m-t-0 twitter-tweet">
-                {% include 'twitter/includes/tweet.html' with tweet=tweet detail=False show_user=show_user perms=perms only %}
+                {% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view|default:False only %}
                 <hr>
             </li>
         {% endfor %}
     </ul>
 
-    {% if page_obj %}
+    {% if page_obj|default:False %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 {% else %}

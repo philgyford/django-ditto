@@ -3,10 +3,8 @@ A single Tweet.
 
 Expects:
  * tweet, a Tweet object.
- * detail, boolean - True if this we're showing a single Tweet, False if this
+ * view, optional, 'detail' or 'day' - True if this we're showing a single Tweet, False if this
                         Tweet is in a list.
- * show_user, boolean - True if we should show the 'By Phil Gyford' bit, False
-                        otherwise.
  * perms - The Django perms object.
 {% endcomment %}
 
@@ -16,43 +14,46 @@ Expects:
     </div>
     <div class="media-body">
         <p class="m-b-0 twitter-tweet-about">
-            {% if show_user %}
-                <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
-                <small class="text-muted">
-                    <span class="twitter-tweet-screenname">{{ tweet.user }}</span> •
-            {% else %}
-                <small class="text-muted">
-            {% endif %}
-            {% if detail %}
-                <a href="{{ tweet.permalink }}" title="See on Twitter">
-            {% else %}
-                <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">
-            {% endif %}
-                <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">{{ tweet.post_time|date:'j M Y, g:i A' }}</time>
-            </a>
-            {% if tweet.is_reply %}
-                • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
-            {% endif %}
-            {% if perms.twitter.can_change_tweet %}
-                • <a href="{% url 'admin:twitter_tweet_change' tweet.id %}">Edit</a>
-            {% endif %}
+            <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
+            <small class="text-muted">
+                <span class="twitter-tweet-screenname">{{ tweet.user }}</span> •
+                <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">
+                    {% if view and view == 'day' %}
+                        {{ tweet.post_time|date:'j M Y, g:i A' }}
+                    {% else %}
+                        <a href="{% url 'ditto:day_archive' year=tweet.post_time|date:'Y' month=tweet.post_time|date:'m' day=tweet.post_time|date:'d' %}" title="All items from this day">{{ tweet.post_time|date:'j M Y' }}</a>{{ tweet.post_time|date:', g:i A' }}
+                    {% endif %}
+                </time>
+
+                {% if view and view == 'detail' %}
+                    • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>
+                {% else %}
+                    • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
+                {% endif %}
+
+                {% if tweet.is_reply %}
+                    • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
+                {% endif %}
+                {% if perms.twitter.can_change_tweet %}
+                    • <a href="{% url 'admin:twitter_tweet_change' tweet.id %}">Edit</a>
+                {% endif %}
             </small>
         </p>
 
-        <p class="{% if tweet.media_count == 0 %}m-b-0{% endif %}{% if detail %} lead{% endif %} twitter-tweet-text">
+        <p class="{% if tweet.media_count == 0 %}m-b-0{% endif %}{% if view and view == 'detail' %} lead{% endif %} twitter-tweet-text">
             {{ tweet.text_html|safe }}
         </p>
 
         {% if tweet.get_quoted_tweet %}
             <div class="media text-muted twitter-tweet-quoted">
-                {% include 'twitter/includes/tweet.html' with tweet=tweet.get_quoted_tweet detail=False show_user=True perms=perms only %}
+                {% include 'twitter/includes/tweet.html' with tweet=tweet.get_quoted_tweet view=view|default:False perms=perms only %}
             </div>
         {% endif %}
 
         {% if tweet.media_count > 0 %}
             <ul class="m-b-0 list-unstyled">
                 {% for media in tweet.media_set.all %}
-                    {% include 'twitter/includes/media.html' with media=media detail=detail %}
+                    {% include 'twitter/includes/media.html' with media=media view=view|default:False %}
                 {% endfor %}
             </ul>
         {% endif %}

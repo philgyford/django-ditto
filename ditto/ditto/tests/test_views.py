@@ -1,4 +1,6 @@
+import datetime
 from unittest.mock import patch
+import pytz
 
 from django.apps import apps
 from django.core.urlresolvers import reverse
@@ -57,17 +59,17 @@ class DittoViewTests(TestCase):
 
         response = self.client.get(reverse('ditto:index'))
 
-        self.assertIn('twitter_recent_tweet_list', response.context)
-        self.assertIn('twitter_favorites_tweet_list', response.context)
+        self.assertIn('twitter_tweet_list', response.context)
+        self.assertIn('twitter_favorite_list', response.context)
 
         self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_recent_tweet_list']],
+            [tweet.pk for tweet in response.context['twitter_tweet_list']],
             [recent_tweets_2[2].pk,recent_tweets_2[1].pk,recent_tweets_2[0].pk,
             recent_tweets_1[2].pk,recent_tweets_1[1].pk]
         )
 
         self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_favorites_tweet_list']],
+            [tweet.pk for tweet in response.context['twitter_favorite_list']],
             [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
             favoritable_tweets[3].pk, favoritable_tweets[2].pk,
             favoritable_tweets[1].pk]
@@ -97,7 +99,7 @@ class DittoViewTests(TestCase):
 
         response = self.client.get(reverse('ditto:index'))
 
-        tweets = response.context['twitter_recent_tweet_list']
+        tweets = response.context['twitter_tweet_list']
         self.assertEqual(len(tweets), 2)
         self.assertEqual(tweets[0].pk, public_tweet_2.pk)
         self.assertEqual(tweets[1].pk, public_tweet_1.pk)
@@ -118,7 +120,7 @@ class DittoViewTests(TestCase):
 
         response = self.client.get(reverse('ditto:index'))
 
-        tweets = response.context['twitter_favorites_tweet_list']
+        tweets = response.context['twitter_favorite_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
 
@@ -189,4 +191,87 @@ class DittoViewTests(TestCase):
         self.assertTrue('bookmark_list' in response.context)
         self.assertEqual(len(response.context['bookmark_list']), 1)
         self.assertEqual(response.context['bookmark_list'][0].pk, bookmark_2.pk)
+
+
+class DittoDayArchiveTestCase(TestCase):
+
+    def setUp(self):
+        self.url = reverse('ditto:day_archive', kwargs={
+            'year': 2015, 'month': '11', 'day': '10',
+        })
+
+        self.today = datetime.datetime.strptime(
+                    '2015-11-10 12:00:00', '%Y-%m-%d %H:%M:%S'
+                ).replace(tzinfo=pytz.utc)
+        self.tomorrow = self.today + datetime.timedelta(days=1)
+        self.yesterday = self.today - datetime.timedelta(days=1)
+
+        self.bookmark_1 = pinboardfactories.BookmarkFactory.create(
+                                                        post_time=self.today)
+        self.bookmark_2 = pinboardfactories.BookmarkFactory.create(
+                                                    post_time=self.tomorrow)
+
+        tw_account = twitterfactories.AccountFactory.create()
+        self.tweet_1 = twitterfactories.TweetFactory.create(
+                                    post_time=self.today, user=tw_account.user)
+        self.tweet_2 = twitterfactories.TweetFactory.create(
+                                post_time=self.tomorrow, user=tw_account.user)
+
+        self.favorite_1 = twitterfactories.TweetFactory.create(
+                                                        post_time=self.today)
+        self.favorite_2 = twitterfactories.TweetFactory.create(
+                                                    post_time=self.tomorrow)
+        tw_account.user.favorites.add(self.favorite_1)
+
+    def test_day_templates(self):
+        "Day archive page uses the correct templates"
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'ditto/archive_day.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_day_context(self):
+        "Only shows items from the specified day."
+        response = self.client.get(self.url)
+
+        self.assertTrue('total_count' in response.context)
+        self.assertEqual(3, response.context['total_count'])
+
+        self.assertTrue('pinboard_bookmark_list' in response.context)
+        self.assertEqual(1, len(response.context['pinboard_bookmark_list']))
+        self.assertEqual(response.context['pinboard_bookmark_list'][0].pk,
+                                                            self.bookmark_1.pk)
+
+        self.assertTrue('twitter_tweet_list' in response.context)
+        self.assertEqual(1, len(response.context['twitter_tweet_list']))
+        self.assertEqual(response.context['twitter_tweet_list'][0].pk,
+                                                                self.tweet_1.pk)
+
+        self.assertTrue('twitter_favorite_list' in response.context)
+        self.assertEqual(1, len(response.context['twitter_favorite_list']))
+        self.assertEqual(response.context['twitter_favorite_list'][0].pk,
+                                                            self.favorite_1.pk)
+
+        self.assertTrue('day' in response.context)
+        self.assertEqual(response.context['day'], self.today.date())
+        self.assertTrue('previous_day' in response.context)
+        self.assertEqual(response.context['previous_day'],
+                                                        self.yesterday.date())
+        self.assertTrue('next_day' in response.context)
+        self.assertEqual(response.context['next_day'], self.tomorrow.date())
+
+    def test_day_privacy(self):
+        "Doesn't show private items."
+        self.bookmark_1.is_private = True
+        self.bookmark_1.save()
+        self.tweet_1.user.is_private = True
+        self.tweet_1.user.save()
+        self.favorite_1.user.is_private = True
+        self.favorite_1.user.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(0, response.context['total_count'])
+        self.assertEqual(0, len(response.context['pinboard_bookmark_list']))
+        self.assertEqual(0, len(response.context['twitter_tweet_list']))
+        self.assertEqual(0, len(response.context['twitter_favorite_list']))
 

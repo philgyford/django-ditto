@@ -19,7 +19,7 @@
         <div class="col-md-9">
             <div class="media m-t-0 pinboard-bookmark pinboard-bookmark-detail">
                 <hr>
-                {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark detail=True perms=perms only %}
+                {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view='detail' perms=perms only %}
             </div>
         </div> <!-- .col -->
 
