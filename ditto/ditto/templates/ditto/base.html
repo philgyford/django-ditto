@@ -14,15 +14,33 @@
         <nav class="navbar navbar-dark bg-inverse m-b">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'ditto:index' %}">Ditto</a>
-
-                <ul class="nav navbar-nav">
-                    <li class="nav-item {% block pinboard_nav_active %}{% endblock %}"><a class="nav-link" href="{% url 'pinboard:index' %}">Pinboard</a></li>
-                    <li class="nav-item {% block twitter_nav_active %}{% endblock %}"><a class="nav-link" href="{% url 'twitter:index' %}">Twitter</a></li>
-                </ul>
+                {% if enabled_apps %}
+                    <ul class="nav navbar-nav">
+                        {% for app in enabled_apps %}
+                            {% if app == 'pinboard' %}
+                                <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
+                                    <a class="nav-link" href="{% url 'pinboard:index' %}">
+                                        Pinboard
+                                    </a>
+                                </li>
+                            {% elif app == 'twitter' %}
+                                <li class="nav-item {% block twitter_nav_active %}{% endblock %}">
+                                    <a class="nav-link" href="{% url 'twitter:index' %}">
+                                        Twitter
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
         </nav>
 
         <div class="container">
+
+            {% if not enabled_apps %}
+                <p class="text-warning">Add <code>ditto.ditto.context_processors.ditto</code> to <code>context_processors</code> in your settings.</p>
+            {% endif %}
 
             <ol class="breadcrumb">
                 {% block breadcrumbs %}{% endblock %}

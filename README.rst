@@ -29,13 +29,27 @@ Add to INSTALLED_APPS
 To use Ditto in your own project (untested as yet), add the core ``ditto.ditto`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the appropriate application for which services you need. eg, to use Pinboard::
 
     INSTALLED_APPS = (
-        ...
+        # other apps listed here.
         'taggit',
         'ditto.ditto',
         'ditto.pinboard',
     )
 
 Note that ``ditto.pinboard`` also requires ``taggit`` to be included, as shown.
+
+Add the project's context processor in your settings::
+
+    TEMPLATES = [
+        {
+            ...
+            'OPTIONS': {
+                'context_processors': [
+                    # other context processors listed here.
+                    'ditto.ditto.context_processors.ditto',
+                ]
+            }
+        }
+    ]
 
 
 Add to urls.py
