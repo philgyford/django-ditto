@@ -2,7 +2,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from .managers import FavoritesManager, PublicFavoritesManager, WithAccountsManager
+from . import managers
 from .utils import htmlify_tweet
 from ..ditto.managers import PublicItemManager
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
@@ -203,8 +203,11 @@ class ExtraTweetManagers(models.Model):
     override those in DittoItemModel.
     """
     # For Tweets favorited by any Account:
-    favorite_objects = FavoritesManager()
-    public_favorite_objects = PublicFavoritesManager()
+    favorite_objects = managers.FavoritesManager()
+    public_favorite_objects = managers.PublicFavoritesManager()
+
+    tweet_objects = managers.TweetsManager()
+    public_tweet_objects = managers.PublicTweetsManager()
 
     class Meta:
         abstract = True
@@ -393,7 +396,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     objects = models.Manager()
     # All Users that have Accounts:
-    objects_with_accounts = WithAccountsManager()
+    objects_with_accounts = managers.WithAccountsManager()
 
     def __str__(self):
         return '@%s' % self.screen_name

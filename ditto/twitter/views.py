@@ -17,11 +17,8 @@ class Home(PaginatedListView):
 
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
-        # Need to get the User for each Account that has one:
-        users = User.objects_with_accounts.all()
-
         # Use select_related to fetch user details too. Could be nasty...
-        return Tweet.public_objects.filter(user=users).select_related()
+        return Tweet.public_tweet_objects.all().select_related()
 
 
 class Favorites(PaginatedListView):

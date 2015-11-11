@@ -55,7 +55,6 @@ class DittoQuerysetsMixin:
 
     def get_app_querysets(self):
         """Returns a dict of querysets for all the DittoItem-inheriting objects
-        for all enabled Ditto apps.
         """
         querysets = {}
 
@@ -63,8 +62,7 @@ class DittoQuerysetsMixin:
             if app_name == 'pinboard':
                 querysets['pinboard_bookmark_list'] = Bookmark.public_objects.all()
             elif app_name == 'twitter':
-                twitter_users = TwitterUser.objects_with_accounts.all()
-                querysets['twitter_tweet_list'] = Tweet.public_objects.filter(user=twitter_users).select_related()
+                querysets['twitter_tweet_list'] = Tweet.public_tweet_objects.all().select_related()
                 querysets['twitter_favorite_list'] = Tweet.public_favorite_objects.all().select_related()
 
         return querysets
