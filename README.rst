@@ -3,13 +3,13 @@ Ditto
 =====
 
 A collection of Django apps for copying things from third-party sites and
-services. Very much in-progress.
+services. Very much in-progress. Python 3, Django 1.8.
 
-Currently only copies bookmarks from `Pinboard <https://pinboard.in/>`_ and tweets from Twitter. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_.
+Currently only copies bookmarks from `Pinboard <https://pinboard.in/>`_ and tweets from Twitter. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as it's still in development.
 
 There is a demo Django project website for viewing fetched items in the ``/demo/`` directory.
 
-Docs below are hasty; I'm not expecting anyone else to use this yet.
+The docs below are hasty; I'm not expecting anyone else to use this yet.
 
 
 Getting started
