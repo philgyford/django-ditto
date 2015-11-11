@@ -8,14 +8,14 @@ from django.utils.translation import ugettext as _
 from django.views.generic import DayArchiveView, DetailView, ListView, TemplateView, View
 from django.views.generic.dates import DateMixin, YearMixin, MonthMixin, DayMixin
 
-from . import apps
+from .apps import ditto_apps
 from .paginator import DiggPaginator
 
 
-if apps.is_installed('pinboard'):
+if ditto_apps.is_installed('pinboard'):
     from ..pinboard.models import Bookmark
 
-if apps.is_installed('twitter'):
+if ditto_apps.is_installed('twitter'):
     from ..twitter.models import Tweet, User as TwitterUser
 
 
@@ -41,7 +41,7 @@ class DittoQuerysetsMixin:
         """
         names = []
 
-        for app_name in apps.enabled():
+        for app_name in ditto_apps.enabled():
             if app_name == 'pinboard':
                 names.append('pinboard_bookmark_list')
             elif app_name == 'twitter':
@@ -59,7 +59,7 @@ class DittoQuerysetsMixin:
         """
         querysets = {}
 
-        for app_name in apps.enabled():
+        for app_name in ditto_apps.enabled():
             if app_name == 'pinboard':
                 querysets['pinboard_bookmark_list'] = Bookmark.public_objects.all()
             elif app_name == 'twitter':
@@ -103,7 +103,7 @@ class TagDetail(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tag'] = kwargs['slug']
-        if apps.is_enabled('pinboard'):
+        if ditto_apps.is_enabled('pinboard'):
             context['pinboard_bookmark_list'] = Bookmark.public_objects.filter(
                                             tags__slug__in=[kwargs['slug']])
         return context
