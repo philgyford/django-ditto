@@ -10,8 +10,9 @@
 {% block content %}
     <h1 class="m-y-md">
         {% block title %}
-            Tweets liked by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>
+            Tweets liked by {{ account.user.name }}
         {% endblock %}
+        <small class="text-muted">{{ account.user }}</small>
     </h1>
 
     <div class="row">

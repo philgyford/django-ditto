@@ -7,7 +7,9 @@
 
 {% block content %}
     <h1 class="m-y-md">
-        {% block title %}{{ day|date:'l, j F Y' }}{% endblock %}
+        {% block title %}
+            {{ day|date:'l, j F Y' }}
+        {% endblock %}
     </h1>
 
     <div class="row">

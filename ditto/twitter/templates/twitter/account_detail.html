@@ -10,8 +10,9 @@
 
     <h1 class="m-y-md">
         {% block title %}
-            Tweets by {{ account.user.name }} <small class="text-muted">{{ account.user }}</small>
+            Tweets by {{ account.user.name }}
         {% endblock %}
+        <small class="text-muted">{{ account.user }}</small>
     </h1>
 
     <div class="row">
