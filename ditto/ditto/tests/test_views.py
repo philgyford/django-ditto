@@ -35,7 +35,7 @@ class DittoViewTests(TestCase):
 
         self.assertTrue('pinboard_bookmark_list' in response.context)
         # It shows 10 of all the bookmarks:
-        self.assertEqual(len(response.context['pinboard_bookmark_list']), 5)
+        self.assertEqual(len(response.context['pinboard_bookmark_list']), 3)
         # It doesn't include the most recent one, which is private:
         self.assertNotEqual(
                         response.context['pinboard_bookmark_list'][0].title,
@@ -64,15 +64,14 @@ class DittoViewTests(TestCase):
 
         self.assertEqual(
             [tweet.pk for tweet in response.context['twitter_tweet_list']],
-            [recent_tweets_2[2].pk,recent_tweets_2[1].pk,recent_tweets_2[0].pk,
-            recent_tweets_1[2].pk,recent_tweets_1[1].pk]
+            [recent_tweets_2[2].pk, recent_tweets_2[1].pk,
+                recent_tweets_2[0].pk,]
         )
 
         self.assertEqual(
             [tweet.pk for tweet in response.context['twitter_favorite_list']],
             [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
-            favoritable_tweets[3].pk, favoritable_tweets[2].pk,
-            favoritable_tweets[1].pk]
+                favoritable_tweets[3].pk,]
         )
 
     def test_home_privacy_pinboard(self):

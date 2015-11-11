@@ -84,7 +84,7 @@ class Home(DittoQuerysetsMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         for qs_name, qs in self.get_app_querysets().items():
-            context[qs_name] = qs[:5]
+            context[qs_name] = qs[:3]
 
         return context
 
