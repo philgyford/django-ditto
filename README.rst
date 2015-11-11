@@ -127,7 +127,7 @@ or instead, want to fetch more than that, eg::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=200
 
-This would update data such as the retweet and like counts for all of the
+This would update data such as the retweet and like counts for all of the 200
 fetched Tweets, even if they're older than your last fetch.
 
 And one or both of these to fetch recent Tweets that your accounts have favorited::

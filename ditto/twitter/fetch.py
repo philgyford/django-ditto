@@ -434,9 +434,9 @@ class FetchForAccount(object):
                 # when fetching tweets, rather than verifying credentials.
                 # The former return a list, the latter a dict.
                 if isinstance(self.results, list):
+                    if self.last_id is None:
+                        self.last_id = self.results[0]['id']
                     if self.fetch_type == 'new':
-                        if self.last_id is None:
-                            self.last_id = self.results[0]['id']
                         # The max_id for the next 'page' of tweets:
                         self.max_id = self.results[-1]['id'] - 1
                     else: # 'count'

@@ -429,7 +429,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         "If fetching a number of tweets, requests that number, not since_id"
         # We're patching the saving of results, so just need the correct
         # number of 'Tweets' in the results:
-        body = json.dumps([dict() for x in range(25)])
+        body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.RecentTweetsForAccount._save_results'):
             result = RecentTweetsFetcher(screen_name='jill').fetch(25)
@@ -437,7 +437,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
 
     @responses.activate
-    def test_updates_last_recent_id(self):
+    def test_updates_last_recent_id_new(self):
         "The account's last_recent_id should be set to the most recent tweet's"
         self.account_1.last_recent_id = 9876543210
         self.account_1.save()
@@ -447,16 +447,18 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(self.account_1.last_recent_id, 300)
 
     @responses.activate
-    def test_does_not_update_last_recent_id(self):
-        "The account's last_recent_id should NOT be changed if requesting count tweets"
+    def test_updates_last_recent_id_count(self):
+        """The account's last_recent_id should also be changed if requesting
+        count tweets
+        """
         self.account_1.last_recent_id = 9876543210
         self.account_1.save()
-        body = json.dumps([dict() for x in range(25)])
+        body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.RecentTweetsForAccount._save_results'):
             result = RecentTweetsFetcher(screen_name='jill').fetch(25)
             self.account_1.refresh_from_db()
-            self.assertEqual(self.account_1.last_recent_id, 9876543210)
+            self.assertEqual(self.account_1.last_recent_id, 999)
 
     @responses.activate
     def test_returns_correct_success_response(self):
@@ -524,9 +526,9 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         "Fetches subsequent pages until enough counted tweets are returned."
         qs = {'user_id': self.account_1.user.twitter_id,
                                         'include_rts': 'true', 'count': 200}
-        # Return "[{}, {}, {}...]" and patch _save_results() as we're only
-        # interested in how many times we ask for more results.
-        body = json.dumps([dict() for x in range(200)])
+        # Return "[{id:1}, {id:1}, {id:1}...]" and patch _save_results() as
+        # we're only interested in how many times we ask for more results.
+        body = json.dumps([{'id':1} for x in range(200)])
 
         # We're going to request 3 x 200 Tweets and then...
         for n in range(3):
@@ -584,7 +586,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_includes_count(self):
         "If fetching a number of tweets, requests that number, not since_id"
-        body = json.dumps([dict() for x in range(25)])
+        body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FavoriteTweetsForAccount._save_results'):
             result = FavoriteTweetsFetcher(screen_name='jill').fetch(25)
@@ -592,7 +594,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
 
     @responses.activate
-    def test_updates_last_favorite_id(self):
+    def test_updates_last_favorite_id_new(self):
         "The account's last_favorite_id should be set to the most recent tweet's"
         self.account_1.last_favorite_id = 9876543210
         self.account_1.save()
@@ -602,16 +604,18 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(self.account_1.last_favorite_id, 300)
 
     @responses.activate
-    def test_does_not_update_last_favorite_id(self):
-        "The account's last_favorite_id should NOT be changed if requesting count tweets"
+    def test_updates_last_favorite_id_count(self):
+        """The account's last_favorite_id should be changed if requesting count
+        tweets
+        """
         self.account_1.last_favorite_id = 9876543210
         self.account_1.save()
-        body = json.dumps([dict() for x in range(25)])
+        body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FavoriteTweetsForAccount._save_results'):
             result = FavoriteTweetsFetcher(screen_name='jill').fetch(25)
             self.account_1.refresh_from_db()
-            self.assertEqual(self.account_1.last_favorite_id, 9876543210)
+            self.assertEqual(self.account_1.last_favorite_id, 999)
 
     @responses.activate
     def test_returns_correct_success_response(self):
@@ -689,9 +693,9 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     def test_fetches_multiple_pages_for_count(self):
         "Fetches subsequent pages until enough counted tweets are returned."
         qs = {'user_id': self.account_1.user.twitter_id, 'count': 200}
-        # Return "[{}, {}, {}...]" and patch _save_results() as we're only
-        # interested in how many times we ask for more results.
-        body = json.dumps([dict() for x in range(200)])
+        # Return "[{id:1}, {id:1}, {id:1}...]" and patch _save_results() as
+        # we're only interested in how many times we ask for more results.
+        body = json.dumps([{'id':1} for x in range(200)])
 
         # We're going to request 3 x 200 Tweets and then...
         for n in range(3):
