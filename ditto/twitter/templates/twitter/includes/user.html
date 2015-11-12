@@ -29,6 +29,7 @@
         <li class="list-group-item">{{ user.followers_count }} Follower{{ user.followers_count|pluralize }}</li>
         <li class="list-group-item">Following {{ user.friends_count }}</li>
         <li class="list-group-item">On {{ user.listed_count }} List{{ user.listed_count|pluralize }}</li>
+        <li class="list-group-item text-muted"><small>As of <time datetime="{{ user.fetch_time|date:'Y-m-d H:i:s' }}">{{ user.fetch_time|date:"j M Y g:i A" }}</time></small></li>
     </ul>
     {% if account == None or account.is_active %}
         <div class="card-block">
