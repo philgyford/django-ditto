@@ -363,9 +363,10 @@ class FetchForAccount(object):
         self.return_value = {}
 
         # Will be either:
+        # 'verify' (ie, Verifying an account's credentials)
         # 'new' (ie, all Tweets since previous fetch) or
         # 'count' (ie, a certain number of Tweets).
-        self.fetch_type = 'new'
+        self.fetch_type = None
 
         # When fetching 'new' Tweets, after a query, this will be set as the
         # max_id to use for the next query.
@@ -397,11 +398,12 @@ class FetchForAccount(object):
         else:
             self.return_value['account'] = 'Unsaved Account'
 
-        if num == 'new':
-            self.fetch_type = 'new'
-        else:
-            self.fetch_type = 'count'
-            self.remaining_to_fetch = num
+        if self.fetch_type != 'verify':
+            if num == 'new':
+                self.fetch_type = 'new'
+            else:
+                self.fetch_type = 'count'
+                self.remaining_to_fetch = num
 
         if self.account.hasCredentials():
             self.api = Twython(
@@ -430,10 +432,9 @@ class FetchForAccount(object):
                 self._save_results()
                 self._post_save()
 
-                # This is nasty. But we only want to do all this stuff
-                # when fetching tweets, rather than verifying credentials.
-                # The former return a list, the latter a dict.
-                if isinstance(self.results, list):
+                # We only want to do all this stuff when fetching tweets,
+                # rather than verifying credentials.
+                if self.fetch_type != 'verify':
                     if self.last_id is None:
                         self.last_id = self.results[0]['id']
                     if self.fetch_type == 'new':
@@ -508,6 +509,7 @@ class VerifyForAccount(UserMixin, FetchForAccount):
 
     def __init__(self, account):
         super().__init__(account)
+        self.fetch_type = 'verify'
 
     def _call_api(self):
         """Sets self.results to data for a single Twitter User."""
