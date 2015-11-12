@@ -116,26 +116,34 @@ class TwitterViewTests(TestCase):
         # Check it doesn't appear on the page:
         self.assertEqual(len(tweets), 0)
 
-    def test_account_detail_templates(self):
+    def test_user_detail_templates(self):
         "Uses the correct templates"
         account = factories.AccountFactory.create()
-        response = self.client.get(reverse('twitter:account_detail',
+        response = self.client.get(reverse('twitter:user_detail',
                             kwargs={'screen_name': account.user.screen_name}))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'twitter/account_detail.html')
+        self.assertTemplateUsed(response, 'twitter/user_detail.html')
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_account_detail_context(self):
+    def test_user_detail_context(self):
         "Sends the correct data to templates"
-        account_1 = factories.AccountFactory.create()
-        account_2 = factories.AccountFactory.create()
-        tweets_1 = factories.TweetFactory.create_batch(3, user=account_1.user)
-        tweets_2 = factories.TweetFactory.create_batch(3, user=account_2.user)
-        response = self.client.get(reverse('twitter:account_detail',
-                        kwargs={'screen_name': account_1.user.screen_name}))
+        private_user = factories.UserFactory.create(is_private=True)
+        private_account = factories.AccountFactory.create(user=private_user)
+        public_accounts = factories.AccountFactory.create_batch(3)
+
+        user_1 = factories.UserFactory.create()
+        user_2 = factories.UserFactory.create()
+        tweets_1 = factories.TweetFactory.create_batch(3, user=user_1)
+        tweets_2 = factories.TweetFactory.create_batch(3, user=user_2)
+        response = self.client.get(reverse('twitter:user_detail',
+                                kwargs={'screen_name': user_1.screen_name}))
         self.assertIn('account', response.context)
-        self.assertEqual(account_1.pk, response.context['account'].pk)
+        self.assertIsNone(response.context['account'])
+        self.assertIn('public_accounts', response.context)
+        self.assertEqual(len(response.context['public_accounts']), 3)
+        self.assertIn('user', response.context)
+        self.assertEqual(user_1.pk, response.context['user'].pk)
         self.assertIn('tweet_list', response.context)
         self.assertEqual(len(response.context['tweet_list']), 3)
         self.assertEqual(
@@ -143,12 +151,31 @@ class TwitterViewTests(TestCase):
             [3,2,1]
         )
 
-    def test_account_detail_privacy(self):
+    def test_user_detail_context_with_account(self):
+        "Sends the correct data to templates"
+        account_1 = factories.AccountFactory.create()
+        account_2 = factories.AccountFactory.create()
+        tweets_1 = factories.TweetFactory.create_batch(3, user=account_1.user)
+        tweets_2 = factories.TweetFactory.create_batch(3, user=account_2.user)
+        response = self.client.get(reverse('twitter:user_detail',
+                        kwargs={'screen_name': account_1.user.screen_name}))
+        self.assertIn('account', response.context)
+        self.assertEqual(account_1.pk, response.context['account'].pk)
+        self.assertIn('user', response.context)
+        self.assertEqual(account_1.user.pk, response.context['user'].pk)
+        self.assertIn('tweet_list', response.context)
+        self.assertEqual(len(response.context['tweet_list']), 3)
+        self.assertEqual(
+            [twitter.pk for twitter in response.context['tweet_list']],
+            [3,2,1]
+        )
+
+    def test_user_detail_privacy(self):
         "It does not show private Tweets"
         user = factories.UserFactory.create(is_private=True)
         account = factories.AccountFactory.create(user=user)
         tweets = factories.TweetFactory.create_batch(3, user=user)
-        response = self.client.get(reverse('twitter:account_detail',
+        response = self.client.get(reverse('twitter:user_detail',
                                     kwargs={'screen_name': user.screen_name}))
         self.assertIn('account', response.context)
         self.assertEqual(len(response.context['tweet_list']), 0)

@@ -1,40 +1,47 @@
 {# Display information about a Twitter user. #}
-{# Expects a single `user` which is a User object. #}
+{# Expects a single `user` which is a Twitter User object. #}
 {# And an optional 'account' if this user has an Account here. #}
 
 {% load l10n %}
 
 <div class="card twitter-user">
-    {% if user.description or user.url %}
-        <div class="card-block">
-            <h4 class="card-title twitter-user-name">
-                {{ user.name }}
-                <small class="text-muted twitter-user-screenname">
-                    <span class="twitter-tweet-screenname">{{ user }}</span>
-                </small>
-            </h4>
-            <p class="card-text twitter-user-description">
-                {% if user.description %}
-                    {{ user.description }}<br>
-                {% endif %}
-                {% if user.url %}
-                    <a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a><br>
-                {% endif %}
-            </p>
-        </div>
-    {% endif %}
+    <div class="card-block">
+        <h4 class="card-title m-b-0 twitter-user-name">
+            {{ user.name }}
+            <small class="text-muted twitter-user-screenname">{{ user }}</small>
+        </h4>
+    </div>
+    <ul class="list-group list-group-flush twitter-user-about">
+        {% if user.description %}
+            <li class="list-group-item twitter-user-description">{{ user.description }}</li>
+        {% endif %}
+        {% if user.location %}
+            <li class="list-group-item twitter-user-location">{{ user.location }}</li>
+        {% endif %}
+        {% if user.url %}
+            <li class="list-group-item twitter-user-url"><a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a></li>
+        {% endif %}
+        <li class="list-group-item twitter-user-joined">Joined {{ user.created_at|date:"M Y" }}</li>
+        {% if account == None or account.is_active %}
+            <li class="list-group-item twitter-user-link"><a href="{{ user.permalink }}">At Twitter.com</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="card twitter-user">
     <ul class="list-group list-group-flush twitter-user-counts">
         <li class="list-group-item">{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}</li>
         <li class="list-group-item">{{ user.favorites_count }} Like{{ user.favorites_count|pluralize }}</li>
         <li class="list-group-item">{{ user.followers_count }} Follower{{ user.followers_count|pluralize }}</li>
         <li class="list-group-item">Following {{ user.friends_count }}</li>
         <li class="list-group-item">On {{ user.listed_count }} List{{ user.listed_count|pluralize }}</li>
-        <li class="list-group-item text-muted"><small>As of <time datetime="{{ user.fetch_time|date:'Y-m-d H:i:s' }}">{{ user.fetch_time|date:"j M Y g:i A" }}</time></small></li>
     </ul>
-    {% if account == None or account.is_active %}
-        <div class="card-block">
-            <a class="card-link" href="{{ user.permalink }}">At Twitter.com</a>
-        </div>
-    {% endif %}
 </div>
 
+<div class="card twitter-user">
+    <div class="card-block">
+        <p class="card-text text-muted">
+            <small>As of <time datetime="{{ user.fetch_time|date:'Y-m-d H:i:s' }}">{{ user.fetch_time|date:"j M Y g:i A" }}</time></small>
+        </p>
+    </div>
+</div>

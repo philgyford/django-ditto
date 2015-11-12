@@ -1,0 +1,51 @@
+{% extends 'twitter/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'twitter:index' %}">Twitter</a></li>
+    <li class="active">{{ twitter_user }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="m-y-md">
+        {% block title %}
+            Tweets by {{ twitter_user.name }}
+        {% endblock %}
+        <small class="text-muted">{{ twitter_user }}</small>
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'twitter/includes/user.html' with user=twitter_user account=account only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% if account %}
+                <ul class="nav nav-tabs m-b-md">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">Tweets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Likes</a>
+                    </li>
+                </ul>
+            {% else %}
+                <p class="lead">
+                    Liked by 
+                    {% for account in public_accounts %}
+                        {% if not forloop.first %},{% endif %}
+                            <a href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a>{% endfor %}.
+                </p>
+            {% endif %}
+
+            {% if twitter_user.is_private %}
+                <p>This user is private.</p>
+            {% endif %}
+
+            {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj perms=perms only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

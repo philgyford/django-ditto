@@ -7,7 +7,7 @@
         {% if account == None %}
             {{ twitter_user }}
         {% else %}
-            <a href="{% url 'twitter:account_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a>
+            <a href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">{{ account.user }}</a>
         {% endif %}
     </li>
     <li class="active">Tweet</li>

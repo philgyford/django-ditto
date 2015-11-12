@@ -151,7 +151,7 @@ class TwitterAccountTestCase(TestCase):
         user = UserFactory(screen_name='bill')
         account = AccountFactory(user=user)
         self.assertEqual(account.get_absolute_url(),
-            reverse('twitter:account_detail', kwargs={'screen_name': 'bill'}))
+            reverse('twitter:user_detail', kwargs={'screen_name': 'bill'}))
 
     def test_get_absolute_url_no_user(self):
         account = AccountFactory(user=None)

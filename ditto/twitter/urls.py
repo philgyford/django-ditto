@@ -15,8 +15,8 @@ urlpatterns = [
     ),
     url(
         regex=r"^(?P<screen_name>\w+)$",
-        view=views.AccountDetail.as_view(),
-        name='account_detail'
+        view=views.UserDetail.as_view(),
+        name='user_detail'
     ),
     url(
         regex=r"^(?P<screen_name>\w+)/likes$",

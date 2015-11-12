@@ -14,9 +14,12 @@ Expects:
     </div>
     <div class="media-body">
         <p class="m-b-0 twitter-tweet-about">
-            <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
+            <a href="{% url 'twitter:user_detail' screen_name=tweet.user.screen_name %}" title="More Tweets by this person">
+                <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
+                <small class="twitter-tweet-screenname">{{ tweet.user }}</small>
+            </a>
             <small class="text-muted">
-                <span class="twitter-tweet-screenname">{{ tweet.user }}</span> •
+                •
                 <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">
                     {% if view and view == 'day' %}
                         {{ tweet.post_time|date:'j M Y, g:i A' }}
