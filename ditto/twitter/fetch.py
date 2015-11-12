@@ -17,18 +17,16 @@ from .models import Account, Media, Tweet, User
 #   UserMixin
 #     TweetMixin
 #
-# FetchForAccount
-#   VerifyForAccount
-#   RecentTweetsForAccount
-#   FavoriteTweetsForAccount
+# Fetch
+#   FetchVerify
+#   FetchTweets
+#     FetchTweetsRecent
+#     FetchTweetsFavorite
 #
 # TwitterFetcher
 #   VerifyFetcher
 #   RecentTweetsFetcher
 #   FavoriteTweetsFetcher
-#
-# UserFetcher
-#
 #
 # The *Fetcher classes are the ones that should be used externally, like:
 #
@@ -328,7 +326,7 @@ class TweetMixin(UserMixin):
 
 
 
-class FetchForAccount(object):
+class Fetch(object):
     """Parent class for children that will call the Twitter API to fetch data
     for a single Account.
     Children should define their own methods for:
@@ -340,8 +338,8 @@ class FetchForAccount(object):
 
     Use it like:
         account = Account.objects.get(pk=1)
-        accountFetcher = RecentTweetsForAccount(account)
-        result = accountFetcher.fetch()
+        fetcher = RecentTweetsFetcher(account)
+        result = fetcher.fetch()
     """
 
     def __init__(self, account):
@@ -432,23 +430,6 @@ class FetchForAccount(object):
                 self._save_results()
                 self._post_save()
 
-                # We only want to do all this stuff when fetching tweets,
-                # rather than verifying credentials.
-                if self.fetch_type != 'verify':
-                    if self.last_id is None:
-                        self.last_id = self.results[0]['id']
-                    if self.fetch_type == 'new':
-                        # The max_id for the next 'page' of tweets:
-                        self.max_id = self.results[-1]['id'] - 1
-                    else: # 'count'
-                        self.remaining_to_fetch -= len(self.results)
-
-                    self.results_count += len(self.results)
-
-                    if self._more_to_fetch():
-                        time.sleep(0.5)
-                        self._fetch_pages()
-
             self.return_value['success'] = True
         return
 
@@ -480,7 +461,7 @@ class FetchForAccount(object):
         Should call self.api.a_function_name() and set self.results with the
         results.
         """
-        raise FetchError("Children of the FetchForAccount class should define their own _call_api() method.")
+        raise FetchError("Children of the Fetch class should define their own _call_api() method.")
 
     def _post_save(self):
         """Can optionally be defined in child classes.
@@ -502,7 +483,7 @@ class FetchForAccount(object):
         self.objects = []
 
 
-class VerifyForAccount(UserMixin, FetchForAccount):
+class FetchVerify(UserMixin, Fetch):
     """For verifying an Account's API credentials, but ALSO fetches the user
     data for that single Account.
     """
@@ -528,7 +509,34 @@ class VerifyForAccount(UserMixin, FetchForAccount):
         self.objects = [user]
 
 
-class RecentTweetsForAccount(TweetMixin, FetchForAccount):
+class FetchTweets(TweetMixin, Fetch):
+    """A parent class for those which fetch Tweets - RecentTweets or
+    FavoriteTweets.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _post_save(self):
+        "After saving a page of results, what to do..."
+
+        if self.last_id is None:
+            self.last_id = self.results[0]['id']
+
+        if self.fetch_type == 'new':
+            # The max_id for the next 'page' of tweets:
+            self.max_id = self.results[-1]['id'] - 1
+        elif self.fetch_type == 'count':
+            self.remaining_to_fetch -= len(self.results)
+
+        self.results_count += len(self.results)
+
+        if self._more_to_fetch():
+            time.sleep(0.5)
+            self._fetch_pages()
+
+
+class FetchTweetsRecent(FetchTweets):
     """For fetching recent tweets by a single Account."""
 
     def __init__(self, *args, **kwargs):
@@ -556,9 +564,7 @@ class RecentTweetsForAccount(TweetMixin, FetchForAccount):
                                 since_id=self._since_id())
 
     def _post_fetch(self):
-        """Set the last_recent_id of our Account to the most recent Tweet we
-        fetched.
-        """
+        "Set last_recent_id of our Account to the most recent Tweet fetched."
         if self.last_id is not None:
             self.account.last_recent_id = self.last_id
             self.account.save()
@@ -573,7 +579,7 @@ class RecentTweetsForAccount(TweetMixin, FetchForAccount):
             self.objects.append(tw)
 
 
-class FavoriteTweetsForAccount(TweetMixin, FetchForAccount):
+class FetchTweetsFavorite(FetchTweets):
     """For fetching tweets favorited by a single Account."""
 
     def __init__(self, *args, **kwargs):
@@ -720,7 +726,7 @@ class VerifyFetcher(TwitterFetcher):
     """
 
     def _get_account_fetcher(self, account):
-        return VerifyForAccount(account)
+        return FetchVerify(account)
 
 
 class RecentTweetsFetcher(TwitterFetcher):
@@ -734,7 +740,7 @@ class RecentTweetsFetcher(TwitterFetcher):
     """
 
     def _get_account_fetcher(self, account):
-        return RecentTweetsForAccount(account)
+        return FetchTweetsRecent(account)
 
 
 class FavoriteTweetsFetcher(TwitterFetcher):
@@ -749,5 +755,5 @@ class FavoriteTweetsFetcher(TwitterFetcher):
     """
 
     def _get_account_fetcher(self, account):
-        return FavoriteTweetsForAccount(account)
+        return FetchTweetsFavorite(account)
 

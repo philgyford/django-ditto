@@ -70,10 +70,10 @@ class Account(TimeStampedModelMixin, models.Model):
         or
         {'account': 'text string', 'success': True, 'user': <User obj>}
         """
-        from .fetch import VerifyForAccount
+        from .fetch import FetchVerify
 
         if self.hasCredentials():
-            results = VerifyForAccount(account=self).fetch()
+            results = FetchVerify(account=self).fetch()
             if 'user' in results and isinstance(results['user'], User):
                 self.user = results['user']
             return results
