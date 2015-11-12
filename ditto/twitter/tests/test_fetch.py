@@ -432,7 +432,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
-            result = RecentTweetsFetcher(screen_name='jill').fetch(25)
+            result = RecentTweetsFetcher(screen_name='jill').fetch(count=25)
             self.assertIn('count=25', responses.calls[0][0].url)
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
 
@@ -456,7 +456,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
-            result = RecentTweetsFetcher(screen_name='jill').fetch(25)
+            result = RecentTweetsFetcher(screen_name='jill').fetch(count=25)
             self.account_1.refresh_from_db()
             self.assertEqual(self.account_1.last_recent_id, 999)
 
@@ -539,7 +539,8 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
 
         with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
             with patch('time.sleep'):
-                result = RecentTweetsFetcher(screen_name='jill').fetch(700)
+                result = RecentTweetsFetcher(screen_name='jill').fetch(
+                                                                    count=700)
                 self.assertEqual(4, len(responses.calls))
 
 
@@ -589,7 +590,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
-            result = FavoriteTweetsFetcher(screen_name='jill').fetch(25)
+            result = FavoriteTweetsFetcher(screen_name='jill').fetch(count=25)
             self.assertIn('count=25', responses.calls[0][0].url)
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
 
@@ -613,7 +614,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
         with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
-            result = FavoriteTweetsFetcher(screen_name='jill').fetch(25)
+            result = FavoriteTweetsFetcher(screen_name='jill').fetch(count=25)
             self.account_1.refresh_from_db()
             self.assertEqual(self.account_1.last_favorite_id, 999)
 
@@ -706,7 +707,8 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
 
         with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
             with patch('time.sleep'):
-                result = FavoriteTweetsFetcher(screen_name='jill').fetch(700)
+                result = FavoriteTweetsFetcher(screen_name='jill').fetch(
+                                                                    count=700)
                 self.assertEqual(4, len(responses.calls))
 
 

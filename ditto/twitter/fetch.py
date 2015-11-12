@@ -19,19 +19,21 @@ from .models import Account, Media, Tweet, User
 #
 # Fetch
 #   FetchVerify
+#   FetchUsers
 #   FetchTweets
 #     FetchTweetsRecent
 #     FetchTweetsFavorite
 #
 # TwitterFetcher
 #   VerifyFetcher
+#   UsersFetcher
 #   RecentTweetsFetcher
 #   FavoriteTweetsFetcher
 #
 # The *Fetcher classes are the ones that should be used externally, like:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
-#   fetcher.fetch(num=20)
+#   fetcher.fetch(count=20)
 
 
 class FetchError(Exception):
@@ -107,9 +109,9 @@ class UserMixin(TwitterItemMixin):
         if 'favourites_count' in user:
             defaults['favourites_count'] = user['favourites_count']
 
-        for count in ['followers_count', 'friends_count', 'listed_count', 'statuses_count']:
-            if count in user:
-                defaults[count] = user[count]
+        for a_count in ['followers_count', 'friends_count', 'listed_count', 'statuses_count']:
+            if a_count in user:
+                defaults[a_count] = user[a_count]
 
         user_obj, created = User.objects.update_or_create(
             twitter_id=user['id'], defaults=defaults
@@ -341,67 +343,39 @@ class Fetch(object):
         fetcher = RecentTweetsFetcher(account)
         result = fetcher.fetch()
     """
+    # Will be an Account object, passed into init()
+    account = None
+
+    # Will be the Twython object for calling the Twitter API.
+    api = None
+
+    # Will be the UTC datetime that we fetch the results.
+    fetch_time = None
+
+    # Will be the results fetched from the API via Twython.
+    results = []
+
+    # Will be a list of all the Users/Tweets/etc created/updated:
+    objects = []
+
+    # What we'll return for each account:
+    return_value = {}
+
+    # When fetching Tweets or Users this will be the total amount fetched.
+    results_count = 0
 
     def __init__(self, account):
-
         self.account = account
 
-        # Will be the Twython object for calling the Twitter API.
-        self.api = None
+    def fetch(self):
+        self._reset()
 
-        # Will be the results fetched from the API via Twython.
-        self.results = []
-
-        # Will be a list of all the Users/Tweets/etc created/updated:
-        self.objects = []
-
-        self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-        # What we'll return for each account:
-        self.return_value = {}
-
-        # Will be either:
-        # 'verify' (ie, Verifying an account's credentials)
-        # 'new' (ie, all Tweets since previous fetch) or
-        # 'count' (ie, a certain number of Tweets).
-        self.fetch_type = None
-
-        # When fetching 'new' Tweets, after a query, this will be set as the
-        # max_id to use for the next query.
-        self.max_id = None
-
-        # When fetching 'new' Tweets, this will be set as the highest ID
-        # fetched, so it can be used to set account.last_recent_id or
-        # account.last_favorite_id when we're done.
-        self.last_id = None
-
-        # When fetching a 'count' of Tweets, this will be the number
-        # still to fetch.
-        self.remaining_to_fetch = 0
-
-        # When fetching Tweets this will be the total amount fetched.
-        self.results_count = 0
-
-    def fetch(self, num='new'):
-        """
-        Keyword arguments:
-        num -- Either 'new' (to fetch all tweets since the last time), or a
-                number (eg, 100), to fetch that many of the most recent tweets,
-                per Account.
-        """
         if self.account.user:
             self.return_value['account'] = self.account.user.screen_name
         elif self.account.pk:
             self.return_value['account'] = 'Account: %s' % str(self.account)
         else:
             self.return_value['account'] = 'Unsaved Account'
-
-        if self.fetch_type != 'verify':
-            if num == 'new':
-                self.fetch_type = 'new'
-            else:
-                self.fetch_type = 'count'
-                self.remaining_to_fetch = num
 
         if self.account.hasCredentials():
             self.api = Twython(
@@ -416,6 +390,13 @@ class Fetch(object):
         self.return_value['fetched'] = self.results_count
 
         return self.return_value
+
+    def _reset(self):
+        self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.results = []
+        self.objects = []
+        self.return_value = {}
+        self.results_count = 0
 
     def _fetch_pages(self):
         try:
@@ -432,26 +413,6 @@ class Fetch(object):
 
             self.return_value['success'] = True
         return
-
-    def _more_to_fetch(self):
-        if self.fetch_type == 'new':
-            if self._since_id() is None or self.max_id > self._since_id():
-                return True
-            else:
-                return False
-        else:
-            # 'count'
-            if self.remaining_to_fetch > 0:
-                return True
-            else:
-                return False
-
-    def _tweets_to_fetch_in_query(self):
-        "How many Tweets to fetch in the current API query."
-        count = 200
-        if self.fetch_type == 'count' and self.remaining_to_fetch < 200:
-            count = self.remaining_to_fetch
-        return count
 
     def _since_id(self):
         return None
@@ -488,10 +449,6 @@ class FetchVerify(UserMixin, Fetch):
     data for that single Account.
     """
 
-    def __init__(self, account):
-        super().__init__(account)
-        self.fetch_type = 'verify'
-
     def _call_api(self):
         """Sets self.results to data for a single Twitter User."""
         self.results = self.api.verify_credentials()
@@ -509,13 +466,98 @@ class FetchVerify(UserMixin, Fetch):
         self.objects = [user]
 
 
+class FetchUsers(UserMixin, Fetch):
+    """For fetching users.
+
+    Supply fetch() with a list of Twitter user IDs, and corresponding Users
+    will be created/updated in the DB.
+    """
+
+    # Maximum number of users to ask for per query, allowed by the API:
+    fetch_per_query = 100
+
+    # Will be all the IDs we have yet to fetch from the API:
+    ids_remaining_to_fetch = []
+
+    def fetch(self, user_ids=[]):
+        """
+        Keyword arguments:
+        user_ids -- A list of Twitter user IDs to fetch. Up to the maximum
+        allowed in a reasonable window. At time of writing, the API allows
+        100 per query, and 60 queries per 15 minute window. So 6000 user_ids
+        would be the maximum.
+        """
+        self.ids_remaining_to_fetch = user_ids
+        return super().fetch()
+
+    def _call_api(self):
+        self.results = self.api.lookup_user(
+                            user_id=self._ids_to_fetch_in_query(),
+                            include_entities=False
+                        )
+
+    def _post_save(self):
+        # Remove the IDs we just fetched from the list:
+        self.ids_remaining_to_fetch = self.ids_remaining_to_fetch[
+                                                        self.fetch_per_query:]
+
+        self.results_count += len(self.results)
+
+        if self._more_to_fetch():
+            time.sleep(0.5)
+            self._fetch_pages()
+
+    def _more_to_fetch(self):
+        if len(self.ids_remaining_to_fetch) > 0:
+            return True
+        else:
+            return False
+
+    def _save_results(self):
+        for user in self.results:
+            user_obj = self.save_user(user, self.fetch_time)
+            self.objects.append(user_obj)
+
+    def _ids_to_fetch_in_query(self):
+        """
+        If self.fetch_per_query is 100, this returns the next 100 user_ids from
+        self.ids_remaining_to_fetch.
+        """
+        return self.ids_remaining_to_fetch[:self.fetch_per_query]
+
+
 class FetchTweets(TweetMixin, Fetch):
     """A parent class for those which fetch Tweets - RecentTweets or
     FavoriteTweets.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # When fetching 'new' Tweets, after a query, this will be set as the
+    # max_id to use for the next query.
+    max_id = None
+
+    # When fetching 'new' Tweets, this will be set as the highest ID
+    # fetched, so it can be used to set account.last_recent_id or
+    # account.last_favorite_id when we're done.
+    last_id = None
+
+    remaining_to_fetch = 0
+
+    # Will be 'new' or 'number':
+    fetch_type = 'new'
+
+    def fetch(self, count='new'):
+        """
+        Keyword arguments:
+        count -- Either 'new' (get the Tweets since the last fetch) or a number
+                to fetch that many, up to the API limit (3200 currently).
+        """
+        if count == 'new':
+            self.fetch_type = 'new'
+        else:
+            self.fetch_type = 'number'
+            self.remaining_to_fetch = count
+
+        return super().fetch()
 
     def _post_save(self):
         "After saving a page of results, what to do..."
@@ -526,7 +568,7 @@ class FetchTweets(TweetMixin, Fetch):
         if self.fetch_type == 'new':
             # The max_id for the next 'page' of tweets:
             self.max_id = self.results[-1]['id'] - 1
-        elif self.fetch_type == 'count':
+        elif self.fetch_type == 'number':
             self.remaining_to_fetch -= len(self.results)
 
         self.results_count += len(self.results)
@@ -535,12 +577,29 @@ class FetchTweets(TweetMixin, Fetch):
             time.sleep(0.5)
             self._fetch_pages()
 
+    def _more_to_fetch(self):
+        if self.fetch_type == 'new':
+            if self._since_id() is None or self.max_id > self._since_id():
+                return True
+            else:
+                return False
+        elif self.fetch_type == 'number':
+            if self.remaining_to_fetch > 0:
+                return True
+            else:
+                return False
+        return False
+
+    def _tweets_to_fetch_in_query(self):
+        "How many Tweets to fetch in the current API query."
+        to_fetch = 200
+        if self.fetch_type == 'number' and self.remaining_to_fetch < 200:
+            to_fetch = self.remaining_to_fetch
+        return to_fetch
+
 
 class FetchTweetsRecent(FetchTweets):
     """For fetching recent tweets by a single Account."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def _since_id(self):
         if self.fetch_type == 'new':
@@ -581,9 +640,6 @@ class FetchTweetsRecent(FetchTweets):
 
 class FetchTweetsFavorite(FetchTweets):
     """For fetching tweets favorited by a single Account."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def _since_id(self):
         if self.fetch_type == 'new':
@@ -656,13 +712,8 @@ class TwitterFetcher(object):
         # [ {'account': 'thescreename', 'success': True, 'fetched': 200} ]
         self.return_values = []
 
-    def fetch(self, num='new'):
+    def fetch(self, **kwargs):
         """Fetch data for one or more Accounts.
-
-        Keyword arguments:
-        num -- Either 'new' (to fetch all tweets since the last time), or a
-                number (eg, 100), to fetch that many of the most recent tweets,
-                per Account.
 
         Returns:
         A list of dicts, one dict per Account, containing data about
@@ -670,7 +721,7 @@ class TwitterFetcher(object):
         """
         for account in self.accounts:
             accountFetcher = self._get_account_fetcher(account)
-            return_value = accountFetcher.fetch(num=num)
+            return_value = accountFetcher.fetch(**kwargs)
             self._add_to_return_values(return_value)
 
         return self.return_values
@@ -725,8 +776,34 @@ class VerifyFetcher(TwitterFetcher):
         results = fetcher.fetch()
     """
 
+    def fetch(self):
+        "No special arguments."
+        return super().fetch()
+
     def _get_account_fetcher(self, account):
         return FetchVerify(account)
+
+
+class UsersFetcher(TwitterFetcher):
+    """Fetches data for a list of Twitter users, based on their ID.
+
+    A screen_name for an Account is required, as we need to fetch the users
+    using the API credentials from an Account.
+
+    Usage:
+        fetcher = UsersFetcher(screen_name='aScreenName')
+        results = fetcher.fetch(user_ids=[123456,9876,])
+    """
+
+    def fetch(self, user_ids=[]):
+        """
+        Keyword arguments:
+        user_ids -- A list of Twitter user IDs to fetch and store data for.
+        """
+        return super().fetch(user_ids=user_ids)
+
+    def _get_account_fetcher(self, account):
+        return FetchUsers(account)
 
 
 class RecentTweetsFetcher(TwitterFetcher):
@@ -736,8 +813,17 @@ class RecentTweetsFetcher(TwitterFetcher):
 
     Usage (or omit screen_name for all Accounts):
         fetcher = RecentTweetsFetcher(screen_name='aScreenName')
-        results = fetcher.fetch()
+        results = fetcher.fetch(count=200) # or count='new'
     """
+
+    def fetch(self, count='new'):
+        """
+        Keyword arguments:
+        count -- Either 'new' (to fetch all tweets since the last time), or a
+                number (eg, 100), to fetch that many of the most recent tweets,
+                per Account.
+        """
+        return super().fetch(count=count)
 
     def _get_account_fetcher(self, account):
         return FetchTweetsRecent(account)
@@ -751,8 +837,17 @@ class FavoriteTweetsFetcher(TwitterFetcher):
 
     Usage (or omit screen_name for all Accounts):
         fetcher = FavoriteTweetsFetcher(screen_name='aScreenName')
-        results = fetcher.fetch()
+        results = fetcher.fetch(count=200) # or count='new'
     """
+
+    def fetch(self, count='new'):
+        """
+        Keyword arguments:
+        count -- Either 'new' (to fetch all tweets since the last time), or a
+                number (eg, 100), to fetch that many of the most recent
+                favorite tweets, per Account.
+        """
+        return super().fetch(count=count)
 
     def _get_account_fetcher(self, account):
         return FetchTweetsFavorite(account)
