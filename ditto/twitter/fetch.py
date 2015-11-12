@@ -446,7 +446,7 @@ class FetchForAccount(object):
                     self.results_count += len(self.results)
 
                     if self._more_to_fetch():
-                        time.sleep(1.5)
+                        time.sleep(0.5)
                         self._fetch_pages()
 
             self.return_value['success'] = True
