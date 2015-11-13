@@ -19,7 +19,7 @@
             <li class="list-group-item twitter-user-location">{{ user.location }}</li>
         {% endif %}
         {% if user.url %}
-            <li class="list-group-item twitter-user-url"><a href="{{ user.url }}" rel="external nofollow">{{ user.url }}</a></li>
+            <li class="list-group-item twitter-user-url">{{ user.url|cut:"http://"|cut:"https://"|urlizetrunc:15 }}</li>
         {% endif %}
         <li class="list-group-item twitter-user-joined">Joined {{ user.created_at|date:"M Y" }}</li>
         {% if account == None or account.is_active %}
