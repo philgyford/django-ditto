@@ -40,20 +40,20 @@ class FetchTwitterArgsTweets(FetchTwitterArgs):
         "Calls the correct method when fetching recent tweets"
         call_command('fetch_twitter_tweets', recent='new', stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name=None)
-        self.fetcher_class().fetch.assert_called_once_with(num='new')
+        self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_recent_and_account(self):
         "Calls the correct method when fetching one account's recent tweets"
         call_command('fetch_twitter_tweets', recent='new', account='barbara',
                                                             stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name='barbara')
-        self.fetcher_class().fetch.assert_called_once_with(num='new')
+        self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_number(self):
         "Should send an int to fetch()."
         call_command('fetch_twitter_tweets', recent='25', stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name=None)
-        self.fetcher_class().fetch.assert_called_once_with(num=25)
+        self.fetcher_class().fetch.assert_called_once_with(count=25)
 
 
 class FetchTwitterFavoritesArgs(FetchTwitterArgs):
@@ -74,20 +74,20 @@ class FetchTwitterFavoritesArgs(FetchTwitterArgs):
         "Calls the correct method when fetching favorite tweets"
         call_command('fetch_twitter_favorites', recent='new', stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name=None)
-        self.fetcher_class().fetch.assert_called_once_with(num='new')
+        self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_favorites_and_account(self):
         "Calls the correct method when fetching one account's favorite tweets"
         call_command('fetch_twitter_favorites', recent='new',
                                     account='barbara', stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name='barbara')
-        self.fetcher_class().fetch.assert_called_once_with(num='new')
+        self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_favorites(self):
         "Should send an int to fetch()"
         call_command('fetch_twitter_favorites', recent='25', stdout=StringIO())
         self.fetcher_class.assert_called_once_with(screen_name=None)
-        self.fetcher_class().fetch.assert_called_once_with(num=25)
+        self.fetcher_class().fetch.assert_called_once_with(count=25)
 
 
 class FetchTwitterOutput(TestCase):
