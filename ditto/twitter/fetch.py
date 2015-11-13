@@ -479,20 +479,35 @@ class FetchUsers(UserMixin, Fetch):
     # Will be all the IDs we have yet to fetch from the API:
     ids_remaining_to_fetch = []
 
+    # Maxmum number of requests allowed per 15 minute window:
+    max_requests = 60
+
     def fetch(self, user_ids=[]):
         """
         Keyword arguments:
-        user_ids -- A list of Twitter user IDs to fetch. Up to the maximum
+        user_ids -- A list of Twitter user IDs to fetch. Optional. If not
+        supplied, we fetch data for all Users in the DB. Up to the maximum
         allowed in a reasonable window. At time of writing, the API allows
         100 per query, and 60 queries per 15 minute window. So 6000 user_ids
         would be the maximum.
         """
+
+        if len(user_ids) == 0:
+            # What's the biggest number we're able to fetch:
+            limit = self.fetch_per_query * self.max_requests
+            # Get all the IDs, up to the limit, ordered by fetch_time, so
+            # that we get the least-recently updated this time.
+            user_ids = User.objects.values_list('twitter_id', flat=True).order_by('fetch_time')[:limit]
+
         self.ids_remaining_to_fetch = user_ids
         return super().fetch()
 
     def _call_api(self):
+        # Sometimes this worked fine with numeric IDs, other times Tweepy
+        # didn't put them in the URL and they had to be strings. Odd.
+        ids = [str(id) for id in self._ids_to_fetch_in_query()]
         self.results = self.api.lookup_user(
-                            user_id=self._ids_to_fetch_in_query(),
+                            user_id=ids,
                             include_entities=False
                         )
 

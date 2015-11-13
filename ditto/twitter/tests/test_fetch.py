@@ -748,6 +748,17 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
         self.assertIn('Rate limit exceeded', result[0]['message'])
 
     @responses.activate
+    def test_requests_all_users(self):
+        "If no user_ids supplied, uses all users in the DB"
+        users = factories.UserFactory.create_batch(5)
+        result = UsersFetcher(screen_name='jill').fetch()
+
+        ids = User.objects.values_list('twitter_id', flat=True).order_by('fetch_time')
+        ids = '%2C'.join(map(str, ids))
+        self.assertIn(ids, responses.calls[0][0].url)
+
+
+    @responses.activate
     def test_creates_users(self):
         self.add_response(body=self.make_response_body())
         result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
@@ -767,18 +778,19 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_fetches_multiple_pages(self):
         # We're going to ask for 350 user IDs, which will be split over 4 pages.
-        user_ids = [str(id) for id in range(1,351)]
+        user_ids = [id for id in range(1,351)]
         body = json.dumps([{'id':id} for id in range(1,100)])
 
         for n in range(3):
             # First time, add user_ids 1-100. Then 101-200. Then 201-300.
             start = n * 100
             end = (n+1) * 100
-            qs = {'user_id': '%2C'.join(user_ids[start:end]),
-                                                    'include_entities': 'false'}
+            qs = {
+                'user_id': '%2C'.join(map(str, user_ids[start:end])),
+                'include_entities': 'false'}
             self.add_response(body=body, querystring=qs, match_querystring=True)
         # Then add the final 301-350 user_ids.
-        qs['user_id'] = '%2C'.join(user_ids[-50:])
+        qs['user_id'] = '%2C'.join(map(str, user_ids[-50:]))
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
         with patch('ditto.twitter.fetch.FetchUsers._save_results'):
