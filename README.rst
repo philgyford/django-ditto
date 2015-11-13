@@ -154,6 +154,11 @@ Twitter screen name. eg::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=new --account=philgyford
 
+You may periodically want to update the stored data about all Twitter users
+(numbers of Tweets, descriptions, etc). This will fetch the latest data::
+
+    $ ./demo/manage.py fetch_users
+
 
 Other things
 ############

@@ -253,3 +253,48 @@ class GenerateTweetHtml(TestCase):
         with self.assertRaises(CommandError):
             call_command('generate_tweet_html', account='thelma')
 
+
+class FetchUsers(TestCase):
+
+    def setUp(self):
+        user_1 = factories.UserFactory(screen_name='terry')
+        user_2 = factories.UserFactory(screen_name='bob')
+        account_1 = factories.AccountFactory(user=user_1)
+        account_2 = factories.AccountWithCredentialsFactory(user=user_2)
+
+        self.patcher = patch('ditto.twitter.management.commands.fetch_users.UsersFetcher')
+        self.fetcher_class = self.patcher.start()
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_with_account(self):
+        call_command('fetch_users', account='bob')
+        self.fetcher_class.assert_called_once_with(screen_name='bob')
+        self.fetcher_class().fetch.assert_called_once_with()
+
+    def test_without_account(self):
+        call_command('fetch_users')
+        self.fetcher_class.assert_called_once_with(screen_name='bob')
+        self.fetcher_class().fetch.assert_called_once_with()
+
+    def test_success_output(self):
+        self.fetcher_class().fetch.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 612}]
+        ]
+        call_command('fetch_users', account='bob', stdout=self.out)
+        self.assertIn('philgyford: Fetched 612 Users', self.out.getvalue())
+
+    def test_error_output(self):
+        self.fetcher_class().fetch.side_effect = [
+            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+        ]
+        call_command('fetch_users', account='bob', stdout=self.out,
+                                                        stderr=self.out_err)
+        self.assertIn('philgyford: Failed to fetch Users: It broke',
+                                                    self.out_err.getvalue())
+
+
+
