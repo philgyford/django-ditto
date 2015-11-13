@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from django.test import TestCase
 
 from .. import factories
-from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, VerifyFetcher, FetchVerify
+from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, UsersFetcher, VerifyFetcher, FetchVerify
 from ..models import Account, Media, Tweet, User
 
 
@@ -624,14 +624,13 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher().fetch()
         self.assertEqual(len(result), 2)
-        self.assertTrue(result[1]['account'], 'jill')
+        self.assertEqual(result[1]['account'], 'jill')
         self.assertTrue(result[1]['success'])
         self.assertEqual(result[1]['fetched'], 3)
 
     @responses.activate
     def test_returns_error_if_api_call_fails(self):
-        self.add_response(body='{"errors":[{"message":"Rate limit exceeded","code":88}]}',
-                            status=429)
+        self.add_response(body='{"errors":[{"message":"Rate limit exceeded","code":88}]}', status=429)
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertFalse(result[0]['success'])
         self.assertIn('Rate limit exceeded', result[0]['message'])
@@ -709,6 +708,82 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
             with patch('time.sleep'):
                 result = FavoriteTweetsFetcher(screen_name='jill').fetch(
                                                                     count=700)
+                self.assertEqual(4, len(responses.calls))
+
+
+class UsersFetcherTestCase(TwitterFetcherTestCase):
+
+    api_fixture = 'ditto/twitter/fixtures/api/users_lookup.json'
+
+    api_call = 'users/lookup'
+
+    @responses.activate
+    def test_makes_one_api_call(self):
+        self.add_response(body=self.make_response_body())
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertEqual(1, len(responses.calls))
+
+    @responses.activate
+    def test_makes_correct_api_call(self):
+        self.add_response(body=self.make_response_body())
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertIn('users/lookup.json?', responses.calls[0][0].url)
+        self.assertIn('include_entities=false', responses.calls[0][0].url)
+        self.assertIn('user_id=460060168%2C26727655%2C6795192',
+                                                    responses.calls[0][0].url)
+
+    @responses.activate
+    def test_returns_correct_success_response(self):
+        self.add_response(body=self.make_response_body())
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertEqual(result[0]['account'], 'jill')
+        self.assertTrue(result[0]['success'])
+        self.assertEqual(result[0]['fetched'], 3)
+
+    @responses.activate
+    def test_returns_error_if_api_call_fails(self):
+        self.add_response(body='{"errors":[{"message":"Rate limit exceeded","code":88}]}', status=429)
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertFalse(result[0]['success'])
+        self.assertIn('Rate limit exceeded', result[0]['message'])
+
+    @responses.activate
+    def test_creates_users(self):
+        self.add_response(body=self.make_response_body())
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertEqual(1, User.objects.filter(twitter_id=460060168).count())
+        self.assertEqual(1, User.objects.filter(twitter_id=26727655).count())
+        self.assertEqual(1, User.objects.filter(twitter_id=6795192).count())
+
+    @responses.activate
+    def test_updates_users(self):
+        user = factories.UserFactory.create(
+                                    twitter_id=26727655, screen_name='bill')
+        self.add_response(body=self.make_response_body())
+        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        self.assertEqual('Aiannucci',
+                            User.objects.get(twitter_id=26727655).screen_name)
+
+    @responses.activate
+    def test_fetches_multiple_pages(self):
+        # We're going to ask for 350 user IDs, which will be split over 4 pages.
+        user_ids = [str(id) for id in range(1,351)]
+        body = json.dumps([{'id':id} for id in range(1,100)])
+
+        for n in range(3):
+            # First time, add user_ids 1-100. Then 101-200. Then 201-300.
+            start = n * 100
+            end = (n+1) * 100
+            qs = {'user_id': '%2C'.join(user_ids[start:end]),
+                                                    'include_entities': 'false'}
+            self.add_response(body=body, querystring=qs, match_querystring=True)
+        # Then add the final 301-350 user_ids.
+        qs['user_id'] = '%2C'.join(user_ids[-50:])
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+
+        with patch('ditto.twitter.fetch.FetchUsers._save_results'):
+            with patch('time.sleep'):
+                result = UsersFetcher(screen_name='jill').fetch(user_ids)
                 self.assertEqual(4, len(responses.calls))
 
 
