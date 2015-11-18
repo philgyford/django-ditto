@@ -157,14 +157,14 @@ class FetchTwitterOutputFavorites(FetchTwitterOutput):
 
 class FetchTwitterOutputAccounts(FetchTwitterOutput):
 
-    fetch_method_path = 'ditto.twitter.management.commands.fetch_accounts.VerifyFetcher.fetch'
+    fetch_method_path = 'ditto.twitter.management.commands.fetch_twitter_accounts.VerifyFetcher.fetch'
 
     def test_success_output(self):
         "Responds correctly when users were successfully fetched"
         self.fetch_method.side_effect = [
             [{'account': 'philgyford', 'success': True}]
         ]
-        call_command('fetch_accounts', stdout=self.out)
+        call_command('fetch_twitter_accounts', stdout=self.out)
         self.assertIn('Fetched @philgyford', self.out.getvalue())
 
     def test_error_output(self):
@@ -173,7 +173,7 @@ class FetchTwitterOutputAccounts(FetchTwitterOutput):
                 [{'account': 'philgyford', 'success': False,
                     'message': 'It broke'}]
         ]
-        call_command('fetch_accounts', stdout=self.out, stderr=self.out_err)
+        call_command('fetch_twitter_accounts', stdout=self.out, stderr=self.out_err)
         self.assertIn('Could not fetch @philgyford: It broke',
                                                         self.out_err.getvalue())
 
@@ -181,7 +181,7 @@ class FetchTwitterOutputAccounts(FetchTwitterOutput):
 class ImportTweets(TestCase):
 
     def setUp(self):
-        self.patcher = patch('ditto.twitter.management.commands.import_tweets.TweetIngester.ingest')
+        self.patcher = patch('ditto.twitter.management.commands.import_twitter_tweets.TweetIngester.ingest')
         self.ingest_mock = self.patcher.start()
         self.out = StringIO()
         self.out_err = StringIO()
@@ -192,16 +192,17 @@ class ImportTweets(TestCase):
     def test_fails_with_no_args(self):
         "Fails when no arguments are provided"
         with self.assertRaises(CommandError):
-            call_command('import_tweets')
+            call_command('import_twitter_tweets')
 
     def test_fails_with_invalid_directory(self):
         with patch('os.path.isdir', return_value=False):
             with self.assertRaises(CommandError):
-                call_command('import_tweets', path='/wrong/path')
+                call_command('import_twitter_tweets', path='/wrong/path')
 
     def test_calls_ingest_method(self):
         with patch('os.path.isdir', return_value=True):
-            call_command('import_tweets', path='/right/path', stdout=self.out)
+            call_command('import_twitter_tweets', path='/right/path',
+                                                            stdout=self.out)
             self.ingest_mock.assert_called_once_with(
                                         directory='/right/path/data/js/tweets')
 
@@ -211,7 +212,8 @@ class ImportTweets(TestCase):
             'success': True, 'tweets': 12345, 'files': 21
         }
         with patch('os.path.isdir', return_value=True):
-            call_command('import_tweets', path='/right/path', stdout=self.out)
+            call_command('import_twitter_tweets', path='/right/path',
+                                                            stdout=self.out)
             self.assertIn('Imported 12345 tweets from 21 files',
                                                             self.out.getvalue())
 
@@ -221,7 +223,7 @@ class ImportTweets(TestCase):
             'success': False, 'message': 'Something went wrong',
         }
         with patch('os.path.isdir', return_value=True):
-            call_command('import_tweets', path='/right/path',
+            call_command('import_twitter_tweets', path='/right/path',
                                         stdout=self.out, stderr=self.out_err)
             self.assertIn('Something went wrong', self.out_err.getvalue())
 
@@ -239,19 +241,20 @@ class GenerateTweetHtml(TestCase):
 
     @patch('ditto.twitter.models.Tweet.save')
     def test_with_all_accounts(self, save_method):
-        call_command('generate_tweet_html', stdout=self.out)
+        call_command('generate_twitter_tweet_html', stdout=self.out)
         self.assertEqual(save_method.call_count, 5)
         self.assertIn('Generated HTML for 5 Tweets', self.out.getvalue())
 
     @patch('ditto.twitter.models.Tweet.save')
     def test_with_one_account(self, save_method):
-        call_command('generate_tweet_html', account='terry', stdout=self.out)
+        call_command('generate_twitter_tweet_html', account='terry',
+                                                            stdout=self.out)
         self.assertEqual(save_method.call_count, 2)
         self.assertIn('Generated HTML for 2 Tweets', self.out.getvalue())
 
     def test_with_invalid_account(self):
         with self.assertRaises(CommandError):
-            call_command('generate_tweet_html', account='thelma')
+            call_command('generate_twitter_tweet_html', account='thelma')
 
 
 class UpdateUsers(TestCase):

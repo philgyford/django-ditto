@@ -116,13 +116,13 @@ In the Django admin, add a new Account, with Twitter API credentials.
 
 Then you *must* do::
 
-    $ ./demo/manage.py fetch_accounts
+    $ ./demo/manage.py fetch_twitter_accounts
 
 which will fetch the data for that account's Twitter user.
 
 If you have more than 3,200 Tweets, request your Twitter archive at https://twitter.com/settings/account . When you've downloaded it, do::
 
-    $ ./demo/manage.py import_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
+    $ ./demo/manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 
 using the correct path to the directory you've downloaded and unzipped. This
 will import all of the Tweets found in the archive. The data in the archive
