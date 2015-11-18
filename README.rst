@@ -167,7 +167,10 @@ Twitter screen name. eg::
 You may periodically want to update the stored data about all Twitter users
 (numbers of Tweets, descriptions, etc). This will fetch the latest data::
 
-    $ ./demo/manage.py fetch_users
+    $ ./demo/manage.py fetch_twitter_users --account=philgyford
+
+TODO: Summary of the commands you might want to run via cron etc, and how
+often.
 
 
 Other things
