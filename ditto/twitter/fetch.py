@@ -19,14 +19,17 @@ from .models import Account, Media, Tweet, User
 #
 # Fetch
 #   FetchVerify
-#   FetchUsers
-#   FetchTweets
+#   FetchLookup
+#     FetchUsers
+#     FetchTweets
+#   FetchNewTweets
 #     FetchTweetsRecent
 #     FetchTweetsFavorite
 #
 # TwitterFetcher
 #   VerifyFetcher
 #   UsersFetcher
+#   TweetsFetcher
 #   RecentTweetsFetcher
 #   FavoriteTweetsFetcher
 #
@@ -466,14 +469,9 @@ class FetchVerify(UserMixin, Fetch):
         self.objects = [user]
 
 
-class FetchUsers(UserMixin, Fetch):
-    """For fetching users.
+class FetchLookup(Fetch):
 
-    Supply fetch() with a list of Twitter user IDs, and corresponding Users
-    will be created/updated in the DB.
-    """
-
-    # Maximum number of users to ask for per query, allowed by the API:
+    # Maximum number of users/tweets to ask for per query, allowed by the API:
     fetch_per_query = 100
 
     # Will be all the IDs we have yet to fetch from the API:
@@ -482,34 +480,29 @@ class FetchUsers(UserMixin, Fetch):
     # Maxmum number of requests allowed per 15 minute window:
     max_requests = 60
 
-    def fetch(self, user_ids=[]):
+    def fetch(self, ids=[]):
         """
         Keyword arguments:
-        user_ids -- A list of Twitter user IDs to fetch. Optional. If not
-        supplied, we fetch data for all Users in the DB. Up to the maximum
-        allowed in a reasonable window. At time of writing, the API allows
-        100 per query, and 60 queries per 15 minute window. So 6000 user_ids
-        would be the maximum.
+        ids -- A list of Twitter user/tweet IDs to fetch. Optional. If not
+        supplied, we fetch data for all Users/Tweets in the DB. Up to the
+        maximum allowed in a reasonable window. At time of writing, the API
+        allows 100 per query, and 60 queries per 15 minute window. So 6000
+        ids would be the maximum.
         """
+        self._set_initial_ids(ids)
+        return super().fetch()
 
-        if len(user_ids) == 0:
+    def _set_initial_ids(self, ids):
+        """ids is a list of Twitter User/Tweet IDs, or an empty list."""
+
+        if len(ids) == 0:
             # What's the biggest number we're able to fetch:
             limit = self.fetch_per_query * self.max_requests
             # Get all the IDs, up to the limit, ordered by fetch_time, so
             # that we get the least-recently updated this time.
-            user_ids = User.objects.values_list('twitter_id', flat=True).order_by('fetch_time')[:limit]
+            ids = self.model.objects.values_list('twitter_id', flat=True).order_by('fetch_time')[:limit]
 
-        self.ids_remaining_to_fetch = user_ids
-        return super().fetch()
-
-    def _call_api(self):
-        # Sometimes this worked fine with numeric IDs, other times Tweepy
-        # didn't put them in the URL and they had to be strings. Odd.
-        ids = [str(id) for id in self._ids_to_fetch_in_query()]
-        self.results = self.api.lookup_user(
-                            user_id=ids,
-                            include_entities=False
-                        )
+        self.ids_remaining_to_fetch = ids
 
     def _post_save(self):
         # Remove the IDs we just fetched from the list:
@@ -528,22 +521,69 @@ class FetchUsers(UserMixin, Fetch):
         else:
             return False
 
-    def _save_results(self):
-        for user in self.results:
-            user_obj = self.save_user(user, self.fetch_time)
-            self.objects.append(user_obj)
-
     def _ids_to_fetch_in_query(self):
         """
-        If self.fetch_per_query is 100, this returns the next 100 user_ids from
+        If self.fetch_per_query is 100, this returns the next 100 ids from
         self.ids_remaining_to_fetch.
         """
         return self.ids_remaining_to_fetch[:self.fetch_per_query]
 
 
-class FetchTweets(TweetMixin, Fetch):
-    """A parent class for those which fetch Tweets - RecentTweets or
-    FavoriteTweets.
+
+class FetchUsers(UserMixin, FetchLookup):
+    """For fetching users.
+
+    Supply fetch() with a list of Twitter user IDs, and corresponding Users
+    will be created/updated in the DB. Or, if no IDs are supplied, fetch the
+    least-recently-fetched Users.
+    """
+
+    model = User
+
+    def _call_api(self):
+        # Sometimes this worked fine with numeric IDs, other times Tweepy
+        # didn't put them in the URL and they had to be strings. Odd.
+        ids = [str(id) for id in self._ids_to_fetch_in_query()]
+        self.results = self.api.lookup_user(
+                            user_id=ids,
+                            include_entities=False
+                        )
+
+    def _save_results(self):
+        for user in self.results:
+            user_obj = self.save_user(user, self.fetch_time)
+            self.objects.append(user_obj)
+
+
+class FetchTweets(TweetMixin, FetchLookup):
+    """For fetching specific Tweets.
+
+    Supply fetch() with a list of Twitter Tweet IDs, and coresponding Tweets
+    will be created/updated in the DB. Or, if no IDs are supplied, fetch the
+    least-recently-fetched Tweets.
+    """
+
+    model = Tweet
+
+    def _call_api(self):
+        ids = [str(id) for id in self._ids_to_fetch_in_query()]
+        self.results = self.api.lookup_status(
+                            id=ids,
+                            include_entities=True,
+                            trim_user=False,
+                            map=False
+                        )
+
+    def _save_results(self):
+        for tweet in self.results:
+            tweet_obj = self.save_tweet(tweet, self.fetch_time)
+            self.objects.append(tweet_obj)
+
+
+class FetchNewTweets(TweetMixin, Fetch):
+    """A parent class for those which fetch "new" Tweets. ie, fetching a
+    quantity of the most recent Tweets/favorited Tweets. As opposed to fetching
+    a specified selection of Tweets, regardless of when they were.
     """
 
     # When fetching 'new' Tweets, after a query, this will be set as the
@@ -613,7 +653,7 @@ class FetchTweets(TweetMixin, Fetch):
         return to_fetch
 
 
-class FetchTweetsRecent(FetchTweets):
+class FetchTweetsRecent(FetchNewTweets):
     """For fetching recent tweets by a single Account."""
 
     def _since_id(self):
@@ -653,7 +693,7 @@ class FetchTweetsRecent(FetchTweets):
             self.objects.append(tw)
 
 
-class FetchTweetsFavorite(FetchTweets):
+class FetchTweetsFavorite(FetchNewTweets):
     """For fetching tweets favorited by a single Account."""
 
     def _since_id(self):
@@ -807,18 +847,40 @@ class UsersFetcher(TwitterFetcher):
 
     Usage:
         fetcher = UsersFetcher(screen_name='aScreenName')
-        results = fetcher.fetch(user_ids=[123456,9876,])
+        results = fetcher.fetch(ids=[123456,9876,])
     """
 
-    def fetch(self, user_ids=[]):
+    def fetch(self, ids=[]):
         """
         Keyword arguments:
-        user_ids -- A list of Twitter user IDs to fetch and store data for.
+        ids -- A list of Twitter user IDs to fetch and store data for.
         """
-        return super().fetch(user_ids=user_ids)
+        return super().fetch(ids=ids)
 
     def _get_account_fetcher(self, account):
         return FetchUsers(account)
+
+
+class TweetsFetcher(TwitterFetcher):
+    """Fetches data for a list of Tweets, based on their ID.
+
+    A screen_name for an Account is required, as we need to fetch the Tweets
+    using the API credentials from an Account.
+
+    Usage:
+        fetcher = TweetFetcher(screen_name='aScreenName')
+        results = fetcher.fetch(ids=[123456,9876,])
+    """
+
+    def fetch(self, ids=[]):
+        """
+        Keyword arguments:
+        ids -- A list of Twitter Tweet IDs to fetch and store data for.
+        """
+        return super().fetch(ids=ids)
+
+    def _get_account_fetcher(self, account):
+        return FetchTweets(account)
 
 
 class RecentTweetsFetcher(TwitterFetcher):

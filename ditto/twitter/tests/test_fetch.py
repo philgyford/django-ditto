@@ -8,10 +8,11 @@ import pytz
 import responses
 from freezegun import freeze_time
 
+from django.http import QueryDict
 from django.test import TestCase
 
 from .. import factories
-from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, UsersFetcher, VerifyFetcher, FetchVerify
+from ..fetch import FavoriteTweetsFetcher, FetchError, TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin, UsersFetcher, TweetsFetcher, VerifyFetcher, FetchVerify
 from ..models import Account, Media, Tweet, User
 
 
@@ -35,7 +36,7 @@ class FetchTwitterTestCase(TestCase):
         json_file.close()
         return json_data
 
-    def add_response(self, body, status=200, querystring={}, match_querystring=False):
+    def add_response(self, body, status=200, querystring={}, match_querystring=False, method='GET'):
         """Add a Twitter API response.
 
         Keyword arguments:
@@ -44,6 +45,7 @@ class FetchTwitterTestCase(TestCase):
         querystring -- eg {'count': 200, 'user_id': 123}
         match_querystring -- You probably want this to be True if you've set
                              a querystring.
+        method -- 'GET' or 'POST'.
         """
         url = '%s/%s.json' % (self.api_url, self.api_call)
 
@@ -52,8 +54,10 @@ class FetchTwitterTestCase(TestCase):
                                                 for key in querystring.keys())
             url = '%s?%s' % (url, qs)
 
+        method = responses.POST if method == 'POST' else responses.GET
+
         responses.add(
-            responses.GET,
+            method,
             url,
             status=status,
             match_querystring=match_querystring,
@@ -749,14 +753,13 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
 
     @responses.activate
     def test_requests_all_users(self):
-        "If no user_ids supplied, uses all users in the DB"
+        "If no ids supplied, uses all users in the DB"
         users = factories.UserFactory.create_batch(5)
         result = UsersFetcher(screen_name='jill').fetch()
 
         ids = User.objects.values_list('twitter_id', flat=True).order_by('fetch_time')
         ids = '%2C'.join(map(str, ids))
         self.assertIn(ids, responses.calls[0][0].url)
-
 
     @responses.activate
     def test_creates_users(self):
@@ -778,24 +781,128 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_fetches_multiple_pages(self):
         # We're going to ask for 350 user IDs, which will be split over 4 pages.
-        user_ids = [id for id in range(1,351)]
+        ids = [id for id in range(1,351)]
         body = json.dumps([{'id':id} for id in range(1,100)])
 
         for n in range(3):
-            # First time, add user_ids 1-100. Then 101-200. Then 201-300.
+            # First time, add ids 1-100. Then 101-200. Then 201-300.
             start = n * 100
             end = (n+1) * 100
             qs = {
-                'user_id': '%2C'.join(map(str, user_ids[start:end])),
+                'user_id': '%2C'.join(map(str, ids[start:end])),
                 'include_entities': 'false'}
             self.add_response(body=body, querystring=qs, match_querystring=True)
-        # Then add the final 301-350 user_ids.
-        qs['user_id'] = '%2C'.join(map(str, user_ids[-50:]))
+        # Then add the final 301-350 ids.
+        qs['user_id'] = '%2C'.join(map(str, ids[-50:]))
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
         with patch('ditto.twitter.fetch.FetchUsers._save_results'):
             with patch('time.sleep'):
-                result = UsersFetcher(screen_name='jill').fetch(user_ids)
+                result = UsersFetcher(screen_name='jill').fetch(ids)
+                self.assertEqual(4, len(responses.calls))
+
+
+class TweetsFetcherTestCase(TwitterFetcherTestCase):
+
+    api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
+
+    api_call = 'statuses/lookup'
+
+    @responses.activate
+    def test_makes_one_api_call(self):
+        self.add_response(body=self.make_response_body(), method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300, 200, 100])
+        self.assertEqual(1, len(responses.calls))
+
+    @responses.activate
+    def test_makes_correct_api_call(self):
+        self.add_response(body=self.make_response_body(), method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300, 200, 100])
+        self.assertIn('statuses/lookup.json', responses.calls[0][0].url)
+
+        # To get the POST params:
+        params = QueryDict(responses.calls[0][0].body)
+
+        self.assertIn('include_entities', params)
+        self.assertEqual(params['include_entities'], 'true')
+        self.assertIn('trim_user', params)
+        self.assertEqual(params['trim_user'], 'false')
+        self.assertIn('map', params)
+        self.assertEqual(params['map'], 'false')
+        self.assertIn('id', params)
+        self.assertEqual(params['id'], '300,200,100')
+
+    @responses.activate
+    def test_returns_correct_success_response(self):
+        self.add_response(body=self.make_response_body(), method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300,200,100])
+        self.assertEqual(result[0]['account'], 'jill')
+        self.assertTrue(result[0]['success'])
+        self.assertEqual(result[0]['fetched'], 3)
+
+    @responses.activate
+    def test_returns_error_if_api_call_fails(self):
+        self.add_response(body='{"errors":[{"message":"Rate limit exceeded","code":88}]}', status=429, method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300,200,100])
+        self.assertFalse(result[0]['success'])
+        self.assertIn('Rate limit exceeded', result[0]['message'])
+
+    @responses.activate
+    def test_requests_all_tweets(self):
+        "If no ids supplied, uses all tweets in the DB"
+        tweets = factories.TweetFactory.create_batch(5)
+        result = TweetsFetcher(screen_name='jill').fetch()
+
+        ids = Tweet.objects.values_list('twitter_id', flat=True).order_by('fetch_time')
+
+        params = QueryDict(responses.calls[0][0].body)
+        self.assertIn('id', params)
+        self.assertEqual(','.join(map(str, ids)), params['id'])
+
+    @responses.activate
+    def test_creates_tweets(self):
+        self.add_response(body=self.make_response_body(), method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300,200,100])
+        self.assertEqual(1, Tweet.objects.filter(twitter_id=300).count())
+        self.assertEqual(1, Tweet.objects.filter(twitter_id=200).count())
+        self.assertEqual(1, Tweet.objects.filter(twitter_id=100).count())
+
+    @responses.activate
+    def test_updates_tweets(self):
+        tweets = factories.TweetFactory.create(
+                                    twitter_id=200, text='Will change')
+        self.add_response(body=self.make_response_body(), method='POST')
+        result = TweetsFetcher(screen_name='jill').fetch([300,200,100])
+        self.assertEqual(Tweet.objects.get(twitter_id=200).text,
+            "@rooreynolds I've read stories of people travelling abroad who were mistaken for military/security because of that kind of thing… careful :)")
+
+    @responses.activate
+    def test_fetches_multiple_pages(self):
+        """
+        The mocked requests work without specifying the data we're POSTing,
+        so... not doing anything with it.
+        """
+        # We're going to ask for 350 tweet IDs which will be split over 4 pages.
+        ids = [id for id in range(1,351)]
+        body = json.dumps([{'id':id} for id in range(1,100)])
+
+        for n in range(3):
+            # First time, add ids 1-100. Then 101-200. Then 201-300.
+            start = n * 100
+            end = (n+1) * 100
+            #qs = {
+                #'id': ','.join(map(str, ids[start:end])),
+                #'include_entities': 'true',
+                #'trim_user': 'false',
+                #'map': 'false'}
+            self.add_response(body=body, method='POST')
+        # Then add the final 301-350 ids.
+        #qs['id'] = ','.join(map(str, ids[-50:]))
+        self.add_response(body=body, method='POST')
+
+        with patch('ditto.twitter.fetch.FetchTweets._save_results'):
+            with patch('time.sleep'):
+                result = TweetsFetcher(screen_name='jill').fetch(ids)
                 self.assertEqual(4, len(responses.calls))
 
 

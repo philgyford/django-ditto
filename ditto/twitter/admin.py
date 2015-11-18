@@ -74,7 +74,7 @@ class MediaInline(admin.StackedInline):
 class TweetAdmin(admin.ModelAdmin):
     list_display = ('user','is_private', 'title', 'post_time', )
     list_display_links = ('title', )
-    list_filter = ('user', 'post_time',)
+    list_filter = ('post_time', 'fetch_time', )
 
     inlines = [
         MediaInline,

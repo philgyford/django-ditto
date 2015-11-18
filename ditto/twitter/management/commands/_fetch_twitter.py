@@ -40,10 +40,10 @@ class FetchTwitterCommand(BaseCommand):
         else:
             raise CommandError("Specify --recent, eg --recent=100 or --recent=new.")
 
-    def fetch_tweets(self, account, count):
+    def fetch_tweets(self, screen_name, count):
         """Child classes should override this method to call a method that
         fetches tweets and returns results, eg:
-            return RecentTweetsFetcher(screen_name=account).fetch(count=count)
+            return RecentTweetsFetcher(screen_name=screen_name).fetch(count=count)
         """
         return {}
 

@@ -125,14 +125,24 @@ If you have more than 3,200 Tweets, request your Twitter archive at https://twit
     $ ./demo/manage.py import_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 
 using the correct path to the directory you've downloaded and unzipped. This
-will import all of the Tweets found in the archive.
+will import all of the Tweets found in the archive. The data in the archive
+isn't complete, so to fully-populate those Tweets you should run this::
 
-Whether you've done that or not, then fetch all the Tweets possible from the
-API (which includes more complete data than the downloaded archive)::
+    $ ./demo/manage.py update_twitter_tweets --account=[your screen name]
+
+with the Twitter screen name of the Account you added. This will fetch data for
+up to 6000 Tweets. You can run it every 15 minutes if you have more than 6000
+Tweets from your archive. It will fetch data for the least-recently fetched.
+It's worth running every so often in the future, to fetch the latest data (such
+as Retweet and Like counts).
+
+If there are newer Tweets, not in your downloaded archive, then run this::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=3200
 
-Run this periodically to fetch the most recent Tweets::
+The ``3200`` is the number of recent Tweets to fetch, with ``3200`` being the maximum allowed in one go.
+
+Run this version periodically to fetch the most recent Tweets::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=new
 

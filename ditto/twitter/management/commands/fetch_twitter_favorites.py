@@ -24,6 +24,6 @@ class Command(FetchTwitterCommand):
 
     recent_help = 'Fetch the most recent liked Tweets, eg "100" or "new".'
 
-    def fetch_tweets(self, account, count):
-        return FavoriteTweetsFetcher(screen_name=account).fetch(count=count)
+    def fetch_tweets(self, screen_name, count):
+        return FavoriteTweetsFetcher(screen_name=screen_name).fetch(count=count)
 

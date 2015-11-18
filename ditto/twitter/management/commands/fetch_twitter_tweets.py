@@ -20,7 +20,7 @@ class Command(FetchTwitterCommand):
 
     recent_help = 'Fetches the most recent Tweets, eg "100" or "new".'
 
-    def fetch_tweets(self, account, count):
-        return RecentTweetsFetcher(screen_name=account).fetch(count=count)
+    def fetch_tweets(self, screen_name, count):
+        return RecentTweetsFetcher(screen_name=screen_name).fetch(count=count)
 
 
