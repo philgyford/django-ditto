@@ -20,7 +20,7 @@ class Account(TimeStampedModelMixin, models.Model):
                                                     on_delete=models.SET_NULL)
 
     consumer_key = models.CharField(null=False, blank=True, max_length=255,
-            help_text="(API Key)")
+            help_text="(API Key) From https://apps.twitter.com")
     consumer_secret = models.CharField(null=False, blank=True, max_length=255,
             help_text="(API Secret)")
     access_token = models.CharField(null=False, blank=True, max_length=255)

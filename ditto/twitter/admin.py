@@ -117,13 +117,14 @@ class TweetAdmin(admin.ModelAdmin):
             }
         )},
     }
-    readonly_fields = ('text_html', 'time_created', 'time_modified',)
+    readonly_fields = ('text_html', 'raw',
+                        'fetch_time', 'time_created', 'time_modified',)
     search_fields = ('text', )
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('screen_name', 'name', 'is_private', 'fetch_time')
+    list_display = ('screen_name', 'name', 'is_private', 'fetch_time',)
     list_display_links = ('screen_name', )
 
     fieldsets = (
@@ -138,6 +139,6 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
         }),
     )
-    readonly_fields = ('time_created', 'time_modified',)
-    search_fields = ('screen_name', 'name')
+    readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
+    search_fields = ('screen_name', 'name',)
 

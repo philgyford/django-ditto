@@ -14,8 +14,11 @@ class AccountAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('username', 'url', 'api_token', 'is_active', )
+            'fields': ('username', 'url', 'is_active', )
         }),
+        ('API', {
+            'fields': ('api_token',),
+            'description': 'Your API Token can be found at <a href="From https://pinboard.in/settings/password ">pinboard.in/settings/password</a>'}),
         ('Data', {
             'fields': ('time_created', 'time_modified',)
         }),

@@ -79,10 +79,16 @@ Services
 ########
 
 
+Flickr
+******
+
+In the Django admin, add your Flickr account(s) with API key and secret from https://www.flickr.com/services/apps/create/apply/
+
+
 Pinboard
 ********
 
-In the Django admin, add your Pinboard account(s) with API token from https://pinboard.in/settings/password .
+In the Django admin, add your Pinboard account(s) with the API token from https://pinboard.in/settings/password .
 
 Import all of your bookmarks::
 
@@ -112,7 +118,7 @@ Be aware of the rate limits: https://pinboard.in/api/#limits
 Twitter
 *******
 
-In the Django admin, add a new Account, with Twitter API credentials.
+In the Django admin, add a new Account, with Twitter API credentials from https://apps.twitter.com/ .
 
 Then you *must* do::
 
