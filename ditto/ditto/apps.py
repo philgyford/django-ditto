@@ -14,6 +14,7 @@ class Apps(object):
     def all(self):
         "A list of all possible Ditto apps that could be installed/enabled."
         return [
+                'flickr',
                 'pinboard',
                 'twitter',
                ]
