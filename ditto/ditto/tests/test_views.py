@@ -128,6 +128,7 @@ class DittoViewTests(TestCase):
         with patch.object(apps, 'is_installed') as mock_method:
             # Fake it so it looks like ditto.pinboard isn't installed:
             mock_method.side_effect = lambda x: {
+                'ditto.flickr': True,
                 'ditto.pinboard': False,
                 'ditto.twitter': True,
             }[x]
@@ -139,6 +140,7 @@ class DittoViewTests(TestCase):
         with patch.object(apps, 'is_installed') as mock_method:
             # Fake it so it looks like ditto.twitter isn't installed:
             mock_method.side_effect = lambda x: {
+                'ditto.flickr': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': False,
             }[x]

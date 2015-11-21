@@ -39,7 +39,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                         max_length=50, verbose_name='NSID')
     is_pro = models.BooleanField(null=False, blank=False, default=False,
                                                     verbose_name='Is Pro?')
-    iconserver = models.PositiveIntegerField(null=False, blank=False)
+    iconserver = models.CharField(null=False, blank=False, max_length=20)
     iconfarm = models.PositiveIntegerField(null=False, blank=False)
 
     username = models.CharField(null=False, blank=False, unique=True,
@@ -76,4 +76,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     class Meta:
         ordering = ['realname']
+
+    @property
+    def name(self):
+        return self.realname
 

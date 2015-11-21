@@ -36,7 +36,7 @@ from .models import Account, Media, Tweet, User
 # The *Fetcher classes are the ones that should be used externally, like:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
-#   fetcher.fetch(count=20)
+#   results = fetcher.fetch(count=20)
 
 
 class FetchError(Exception):
@@ -427,6 +427,13 @@ class Fetch(object):
         """
         raise FetchError("Children of the Fetch class should define their own _call_api() method.")
 
+    def _save_results(self):
+        """Define in child classes.
+        Should go through self._results() and, probably, call
+        self.save_tweet() or self.save_user() for each one.
+        """
+        self.objects = []
+
     def _post_save(self):
         """Can optionally be defined in child classes.
         Do any extra things that need to be done after saving a page of data.
@@ -438,13 +445,6 @@ class Fetch(object):
         Do any extra things that need to be done after we've fetched all data.
         """
         pass
-
-    def _save_results(self):
-        """Define in child classes.
-        Should go through self._results() and, probably, call
-        self.save_tweet() or self.save_user() for each one.
-        """
-        self.objects = []
 
 
 class FetchVerify(UserMixin, Fetch):
@@ -783,12 +783,12 @@ class TwitterFetcher(object):
 
     def _get_account_fetcher(self, account):
         """Should be changed for each child class.
-        Should return an instance of a child of TwitterAccountFetcher().
+        Should return an instance of a child of Fetch().
 
         Keyword arguments:
         account -- An Account object.
         """
-        return TwitterAccountFetcher(account)
+        return Fetch(account)
 
     def _add_to_return_values(self, return_value):
         """Add return_value to the list in self.return_values."""

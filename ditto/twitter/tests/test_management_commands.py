@@ -10,6 +10,7 @@ from .. import factories
 
 
 class FetchTwitterArgs(TestCase):
+    "Testing the handling of arguments passed to the commands."
 
     # Child classes should set this:
     fetcher_class_path = ''
@@ -22,7 +23,7 @@ class FetchTwitterArgs(TestCase):
         self.patcher.stop()
 
 
-class FetchTwitterArgsTweets(FetchTwitterArgs):
+class FetchTwitterTweetsArgs(FetchTwitterArgs):
 
     fetcher_class_path = 'ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher'
 
@@ -38,20 +39,19 @@ class FetchTwitterArgsTweets(FetchTwitterArgs):
 
     def test_with_recent(self):
         "Calls the correct method when fetching recent tweets"
-        call_command('fetch_twitter_tweets', recent='new', stdout=StringIO())
+        call_command('fetch_twitter_tweets', recent='new')
         self.fetcher_class.assert_called_once_with(screen_name=None)
         self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_recent_and_account(self):
         "Calls the correct method when fetching one account's recent tweets"
-        call_command('fetch_twitter_tweets', recent='new', account='barbara',
-                                                            stdout=StringIO())
+        call_command('fetch_twitter_tweets', recent='new', account='barbara')
         self.fetcher_class.assert_called_once_with(screen_name='barbara')
         self.fetcher_class().fetch.assert_called_once_with(count='new')
 
     def test_with_number(self):
         "Should send an int to fetch()."
-        call_command('fetch_twitter_tweets', recent='25', stdout=StringIO())
+        call_command('fetch_twitter_tweets', recent='25')
         self.fetcher_class.assert_called_once_with(screen_name=None)
         self.fetcher_class().fetch.assert_called_once_with(count=25)
 
@@ -91,6 +91,7 @@ class FetchTwitterFavoritesArgs(FetchTwitterArgs):
 
 
 class FetchTwitterOutput(TestCase):
+    "Testing the commands output what they should on success/failure."
 
     # Child classes should set this:
     fetch_method_path = ''
@@ -108,7 +109,7 @@ class FetchTwitterOutput(TestCase):
         self.patcher.stop()
 
 
-class FetchTwitterOutputTweets(FetchTwitterOutput):
+class FetchTwitterTweetsOutput(FetchTwitterOutput):
 
     fetch_method_path = 'ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher.fetch'
 
@@ -132,7 +133,7 @@ class FetchTwitterOutputTweets(FetchTwitterOutput):
                                                     self.out_err.getvalue())
 
 
-class FetchTwitterOutputFavorites(FetchTwitterOutput):
+class FetchTwitterFavoritesOutput(FetchTwitterOutput):
 
     fetch_method_path = 'ditto.twitter.management.commands.fetch_twitter_favorites.FavoriteTweetsFetcher.fetch'
 
@@ -155,7 +156,7 @@ class FetchTwitterOutputFavorites(FetchTwitterOutput):
                                                     self.out_err.getvalue())
 
 
-class FetchTwitterOutputAccounts(FetchTwitterOutput):
+class FetchTwitterAccountsOutput(FetchTwitterOutput):
 
     fetch_method_path = 'ditto.twitter.management.commands.fetch_twitter_accounts.VerifyFetcher.fetch'
 
