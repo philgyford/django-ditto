@@ -24,9 +24,9 @@ class Account(TimeStampedModelMixin, models.Model):
             return '%d' % self.pk
 
     class Meta:
-        ordering = ['user__username']
+        ordering = ['user__realname']
 
-    def hasCredentials(self):
+    def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
         if self.api_key and self.api_secret:
             return True

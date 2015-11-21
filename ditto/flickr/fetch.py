@@ -32,7 +32,7 @@ class UserMixin(object):
 
     def save_user(self, user, fetch_time):
         print(user)
-        # Return user object.
+        # Return User object.
 
 
 class Fetch(object):
@@ -76,7 +76,7 @@ class Fetch(object):
         else:
             self.return_value['account'] = 'Unsaved Account'
 
-        if self.account.hasCredentials():
+        if self.account.has_credentials():
             self.api = flickrapi.FlickrAPI(self.account.api_key,
                                 self.account.api_secret, format='parsed-json')
             self._fetch_pages()
