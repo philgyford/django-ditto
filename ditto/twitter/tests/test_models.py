@@ -141,11 +141,11 @@ class TwitterAccountTestCase(TestCase):
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
         account = AccountWithCredentialsFactory.build(user=None)
-        self.assertTrue(account.hasCredentials())
+        self.assertTrue(account.has_credentials())
 
     def test_has_credentials_false(self):
         account = AccountFactory.build(user=None)
-        self.assertFalse(account.hasCredentials())
+        self.assertFalse(account.has_credentials())
 
     def test_get_absolute_url_with_user(self):
         user = UserFactory(screen_name='bill')

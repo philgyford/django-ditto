@@ -380,7 +380,7 @@ class Fetch(object):
         else:
             self.return_value['account'] = 'Unsaved Account'
 
-        if self.account.hasCredentials():
+        if self.account.has_credentials():
             self.api = Twython(
                 self.account.consumer_key, self.account.consumer_secret,
                 self.account.access_token, self.account.access_token_secret)

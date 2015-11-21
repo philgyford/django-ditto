@@ -72,7 +72,7 @@ class Account(TimeStampedModelMixin, models.Model):
         """
         from .fetch import FetchVerify
 
-        if self.hasCredentials():
+        if self.has_credentials():
             results = FetchVerify(account=self).fetch()
             if 'user' in results and isinstance(results['user'], User):
                 self.user = results['user']
@@ -80,7 +80,7 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return False
 
-    def hasCredentials(self):
+    def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
         if self.consumer_key and self.consumer_secret and self.access_token and self.access_token_secret:
             return True
