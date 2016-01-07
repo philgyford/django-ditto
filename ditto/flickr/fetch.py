@@ -1,4 +1,5 @@
 import datetime
+import json
 import pytz
 
 import flickrapi
@@ -10,7 +11,8 @@ from .models import Account, User
 #
 # FetchError
 #
-# UserMixin
+# FlickrItemMixin
+#   UserMixin
 #
 # Fetch
 #   FetchUser
@@ -28,18 +30,83 @@ class FetchError(Exception):
     pass
 
 
-class UserMixin(object):
+class FlickrItemMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _api_datetime_to_datetime(self, api_time):
+        """Change a text datetime from the API to a datetime with timezone.
+        api_time is a string like "1956-01-01 00:00:00".
+        """
+        return datetime.datetime.strptime(
+                        api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+
+    def _api_unixtime_to_datetime(self, api_time):
+        """Change a text unixtime from the API to a datetime with timezone.
+        api_time is a string or int like "1093459273".
+        """
+        return datetime.datetime.utcfromtimestamp(
+                                        int(api_time)).replace(tzinfo=pytz.utc)
+
+
+class UserMixin(FlickrItemMixin):
+    "Provides a method for creating/updating a User using data from the API."
 
     def save_user(self, user, fetch_time):
-        print(user)
-        # Return User object.
+        """
+        Keyword arguments:
+        user -- A dict of the data about a user from the API's JSON.
+        fetch_time -- A datetime.
+
+        Returns the User object.
+        """
+        raw_json = json.dumps(user)
+
+        person = user['person']
+
+        defaults = {
+            'fetch_time':   fetch_time,
+            'raw':          raw_json,
+            'nsid':         person['nsid'],
+            'is_pro':       True if person['ispro'] == 1 else False,
+            'iconserver':   person['iconserver'],
+            'iconfarm':     person['iconfarm'],
+            'username':     person['username']['_content'],
+            'realname':     person['realname']['_content'],
+            'location':     person['location']['_content'],
+            'description':  person['description']['_content'],
+            'photos_url':   person['photosurl']['_content'],
+            'profile_url':  person['profileurl']['_content'],
+            'photos_count': int(person['photos']['count']['_content']),
+            'photos_first_date': self._api_unixtime_to_datetime(
+                                person['photos']['firstdate']['_content']),
+            'photos_first_date_taken': self._api_datetime_to_datetime(
+                                person['photos']['firstdatetaken']['_content']),
+        }
+
+        if 'views' in person['photos']:
+            # I think this might only be returned for the Account's own user.
+            defaults['photos_views'] = \
+                                    int(person['photos']['views']['_content'])
+
+        user_obj, created = User.objects.update_or_create(
+            nsid=person['nsid'], defaults=defaults
+        )
+
+        return user_obj
 
 
 class Fetch(object):
     """Parent class for children that will call the Flickr API to fetch data.
 
-    Children should define their own methods for:
-        TODO
+    Children must define their own methods for:
+        _call_api()
+        _save_results()
+
+    And optionally:
+        _post_save()
+        _post_fetch()
 
     """
     # Will be an Account object, passed into init()
@@ -88,7 +155,7 @@ class Fetch(object):
         self.return_value['fetched'] = self.results_count
 
         return self.return_value
-        
+
     def _reset(self):
         self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
         self.results = []
@@ -119,7 +186,6 @@ class Fetch(object):
         """
         raise FetchError("Children of the Fetch class should define their own _call_api() method.")
 
-    
     def _save_results(self):
         """Define in child classes.
         Should go through self._results() and, probably, call
@@ -147,7 +213,7 @@ class FetchUser(UserMixin, Fetch):
 
     def fetch(self, url=None):
         """
-        url -- The Flickr URL owned by a user,
+        url -- A Flickr URL owned by a user,
                 eg 'https://www.flickr.com/photos/philgyford/8102921/'
         """
         self.user_url = url
@@ -168,7 +234,7 @@ class FetchUser(UserMixin, Fetch):
         except FlickrError as e:
             raise FetchError("Error when getting info about User with id '%s': %s" % (user['user']['id'], e))
 
-        self.results = [info['person']]
+        self.results = [info]
 
     def _save_results(self):
         user_obj = self.save_user(self.results[0], self.fetch_time)
@@ -178,6 +244,8 @@ class FetchUser(UserMixin, Fetch):
 
 
 class FlickrFetcher(object):
+    """Parent class for fetching things from Flickr.
+    """
 
     def __init__(self, username=None):
         """Keyword arguments:
@@ -201,20 +269,22 @@ class FlickrFetcher(object):
         success/failure.
         """
         for account in self.accounts:
-            accountFetcher = self._get_account_fetcher(account)
-            return_value = accountFetcher.fetch(**kwargs)
+            fetchObject = self._get_fetch_object(account)
+            return_value = fetchObject.fetch(**kwargs)
             self._add_to_return_values(return_value)
 
         return self.return_values
 
-    def _get_account_fetcher(self, account):
+    def _get_fetch_object(self, account):
         """Should be changed for each child class.
         Should return an instance of a child of Fetch().
+        eg:
+            return FetchThingy(account)
 
         Keyword arguments:
         account -- An Account object.
         """
-        return Fetch()
+        raise FetchError("Children of the FlickrFetcher class should define their own _get_fetch_object() method.")
 
     def _add_to_return_values(self, return_value):
         """Add return_value to the list in self.return_values."""
@@ -258,7 +328,7 @@ class UserFetcher(FlickrFetcher):
     def fetch(self, url=None):
         return super().fetch(url=url)
 
-    def _get_account_fetcher(self, account):
+    def _get_fetch_object(self, account):
         return FetchUser(account)
 
     def _set_accounts(self, username=None):

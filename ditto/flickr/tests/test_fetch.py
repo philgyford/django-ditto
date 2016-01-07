@@ -11,6 +11,7 @@ from django.test import TestCase
 
 from ..factories import AccountFactory, UserFactory
 from ..fetch import UserMixin, UserFetcher
+from ..models import User
 
 
 class FetcherTestCase(TestCase):
@@ -22,6 +23,7 @@ class FetcherTestCase(TestCase):
     def make_response_body(self, fixture=None):
         """Makes the JSON response to a call to the API
         fixture -- Path to a JSON fixture file. Else, self.api_fixture is used.
+        Returns the JSON text.
         """
         if fixture is None:
             fixture = self.api_fixture
@@ -151,7 +153,70 @@ class UserFetcherTestCase(FetcherTestCase):
 
         user_response = json.loads(self.make_response_body())
 
-        save_user.assert_called_once_with(user_response['person'],
+        save_user.assert_called_once_with(user_response,
                         datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
 
+
+class UserMixinTestCase(FetcherTestCase):
+
+    api_fixture = 'ditto/flickr/fixtures/api/people_getinfo.json'
+
+    def make_user_object(self, user_data):
+        """"Creates/updates a User from API data, then fetches that User from
+        the DB and returns it.
+        """
+        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        saved_user = UserMixin().save_user(user_data, fetch_time)
+        return User.objects.get(nsid="35034346050@N01")
+
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    def test_saves_correct_user_data(self):
+        """Passing save_user() data from the API should create a new User."""
+        user_data = json.loads(self.make_response_body())
+        user = self.make_user_object(user_data)
+
+        self.assertEqual(user.fetch_time,
+                            datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+        self.assertEqual(user.raw, json.dumps(user_data))
+        self.assertEqual(user.nsid, "35034346050@N01")
+        self.assertTrue(user.is_pro)
+        self.assertEqual(user.iconserver, '7420')
+        self.assertEqual(user.iconfarm, 8)
+        self.assertEqual(user.username, 'Phil Gyford')
+        self.assertEqual(user.realname, 'Phil Gyford')
+        self.assertEqual(user.location, 'London, UK')
+        self.assertEqual(user.description, 'A test description.')
+        self.assertEqual(user.photos_url, 'https://www.flickr.com/photos/philgyford/')
+        self.assertEqual(user.profile_url, 'https://www.flickr.com/people/philgyford/')
+        self.assertEqual(user.photos_count, 2876)
+        self.assertEqual(user.photos_first_date, datetime.datetime.utcfromtimestamp(1093459273).replace(tzinfo=pytz.utc))
+        self.assertEqual(user.photos_first_date_taken,
+                                datetime.datetime.strptime(
+                                    '1956-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        self.assertEqual(user.photos_views, 227227)
+
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    def test_updates_existing_user(self):
+        """Passing save_user() data from the API should update an existing
+        User.
+        """
+        # Some data that will be updated:
+        existing_user = User(nsid="35034346050@N01",
+                            iconfarm=3,
+                            is_pro=False,
+                            username="Bob",
+                            location="San Francisco",
+                            photos_count=3,
+                            photos_views=3)
+        existing_user.save()
+
+        user_data = json.loads(self.make_response_body())
+        user = self.make_user_object(user_data)
+
+        self.assertTrue(user.is_pro)
+        self.assertEqual(user.username, 'Phil Gyford')
+        self.assertEqual(user.location, 'London, UK')
+        self.assertEqual(user.photos_count, 2876)
+        self.assertEqual(user.photos_views, 227227)
 
