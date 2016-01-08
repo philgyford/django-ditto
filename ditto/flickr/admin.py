@@ -35,7 +35,7 @@ class AccountAdmin(admin.ModelAdmin):
     readonly_fields = ('time_created', 'time_modified',)
 
     def has_credentials(self, obj):
-        return obj.hasCredentials()
+        return obj.has_credentials()
     has_credentials.boolean = True
 
 

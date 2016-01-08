@@ -84,6 +84,13 @@ Flickr
 
 In the Django admin, add your Flickr account(s) with API key and secret from https://www.flickr.com/services/apps/create/apply/
 
+For each of those Accounts, fetch the Flickr user, eg::
+
+    $ ./demo/manage.py fetch_flickr_user --url=https://www.flickr.com/photos/philgyford
+
+In the Django admin, edit each Flickr Account you created, associate it with
+the correct Flickr User.
+
 
 Pinboard
 ********
