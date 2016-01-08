@@ -257,6 +257,9 @@ class UserMixinTestCase(FetchTwitterTestCase):
         return user_data
 
     def make_user_object(self, user_data):
+        """"Creates/updates a User from API data, then fetches that User from
+        the DB and returns it.
+        """
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
         user_mixin = UserMixin()
         saved_user = user_mixin.save_user(user_data, fetch_time)
