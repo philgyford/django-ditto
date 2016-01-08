@@ -153,7 +153,7 @@ class UserFetcherTestCase(FetcherTestCase):
 
         user_response = json.loads(self.make_response_body())
 
-        save_user.assert_called_once_with(user_response,
+        save_user.assert_called_once_with(user_response['person'],
                         datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
 
 
@@ -166,7 +166,7 @@ class UserMixinTestCase(FetcherTestCase):
         the DB and returns it.
         """
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        saved_user = UserMixin().save_user(user_data, fetch_time)
+        saved_user = UserMixin().save_user(user_data['person'], fetch_time)
         return User.objects.get(nsid="35034346050@N01")
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
@@ -177,7 +177,7 @@ class UserMixinTestCase(FetcherTestCase):
 
         self.assertEqual(user.fetch_time,
                             datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
-        self.assertEqual(user.raw, json.dumps(user_data))
+        self.assertEqual(user.raw, json.dumps(user_data['person']))
         self.assertEqual(user.nsid, "35034346050@N01")
         self.assertTrue(user.is_pro)
         self.assertEqual(user.iconserver, '7420')

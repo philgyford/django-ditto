@@ -63,35 +63,33 @@ class UserMixin(FlickrItemMixin):
         """
         raw_json = json.dumps(user)
 
-        person = user['person']
-
         defaults = {
             'fetch_time':   fetch_time,
             'raw':          raw_json,
-            'nsid':         person['nsid'],
-            'is_pro':       True if person['ispro'] == 1 else False,
-            'iconserver':   person['iconserver'],
-            'iconfarm':     person['iconfarm'],
-            'username':     person['username']['_content'],
-            'realname':     person['realname']['_content'],
-            'location':     person['location']['_content'],
-            'description':  person['description']['_content'],
-            'photos_url':   person['photosurl']['_content'],
-            'profile_url':  person['profileurl']['_content'],
-            'photos_count': int(person['photos']['count']['_content']),
+            'nsid':         user['nsid'],
+            'is_pro':       True if user['ispro'] == 1 else False,
+            'iconserver':   user['iconserver'],
+            'iconfarm':     user['iconfarm'],
+            'username':     user['username']['_content'],
+            'realname':     user['realname']['_content'],
+            'location':     user['location']['_content'],
+            'description':  user['description']['_content'],
+            'photos_url':   user['photosurl']['_content'],
+            'profile_url':  user['profileurl']['_content'],
+            'photos_count': int(user['photos']['count']['_content']),
             'photos_first_date': self._api_unixtime_to_datetime(
-                                person['photos']['firstdate']['_content']),
+                                user['photos']['firstdate']['_content']),
             'photos_first_date_taken': self._api_datetime_to_datetime(
-                                person['photos']['firstdatetaken']['_content']),
+                                user['photos']['firstdatetaken']['_content']),
         }
 
-        if 'views' in person['photos']:
+        if 'views' in user['photos']:
             # I think this might only be returned for the Account's own user.
             defaults['photos_views'] = \
-                                    int(person['photos']['views']['_content'])
+                                    int(user['photos']['views']['_content'])
 
         user_obj, created = User.objects.update_or_create(
-            nsid=person['nsid'], defaults=defaults
+            nsid=user['nsid'], defaults=defaults
         )
 
         return user_obj
@@ -234,7 +232,8 @@ class FetchUser(UserMixin, Fetch):
         except FlickrError as e:
             raise FetchError("Error when getting info about User with id '%s': %s" % (user['user']['id'], e))
 
-        self.results = [info]
+        # info has 'person' and 'stat' elements.
+        self.results = [ info['person'] ]
 
     def _save_results(self):
         user_obj = self.save_user(self.results[0], self.fetch_time)
