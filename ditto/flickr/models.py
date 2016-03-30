@@ -48,7 +48,7 @@ class TaggedPhoto(TaggedItemBase):
     author = models.ForeignKey('User')
     machine_tag = models.BooleanField(default=False)
     content_object = models.ForeignKey('Photo',
-                                related_name="%(app_label)s_%(class)s_items") 
+                                related_name="%(app_label)s_%(class)s_items")
 
     class Meta:
         verbose_name = 'Photo/Tag Relationship'
@@ -107,21 +107,21 @@ class Photo(DittoItemModel):
     # is_private is in DittoItemModel
     description = models.TextField(blank=True, help_text="Can contain HTML")
 
-    secret = models.CharField(max_length=20) 
-    original_secret = models.CharField(max_length=20) 
+    secret = models.CharField(max_length=20)
+    original_secret = models.CharField(max_length=20)
     server = models.CharField(max_length=20)
     farm = models.PositiveSmallIntegerField()
 
     license = models.CharField(max_length=50, choices=LICENSES)
     rotation = models.PositiveSmallIntegerField(default=0,
         help_text="Current clockwise rotation, in degrees, by which the smaller image sizes differ from the original image.")
-    original_format = models.CharField(max_length=10, help_text="eg, 'png'") 
+    original_format = models.CharField(max_length=10, help_text="eg, 'png'")
     safety_level = models.PositiveSmallIntegerField(
                             default=SAFETY_LEVELS[0][0], choices=SAFETY_LEVELS)
 
     has_people = models.BooleanField(default=False,
                             help_text="Are there Flickr users in this photo?")
-    
+
     # post_time is in DittoItemModel
     last_update_time = models.DateTimeField(null=True, blank=True,
         help_text="The last time the photo, or any of its metadata (tags, comments, etc.) was modified on Flickr. UTC.")
@@ -171,7 +171,7 @@ class Photo(DittoItemModel):
     country_place_id = models.CharField(blank=True, max_length=30)
     country_woeid = models.CharField(blank=True, max_length=30)
 
-    # EXIF ################################################################### 
+    # EXIF ###################################################################
 
     # EXIF data comes from a separate query, so store its JSON here.
     exif_raw = models.TextField(blank=True,
