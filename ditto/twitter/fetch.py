@@ -310,10 +310,15 @@ class TweetMixin(UserMixin):
 
         if 'quoted_status_id' in tweet:
             defaults['quoted_status_id'] = tweet['quoted_status_id']
-            # We'll also create/update the quoted User object, and quoted Tweet.
-            quoted_user = self.save_user(
+
+            if 'quoted_status' in tweet:
+                # If tweet 1 quotes tweet 2 that quotes tweet 3, then
+                # tweet 2 will have 'quoted_status_id' but not 'quoted_status'.
+                # But the tweet does have quoted_status, we'll create/update
+                # the quoted User object, and quoted Tweet.
+                quoted_user = self.save_user(
                                     tweet['quoted_status']['user'], fetch_time)
-            quoted_tweet_obj = self.save_tweet(
+                quoted_tweet_obj = self.save_tweet(
                                             tweet['quoted_status'], fetch_time)
 
         tweet_obj, created = Tweet.objects.update_or_create(
