@@ -77,13 +77,13 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     Should be inherited by a model in child apps.
     eg, Tweet, Photo, Bookmark, etc.
     """
-    title = models.CharField(null=False, blank=True, max_length=255)
-    permalink = models.URLField(null=False, blank=True,
+    title = models.CharField(blank=True, max_length=255)
+    permalink = models.URLField(blank=True,
                     help_text="URL of the item on the service's website.")
     # Ensures that all children have a common short piece of text for display:
-    summary = models.CharField(null=False, blank=True, max_length=255,
+    summary = models.CharField(blank=True, max_length=255,
         help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
-    is_private = models.BooleanField(default=False, null=False, blank=False,
+    is_private = models.BooleanField(default=False,
         help_text="If true, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
         help_text="The time the item's data was last fetched, and was new or changed.")
@@ -97,7 +97,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     longitude = models.DecimalField(null=True, blank=True,
                                             max_digits=12, decimal_places=9)
 
-    raw = models.TextField(null=False, blank=True,
+    raw = models.TextField(blank=True,
                                     help_text="eg, the raw JSON from the API.")
 
     # All Items (eg, used in Admin):
@@ -108,6 +108,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     class Meta:
         abstract = True
+        get_latest_by = 'post_time'
 
     def __str__(self):
         return self.title
