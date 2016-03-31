@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import json
 import pytz
@@ -12,13 +13,17 @@ from .models import Account, User
 # FetchError
 #
 # FlickrItemMixin
-#   UserMixin
+#   UserMixin               # Method for saving a User.
+#       PhotoMixin          # Method for saving a Photo.
 #
 # Fetch
-#   FetchUser
+#   FetchUser               # Fetches and saves one Account's User.
+#   FetchPhotos
+#       FetchPhotosRecent   # Fetches and saves one Account's recent photos.
 #
 # FlickrFetcher
-#   UserFetcher
+#   UserFetcher             # Fetches and saves one Account's User by URL.
+#   RecentPhotosFetcher     # Fetches and saves Photos for one or all Accounts.
 #
 # Use a fetcher like:
 #
@@ -52,6 +57,9 @@ class FlickrItemMixin(object):
 
 class UserMixin(FlickrItemMixin):
     "Provides a method for creating/updating a User using data from the API."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def save_user(self, user, fetch_time):
         """
@@ -95,17 +103,60 @@ class UserMixin(FlickrItemMixin):
         return user_obj
 
 
+class PhotoMixin(UserMixin):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save_photo(self, photo, fetch_time):
+        """Takes a dict of photo data from the API and creates or updates a
+        Photo object and its associated User object.
+
+        Keyword arguments:
+        photo -- The photo data.
+                 From the Flickr API. With extra fields:
+                     'user': {'id': 4}
+        fetch_time -- A datetime.
+
+        Returns:
+        The Photo object that was created or updated.
+        """
+        raw_json = json.dumps(photo)
+
+        print(photo['id'])
+
+        defaults = {
+            'fetch_time':           fetch_time,
+            'raw':                  raw_json,
+            'user':                 user_id,
+            'is_private':           (photo['ispublic'] == 0),
+            'post_time':            photo['date_upload']
+            
+            'flickr_id':            photo['id'],
+                
+        }
+
+        photo_obj, created = Photo.objects.update_or_create(
+                flickr_id=photo['id'],
+                defaults=defaults
+            )
+
+        return photo_obj
+
+
 class Fetch(object):
     """Parent class for children that will call the Flickr API to fetch data.
+
+    We call the fetch() method, which calls:
+        _fetch_pages() which calls:
+            _call_api() and puts data into self.results.
+            If no data is returned then we're on final page and it calls:
+                _save_results() which saves the objects.
+    It keeps going on subsequent pages until we've got everything.
 
     Children must define their own methods for:
         _call_api()
         _save_results()
-
-    And optionally:
-        _post_save()
-        _post_fetch()
-
     """
     # Will be an Account object, passed into init()
     account = None
@@ -128,6 +179,12 @@ class Fetch(object):
     # When fetching Photos or Users this will be the total amount fetched.
     results_count = 0
 
+    # The number of the page we last fetched (for things that have pages).
+    page = 1
+
+    # Will be set to the number of pages to fetch, when we get the first result.
+    total_pages = 1
+
     def __init__(self, account):
         self.account = account
 
@@ -145,7 +202,6 @@ class Fetch(object):
             self.api = flickrapi.FlickrAPI(self.account.api_key,
                                 self.account.api_secret, format='parsed-json')
             self._fetch_pages()
-            self._post_fetch()
         else:
             self.return_value['success'] = False
             self.return_value['message'] = 'Account has no API credentials'
@@ -162,19 +218,17 @@ class Fetch(object):
         self.results_count = 0
 
     def _fetch_pages(self):
-        try:
-            self._call_api()
-        except FetchError as e:
-            self.return_value['success'] = False
-            self.return_value['message'] = 'Error when calling API: %s' % e
-        else:
-            # If we've got to the last 'page' of tweet results, we'll receive
-            # an empty list from the API.
-            if (len(self.results) > 0):
-                self._save_results()
-                self._post_save()
-
-            self.return_value['success'] = True
+        while self.page <= self.total_pages:
+            try:
+                self._call_api()
+            except FetchError as e:
+                self.return_value['success'] = False
+                self.return_value['message'] = 'Error when calling API: %s' % e
+            self.page += 1
+        self._fetch_extra()
+        # Got all the pages of results, data put into self.results:
+        self._save_results()
+        self.return_value['success'] = True
         return
 
     def _call_api(self):
@@ -184,24 +238,17 @@ class Fetch(object):
         """
         raise FetchError("Children of the Fetch class should define their own _call_api() method.")
 
+    def _fetch_extra(self):
+        """Can be defined in child classes to fetch extra data to add to
+        self.results before we save the data in the DB."""
+        pass
+
     def _save_results(self):
         """Define in child classes.
         Should go through self._results() and, probably, call
         self.save_user() or self.save_photo() for each one.
         """
-        self.objects = []
-
-    def _post_save(self):
-        """Can optionally be defined in child classes.
-        Do any extra things that need to be done after saving a page of data.
-        """
-        pass
-
-    def _post_fetch(self):
-        """Can optionally be defined in child classes.
-        Do any extra things that need to be done after we've fetched all data.
-        """
-        pass
+        raise FetchError("Children of the Fetch class should define their own _save_results() method.")
 
 
 class FetchUser(UserMixin, Fetch):
@@ -242,8 +289,125 @@ class FetchUser(UserMixin, Fetch):
         self.results_count = 1
 
 
+class FetchPhotos(PhotoMixin, Fetch):
+
+    # Will be the minimum date of upload/fave for Photos that we'll fetch.
+    min_date = None
+
+    # Will be 'new' or 'date':
+    fetch_type = 'new'
+
+    # 500 is the max the API allows.
+    photos_per_page = 5
+
+    # Will match Flickr IDs with our User IDs.
+    # When we fetch a user's data, because we've just fetched their photo,
+    # we add their IDs to this, so we don't fetch again this time.
+    fetched_users = {}
+
+    def __init__(self, *args, **kwargs):
+        # Set default min_date:
+        self.min_date = datetime.datetime.strptime('2000-01-01', '%Y-%m-%d')
+        super().__init__(*args, **kwargs)
+
+    def fetch(self, since='new'):
+        """
+        Keyword arguments:
+        since -- Either 'new' (get the Photos since the last fetch) or a 
+                'YYYY-MM-DD' date, which will get the photos uploaded/faved on
+                or after that date.
+        """
+        if since == 'date':
+            self.fetch_type = 'date'
+            self.min_date = datetime.datetime.strptime(since, '%Y-%m-%d')
+        else:
+            self.fetch_type = 'new'
+
+        return super().fetch()
+
+    def _fetch_user(self, flickr_id):
+        """
+        Fetch, and save, a single user from the API, from their Flickr ID.
+        Adds the User ID to self.fetched_users.
+        """
+        print("Fetching user %s" % flickr_id)
+        try:
+            user_info = self.api.people.getInfo(user_id=flickr_id)
+        except FlickrError as e:
+            raise FetchError("Error when getting info about User with id '%s': %s" % (flickr_id, e))
+
+        user_obj = self.save_user(user_info['person'], self.fetch_time)
+        self.fetched_users[flickr_id] = user_obj.id
+
+
+class FetchPhotosRecent(FetchPhotos):
+    """For fetching a list of recent photos by a single Account."""
+
+    def _call_api(self):
+        """Fetch one page of results, containing very basic info about the
+        Photos."""
+        # Turn our datetime object into a unix timestamp:
+        min_unixtime = calendar.timegm(self.min_date.timetuple())
+
+        try:
+            results = self.api.people.getPhotos(
+                                            user_id=self.account.user.nsid,
+                                            min_upload_date=min_unixtime,
+                                            per_page=self.photos_per_page,
+                                            page=self.page
+                                        )
+        except FlickrError as e:
+            raise FetchError("Error when fetching recent photos (page %s): %s" % (self.page, e))
+
+        if self.page == 1 and 'photos' in results and 'pages' in esults['photos']:
+            # First time, set the total_pages there are to fetch.
+            self.total_pages == results['photos']['pages']
+
+        # Add the list of photos' data from this page on to our total list:
+        self.results += results['photos']['photo']
+
+    def _fetch_extra(self):
+        """Before saving we need to go through the big list of photos we've
+        fetched, and fetch more detailed info to add to each photo's data.
+
+        I've a feeling it's horrible to cycle through a list and amend each
+        of its dicts in place, but...
+        """
+        for i, photo in enumerate(self.results):
+            # TODO: getInfo()
+            # TODO: getSizes() ?
+            # TODO: geo_getLocation()
+            # eg:
+            # self.results[i]['sizes'] = blah
+
+            #if self.fetched_users.get(photo['owner'], None) is None:
+                # We haven't already fetched this user, so get it:
+                #self._fetch_user(photo['owner'])
+
+            # Add our ID of the photo's owner:
+            # self.results[i]['user'] = {
+            #                       'id': self.fetched_users[photo['owner']]}
+
+            pass
+
+    def _save_results(self):
+        """Save all the data we've fetched about photos to the DB."""
+        for photo in self.results:
+            p = self.save_photo(photo, self.fetch_time)
+            self.objects.append(p)
+
+
+
 class FlickrFetcher(object):
     """Parent class for fetching things from Flickr.
+
+    Use like:
+        fetcher = ChildFlickrFetcher(username='philgyford')
+        fetcher.fetch()
+
+    Or, for all accounts:
+        fetcher = ChildFlickrFetcher()
+        fetcher.fetch()
     """
 
     def __init__(self, username=None):
@@ -334,4 +498,23 @@ class UserFetcher(FlickrFetcher):
         super()._set_accounts(username=username)
         if len(self.accounts) > 0:
             self.accounts = [self.accounts[0]]
+
+
+#class PhotosFetcher(FlickrFetcher):
+
+    #def fetch(self, ids=[]):
+        #return super().fetch(ids=ids)
+
+    #def _get_fetch_object(self, account):
+        #return FetchPhotos(account)
+
+
+
+class RecentPhotosFetcher(FlickrFetcher):
+  
+    def fetch(self, since='new'):
+        return super().fetch(since=since)
+
+    def _get_fetch_object(self, account):
+        return FetchPhotosRecent(account)
 

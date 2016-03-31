@@ -746,7 +746,7 @@ class TwitterFetcher(object):
     for one or several Accounts.
 
     Use like:
-        fetcher = ChildFetcher(screen_name='philgyford')
+        fetcher = ChildTwitterFetcher(screen_name='philgyford')
         fetcher.fetch()
 
     Or, for all accounts:

@@ -98,6 +98,23 @@ class Photo(DittoItemModel):
         (2, 'outdoors'),
     )
 
+    # From https://www.flickr.com/services/api/misc.urls.html
+    # Before 2010-05-25 large photos only exist for very large original images.
+    # Medium 800, large 1600, and large 2048 photos only exist after 2012-03-01.
+    SIZES = (
+        ('s', 'Small square'),  # 75x75
+        ('q', 'Large square'),  # 150x150
+        ('t', 'Thumbnail'),     # 100
+        ('m', 'Small'),         # 240
+        ('n', 'Small 320'),
+        ('', 'Medium'),         # 500
+        ('z', 'Medium 640'),
+        ('c', 'Medium 800'),
+        ('b', 'Large'),         # 1024
+        ('h', 'Large 1600'),
+        ('k', 'Large 2048'),
+        ('o', 'Original'),
+    )
 
     user = models.ForeignKey('User')
 
@@ -140,6 +157,49 @@ class Photo(DittoItemModel):
 
     media = models.CharField(default=MEDIA_TYPES[0][0], choices=MEDIA_TYPES,
                                                                 max_length=10)
+
+    # SIZES ##################################################################
+
+    width_t = models.PositiveSmallIntegerField("Thumbnail width",
+                                                        null=True, blank=True)
+    height_t = models.PositiveSmallIntegerField("Thumbnail height",
+                                                        null=True, blank=True)
+    width_m = models.PositiveSmallIntegerField("Small width",
+                                                        null=True, blank=True)
+    height_m = models.PositiveSmallIntegerField("Small height",
+                                                        null=True, blank=True)
+    width_n = models.PositiveSmallIntegerField("Small 320 width",
+                                                        null=True, blank=True)
+    height_n = models.PositiveSmallIntegerField("Small 320 height",
+                                                        null=True, blank=True)
+    width = models.PositiveSmallIntegerField("Medium width",
+                                                        null=True, blank=True)
+    height = models.PositiveSmallIntegerField("Medium height",
+                                                        null=True, blank=True)
+    width_z = models.PositiveSmallIntegerField("Medium 640 width",
+                                                        null=True, blank=True)
+    height_z = models.PositiveSmallIntegerField("Medium 640 height",
+                                                        null=True, blank=True)
+    width_c = models.PositiveSmallIntegerField("Medium 800 width",
+                                                        null=True, blank=True)
+    height_c = models.PositiveSmallIntegerField("Medium 800 height",
+                                                        null=True, blank=True)
+    width_b = models.PositiveSmallIntegerField("Large width",
+                                                        null=True, blank=True)
+    height_b = models.PositiveSmallIntegerField("Large height",
+                                                        null=True, blank=True)
+    width_h = models.PositiveSmallIntegerField("Large 1600 width",
+                                                        null=True, blank=True)
+    height_h = models.PositiveSmallIntegerField("Large 1600 height",
+                                                        null=True, blank=True)
+    width_k = models.PositiveSmallIntegerField("Large 2048 width",
+                                                        null=True, blank=True)
+    height_k = models.PositiveSmallIntegerField("Large 2048 height",
+                                                        null=True, blank=True)
+    width_o = models.PositiveSmallIntegerField("Original width",
+                                                        null=True, blank=True)
+    height_o = models.PositiveSmallIntegerField("Original height",
+                                                        null=True, blank=True)
 
     # LOCATION ###############################################################
 
