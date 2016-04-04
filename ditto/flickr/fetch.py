@@ -6,6 +6,7 @@ import pytz
 import flickrapi
 from flickrapi.exceptions import FlickrError
 
+from ..ditto.utils import truncate_string
 from .models import Account, User
 
 # CLASSES HERE:
@@ -40,12 +41,14 @@ class FlickrItemMixin(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _api_datetime_to_datetime(self, api_time):
+    def _api_datetime_to_datetime(self, api_time, timezone_id='Etc/UTC'):
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like "1956-01-01 00:00:00".
+        timezone_id is a TZ timezone name like 'Africa/Accra'
         """
+        tz = pytz.timezone(timezone_id)
         return datetime.datetime.strptime(
-                        api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+                            api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=tz)
 
     def _api_unixtime_to_datetime(self, api_time):
         """Change a text unixtime from the API to a datetime with timezone.
@@ -113,33 +116,120 @@ class PhotoMixin(UserMixin):
         Photo object and its associated User object.
 
         Keyword arguments:
-        photo -- The photo data.
-                 From the Flickr API. With extra fields:
-                     'user': {'id': 4}
+        photo -- The photo data, from several Flickr API calls.
+                 Has keys:
+                     'user_obj': User object for this photo's owner.
+                     'info': Results of a photos.getInfo call.
+                     'exif': Results of a photos.getExif call.
+                     'sizes': Results of a photos.getSizes call.
         fetch_time -- A datetime.
 
         Returns:
         The Photo object that was created or updated.
         """
-        raw_json = json.dumps(photo)
 
-        print(photo['id'])
+        # photo['urls'] = {'url': [{'type':'photopage', '_content':'http...'}]}
+        permalink = next(url for url in photo['urls']['url'] if url['type'] == 'photopage')['_content']
+
+        summary = truncate_string(photo['description']['_content'],
+                strip_html=True, chars=255, truncate='…', at_word_boundary=True)
 
         defaults = {
+            # DittoItemModel fields
+            'title':                photo['info']['title']['_content'],
+            'permalink':            permalink,
+            'summary':              summary,
+            'is_private':           (photo['info']['visibility']['ispublic'] == 0),
             'fetch_time':           fetch_time,
-            'raw':                  raw_json,
-            'user':                 user_id,
-            'is_private':           (photo['ispublic'] == 0),
-            'post_time':            photo['date_upload']
-            
-            'flickr_id':            photo['id'],
-                
+            'post_time':            self._api_unixtime_to_datetime(
+                                            photo['info']['dates']['posted']),
+            'latitude':             photo['info']['location']['latitude'],
+            'longitude':            photo['info']['location']['longitude'],
+            'raw':                  json.dumps(photo['info']),
+
+            # Photo fields
+            'user':                 user_obj,
+            'flickr_id':            photo['info']['id'],
+            'description':          photo['info']['description']['_content'],
+            'secret':               photo['info']['secret'],
+            'orginal_secret':       photo['info']['originalsecret'],
+            'server':               photo['info']['server'],
+            'farm':                 photo['info']['farm'],
+            'license':              photo['info']['license'],
+            'rotation':             photo['info']['rotation'],
+            'original_format':      photo['info']['originalformat'],
+            'safety_level':         photo['info']['safety_level'],
+            'has_people':           photo['info']['people']['has_people'],
+            'last_update_time':     self._api_unixtime_to_datetime(
+                                        photo['info']['dates']['lastupdate']),
+            'taken_time':           self._api_datetime_to_datetime(
+                                                        photo['dates']['taken'],
+                                                        user_obj.timezone_id),
+            'taken_granularity':    photo['info']['dates']['takengranularity'],
+            'taken_unknown':        photo['info']['dates']['takenunknown'],
+            'view_count':           photo['info']['views'],
+            'comment_count':        photo['info']['comments']['_content'],
+            'media':                photo['info']['media'],
+
+            # Location fields
+            'geo_is_private':       (photo['info']['geoperms']['ispublic'] == 0),
+            'location_accuracy':    photo['info']['location']['accuracy'],
+            'location_context':     photo['info']['location']['context'],
+            'location_place_id':    photo['info']['place_id'],
+            'location_woe_id':      photo['info']['woeid'],
+            'locality_name':        photo['info']['location']['locality']['_content'],
+            'locality_place_id':        photo['info']['location']['locality']['place_id'],
+            'locality_woe_id':        photo['info']['location']['locality']['woeid'],
+            'county_name':        photo['info']['location']['county']['_content'],
+            'county_place_id':        photo['info']['location']['county']['place_id'],
+            'county_woe_id':        photo['info']['location']['county']['woeid'],
+            'region_name':        photo['info']['location']['region']['_content'],
+            'region_place_id':        photo['info']['location']['region']['place_id'],
+            'region_woe_id':        photo['info']['location']['region']['woeid'],
+            'country_name':        photo['info']['location']['country']['_content'],
+            'country_place_id':        photo['info']['location']['country']['place_id'],
+            'country_woe_id':        photo['info']['location']['country']['woeid'],
+
+            # Sizes fields
+            'sizes_raw':            json.dumps(photo['sizes']),
+
+            # EXIF fields
+            'exif_raw':             json.dumps(photo['exif']),
+            'exif_camera':          photo['exif']['camera'],
         }
 
+        # Go through each of the sizes from the API.
+        # If the label (eg, "Small 320") exists, set the size variables
+        # (eg, "width_n" and "height_n" with the pixel sizes.
+        for size in photo['sizes']['size']:
+            variables = photo.get_size_variables(size['label'])
+            if len(variables) == 2:
+                defaults[variables[0]] = int(size['width'])
+                defaults[variables[1]] = int(size['height'])
+
+        try:
+            for e in photo['exif']['exif']:
+                if e['tag'] == 'LensModel':
+                    defaults['exif_lens_model'] == e['raw']['_content']
+                elif e['tag'] == 'FNumber':
+                    defaults['exif_aperture'] == e['clean']['_content']
+                elif e['tag'] == 'ExposureTime':
+                    defaults['exif_exposure'] == e['clean']['_content']
+                elif e['tag'] == 'Flash':
+                    defaults['exif_flash'] == e['raw']['_content']
+                elif e['tag'] == 'FocalLength':
+                    defaults['exif_focal_length'] == e['clean']['_content']
+                elif e['tag'] == 'ISO':
+                    defaults['exif_iso'] == e['raw']['_content']
+        except KeyError:
+            pass
+
         photo_obj, created = Photo.objects.update_or_create(
-                flickr_id=photo['id'],
+                flickr_id=photo['info']['id'],
                 defaults=defaults
             )
+
+        # TODO: Add/sync tags.
 
         return photo_obj
 
@@ -224,12 +314,18 @@ class Fetch(object):
             except FetchError as e:
                 self.return_value['success'] = False
                 self.return_value['message'] = 'Error when calling API: %s' % e
+                break
             self.page += 1
-        self._fetch_extra()
-        # Got all the pages of results, data put into self.results:
-        self._save_results()
-        self.return_value['success'] = True
-        return
+
+        if 'success' in self.return_value and self.return_value['success'] == False:
+            # Something went wrong.
+            return
+        else:
+            self._fetch_extra()
+            # Got all the pages of results, data put into self.results:
+            self._save_results()
+            self.return_value['success'] = True
+            return
 
     def _call_api(self):
         """Define in child classes.
@@ -290,6 +386,8 @@ class FetchUser(UserMixin, Fetch):
 
 
 class FetchPhotos(PhotoMixin, Fetch):
+    """Parent class for any classes that fetch and then save lists of Photos.
+    """
 
     # Will be the minimum date of upload/fave for Photos that we'll fetch.
     min_date = None
@@ -300,9 +398,10 @@ class FetchPhotos(PhotoMixin, Fetch):
     # 500 is the max the API allows.
     photos_per_page = 5
 
-    # Will match Flickr IDs with our User IDs.
-    # When we fetch a user's data, because we've just fetched their photo,
-    # we add their IDs to this, so we don't fetch again this time.
+    # Will match Flickr IDs with their User object.
+    # eg '35034346050@N01' => User
+    # When we fetch a user's data, because we need it to save a photo/tag,
+    # we add their object to this, so we don't fetch again this time.
     fetched_users = {}
 
     def __init__(self, *args, **kwargs):
@@ -313,7 +412,7 @@ class FetchPhotos(PhotoMixin, Fetch):
     def fetch(self, since='new'):
         """
         Keyword arguments:
-        since -- Either 'new' (get the Photos since the last fetch) or a 
+        since -- Either 'new' (get the Photos since the last fetch) or a
                 'YYYY-MM-DD' date, which will get the photos uploaded/faved on
                 or after that date.
         """
@@ -325,19 +424,100 @@ class FetchPhotos(PhotoMixin, Fetch):
 
         return super().fetch()
 
-    def _fetch_user(self, flickr_id):
+    def _call_api(self):
+        """Define in child classes.
+        Should call self.api.a_function_name() and set self.results with the
+        results.
         """
-        Fetch, and save, a single user from the API, from their Flickr ID.
-        Adds the User ID to self.fetched_users.
-        """
-        print("Fetching user %s" % flickr_id)
-        try:
-            user_info = self.api.people.getInfo(user_id=flickr_id)
-        except FlickrError as e:
-            raise FetchError("Error when getting info about User with id '%s': %s" % (flickr_id, e))
+        raise FetchError("Children of the FetchPhotos class should define their own _call_api() method.")
 
-        user_obj = self.save_user(user_info['person'], self.fetch_time)
-        self.fetched_users[flickr_id] = user_obj.id
+    def _fetch_extra(self):
+        """Before saving we need to go through the big list of photos we've
+        fetched, and fetch more detailed info to add to each photo's data.
+        """
+        extra_results = []
+
+        for i, photo in enumerate(self.results):
+
+            self._fetch_user_if_missing(photo['owner'])
+
+            extra_results.append({
+                # Add the data for the photo's owner:
+                'user_obj': self.fetched_users[ photo['owner'] ],
+                # Get all the info about this photo:
+                'info': self._fetch_photo_info(photo['id']),
+                'sizes': self._fetch_photo_sizes(photo['id']),
+                'exif': self._fetch_photo_exif(photo['id']),
+            })
+
+        # Replace self.results with our new array that contains more info.
+        self.results = extra_results
+
+    def _fetch_user_if_missing(self, flickr_user_id):
+        """
+        If we don't have flickr_user_id in self.fetched_users, then fetch, and
+        save, that user from the API. Then add their User to self.fetched_users.
+        flickr_user_id -- The user's ID on Flickr, eg '35034346050@N01'.
+        """
+        if self.fetched_users.get(flickr_user_id, None) is None:
+            try:
+                user_info = self.api.people.getInfo(user_id=flickr_user_id)
+            except FlickrError as e:
+                raise FetchError("Error when getting info about User with id '%s': %s" % (flickr_user_id, e))
+
+            user_obj = self.save_user(user_info['person'], self.fetch_time)
+            self.fetched_users[flickr_user_id] = user_obj
+
+    def _fetch_photo_info(self, photo_id):
+        """Calls the photos.getInfo() method of the Flickr API and returns the
+        info about the photo.
+        https://www.flickr.com/services/api/explore/flickr.photos.getInfo
+        photo_id -- The Flickr photo ID.
+        """
+        try:
+            results = self.api.photos.getInfo(photo_id = photo_id)
+        except FlickrError as e:
+            raise FetchError("Error when fetching photo info (photo %s): %s" % (photo_id, e))
+
+        # Each tag on the photo is added by a specific Flickr user.
+        # (Usually, but not always, the photo owner.)
+        # Check that we've got info about that user in our DB.
+        for tag in results['photo']['tags']['tag']:
+            self._fetch_user_if_missing(tag['author'])
+
+        return results['photo']
+
+    def _fetch_photo_sizes(self, photo_id):
+        """Calls the photos.getSizes() method of the Flickr API and returns the
+        photo's sizes.
+        https://www.flickr.com/services/api/explore/flickr.photos.getSizes
+        photo_id -- The Flickr photo ID.
+        """
+        try:
+            results = self.api.photos.getSizes(photo_id = photo_id)
+        except FlickrError as e:
+            raise FetchError("Error when fetching photo sizes (photo %s): %s" % (photo_id, e))
+
+        return results['sizes']
+
+    def _fetch_photo_exif(self, photo_id):
+        """Calls the photos.getExif() method of the Flickr API and returns the
+        photo's EXIF data.
+        https://www.flickr.com/services/api/explore/flickr.photos.getExif
+        photo_id -- The Flickr photo ID.
+        """
+        try:
+            results = self.api.photos.getExif(photo_id = photo_id)
+        except FlickrError as e:
+            raise FetchError("Error when fetching photo EXIF data (photo %s): %s" % (photo_id, e))
+
+        return results['photo']
+
+    def _save_results(self):
+        """Save all the data we've fetched about photos to the DB."""
+        for photo in self.results:
+            p = self.save_photo(photo, self.fetch_time)
+            self.objects.append(p)
 
 
 class FetchPhotosRecent(FetchPhotos):
@@ -359,43 +539,12 @@ class FetchPhotosRecent(FetchPhotos):
         except FlickrError as e:
             raise FetchError("Error when fetching recent photos (page %s): %s" % (self.page, e))
 
-        if self.page == 1 and 'photos' in results and 'pages' in esults['photos']:
+        if self.page == 1 and 'photos' in results and 'pages' in results['photos']:
             # First time, set the total_pages there are to fetch.
             self.total_pages == results['photos']['pages']
 
         # Add the list of photos' data from this page on to our total list:
         self.results += results['photos']['photo']
-
-    def _fetch_extra(self):
-        """Before saving we need to go through the big list of photos we've
-        fetched, and fetch more detailed info to add to each photo's data.
-
-        I've a feeling it's horrible to cycle through a list and amend each
-        of its dicts in place, but...
-        """
-        for i, photo in enumerate(self.results):
-            # TODO: getInfo()
-            # TODO: getSizes() ?
-            # TODO: geo_getLocation()
-            # eg:
-            # self.results[i]['sizes'] = blah
-
-            #if self.fetched_users.get(photo['owner'], None) is None:
-                # We haven't already fetched this user, so get it:
-                #self._fetch_user(photo['owner'])
-
-            # Add our ID of the photo's owner:
-            # self.results[i]['user'] = {
-            #                       'id': self.fetched_users[photo['owner']]}
-
-            pass
-
-    def _save_results(self):
-        """Save all the data we've fetched about photos to the DB."""
-        for photo in self.results:
-            p = self.save_photo(photo, self.fetch_time)
-            self.objects.append(p)
-
 
 
 class FlickrFetcher(object):
@@ -511,7 +660,7 @@ class UserFetcher(FlickrFetcher):
 
 
 class RecentPhotosFetcher(FlickrFetcher):
-  
+
     def fetch(self, since='new'):
         return super().fetch(since=since)
 

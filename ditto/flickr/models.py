@@ -101,20 +101,20 @@ class Photo(DittoItemModel):
     # From https://www.flickr.com/services/api/misc.urls.html
     # Before 2010-05-25 large photos only exist for very large original images.
     # Medium 800, large 1600, and large 2048 photos only exist after 2012-03-01.
-    SIZES = (
-        ('s', 'Small square'),  # 75x75
-        ('q', 'Large square'),  # 150x150
-        ('t', 'Thumbnail'),     # 100
-        ('m', 'Small'),         # 240
-        ('n', 'Small 320'),
-        ('', 'Medium'),         # 500
-        ('z', 'Medium 640'),
-        ('c', 'Medium 800'),
-        ('b', 'Large'),         # 1024
-        ('h', 'Large 1600'),
-        ('k', 'Large 2048'),
-        ('o', 'Original'),
-    )
+    SIZES = {
+        'Small square':    's',  # 75x75
+        'Large square':    'q',  # 150x150
+        'Thumbnail':       't',  # 100
+        'Small':           'm',  # 240
+        'Small 320':       'n',
+        'Medium':          '',   # 500
+        'Medium 640':      'z',
+        'Medium 800':      'c',
+        'Large':           'b',  # 1024
+        'Large 1600':      'h',
+        'Large 2048':      'k',
+        'Original':        'o',
+    }
 
     user = models.ForeignKey('User')
 
@@ -139,11 +139,11 @@ class Photo(DittoItemModel):
     has_people = models.BooleanField(default=False,
                             help_text="Are there Flickr users in this photo?")
 
-    # post_time is in DittoItemModel
+    # post_time (in GMT) is in DittoItemModel
     last_update_time = models.DateTimeField(null=True, blank=True,
         help_text="The last time the photo, or any of its metadata (tags, comments, etc.) was modified on Flickr. UTC.")
     taken_time = models.DateTimeField(null=True, blank=True,
-                                        help_text="In Flickr user's timezone.")
+                                help_text="In the Flickr user's timezone.")
     taken_granularity = models.PositiveSmallIntegerField(
                 default=DATE_GRANULARITIES[0][0], choices=DATE_GRANULARITIES)
     taken_unknown = models.BooleanField(default=False)
@@ -153,12 +153,13 @@ class Photo(DittoItemModel):
     comment_count = models.PositiveIntegerField(default=0,
                     help_text="How many comments this had been when fetched")
 
-    photopage_url = models.URLField()
-
     media = models.CharField(default=MEDIA_TYPES[0][0], choices=MEDIA_TYPES,
                                                                 max_length=10)
 
     # SIZES ##################################################################
+
+    sizes_raw = models.TextField(blank=True,
+            help_text="eg, the raw JSON from the API - flickr.photos.getSizes.")
 
     width_t = models.PositiveSmallIntegerField("Thumbnail width",
                                                         null=True, blank=True)
@@ -237,12 +238,17 @@ class Photo(DittoItemModel):
     exif_raw = models.TextField(blank=True,
             help_text="The raw JSON from the API from flickr.photos.getExif.")
     exif_camera = models.CharField(blank=True, max_length=50)
-    exif_lens_model = models.CharField(blank=True, max_length=50)
-    exif_aperture = models.CharField(blank=True, max_length=30)
-    exif_exposure = models.CharField(blank=True, max_length=30)
-    exif_flash = models.CharField(blank=True, max_length=30)
-    exif_focal_length = models.CharField(blank=True, max_length=10)
-    exif_iso = models.IntegerField(blank=True)
+    exif_lens_model = models.CharField(blank=True, max_length=50,
+            help_text="eg, 'E PZ 16-50mm F3.5-5.6 OSS'.")
+    exif_aperture = models.CharField(blank=True, max_length=30,
+            help_text="eg, 'f/13.0'.")
+    exif_exposure = models.CharField(blank=True, max_length=30,
+            help_text="eg, '0.01 sec (1/100)'.")
+    exif_flash = models.CharField(blank=True, max_length=30,
+            help_text="eg, 'Off, Did not fire'.")
+    exif_focal_length = models.CharField(blank=True, max_length=10,
+            help_text="eg, '38 mm.'")
+    exif_iso = models.IntegerField(blank=True, help_text="eg, '100'.")
 
     # TODO: NOTES
     # TODO: PEOPLE
@@ -251,6 +257,23 @@ class Photo(DittoItemModel):
 
     class Meta:
         ordering = ('-taken_time',)
+
+    def get_size_variables(self, label):
+        """Get the names of the width and height variables for a specific
+        photo size.
+        label -- The name of a size, eg 'Small square' or 'Large'.
+        Returns a list of 0 or 2 variable names, width first.
+        eg, ['width_s', 'height_s']
+        """
+        variables = []
+        if label in SIZES:
+            letter = SIZES['label']
+            if letter:
+                variables = ['width_'+letter, 'height_'+letter]
+            else:
+                # Medium size.
+                variables = ['width', 'height']
+        return variables
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -285,6 +308,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="The time the data was last fetched, and was new or changed.")
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
+    timezone_id = models.CharField(null=False, blank=False, max_length=50,
+                                            help_text="eg, 'Europe/London'.")
 
     objects = models.Manager()
     # All Users that have Accounts:
