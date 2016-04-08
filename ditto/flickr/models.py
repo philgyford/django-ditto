@@ -5,6 +5,7 @@ from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
 from . import managers
+from ..ditto.utils import truncate_string
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
@@ -42,6 +43,15 @@ class TaggedPhoto(TaggedItemBase):
     Describes the relationship between a django-taggit Tag and a Photo.
     Flickr has various fields which are unique to this relationship, rather
     than the Tag itself.
+
+    Get the TaggedPhoto objects for one tag object:
+        tagged_photo = TaggedPhoto.objects.filter(tag_id=tag)
+
+    Get the TaggedPhoto objects for a particular photo object:
+        tagged_photo = TaggedPhoto.objects.filter(content_object=photo)
+
+    Access the Tag info for a TaggedPhoto, eg:
+        tagged_photo.tag.slug
     """
     flickr_id = models.CharField(max_length=200, verbose_name="Flickr ID",
                                             help_text="The tag's ID on Flickr")
@@ -248,7 +258,7 @@ class Photo(DittoItemModel):
             help_text="eg, 'Off, Did not fire'.")
     exif_focal_length = models.CharField(blank=True, max_length=10,
             help_text="eg, '38 mm.'")
-    exif_iso = models.IntegerField(blank=True, help_text="eg, '100'.")
+    exif_iso = models.IntegerField(blank=True, null=True, help_text="eg, '100'.")
 
     # TODO: NOTES
     # TODO: PEOPLE
@@ -258,6 +268,11 @@ class Photo(DittoItemModel):
     class Meta:
         ordering = ('-taken_time',)
 
+    def summary_source(self):
+        """Make the summary that's created when the Photo is saved."""
+        return truncate_string(self.description,
+                strip_html=True, chars=255, truncate='…', at_word_boundary=True)
+
     def get_size_variables(self, label):
         """Get the names of the width and height variables for a specific
         photo size.
@@ -266,14 +281,64 @@ class Photo(DittoItemModel):
         eg, ['width_s', 'height_s']
         """
         variables = []
-        if label in SIZES:
-            letter = SIZES['label']
+        if label in self.SIZES:
+            letter = self.SIZES[label]
             if letter:
                 variables = ['width_'+letter, 'height_'+letter]
             else:
                 # Medium size.
                 variables = ['width', 'height']
         return variables
+
+    @property
+    def thumbnail_url(self):
+        return self.image_url('t')
+
+    @property
+    def small_url(self):
+        return self.image_url('m')
+
+    @property
+    def small_320_url(self):
+        return self.image_url('n')
+
+    @property
+    def medium_url(self):
+        return self.image_url('-')
+
+    @property
+    def medium_640_url(self):
+        return self.image_url('z')
+
+    @property
+    def medium_800_url(self):
+        return self.image_url('c')
+
+    @property
+    def large_url(self):
+        return self.image_url('b')
+
+    @property
+    def large_1600_url(self):
+        return self.image_url('h')
+
+    @property
+    def large_2048_url(self):
+        return self.image_url('k')
+
+    @property
+    def original_url(self):
+        return 'https://farm%s.static.flickr.com/%s/%s_%s_o.%s' % (
+                self.farm, self.server, self.flickr_id, self.original_secret,
+                self.original_format)
+
+    def image_url(self, size):
+        size_ext = ''
+        if size != '-':
+            # All non-Medium-size images:
+            size_ext = '_%s' % size
+        return 'https://farm%s.static.flickr.com/%s/%s_%s%s.jpg' % (
+                self.farm, self.server, self.flickr_id, self.secret, size_ext) 
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):

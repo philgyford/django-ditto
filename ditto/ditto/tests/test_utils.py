@@ -1,10 +1,22 @@
 # coding: utf-8
+import datetime
+import pytz
 from django.test import TestCase
 
-from ..utils import truncate_string
+from freezegun import freeze_time
+
+from ..utils import datetime_now, truncate_string
 
 
-class DittoUtilsTestCase(TestCase):
+class DatetimeNowTestCase(TestCase):
+
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    def test_datetime_now(self):
+        self.assertEqual(datetime_now(),
+                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+
+
+class TruncateStringTestCase(TestCase):
 
     def test_truncate_string_strip_html(self):
         "By default, strips HTML"

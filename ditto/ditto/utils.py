@@ -24,3 +24,13 @@ def truncate_string(text, strip_html=True, chars=255, truncate=u'…', at_word_b
         text = Truncator(text).chars(chars, html=False, truncate=truncate)
     return text
 
+
+import datetime
+import pytz
+
+def datetime_now():
+    """Just returns a datetime object for now in UTC, with UTC timezone.
+    Because I was doing this a lot in various places.
+    """
+    return datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+

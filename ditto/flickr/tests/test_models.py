@@ -1,7 +1,9 @@
+import datetime
+import pytz
 from django.test import TestCase
 
-from ..factories import AccountFactory, UserFactory
-from ..models import Account, User
+from ..factories import AccountFactory, PhotoFactory, UserFactory
+from ..models import Account, Photo, User
 
 
 class AccountTestCase(TestCase):
@@ -45,4 +47,29 @@ class UserTestCase(TestCase):
         account = AccountFactory(user=user_1)
         users = User.objects_with_accounts.all()
         self.assertEqual(users[0], user_1)
+
+
+class PhotoTestCase(TestCase):
+
+    def test_ordering(self):
+        "Latest photo should come first by default."
+        photo_1 = PhotoFactory(title='Earliest',
+            taken_time=datetime.datetime.strptime(
+                '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=pytz.utc))
+        photo_2 = PhotoFactory(title='Latest',
+            taken_time=datetime.datetime.strptime(
+                '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=pytz.utc))
+        photos = Photo.objects.all()
+        self.assertEqual(photos[0].title, 'Latest')
+        self.assertEqual(photos[1].title, 'Earliest')
+
+    def test_summary(self):
+        "Summary should be made correctly on save."
+        photo = PhotoFactory(
+                description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
+        self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
+        
+        
 

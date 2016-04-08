@@ -75,6 +75,7 @@ class TweetAdmin(admin.ModelAdmin):
     list_display = ('user','is_private', 'title', 'post_time', )
     list_display_links = ('title', )
     list_filter = ('post_time', 'fetch_time', )
+    search_fields = ('text', )
 
     inlines = [
         MediaInline,
@@ -82,8 +83,8 @@ class TweetAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'text', 'text_html', 'title', 'summary', 'post_time', 'is_private',
-                'twitter_id', 'permalink', )
+            'fields': ('user', 'text', 'text_html', 'title', 'summary',
+                'post_time', 'is_private', 'twitter_id', 'permalink', )
         }),
         (None, {
             'fields': ('favorite_count', 'retweet_count', 'media_count',
@@ -101,6 +102,9 @@ class TweetAdmin(admin.ModelAdmin):
         }),
     )
 
+    readonly_fields = ('text_html', 'raw',
+                        'fetch_time', 'time_created', 'time_modified',)
+
     formfield_overrides = {
         # Make the inputs full-width.
         models.CharField: {'widget': TextInput(
@@ -117,15 +121,13 @@ class TweetAdmin(admin.ModelAdmin):
             }
         )},
     }
-    readonly_fields = ('text_html', 'raw',
-                        'fetch_time', 'time_created', 'time_modified',)
-    search_fields = ('text', )
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('screen_name', 'name', 'is_private', 'fetch_time',)
     list_display_links = ('screen_name', )
+    search_fields = ('screen_name', 'name',)
 
     fieldsets = (
         (None, {
@@ -139,6 +141,6 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
         }),
     )
+
     readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
-    search_fields = ('screen_name', 'name',)
 

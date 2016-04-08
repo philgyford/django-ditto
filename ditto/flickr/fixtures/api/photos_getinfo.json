@@ -1,0 +1,97 @@
+{
+	"photo": {
+		"id": "26069027966",
+		"secret": "abcd123456",
+		"server": "1576",
+		"farm": 2,
+		"dateuploaded": "1459181105",
+		"isfavorite": 0,
+		"license": 1,
+		"safety_level": 0,
+		"rotation": 0,
+		"originalsecret": "abcd098765f",
+		"originalformat": "jpg", 
+		"owner": {
+			"nsid": "35034346050@N01",
+			"username": "Phil Gyford",
+			"realname": "Phil Gyford",
+			"location": "London, UK",
+			"iconserver": "7420",
+			"iconfarm": 8,
+			"path_alias": "philgyford"
+		}, 
+		"title": { "_content": "Dore Abbey" }, 
+		"description": { "_content": "Some <b>test HTML<\/b>.\n\nAnd another paragraph." }, 
+		"visibility": {
+			"ispublic": 1,
+			"isfriend": 0,
+			"isfamily": 0
+		}, 
+		"dates": {
+			"posted": "1459181105",
+			"taken": "2016-03-17 16:25:15",
+			"takengranularity": 0,
+			"takenunknown": 0,
+			"lastupdate": "1459776071"
+		}, 
+		"permissions": {
+			"permcomment": 2,
+			"permaddmeta": 2
+		},
+		"views": 55, 
+		"editability": {
+			"cancomment": 1,
+			"canaddmeta": 1
+		}, 
+		"publiceditability": {
+			"cancomment": 0,
+			"canaddmeta": 0
+		}, 
+		"usage": {
+			"candownload": 1,
+			"canblog": 1,
+			"canprint": 1,
+			"canshare": 1
+		}, 
+		"comments": { "_content": 2 }, 
+		"notes": { 
+		"note": [ ] }, 
+		"people": { "haspeople": 0 }, 
+		"tags": { 
+			"tag": [
+				{ "id": "5827-26069027966-1200699", "author": "12345678901@N01", "authorname": "Tommy Test", "raw": "Abbey Dore", "_content": "abbeydore", "machine_tag": "" },
+				{ "id": "5827-26069027966-1649412", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "Dore Abbey", "_content": "doreabbey", "machine_tag": "" },
+				{ "id": "5827-26069027966-23309", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "tester:foo=bar", "_content": "tester:foo=bar", "machine_tag": "1" },
+				{ "id": "5827-26069027966-110", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "UK", "_content": "uk", "machine_tag": "" },
+				{ "id": "5827-26069027966-883", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "abbey", "_content": "abbey", "machine_tag": "" },
+				{ "id": "5827-26069027966-765", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "church", "_content": "church", "machine_tag": "" },
+				{ "id": "5827-26069027966-65846", "author": "35034346050@N01", "authorname": "Phil Gyford", "raw": "tester", "_content": "tester", "machine_tag": "" }
+			]
+		}, 
+		"location": {
+			"latitude": 51.967930,
+			"longitude": -2.894419,
+			"accuracy": 16,
+			"context": 0, 
+			"locality": { "_content": "Abbey Dore", "place_id": "RZ9p3HlQUrt5wg", "woeid": "10178" }, 
+			"county": { "_content": "Herefordshire", "place_id": "7O4FecxQULxfINbBfQ", "woeid": "12602187" }, 
+			"region": { "_content": "England", "place_id": "2eIY2QFTVr_DwWZNLg", "woeid": "24554868" }, 
+			"country": { "_content": "United Kingdom", "place_id": "cnffEpdTUb5v258BBA", "woeid": "23424975" },
+			"place_id": "RZ9p3HlQUrt5wg",
+			"woeid": "10178"
+		}, 
+		"geoperms": {
+			"ispublic": 1,
+			"iscontact": 0,
+			"isfriend": 0,
+			"isfamily": 0
+		}, 
+		"urls": { 
+			"url": [
+				{ "type": "photopage", "_content": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/" }
+			]
+		},
+		"media": "photo"
+	},
+	"stat": "ok"
+}

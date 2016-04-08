@@ -14,6 +14,7 @@ class UserFactory(factory.DjangoModelFactory):
     realname = factory.Sequence(lambda n: 'User Name %d' % n)
     iconserver = '1234'
     iconfarm = 5
+    timezone_id = 'America/Los_Angeles'
 
     photos_first_date = factory.LazyAttribute(lambda o:
                         datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -33,5 +34,24 @@ class AccountFactory(factory.DjangoModelFactory):
             username=factory.Sequence(lambda n: n),
             realname=factory.Sequence(lambda n: 'User Name %d' % n)
         )
+
+
+class PhotoFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.Photo
+
+    user = factory.SubFactory(UserFactory,
+            username=factory.Sequence(lambda n: n),
+            realname=factory.Sequence(lambda n: 'User Name %d' % n)
+        )
+
+    flickr_id = factory.Sequence(lambda n: (n * 1000000))
+    title = factory.Sequence(lambda n: 'Photo %d' % n)
+    secret = factory.Sequence(lambda n: (n * 10000))
+    original_secret = factory.Sequence(lambda n: (n * 10001))
+    server = '987'
+    farm = 2
+
+
 
 

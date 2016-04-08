@@ -1,39 +1,70 @@
 import datetime
 import json
-from unittest.mock import call, patch
-import urllib
-
 import pytz
 import responses
-from freezegun import freeze_time
+import urllib
 
 from django.test import TestCase
 
-from ..factories import AccountFactory, UserFactory
-from ..fetch import UserMixin, UserFetcher
-from ..models import User
+from ..fetch import FlickrUtilsMixin
 
 
-class FetcherTestCase(TestCase):
+class FlickrUtilsMixinTestCase(TestCase):
+    """Not sure these tests are that useful, but still."""
 
-    # A JSON file to use for the response body.
-    # eg 'ditto/flickr/fixtures/api/user.json'
-    api_fixture = ''
+    def test_api_datetime_to_datetime_default_tz(self):
+        api_time = '1998-07-22 13:15:23'
+        time1 = FlickrUtilsMixin()._api_datetime_to_datetime(api_time)
+        time2 = datetime.datetime.strptime(api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.timezone('Etc/UTC'))
+        self.assertEqual(time1, time2)
 
-    def make_response_body(self, fixture=None):
-        """Makes the JSON response to a call to the API
-        fixture -- Path to a JSON fixture file. Else, self.api_fixture is used.
+    def test_api_datetime_to_datetime_custom_tz(self):
+        api_time = '1998-07-22 13:15:23'
+        time1 = FlickrUtilsMixin()._api_datetime_to_datetime(
+                                            api_time, 'America/Los_Angeles')
+        time2 = datetime.datetime.strptime(api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.timezone('America/Los_Angeles'))
+        self.assertEqual(time1, time2)
+
+    def test_unixtime_to_datetime(self):
+        api_time = '1093459273'
+        time1 = FlickrUtilsMixin()._unixtime_to_datetime(api_time)
+        time2 = datetime.datetime.utcfromtimestamp(int(api_time))\
+                                                    .replace(tzinfo=pytz.utc)
+        self.assertEqual(time1, time2)
+
+
+class FlickrFetchTestCase(TestCase):
+    """Useful things used by subsequent test cases."""
+
+    # Used as a URL for urls.lookupUser request.
+    user_url = 'https://www.flickr.com/photos/test/'
+
+    flickr_fixtures = {
+        'urls.lookupUser': 'ditto/flickr/fixtures/api/urls_lookupuser.json',
+        'people.getPhotos': 'ditto/flickr/fixtures/api/people_getphotos.json',
+        'people.getInfo': 'ditto/flickr/fixtures/api/people_getinfo.json',
+        'photos.getInfo': 'ditto/flickr/fixtures/api/photos_getinfo.json',
+        'photos.getSizes': 'ditto/flickr/fixtures/api/photos_getsizes.json',
+        'photos.getExif': 'ditto/flickr/fixtures/api/photos_getexif.json',
+    }
+
+    def load_raw_fixture(self, method):
+        """Makes the JSON response to a call to the API.
+        method -- Method name used in self.flickr_fixtures.
         Returns the JSON text.
         """
-        if fixture is None:
-            fixture = self.api_fixture
-        json_file = open(fixture)
+        json_file = open(self.flickr_fixtures[method])
         json_data = json_file.read()
         json_file.close()
         return json_data
 
-    def add_response(self, body, status=200, querystring={}, match_querystring=True):
-        """Add a Flickr API response.
+    def load_fixture(self, method):
+        """Returns the json.loads() version of the JSON fixture. ie, a python
+        list or dict, not plain text."""
+        return json.loads(self.load_raw_fixture(method))
+
+    def add_flickr_response(self, body, status=200, querystring={}, match_querystring=True):
+        """Add a generic Flickr API response.
 
         Keyword arguments:
         body -- The JSON string representing the body of the response.
@@ -64,159 +95,34 @@ class FetcherTestCase(TestCase):
             content_type='application/json; charset=utf-8'
         )
 
-
-class UserFetcherTestCase(FetcherTestCase):
-
-    api_fixture = 'ditto/flickr/fixtures/api/people_getinfo.json'
-
-    def setUp(self):
-        self.account = AccountFactory(api_key='1234', api_secret='9876')
-
-    def add_lookupurl_response(self, body=None):
-        "Wrapper for add_response() for a particular Flickr query."
-        if body is None:
-            body = self.make_response_body(
-                            'ditto/flickr/fixtures/api/urls_lookupuser.json')
-        self.add_response(
-            body=body,
-            querystring={
-                'method': 'flickr.urls.lookupUser',
-                'url': 'https://www.flickr.com/photos/test/',
-            }
-        )
-
-    def add_getinfo_response(self, body=None):
-        "Wrapper for add_response() for a particular Flickr query."
-        if body is None:
-            body = self.make_response_body()
-        self.add_response(
-            body=body,
-            querystring={
-                'method': 'flickr.people.getInfo',
-                'user_id': '35034346050@N01',
-            }
-        )
-
-    @responses.activate
-    def test_makes_two_api_calls(self):
-        "Should call urls.lookupUser and people.getInfo"
-        self.add_lookupurl_response()
-        self.add_getinfo_response()
-        result = UserFetcher().fetch(url='https://www.flickr.com/photos/test/')
-        self.assertEqual(2, len(responses.calls))
-
-    @responses.activate
-    def test_returns_correct_success_result(self):
-        self.add_lookupurl_response()
-        self.add_getinfo_response()
-        result = UserFetcher().fetch(url='https://www.flickr.com/photos/test/')
-
-        self.assertTrue(len(result), 1)
-        self.assertIn('success', result[0])
-        self.assertTrue(result[0]['success'])
-        self.assertIn('fetched', result[0])
-        self.assertEqual(result[0]['fetched'], 1)
-
-    @responses.activate
-    def test_returns_correct_error_result_1(self):
-        "When the url.lookUp request fails."
-        self.add_lookupurl_response(
-            body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserFetcher().fetch(url='https://www.flickr.com/photos/test/')
-
-        self.assertTrue(len(result), 1)
-        self.assertIn('success', result[0])
-        self.assertFalse(result[0]['success'])
-        self.assertIn('message', result[0])
-
-    @responses.activate
-    def test_returns_correct_error_result_2(self):
-        "When the people.getInfo request fails."
-        self.add_lookupurl_response()
-        self.add_getinfo_response(
-            body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserFetcher().fetch(url='https://www.flickr.com/photos/test/')
-
-        self.assertTrue(len(result), 1)
-        self.assertIn('success', result[0])
-        self.assertFalse(result[0]['success'])
-        self.assertIn('message', result[0])
-
-    @responses.activate
-    @patch('ditto.flickr.fetch.UserMixin.save_user')
-    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    def test_calls_save_user_correctly(self, save_user):
-        save_user.side_effect = [UserFactory()]
-        self.add_lookupurl_response()
-        self.add_getinfo_response()
-        result = UserFetcher().fetch(url='https://www.flickr.com/photos/test/')
-
-        user_response = json.loads(self.make_response_body())
-
-        save_user.assert_called_once_with(user_response['person'],
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
-
-
-class UserMixinTestCase(FetcherTestCase):
-
-    api_fixture = 'ditto/flickr/fixtures/api/people_getinfo.json'
-
-    def make_user_object(self, user_data):
-        """"Creates/updates a User from API data, then fetches that User from
-        the DB and returns it.
+    def add_response(self, method, body=None, querystring={}):
+        """Add a specific API response - useful for 99% of cases.
+        method - API method name, like 'people.getInfo'.
+        body -- Text body for the response. Otherwise, our standard fixture for
+                    that method is used.
+        querystring -- Optional keys/values for the querystring. Individual
+                        items will override the defaults for each method below.
         """
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        saved_user = UserMixin().save_user(user_data['person'], fetch_time)
-        return User.objects.get(nsid="35034346050@N01")
+        querystrings = {
+            'urls.lookupUser':  {'url': self.user_url, },
+            'people.getInfo':   {'user_id': '35034346050@N01', },
+            'people.getPhotos': {'user_id': '35034346050@N01',
+                                'min_upload_date': '946684800',
+                                'page': '1',
+                                'per_page': '500'},
+            'photos.getInfo':   {'photo_id': '26069027966', },
+            'photos.getSizes':  {'photo_id': '26069027966', },
+            'photos.getExif':   {'photo_id': '26069027966', },
+        }
+        if body is None:
+            body = self.load_raw_fixture(method)
 
-    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    def test_saves_correct_user_data(self):
-        """Passing save_user() data from the API should create a new User."""
-        user_data = json.loads(self.make_response_body())
-        user = self.make_user_object(user_data)
+        qs = querystrings[method]
+        qs['method'] = 'flickr.'+method
 
-        self.assertEqual(user.fetch_time,
-                            datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
-        self.assertEqual(user.raw, json.dumps(user_data['person']))
-        self.assertEqual(user.nsid, "35034346050@N01")
-        self.assertTrue(user.is_pro)
-        self.assertEqual(user.iconserver, '7420')
-        self.assertEqual(user.iconfarm, 8)
-        self.assertEqual(user.username, 'Phil Gyford')
-        self.assertEqual(user.realname, 'Phil Gyford')
-        self.assertEqual(user.location, 'London, UK')
-        self.assertEqual(user.description, 'A test description.')
-        self.assertEqual(user.photos_url, 'https://www.flickr.com/photos/philgyford/')
-        self.assertEqual(user.profile_url, 'https://www.flickr.com/people/philgyford/')
-        self.assertEqual(user.photos_count, 2876)
-        self.assertEqual(user.photos_first_date, datetime.datetime.utcfromtimestamp(1093459273).replace(tzinfo=pytz.utc))
-        self.assertEqual(user.photos_first_date_taken,
-                                datetime.datetime.strptime(
-                                    '1956-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'
-                                ).replace(tzinfo=pytz.utc))
-        self.assertEqual(user.photos_views, 227227)
+        # Override or add to the defaults if other options are supplied.
+        for k, v in querystring.items():
+            qs[k] = v
 
-    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    def test_updates_existing_user(self):
-        """Passing save_user() data from the API should update an existing
-        User.
-        """
-        # Some data that will be updated:
-        existing_user = User(nsid="35034346050@N01",
-                            iconfarm=3,
-                            is_pro=False,
-                            username="Bob",
-                            location="San Francisco",
-                            photos_count=3,
-                            photos_views=3)
-        existing_user.save()
-
-        user_data = json.loads(self.make_response_body())
-        user = self.make_user_object(user_data)
-
-        self.assertTrue(user.is_pro)
-        self.assertEqual(user.username, 'Phil Gyford')
-        self.assertEqual(user.location, 'London, UK')
-        self.assertEqual(user.photos_count, 2876)
-        self.assertEqual(user.photos_views, 227227)
+        self.add_flickr_response(querystring=qs, body=body)
 
