@@ -59,9 +59,9 @@ class FlickrUtilsMixin(object):
 
 class UserSaver(FlickrUtilsMixin, object):
     """For creating/updating an individual User based on data from the API.
-    
+
     Use like:
-        
+
         UserSaver().save_user(data, fetch_time)
     """
 
@@ -112,27 +112,27 @@ class UserSaver(FlickrUtilsMixin, object):
 
 class PhotoSaver(FlickrUtilsMixin, object):
     """For creating/updating an individual Photo based on data from the API.
-    
+
     Use like:
-        
+
         PhotoSaver().save_photo(data, fetch_time)
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def save_photo(self, photo, fetch_time):
+    def save_photo(self, photo):
         """Takes a dict of photo data from the API and creates or updates a
         Photo object and its associated User object.
 
         Keyword arguments:
         photo -- The photo data, from several Flickr API calls.
                  Has keys:
+                     'fetch_time': A datetime.
                      'user_obj': User object for this photo's owner.
                      'info': Results of a photos.getInfo call.
                      'exif': Results of a photos.getExif call.
                      'sizes': Results of a photos.getSizes call.
-        fetch_time -- A datetime.
 
         Returns:
         The Photo object that was created or updated.
@@ -148,7 +148,7 @@ class PhotoSaver(FlickrUtilsMixin, object):
             'title':                photo['info']['title']['_content'],
             'permalink':            permalink,
             'is_private':           (photo['info']['visibility']['ispublic'] == 0),
-            'fetch_time':           fetch_time,
+            'fetch_time':           photo['fetch_time'],
             'post_time':            self._unixtime_to_datetime(
                                             photo['info']['dates']['posted']),
             'raw':                  json.dumps(photo['info']),
@@ -349,9 +349,6 @@ class Fetcher(object):
         # By default, set it before Flickr so we get everything.
         self.min_date = datetime.datetime.strptime('2000-01-01', '%Y-%m-%d')
 
-        # Will be the UTC datetime that we fetch data.
-        self.fetch_time = None
-
         # Will be the results fetched from the API via FlickrAPI.
         self.results = []
 
@@ -382,8 +379,6 @@ class Fetcher(object):
                 self.return_value['success'] = False
                 self.return_value['message'] = 'No Account has been set'
         else:
-            self.fetch_time = datetime_now()
-
             if self.is_paged:
                 self._fetch_pages(**kwargs)
             else:
@@ -489,7 +484,7 @@ class UserFetcher(Fetcher):
         self.results = [ info['person'] ]
 
     def _save_results(self):
-        user_obj = UserSaver().save_user(self.results[0], self.fetch_time)
+        user_obj = UserSaver().save_user(self.results[0], datetime_now())
         self.return_value['user'] = {'name': user_obj.name}
         self.results_count = 1
 
@@ -504,7 +499,7 @@ class PhotosFetcher(Fetcher):
         # When we fetch a user's data, because we need it to save a photo/tag,
         # we add their object to this, so we don't fetch again this time.
         self.fetched_users = {}
-        
+
         super().__init__(*args, **kwargs)
 
         # Photos come in pages.
@@ -528,6 +523,7 @@ class PhotosFetcher(Fetcher):
             self._fetch_user_if_missing(photo['owner'])
 
             extra_results.append({
+                'fetch_time': datetime_now(),
                 # Add the data for the photo's owner:
                 'user_obj': self.fetched_users[ photo['owner'] ],
                 # Get all the info about this photo:
@@ -608,7 +604,7 @@ class PhotosFetcher(Fetcher):
         """Save all the data we've fetched about photos to the DB."""
         saver = PhotoSaver()
         for photo in self.results:
-            p = saver.save_photo(photo, self.fetch_time)
+            p = saver.save_photo(photo)
         self.results_count = len(self.results)
 
 

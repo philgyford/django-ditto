@@ -85,14 +85,14 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         """"Creates/updates a Photo from API data, then fetches that Photo from
         the DB and returns it.
         """
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        saved_photo = PhotoSaver().save_photo(photo_data, fetch_time)
+        saved_photo = PhotoSaver().save_photo(photo_data)
         return Photo.objects.get(flickr_id="26069027966")
 
     def make_photo_data(self):
         """Makes the dict of data that photo_save() expects, based on API data.
         """
         return {
+            'fetch_time': datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
             'user_obj': UserFactory(nsid='35034346050@N01'),
             'info': self.load_fixture('photos.getInfo')['photo'],
             'exif': self.load_fixture('photos.getExif')['photo'],
