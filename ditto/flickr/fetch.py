@@ -704,9 +704,9 @@ class FavoritePhotosFetcher(PhotosFetcher):
 
 class MultiAccountFetcher(object):
     """Parent class for fetching things from Flickr for multiple Accounts.
-    
+
     Use something like:
-        
+
         results = ChildMultiAccountFetcher().fetch(foo=bar)
     """
 
