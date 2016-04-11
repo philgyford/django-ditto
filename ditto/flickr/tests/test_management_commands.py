@@ -5,77 +5,73 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from django.utils.six import StringIO
 
-from ..factories import AccountFactory
+from ..factories import AccountFactory, UserFactory
 
 
-class FetchFlickrArgs(TestCase):
-    "Testing the handling of arguments passed to the commands."
-
-    # Child classes should set this:
-    fetcher_class_path = ''
+class FetchFlickrAccountUser(TestCase):
 
     def setUp(self):
-        self.patcher = patch(self.fetcher_class_path)
-        self.fetcher_class = self.patcher.start()
+        # What we'll use as return values from UserIdFetcher().fetch()...
+        self.id_fetcher_success =\
+                    {'success': True, 'id': '35034346050@N01', 'fetched': 1}
+        # ...and UserFetcher().fetch():
+        self.user_fetcher_success =\
+            {'success': True, 'user': {'name': 'Phil Gyford'}, 'fetched': 1}
 
-    def tearDown(self):
-        self.patcher.stop()
-
-
-class FetchFlickrUserArgs(FetchFlickrArgs):
-
-    fetcher_class_path = 'ditto.flickr.management.commands.fetch_flickr_user.UserFetcher'
-
-    def test_fail_with_no_args(self):
-        with self.assertRaises(CommandError):
-            call_command('fetch_flickr_user')
-
-    def test_fail_with_invalid_url(self):
-        with self.assertRaises(CommandError):
-            call_command('fetch_flickr_user', url='Not a URL')
-
-    def test_with_url(self):
-        "Calls the correct method when a valid URL is supplied"
-        call_command('fetch_flickr_user', url='https://www.flickr.com/philgyford')
-        self.fetcher_class.assert_called_once_with()
-        self.fetcher_class().fetch.assert_called_once_with(url='https://www.flickr.com/philgyford')
-
-
-class FetchFlickrOutput(TestCase):
-    "Testing the commands output what they should on success/failure."
-
-    # Child classes should set this:
-    fetch_method_path = ''
-
-    def setUp(self):
-        self.patcher = patch(self.fetch_method_path)
-        self.fetch_method = self.patcher.start()
-        self.account = AccountFactory(is_active=True)
+        self.account = AccountFactory(id=32, user=None)
         self.out = StringIO()
         self.out_err = StringIO()
 
-    def tearDown(self):
-        self.patcher.stop()
 
+    def test_fail_with_no_args(self):
+        with self.assertRaises(CommandError):
+            call_command('fetch_flickr_account_user')
 
-class FetchFlickrUserOutput(FetchFlickrOutput):
+    def test_fail_with_invalid_id(self):
+        call_command('fetch_flickr_account_user', id='3', stderr=self.out_err)
+        self.assertIn("No Account found with an id of '3'",
+                                                    self.out_err.getvalue())
 
-    fetch_method_path = 'ditto.flickr.management.commands.fetch_flickr_user.UserFetcher.fetch'
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserFetcher')
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher')
+    def test_with_id(self, id_fetcher, user_fetcher):
+        user = UserFactory(nsid='35034346050@N01')
+        id_fetcher.return_value.fetch.return_value = self.id_fetcher_success
+        user_fetcher.return_value.fetch.return_value = self.user_fetcher_success
+        call_command('fetch_flickr_account_user', id='32', stdout=self.out)
+        self.assertIn("Fetched and saved user 'Phil Gyford'",
+                                                        self.out.getvalue())
 
-    def test_success_output(self):
-        self.fetch_method.side_effect = [
-            [{'success': True, 'user': {'name': 'Phil Gyford'}},]
-        ]
-        call_command('fetch_flickr_user',
-                    url='https://www.flickr.com/philgyford', stdout=self.out)
-        self.assertIn("Fetched user 'Phil Gyford'", self.out.getvalue())
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserFetcher')
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher')
+    def test_invalid_nsid(self, id_fetcher, user_fetcher):
+        "Correct error message if we fail to find a user for the fetched Flickr ID (unlikely)."
+        id_fetcher.return_value.fetch.return_value =  self.id_fetcher_success
+        user_fetcher.return_value.fetch.return_value =\
+            {'success': False, 'message': 'Oops'}
+        call_command('fetch_flickr_account_user', id='32', stderr=self.out_err)
+        self.assertIn(
+            "Failed to fetch a user using Flickr ID '35034346050@N01': Oops",
+            self.out_err.getvalue())
 
-    def test_error_output(self):
-        self.fetch_method.side_effect = [
-            [{'success': False, 'message': 'It broke'},]
-        ]
-        call_command('fetch_flickr_user',
-                                        url='https://www.flickr.com/fakeuser',
-                                        stdout=self.out, stderr=self.out_err)
-        self.assertIn("Failed to fetch a user using URL 'https://www.flickr.com/fakeuser': It broke", self.out_err.getvalue())
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher')
+    def test_no_matching_nsid(self, id_fetcher):
+        "Correct error message if we can't find a Flickr ID for this Account."
+        id_fetcher.return_value.fetch.return_value =\
+                                        {'success': False, 'message': 'Oops'}
+        call_command('fetch_flickr_account_user', id='32', stderr=self.out_err)
+        self.assertIn(
+            "Failed to fetch a Flickr ID for this Account: Oops",
+            self.out_err.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserFetcher')
+    @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher')
+    def test_associates_account_with_user(self, id_fetcher, user_fetcher):
+        "After fetching and saving the user, associate it with the Account."
+        user = UserFactory(nsid='35034346050@N01')
+        id_fetcher.return_value.fetch.return_value = self.id_fetcher_success
+        user_fetcher.return_value.fetch.return_value = self.user_fetcher_success
+        call_command('fetch_flickr_account_user', id='32', stdout=self.out)
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.user.nsid, '35034346050@N01')
 

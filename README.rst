@@ -84,13 +84,6 @@ Flickr
 
 In the Django admin, add your Flickr account(s) with API key and secret from https://www.flickr.com/services/apps/create/apply/
 
-For each of those Accounts, fetch the Flickr user, eg::
-
-    $ ./demo/manage.py fetch_flickr_user --url=https://www.flickr.com/photos/philgyford
-
-In the Django admin, edit each Flickr Account you created, associate it with
-the correct Flickr User.
-
 By default this will only allow the fetching of fully public photos. To fetch
 all photos your Flickr account can see, you'll need to do this:
 
@@ -104,6 +97,11 @@ all photos your Flickr account can see, you'll need to do this:
 3. Follow the instructions. A new browser window should open for you to
    authorize your Flickr account. You'll then get a code to paste into your
    Terminal.
+
+
+Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user::
+
+    $ ./demo/manage.py fetch_flickr_account_user --id=1
 
 
 Pinboard

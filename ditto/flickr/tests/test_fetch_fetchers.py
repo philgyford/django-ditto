@@ -8,7 +8,8 @@ from freezegun import freeze_time
 from ...ditto.utils import datetime_now
 from ..factories import AccountFactory, UserFactory
 from ..fetch import FetchError, Fetcher, MultiAccountFetcher, PhotosFetcher,\
-        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserByUrlFetcher
+        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserFetcher,\
+        UserIdFetcher
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -67,67 +68,82 @@ class FetcherTestCase(FlickrFetchTestCase):
         self.assertIn('message', result)
 
 
-class UserByUrlFetcherTestCase(FlickrFetchTestCase):
+class UserIdFetcherTestCase(FlickrFetchTestCase):
 
     def setUp(self):
         self.account = AccountFactory(api_key='1234', api_secret='9876')
 
     def test_inherits_from_fetcher(self):
-        self.assertTrue( issubclass(UserByUrlFetcher, Fetcher) )
+        self.assertTrue( issubclass(UserFetcher, Fetcher) )
 
-    def test_failure_with_no_url(self):
-        """Raises FetchError if we don't pass a URL to fetch()"""
-        result = UserByUrlFetcher(account=self.account).fetch()
+    @responses.activate
+    def test_failure_if_api_call_fails(self):
+        self.add_response('test.login',
+            body='{"stat": "fail", "code": 99, "message": "Insufficient permissions. Method requires read privileges; none granted."}')
+        result = UserIdFetcher(account=self.account).fetch()
         self.assertFalse(result['success'])
         self.assertIn('message', result)
 
     @responses.activate
-    def test_failure_if_lookupuser_fails(self):
-        "Fails correctly if the call to urls.lookupUser fails"
-        self.add_response('urls.lookupUser',
-                body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
+    def test_returns_id(self):
+        self.add_response('test.login')
+        result = UserIdFetcher(account=self.account).fetch()
+        self.assertTrue(result['success'])
+        self.assertIn('id', result)
+        self.assertEqual(result['id'], '35034346050@N01')
 
-        self.assertFalse(result['success'])
-        self.assertIn('message', result)
+
+class UserFetcherTestCase(FlickrFetchTestCase):
+
+    def setUp(self):
+        self.account = AccountFactory(api_key='1234', api_secret='9876')
+
+    def test_inherits_from_fetcher(self):
+        self.assertTrue( issubclass(UserFetcher, Fetcher) )
+
+    def test_failure_with_no_id(self):
+        """Raises FetchError if we don't pass an ID to fetch()"""
+        with self.assertRaises(FetchError):
+            result = UserFetcher(account=self.account).fetch()
 
     @responses.activate
     def test_failure_if_getinfo_fails(self):
         "Fails correctly if the call to people.getInfo fails"
-        self.add_response('urls.lookupUser')
         self.add_response('people.getInfo',
-            body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
+                body='{"stat": "fail", "code": 1, "message": "User not found"}')
+        result = UserFetcher(account=self.account).fetch(
+                                                        nsid='35034346050@N01')
 
         self.assertFalse(result['success'])
         self.assertIn('message', result)
 
     @responses.activate
-    def test_makes_two_api_calls(self):
-        "Should call urls.lookupUser and people.getInfo"
-        self.add_response('urls.lookupUser')
+    def test_makes_one_api_calls(self):
+        "Should call people.getInfo"
         self.add_response('people.getInfo')
-        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
-        self.assertEqual(2, len(responses.calls))
+        result = UserFetcher(account=self.account).fetch(
+                                                        nsid='35034346050@N01')
+        self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
     @patch('ditto.flickr.fetch.UserSaver.save_user')
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_calls_save_user_correctly(self, save_user):
         "The correct data should be sent to UserSaver.save_user()"
-        self.add_response('urls.lookupUser')
         self.add_response('people.getInfo')
-        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserFetcher(account=self.account).fetch(
+                                                        nsid='35034346050@N01')
 
         user_response = self.load_fixture('people.getInfo')
 
-        save_user.assert_called_once_with(user_response['person'], datetime_now())
+        save_user.assert_called_once_with(
+                                    user_response['person'], datetime_now())
 
     @responses.activate
     def test_returns_correct_success_result(self):
-        self.add_response('urls.lookupUser')
         self.add_response('people.getInfo')
-        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserFetcher(account=self.account).fetch(
+                                                        nsid='35034346050@N01')
 
         self.assertIn('success', result)
         self.assertTrue(result['success'])

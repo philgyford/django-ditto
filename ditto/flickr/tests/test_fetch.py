@@ -36,16 +36,13 @@ class FlickrUtilsMixinTestCase(TestCase):
 class FlickrFetchTestCase(TestCase):
     """Useful things used by subsequent test cases."""
 
-    # Used as a URL for urls.lookupUser request.
-    user_url = 'https://www.flickr.com/photos/test/'
-
     flickr_fixtures = {
-        'urls.lookupUser': 'ditto/flickr/fixtures/api/urls_lookupuser.json',
         'people.getPhotos': 'ditto/flickr/fixtures/api/people_getphotos.json',
         'people.getInfo': 'ditto/flickr/fixtures/api/people_getinfo.json',
         'photos.getInfo': 'ditto/flickr/fixtures/api/photos_getinfo.json',
         'photos.getSizes': 'ditto/flickr/fixtures/api/photos_getsizes.json',
         'photos.getExif': 'ditto/flickr/fixtures/api/photos_getexif.json',
+        'test.login': 'ditto/flickr/fixtures/api/test_login.json',
     }
 
     def load_raw_fixture(self, method):
@@ -104,7 +101,6 @@ class FlickrFetchTestCase(TestCase):
                         items will override the defaults for each method below.
         """
         querystrings = {
-            'urls.lookupUser':  {'url': self.user_url, },
             'people.getInfo':   {'user_id': '35034346050@N01', },
             'people.getPhotos': {'user_id': '35034346050@N01',
                                 'min_upload_date': '946684800',
@@ -113,6 +109,7 @@ class FlickrFetchTestCase(TestCase):
             'photos.getInfo':   {'photo_id': '26069027966', },
             'photos.getSizes':  {'photo_id': '26069027966', },
             'photos.getExif':   {'photo_id': '26069027966', },
+            'test.login':       {},
         }
         if body is None:
             body = self.load_raw_fixture(method)

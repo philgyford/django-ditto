@@ -20,7 +20,8 @@ from ..ditto.utils import datetime_now
 # PhotoSaver
 #
 # Fetcher
-#   UserByUrlFetcher
+#   UserIdFetcher
+#   UserFetcher
 #   PhotosFetcher
 #       RecentPhotosFetcher
 #
@@ -453,40 +454,56 @@ class Fetcher(object):
             "Subclasses of Fetcher should define their own _save_results().")
 
 
-class UserByUrlFetcher(Fetcher):
-    """Fetches and saves data about a single User from their URL.
-    
-    Note: If the user we're fetching info for is different to the user
-    associated with the supplied Account, the data we fetch and save might
-    be incomplete. I assume.
+class UserIdFetcher(Fetcher):
+    """Returns the Flickr ID for an Account's user.
+    Doesn't save anything.
+
+    Use like:
+        results = UserIdFetcher(account=account_obj).fetch()
+
+    Results will look something like:
+        {'id': '35034346050@N01', 'fetched': 1, 'account': 'Phil Gyford', 'success': True}
     """
 
-    def fetch(self, url=None):
+    def _call_api(self):
+        """Calls test.login() to get the very basic user info for the
+        authenticating user.
+        Docs: https://www.flickr.com/services/api/flickr.test.login.htm
         """
-        url -- A Flickr URL owned by a user,
-                eg 'https://www.flickr.com/photos/philgyford/8102921/'
-        """
-        return super().fetch(url=url)
-
-    def _call_api(self, **kwargs):
-        url = kwargs.get('url', None)
-
-        if url is None:
-            raise FetchError("UserByUrlFetcher._call_api() requires a url.")
-
         try:
-            # First, get the user's NSID using the URL:
-            user = self.api.urls.lookupUser(url=url)
+            info = self.api.test.login()
         except FlickrError as e:
-            raise FetchError("Error when looking up user with URL '%s': %s" % \
-                                                                    (url, e))
+            raise FetchError("Error when calling test.login(): %s'" % e)
+
+        self.results = [ {'id': info['user']['id']} ]
+
+    def _save_results(self):
+        "Doesn't save any results, just prepares to return the Flickr ID."
+        self.return_value['id'] = self.results[0]['id']
+        self.results_count = 1
+
+
+class UserFetcher(Fetcher):
+    """Fetches and saves data about a single User by Flickr ID."""
+
+    def fetch(self, nsid=None):
+        """Fetches and saves data about a single User by Flickr ID.
+        nsid -- A Flickr ID for a user.
+        """
+        if nsid is None:
+            raise FetchError(
+                        "UserFetcher().fetch() requires a Flickr id (NSID)")
+
+        return super().fetch(nsid=nsid)
+
+    def _call_api(self, nsid):
+        "nsid -- A Flickr ID for a user."
         try:
-            # Now we can get the user's info:
-            info = self.api.people.getInfo(user_id=user['user']['id'])
+            info = self.api.people.getInfo(user_id=nsid)
         except FlickrError as e:
             raise FetchError(
-                "Error when getting info about User with id '%s': %s" % \
-                                                    (user['user']['id'], e))
+                "Error when getting info about User with Flickr ID '%s': %s" %\
+                                                                    (nsid, e))
 
         # info has 'person' and 'stat' elements.
         self.results = [ info['person'] ]
