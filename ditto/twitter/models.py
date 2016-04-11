@@ -388,7 +388,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     # As on DittoItemModel:
     fetch_time = models.DateTimeField(null=True, blank=True,
-        help_text="The time the data was last fetched, and was new or changed.")
+                            help_text="The time the data was last fetched.")
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
 

@@ -86,7 +86,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     is_private = models.BooleanField(default=False,
         help_text="If true, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
-        help_text="The time the item's data was last fetched, and was new or changed.")
+                        help_text="The time the item's data was last fetched.")
 
     post_time = models.DateTimeField(null=True, blank=True,
         help_text="The time the item was originally posted/created on its service.")
