@@ -7,7 +7,8 @@ from freezegun import freeze_time
 
 from ...ditto.utils import datetime_now
 from ..factories import AccountFactory, UserFactory
-from ..fetch import FetchError, Fetcher, UserFetcher, PhotosFetcher, RecentPhotosFetcher
+from ..fetch import FetchError, Fetcher, MultiAccountFetcher, PhotosFetcher,\
+        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserFetcher
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -337,4 +338,58 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             self.assertEqual(save_photo.call_count, 3)
             self.assertTrue(results['success'])
             self.assertEqual(results['fetched'], 3)
+
+
+class MultiAccountFetcherTestCase(FlickrFetchTestCase):
+
+    def setUp(self):
+        account = AccountFactory(api_key='1234', api_secret='9876',
+                                    user=UserFactory(nsid='35034346050@N01') )
+
+    def test_fetch_throws_exception(self):
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher().fetch()
+
+
+class RecentPhotosMultiAccountFetcherTestCase(FlickrFetchTestCase):
+
+    def setUp(self):
+        self.account_1 = AccountFactory(api_key='1234', api_secret='9876',
+                                    user=UserFactory(nsid='35034346050@N01') )
+        self.inactive_account = AccountFactory(
+                            api_key='2345', api_secret='8765', is_active=False,
+                            user=UserFactory(nsid='12345678901@N01') )
+        self.account_2 = AccountFactory(api_key='3456', api_secret='7654',
+                                    user=UserFactory(nsid='98765432101@N01') )
+
+    def test_inherits_from_multi_account_fetcher(self):
+        self.assertTrue(
+            issubclass(RecentPhotosMultiAccountFetcher, MultiAccountFetcher)
+        )
+
+    @patch('ditto.flickr.fetch.RecentPhotosFetcher.__init__')
+    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    def test_inits_fetcher_with_active_accounts(self, fetch, init):
+        "RecentPhotosFetcher should be called with 2 active accounts."
+        init.return_value = None
+        RecentPhotosMultiAccountFetcher().fetch()
+        init.assert_has_calls([call(self.account_1), call(self.account_2)])
+
+    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    def test_calls_fetch_for_active_accounts(self, fetch):
+        "RecentPhotosFetcher.fetch() should be called twice."
+        RecentPhotosMultiAccountFetcher().fetch(days=3)
+        fetch.assert_has_calls([call(days=3), call(days=3)])
+
+    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    def test_returns_list_of_return_values(self, fetch):
+        "Should return a list of the dicts that RecentPhotosFetcher.fetch() returns"
+        ret = {'success': True, 'account': 'bob', 'fetched': 7}
+        fetch.side_effect = [ret, ret]
+
+        return_value = RecentPhotosMultiAccountFetcher().fetch(days=3)
+
+        self.assertEqual(len(return_value), 2)
+        self.assertEqual(return_value[0]['account'], 'bob')
+
 

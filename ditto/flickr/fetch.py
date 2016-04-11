@@ -316,7 +316,7 @@ class Fetcher(object):
 
     Depending on the child classes, it would be used something like:
 
-        results = Fetcher(account=my_account).fetch()
+        results = Fetcher(account=account_object).fetch()
 
     results is a dict that will have:
         'success': Boolean.
@@ -703,10 +703,47 @@ class FavoritePhotosFetcher(PhotosFetcher):
 
 
 class MultiAccountFetcher(object):
-    """Parent class for fetching things from Flickr for multiple Accounts."""
-    pass
+    """Parent class for fetching things from Flickr for multiple Accounts.
+    
+    Use something like:
+        
+        results = ChildMultiAccountFetcher().fetch(foo=bar)
+    """
+
+    def __init__(self):
+        """Gets all of the active accounts that child classes will loop through.
+        """
+        self.return_value = []
+
+        self.accounts = Account.objects.filter(is_active=True)
+        if len(self.accounts) == 0:
+            raise FetchError("No active Accounts were found to fetch.")
+        return super().__init__()
+
+    def fetch(self, **kwargs):
+        raise FetchError(
+            "Subclasess of MultiAccountFetcher should define their own fetch().")
 
 
-class MultiAccountRecentPhotosFetcher(MultiAccountFetcher):
-    pass
+class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
+    """For fetching recent photos for ALL accounts.
+
+    Usage:
+
+        results = RecentPhotosMultiAccountFetcher().fetch(days=7)
+
+    Or omit the `days` to fetch ALL photos for ALL accounts.
+
+    results will be a list of dicts containing info about what was fetched (or
+    went wrong) for each account.
+    """
+
+    def fetch(self, days=None):
+        for account in self.accounts:
+            self.return_value.append(
+                RecentPhotosFetcher(account).fetch(days=days)
+            )
+
+        return self.return_value
+
 
