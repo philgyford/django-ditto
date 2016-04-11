@@ -20,9 +20,12 @@ from ..ditto.utils import datetime_now
 # PhotoSaver
 #
 # Fetcher
-#   UserFetcher
+#   UserByUrlFetcher
 #   PhotosFetcher
 #       RecentPhotosFetcher
+#
+# MultiAccountFetcher
+#   RecentPhotosMultiAccountFetcher
 
 
 class FetchError(Exception):
@@ -450,8 +453,13 @@ class Fetcher(object):
             "Subclasses of Fetcher should define their own _save_results().")
 
 
-class UserFetcher(Fetcher):
-    """Fetches and saves data about a single User."""
+class UserByUrlFetcher(Fetcher):
+    """Fetches and saves data about a single User from their URL.
+    
+    Note: If the user we're fetching info for is different to the user
+    associated with the supplied Account, the data we fetch and save might
+    be incomplete. I assume.
+    """
 
     def fetch(self, url=None):
         """
@@ -464,7 +472,7 @@ class UserFetcher(Fetcher):
         url = kwargs.get('url', None)
 
         if url is None:
-            raise FetchError("UserFetcher._call_api() requires a url.")
+            raise FetchError("UserByUrlFetcher._call_api() requires a url.")
 
         try:
             # First, get the user's NSID using the URL:

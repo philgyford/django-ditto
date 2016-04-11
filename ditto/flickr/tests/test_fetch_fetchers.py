@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from ...ditto.utils import datetime_now
 from ..factories import AccountFactory, UserFactory
 from ..fetch import FetchError, Fetcher, MultiAccountFetcher, PhotosFetcher,\
-        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserFetcher
+        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserByUrlFetcher
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -67,17 +67,17 @@ class FetcherTestCase(FlickrFetchTestCase):
         self.assertIn('message', result)
 
 
-class UserFetcherTestCase(FlickrFetchTestCase):
+class UserByUrlFetcherTestCase(FlickrFetchTestCase):
 
     def setUp(self):
         self.account = AccountFactory(api_key='1234', api_secret='9876')
 
     def test_inherits_from_fetcher(self):
-        self.assertTrue( issubclass(UserFetcher, Fetcher) )
+        self.assertTrue( issubclass(UserByUrlFetcher, Fetcher) )
 
     def test_failure_with_no_url(self):
         """Raises FetchError if we don't pass a URL to fetch()"""
-        result = UserFetcher(account=self.account).fetch()
+        result = UserByUrlFetcher(account=self.account).fetch()
         self.assertFalse(result['success'])
         self.assertIn('message', result)
 
@@ -86,7 +86,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         "Fails correctly if the call to urls.lookupUser fails"
         self.add_response('urls.lookupUser',
                 body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
 
         self.assertFalse(result['success'])
         self.assertIn('message', result)
@@ -97,7 +97,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.add_response('urls.lookupUser')
         self.add_response('people.getInfo',
             body='{"stat": "fail", "code": 1, "message": "User not found"}')
-        result = UserFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
 
         self.assertFalse(result['success'])
         self.assertIn('message', result)
@@ -107,7 +107,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         "Should call urls.lookupUser and people.getInfo"
         self.add_response('urls.lookupUser')
         self.add_response('people.getInfo')
-        result = UserFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
@@ -117,7 +117,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         "The correct data should be sent to UserSaver.save_user()"
         self.add_response('urls.lookupUser')
         self.add_response('people.getInfo')
-        result = UserFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
 
         user_response = self.load_fixture('people.getInfo')
 
@@ -127,7 +127,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
     def test_returns_correct_success_result(self):
         self.add_response('urls.lookupUser')
         self.add_response('people.getInfo')
-        result = UserFetcher(account=self.account).fetch(url=self.user_url)
+        result = UserByUrlFetcher(account=self.account).fetch(url=self.user_url)
 
         self.assertIn('success', result)
         self.assertTrue(result['success'])
