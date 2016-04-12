@@ -732,21 +732,55 @@ class FavoritePhotosFetcher(PhotosFetcher):
 
 
 class MultiAccountFetcher(object):
-    """Parent class for fetching things from Flickr for multiple Accounts.
+    """Parent class for fetching things from Flickr for ALL or ONE Account(s).
+
+    Its child classes are useful for:
+        * Fetching from all accounts.
+        * Fetching from a single account with identical interface and response
+          as when fetching from all accounts (otherwise you could use the
+          single account fetcher, like RecentPhotosFetcher()).
+        * Fetching from a single account when you only have the user's NSID.
 
     Use something like:
 
-        results = ChildMultiAccountFetcher().fetch(foo=bar)
+        results = ChildMultiAccountFetcher().fetch(foo=3)
+
+    or:
+
+        results = ChildMultiAccountFetcher(nsid='35034346050@N01').fetch(foo=3)
     """
 
-    def __init__(self):
-        """Gets all of the active accounts that child classes will loop through.
+    # Will be a list of Account objects.
+    accounts = []
+
+    def __init__(self, nsid=None):
+        """Gets all of the Accounts that child classes will loop through.
+
+        nsid -- If nsid is set, we use only the Account associated with the
+                User with that nsid (if it's active). Otherwise, we use all
+                active Accounts.
         """
         self.return_value = []
 
-        self.accounts = Account.objects.filter(is_active=True)
-        if len(self.accounts) == 0:
-            raise FetchError("No active Accounts were found to fetch.")
+        if nsid is None:
+            # Get all active Accounts.
+            self.accounts = list(Account.objects.filter(is_active=True))
+            if len(self.accounts) == 0:
+                raise FetchError("No active Accounts were found to fetch.")
+        else:
+            # Find the Account associated with nsid.
+            try:
+                user = User.objects.get(nsid=nsid)
+            except User.DoesNotExist:
+                raise FetchError("There is no User with the NSID '%s'" % nsid)
+            try:
+                account = Account.objects.get(user=user)
+            except Account.DoesNotExist:
+                raise FetchError("There is no Account associated with the User with NSID '%s'" % nsid)
+            if account.is_active == False:
+                raise FetchError("The Account associated with the User with NSID '%s' is marked as inactive.")
+
+            self.accounts = [account]
         return super().__init__()
 
     def fetch(self, **kwargs):
@@ -755,7 +789,7 @@ class MultiAccountFetcher(object):
 
 
 class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
-    """For fetching recent photos for ALL accounts.
+    """For fetching recent photos for ALL or ONE account(s).
 
     Usage:
 

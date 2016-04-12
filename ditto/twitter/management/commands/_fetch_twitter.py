@@ -38,7 +38,8 @@ class FetchTwitterCommand(BaseCommand):
         elif options['account']:
             raise CommandError("Specify --recent as well as --account.")
         else:
-            raise CommandError("Specify --recent, eg --recent=100 or --recent=new.")
+            raise CommandError(
+                        "Specify --recent, eg --recent=100 or --recent=new.")
 
     def fetch_tweets(self, screen_name, count):
         """Child classes should override this method to call a method that

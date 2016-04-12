@@ -75,3 +75,50 @@ class FetchFlickrAccountUser(TestCase):
         self.account.refresh_from_db()
         self.assertEqual(self.account.user.nsid, '35034346050@N01')
 
+
+class FetchFlickrPhotos(TestCase):
+
+    def setUp(self):
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def test_fail_with_no_args(self):
+        with self.assertRaises(CommandError):
+            call_command('fetch_flickr_photos')
+
+    def test_fail_with_account_only(self):
+        with self.assertRaises(CommandError):
+            call_command('fetch_flickr_photos', account='35034346050@N01')
+
+    def test_fail_with_non_numeric_days(self):
+        with self.assertRaises(CommandError):
+            call_command('fetch_flickr_photos', days='foo')
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_sends_args_to_fetcher_with_account(self, fetcher):
+        call_command('fetch_flickr_photos', account='35034346050@N01', days='4')
+        fetcher.assert_called_with(nsid='35034346050@N01')
+        fetcher.return_value.fetch.assert_called_with(days=4)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_sends_args_to_fetcher_no_account(self, fetcher):
+        call_command('fetch_flickr_photos', days='4')
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(days=4)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_success_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': '40'}]
+        call_command('fetch_flickr_photos', days='4', stdout=self.out)
+        self.assertIn('Phil Gyford: Fetched 40 Photos', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_error_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': False, 'message': 'Oops'}]
+        call_command('fetch_flickr_photos', days='4', stdout=self.out,
+                                                        stderr=self.out_err)
+        self.assertIn('Phil Gyford: Failed to fetch Photos: Oops',
+                                                    self.out_err.getvalue())
+

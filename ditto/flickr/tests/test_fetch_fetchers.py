@@ -370,12 +370,49 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 class MultiAccountFetcherTestCase(FlickrFetchTestCase):
 
     def setUp(self):
-        account = AccountFactory(api_key='1234', api_secret='9876',
+        self.account_1 = AccountFactory(api_key='1234', api_secret='9876',
                                     user=UserFactory(nsid='35034346050@N01') )
+        self.inactive_account = AccountFactory(
+                            api_key='2345', api_secret='8765', is_active=False,
+                            user=UserFactory(nsid='12345678901@N01') )
+        self.account_2 = AccountFactory(api_key='3456', api_secret='7654',
+                                    user=UserFactory(nsid='98765432101@N01') )
 
     def test_fetch_throws_exception(self):
+        "Throws an except if its own fetch() method is called."
         with self.assertRaises(FetchError):
             MultiAccountFetcher().fetch()
+
+    def test_uses_all_accounts_by_default(self):
+        fetcher = MultiAccountFetcher()
+        self.assertEqual(len(fetcher.accounts), 2)
+
+    def test_throws_exception_with_no_active_accounts(self):
+        self.account_1.is_active = False
+        self.account_2.is_active = False
+        self.account_1.save()
+        self.account_2.save()
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher()
+
+    def test_throws_exception_with_invalid_nsid(self):
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='nope')
+
+    def test_throws_exception_with_no_account(self):
+        "If the NSID is not attached to an Account."
+        user = UserFactory(nsid='99999999999@N01')
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='99999999999@N01')
+
+    def test_throws_exception_with_inactive_account(self):
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='12345678901@N01')
+
+    def test_works_with_valid_nsid(self):
+        fetcher = MultiAccountFetcher(nsid='35034346050@N01')
+        self.assertEqual(len(fetcher.accounts), 1)
+        self.assertEqual(fetcher.accounts[0], self.account_1)
 
 
 class RecentPhotosMultiAccountFetcherTestCase(FlickrFetchTestCase):
