@@ -643,10 +643,14 @@ class RecentPhotosFetcher(PhotosFetcher):
 
     def fetch(self, days=None):
         """Fetch all of the Account's user's photos, by default.
-        days -- The number of days back to look, by upload date.
+        days -- Required. The number of days back to look, by upload date, or
+                'all' to fetch all photos.
         """
-        if days is not None:
+        try:
             self.min_date = datetime_now() - datetime.timedelta(days=days)
+        except TypeError:
+            if days != 'all':
+                raise FetchError("days should be a number or 'all'.")
 
         return super().fetch()
 

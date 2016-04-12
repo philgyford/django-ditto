@@ -289,6 +289,16 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     def test_inherits_from_fetcher(self):
         self.assertTrue( issubclass(RecentPhotosFetcher, PhotosFetcher) )
 
+    def test_raises_error_with_invalid_days(self):
+        "days should be an int or 'all'."
+        with self.assertRaises(FetchError):
+            self.fetcher.fetch(days='bibble')
+
+    def test_raises_error_with_no_days(self):
+        "days should be an int or 'all'."
+        with self.assertRaises(FetchError):
+            self.fetcher.fetch()
+
     @responses.activate
     def test_call_api_error(self):
         "_call_api() should throw an error if there's an API error."
@@ -324,7 +334,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         """Check that it uses the _fetch_pages() method we tested above,
         rather than the singular _fetch_page()."""
 
-        self.fetcher.fetch()
+        self.fetcher.fetch(days=3)
         fetch_pages.assert_called_once_with()
 
     @responses.activate
@@ -341,6 +351,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @patch('ditto.flickr.fetch.PhotoSaver.save_photo')
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_info')
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_sizes')
@@ -350,7 +361,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         self.add_response('people.getPhotos')
         self.add_response('people.getInfo')
         with patch('time.sleep'):
-            results = self.fetcher.fetch()
+            results = self.fetcher.fetch(days='all')
             self.assertEqual(save_photo.call_count, 3)
             self.assertTrue(results['success'])
             self.assertEqual(results['fetched'], 3)
