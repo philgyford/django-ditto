@@ -64,7 +64,20 @@ class TaggedPhoto(TaggedItemBase):
         verbose_name = 'Photo/Tag Relationship'
 
 
-class Photo(DittoItemModel):
+class ExtraPhotoManagers(models.Model):
+    """Managers to use in the Photo model, in addition to the defaults defined
+    in DittoItemModel.
+    These need to be here, rather than in the Photo model, or they will
+    override those in DittoItemModel.
+    """
+    photo_objects = managers.PhotosManager()
+    public_photo_objects = managers.PublicPhotosManager()
+
+    class Meta:
+        abstract = True
+
+
+class Photo(DittoItemModel, ExtraPhotoManagers):
 
     # From
     # https://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html

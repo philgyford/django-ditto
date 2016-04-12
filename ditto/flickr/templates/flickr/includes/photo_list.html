@@ -1,0 +1,37 @@
+{% comment %}
+
+Expects:
+ * photo_list, a queryset of Photos.
+ * perms - The Django perms object.
+ * page_obj, optional, a DiggPaginator instance or False (default).
+ * view - optional, 'detail' or 'day'.
+{% endcomment %}
+
+{% if photo_list|length > 0 %}
+    {% if page_obj and page_obj.number > 1 %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+    {% endif %}
+
+    <hr>
+    <ul class="media-list flickr-photos">
+        {% for photo in photo_list %}
+            <li class="media m-t-0 flickr-photo">
+				{{ photo.title }}
+
+				{% comment %}
+					{% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view|default:False only %}
+				{% endcomment %}
+                <hr>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if page_obj|default:False %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+    {% endif %}
+{% else %}
+
+    <p>There are no Photos to show.</p>
+{% endif %}
+
+

@@ -14,7 +14,7 @@ from ..factories import AccountFactory, AccountWithCredentialsFactory, PhotoFact
 from ..models import Account, Media, Tweet, User
 
 
-class TwitterAccountTestCase(TestCase):
+class AccountTestCase(TestCase):
 
     api_url = 'https://api.twitter.com/1.1'
 
@@ -158,7 +158,7 @@ class TwitterAccountTestCase(TestCase):
         self.assertEqual(account.get_absolute_url(), '')
 
 
-class TwitterPhotoTestCase(TestCase):
+class PhotoTestCase(TestCase):
     "Testing things like ordering, privacy. Not individual properties. Sorry."
 
     def test_str(self):
@@ -229,7 +229,7 @@ class TwitterPhotoTestCase(TestCase):
         self.assertEqual(photo.small_url,  '%s:small' % url)
         self.assertEqual(photo.thumb_url,  '%s:thumb' % url)
 
-class TwitterVideoTestCase(TestCase):
+class VideoTestCase(TestCase):
     "Most things are the same for photos and videos, so not re-testing here."
 
     def test_str(self):
@@ -241,7 +241,7 @@ class TwitterVideoTestCase(TestCase):
         self.assertEqual(video.media_type, 'video')
 
 
-class TwitterTweetTestCase(TestCase):
+class TweetTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"
@@ -379,10 +379,7 @@ class TwitterTweetTestCase(TestCase):
         self.assertEqual(get_method.call_count, 1)
 
 
-
-
-
-class TwitterUserTestCase(TestCase):
+class UserTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"

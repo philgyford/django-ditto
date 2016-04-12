@@ -1,5 +1,7 @@
 import datetime
 import pytz
+
+from django.db import IntegrityError
 from django.test import TestCase
 
 from ..factories import AccountFactory, PhotoFactory, UserFactory
@@ -48,8 +50,19 @@ class UserTestCase(TestCase):
         users = User.objects_with_accounts.all()
         self.assertEqual(users[0], user_1)
 
+    def test_unique_nsid(self):
+        "Ensures nsid is unique"
+        user_1 = UserFactory(nsid='12345678901@N01')
+        with self.assertRaises(IntegrityError):
+            user_2 = UserFactory(nsid='12345678901@N01')
+
 
 class PhotoTestCase(TestCase):
+
+    def test_str(self):
+        "Has the correct string represntation"
+        photo = PhotoFactory(title='My test photo')
+        self.assertEqual(photo.__str__(), 'My test photo')
 
     def test_ordering(self):
         "Latest photo should come first by default."
@@ -65,11 +78,59 @@ class PhotoTestCase(TestCase):
         self.assertEqual(photos[0].title, 'Latest')
         self.assertEqual(photos[1].title, 'Earliest')
 
-    def test_summary(self):
+    def test_unique_flickr_id(self):
+        "Ensures flickr_id is unique"
+        photo_1 = PhotoFactory(flickr_id=123456)
+        with self.assertRaises(IntegrityError):
+            photo_2 = PhotoFactory(flickr_id=123456)
+
+    def test_summary_creation(self):
         "Summary should be made correctly on save."
         photo = PhotoFactory(
                 description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
         self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
-        
-        
+
+    def test_default_manager_recent(self):
+        "The default manager includes public AND private photos."
+        public_photo = PhotoFactory(is_private=False)
+        private_photo = PhotoFactory(is_private=True)
+        self.assertEqual(len(Photo.objects.all()), 2)
+
+    def test_public_manager_recent(self):
+        "The public manager ONLY includes public photos."
+        public_photo = PhotoFactory(is_private=False)
+        private_photo = PhotoFactory(is_private=True)
+        photos = Photo.public_objects.all()
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0], public_photo)
+
+    def test_photos_manager(self):
+        "Returns public AND private photos ONLY by an Account."
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        public_photo = PhotoFactory(is_private=False)
+        public_photo_by_account = PhotoFactory(is_private=False, user=user)
+        private_photo = PhotoFactory(is_private=True)
+        private_photo_by_account = PhotoFactory(is_private=True, user=user)
+        photos = Photo.photo_objects.all()
+        self.assertEqual(len(photos), 2)
+        self.assertIn(public_photo_by_account, photos)
+        self.assertIn(private_photo_by_account, photos)
+
+    def test_public_photos_manager(self):
+        "Returns ONLY public photos, ONLY by an Account."
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        public_photo = PhotoFactory(is_private=False)
+        public_photo_by_account = PhotoFactory(is_private=False, user=user)
+        private_photo = PhotoFactory(is_private=True)
+        private_photo_by_account = PhotoFactory(is_private=True, user=user)
+        photos = Photo.public_photo_objects.all()
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0], public_photo_by_account)
+
+
+    #def test_favorites_manager(self):
+    #def test_public_favorites_photos_manager(self):
+    #def test_public_favorites_accounts_manager(self):
 

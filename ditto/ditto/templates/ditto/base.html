@@ -29,6 +29,12 @@
                                         Twitter
                                     </a>
                                 </li>
+                            {% elif app == 'flickr' %}
+                                <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
+                                    <a class="nav-link" href="{% url 'flickr:index' %}">
+                                        Flickr
+                                    </a>
+                                </li>
                             {% endif %}
                         {% endfor %}
                     </ul>

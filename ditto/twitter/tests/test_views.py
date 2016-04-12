@@ -4,7 +4,7 @@ from django.test import TestCase
 from .. import factories
 
 
-class TwitterViewTests(TestCase):
+class ViewTests(TestCase):
 
     def test_home_templates(self):
         "The Twitter home page uses the correct templates"
