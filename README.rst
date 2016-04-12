@@ -98,10 +98,23 @@ all photos your Flickr account can see, you'll need to do this:
    authorize your Flickr account. You'll then get a code to paste into your
    Terminal.
 
-
 Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user::
 
     $ ./demo/manage.py fetch_flickr_account_user --id=1
+
+Now you can fetch Photos. This will fetch ALL Photos for ALL Accounts (it'll
+take a while)::
+
+    $ ./demo/manage.py fetch_flickr_photos --days=all
+
+This will only fetch Photos uploaded in the past 3 days::
+
+    $ ./demo/manage.py fetch_flickr_photos --days=3
+
+Both options can be restricted to only fetch for a single Account by adding the NSID of the Account's Flickr User, eg::
+
+    $ ./demo/manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
+
 
 
 Pinboard
