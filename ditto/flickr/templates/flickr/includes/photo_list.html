@@ -12,19 +12,17 @@ Expects:
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 
-    <hr>
-    <ul class="media-list flickr-photos">
-        {% for photo in photo_list %}
-            <li class="media m-t-0 flickr-photo">
-				{{ photo.title }}
+	{% load ditto %}
 
-				{% comment %}
-					{% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view|default:False only %}
-				{% endcomment %}
-                <hr>
-            </li>
-        {% endfor %}
-    </ul>
+	{% for row in photo_list|split_by:4 %}
+		<div class="row flickr-photos">
+			{% for photo in row %}
+				<div class="col-md-3 flickr-photo">
+					{% include 'flickr/includes/photo.html' with photo=photo perms=perms view=view|default:False only %}
+				</div>
+			{% endfor %}
+		</div> <!-- .row.flickr-photos -->
+	{% endfor %}
 
     {% if page_obj|default:False %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}

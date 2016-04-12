@@ -1,0 +1,24 @@
+{% comment %}
+A single Photo.
+
+Expects:
+ * photo, a Photo object.
+ * view, optional, 'detail' or 'day' - True if this we're showing a single Photo, False if this Photo is in a list.
+ * perms - The Django perms object.
+{% endcomment %}
+
+{% if photo %}
+    <img src="{{ photo.medium_url }}" alt="" class="img-responsive">
+    <h4>{{ photo.title }}</h4>
+    {% if view and view == 'detail' and photo.description %}
+        <p class="flickr-photo-description">{{ photo.description|safe }}</p>
+    {% elif photo.summary %}
+        <p class="flickr-photo-summary">{{ photo.summary|safe }}</p>
+    {% endif %}
+    <p><small class="text-muted">
+        {% load ditto %}
+        {% time_link photo.post_time view %}
+    </small></p>
+{% endif %}
+
+

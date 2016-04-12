@@ -3,8 +3,7 @@ A single Tweet.
 
 Expects:
  * tweet, a Tweet object.
- * view, optional, 'detail' or 'day' - True if this we're showing a single Tweet, False if this
-                        Tweet is in a list.
+ * view, optional, 'detail' or 'day' - True if this we're showing a single Tweet, False if this Tweet is in a list.
  * perms - The Django perms object.
 {% endcomment %}
 
@@ -20,13 +19,8 @@ Expects:
             </a>
             <small class="text-muted">
                 •
-                <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">
-                    {% if view and view == 'day' %}
-                        {{ tweet.post_time|date:'j M Y, g:i A' }}
-                    {% else %}
-                        <a href="{% url 'ditto:day_archive' year=tweet.post_time|date:'Y' month=tweet.post_time|date:'m' day=tweet.post_time|date:'d' %}" title="All items from this day">{{ tweet.post_time|date:'j M Y' }}</a>{{ tweet.post_time|date:', g:i A' }}
-                    {% endif %}
-                </time>
+				{% load ditto %}
+				{% time_link tweet.post_time view %}
 
                 {% if view and view == 'detail' %}
                     • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>

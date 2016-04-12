@@ -35,13 +35,10 @@ Expects:
     <p class="m-b-0 text-muted pinboard-bookmark-about">
         {% if not view or view != 'detail' %}<small>{% endif %}
             By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
-            • <time datetime="{{ bookmark.post_time|date:'Y-m-d H:i:s' }}">
-                {% if view and view == 'day' %}
-                    {{ bookmark.post_time|date:'j M Y, g:i A' }}
-                {% else %}
-                    <a href="{% url 'ditto:day_archive' year=bookmark.post_time|date:'Y' month=bookmark.post_time|date:'m' day=bookmark.post_time|date:'d' %}" title="All items from this day">{{ bookmark.post_time|date:'j M Y' }}</a>{{ bookmark.post_time|date:', g:i A' }}
-                {% endif %}
-            </time>
+            • 
+            {% load ditto %}
+            {% time_link bookmark.post_time view %}
+
             {% if not view or view != 'detail' %}
                 • <a href="{{ bookmark.get_absolute_url }}" title="See only this bookmark">#</a>
             {% endif %}
