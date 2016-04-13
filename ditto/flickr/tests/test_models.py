@@ -56,6 +56,20 @@ class UserTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             user_2 = UserFactory(nsid='12345678901@N01')
 
+    def test_permalink(self):
+        user = UserFactory()
+        self.assertEqual(user.permalink, user.photos_url)
+
+    def test_icon_url(self):
+        user = UserFactory(iconfarm=8, iconserver=7420, nsid='35034346050@N01')
+        self.assertEqual(user.icon_url,
+        'https://farm8.staticflickr.com/7420/buddyicons/35034346050@N01.jpg')
+
+    def test_icon_url_default(self):
+        user = UserFactory(iconserver=0)
+        self.assertEqual(user.icon_url,
+                                'https://www.flickr.com/images/buddyicon.gif')
+
 
 class PhotoTestCase(TestCase):
 

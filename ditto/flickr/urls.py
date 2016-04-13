@@ -8,4 +8,9 @@ urlpatterns = [
         view=views.Home.as_view(),
         name='index'
     ),
+    url(
+        regex=r"^(?P<nsid>[\dN@]+)$",
+        view=views.UserDetail.as_view(),
+        name='user_detail'
+    ),
 ]

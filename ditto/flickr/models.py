@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from taggit.managers import TaggableManager
@@ -29,6 +30,13 @@ class Account(TimeStampedModelMixin, models.Model):
 
     class Meta:
         ordering = ['user__realname']
+
+    def get_absolute_url(self):
+        if self.user:
+            return reverse('flickr:user_detail',
+                        kwargs={'nsid': self.user.nsid})
+        else:
+            return ''
 
     def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
@@ -351,7 +359,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             # All non-Medium-size images:
             size_ext = '_%s' % size
         return 'https://farm%s.static.flickr.com/%s/%s_%s%s.jpg' % (
-                self.farm, self.server, self.flickr_id, self.secret, size_ext) 
+                self.farm, self.server, self.flickr_id, self.secret, size_ext)
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -359,7 +367,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                         max_length=50, verbose_name='NSID')
     is_pro = models.BooleanField(null=False, blank=False, default=False,
                                                     verbose_name='Is Pro?')
-    iconserver = models.CharField(null=False, blank=False, max_length=20)
+    iconserver = models.PositiveIntegerField(null=False, blank=False,
+                                                                   default=0)
     iconfarm = models.PositiveIntegerField(null=False, blank=False)
 
     username = models.CharField(null=False, blank=False, unique=True,
@@ -403,3 +412,14 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def name(self):
         return self.realname
 
+    @property
+    def permalink(self):
+        return self.photos_url
+
+    @property
+    def icon_url(self):
+        if self.iconserver:
+            return 'https://farm%s.staticflickr.com/%s/buddyicons/%s.jpg' % \
+                                    (self.iconfarm, self.iconserver, self.nsid)
+        else:
+            return 'https://www.flickr.com/images/buddyicon.gif'

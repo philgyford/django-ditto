@@ -1,0 +1,43 @@
+{# Display information about a Flickr user. #}
+{# Expects a single `user` which is a Flickr User object. #}
+{# And an optional 'account' if this user has an Account here. #}
+
+{% load l10n %}
+
+<div class="card flickr-user">
+    <div class="card-block">
+        <img src="{{ user.icon_url }}" alt="user icon" width="48" height="48">
+        {% if user.is_pro %}
+            <span class="text-muted">(Pro)</span>
+        {% endif %}
+    </div>
+    <ul class="list-group list-group-flush flickr-user-about">
+        {% if user.description %}
+            <li class="list-group-item flickr-user-description">{{ user.description }}</li>
+        {% endif %}
+        {% if user.location %}
+            <li class="list-group-item flickr-user-location">{{ user.location }}</li>
+        {% endif %}
+        <li class="list-group-item flickr-user-first-date">First upload: {{ user.photos_first_date|date:"M Y" }}</li>
+        <li class="list-group-item flickr-user-first-date-taken">First photo: {{ user.photos_first_date_taken|date:"M Y" }}</li>
+        {% if account == None or account.is_active %}
+            <li class="list-group-item flickr-user-link"><a href="{{ user.permalink }}">At Flickr.com</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="card flickr-user">
+    <ul class="list-group list-group-flush flickr-user-counts">
+        <li class="list-group-item">{{ user.photos_count|localize }} Photo{{ user.photos_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.photos_views|localize }} View{{ user.photos_views|pluralize }}</li>
+    </ul>
+</div>
+
+<div class="card flickr-user">
+    <div class="card-block">
+        <p class="card-text text-muted">
+            <small>As of <time datetime="{{ user.fetch_time|date:'Y-m-d H:i:s' }}">{{ user.fetch_time|date:"j M Y g:i A" }}</time></small>
+        </p>
+    </div>
+</div>
+

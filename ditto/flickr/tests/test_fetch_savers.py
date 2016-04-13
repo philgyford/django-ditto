@@ -36,7 +36,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(user.raw, json.dumps(user_data['person']))
         self.assertEqual(user.nsid, "35034346050@N01")
         self.assertTrue(user.is_pro)
-        self.assertEqual(user.iconserver, '7420')
+        self.assertEqual(user.iconserver, 7420)
         self.assertEqual(user.iconfarm, 8)
         self.assertEqual(user.username, 'Phil Gyford')
         self.assertEqual(user.realname, 'Phil Gyford')

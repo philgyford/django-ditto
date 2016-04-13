@@ -13,9 +13,11 @@ class UserFactory(factory.DjangoModelFactory):
     nsid = factory.Sequence(lambda n: (n * 10000))
     username = factory.Sequence(lambda n: 'user%d' % n)
     realname = factory.Sequence(lambda n: 'User Name %d' % n)
-    iconserver = '1234'
+    iconserver = 1234
     iconfarm = 5
     timezone_id = 'America/Los_Angeles'
+    photos_url = factory.Sequence(
+                        lambda n: 'https://www.flickr.com/photos/user%d/' % n)
 
     photos_first_date = factory.LazyAttribute(lambda o:
                                datetime_now() - datetime.timedelta(weeks=52)
