@@ -279,7 +279,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     tags = TaggableManager(blank=True, through=TaggedPhoto)
 
     class Meta:
-        ordering = ('-taken_time',)
+        ordering = ('-post_time',)
 
     def summary_source(self):
         """Make the summary that's created when the Photo is saved."""
