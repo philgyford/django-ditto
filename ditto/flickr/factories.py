@@ -25,6 +25,7 @@ class UserFactory(factory.DjangoModelFactory):
     photos_first_date_taken = factory.LazyAttribute(lambda o:
                                 datetime_now() - datetime.timedelta(weeks=52)
                             )
+    fetch_time = datetime_now()
 
 
 class AccountFactory(factory.DjangoModelFactory):

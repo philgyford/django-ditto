@@ -32,6 +32,9 @@
                 </ul>
             {% else %}
                 <p class="lead">
+					{% comment %}
+					Not sure this is showing what is implied here... isn't this just listing ALL accounts? 
+					{% endcomment %}
                     Liked by 
                     {% for account in public_accounts %}
                         {% if not forloop.first %},{% endif %}

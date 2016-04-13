@@ -37,7 +37,6 @@ class UserDetailMixin(SingleObjectMixin):
             context['account'] = Account.objects.get(user=self.object)
         except Account.DoesNotExist:
             context['account'] = None
-            context['accounts'] = Account.objects.all()
         return context
 
 

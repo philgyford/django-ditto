@@ -118,7 +118,7 @@ class ViewTests(TestCase):
 
     def test_user_detail_templates(self):
         "Uses the correct templates"
-        account = factories.AccountFactory.create()
+        account = factories.AccountFactory()
         response = self.client.get(reverse('twitter:user_detail',
                             kwargs={'screen_name': account.user.screen_name}))
         self.assertEquals(response.status_code, 200)
@@ -126,14 +126,14 @@ class ViewTests(TestCase):
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_user_detail_context(self):
-        "Sends the correct data to templates"
-        private_user = factories.UserFactory.create(is_private=True)
-        private_account = factories.AccountFactory.create(user=private_user)
+    def test_user_detail_context_no_account(self):
+        "Sends correct data to templates for a User with no Account."
+        private_user = factories.UserFactory(is_private=True)
+        private_account = factories.AccountFactory(user=private_user)
         public_accounts = factories.AccountFactory.create_batch(3)
 
-        user_1 = factories.UserFactory.create()
-        user_2 = factories.UserFactory.create()
+        user_1 = factories.UserFactory()
+        user_2 = factories.UserFactory()
         tweets_1 = factories.TweetFactory.create_batch(3, user=user_1)
         tweets_2 = factories.TweetFactory.create_batch(3, user=user_2)
         response = self.client.get(reverse('twitter:user_detail',
@@ -152,9 +152,9 @@ class ViewTests(TestCase):
         )
 
     def test_user_detail_context_with_account(self):
-        "Sends the correct data to templates"
-        account_1 = factories.AccountFactory.create()
-        account_2 = factories.AccountFactory.create()
+        "Sends correct data to templates for a User with an Account."
+        account_1 = factories.AccountFactory()
+        account_2 = factories.AccountFactory()
         tweets_1 = factories.TweetFactory.create_batch(3, user=account_1.user)
         tweets_2 = factories.TweetFactory.create_batch(3, user=account_2.user)
         response = self.client.get(reverse('twitter:user_detail',
@@ -172,8 +172,8 @@ class ViewTests(TestCase):
 
     def test_user_detail_privacy(self):
         "It does not show private Tweets"
-        user = factories.UserFactory.create(is_private=True)
-        account = factories.AccountFactory.create(user=user)
+        user = factories.UserFactory(is_private=True)
+        account = factories.AccountFactory(user=user)
         tweets = factories.TweetFactory.create_batch(3, user=user)
         response = self.client.get(reverse('twitter:user_detail',
                                     kwargs={'screen_name': user.screen_name}))
@@ -182,7 +182,7 @@ class ViewTests(TestCase):
 
     def test_account_favorites_templates(self):
         "Uses the correct templates"
-        account = factories.AccountFactory.create()
+        account = factories.AccountFactory()
         response = self.client.get(reverse('twitter:account_favorites',
                             kwargs={'screen_name': account.user.screen_name}))
         self.assertEquals(response.status_code, 200)
@@ -249,7 +249,7 @@ class ViewTests(TestCase):
 
     def test_tweet_detail_templates(self):
         "Uses the correct templates"
-        account = factories.AccountFactory.create()
+        account = factories.AccountFactory()
         tweets = factories.TweetFactory.create_batch(3, user=account.user)
         response = self.client.get(reverse('twitter:tweet_detail',
             kwargs={'screen_name': account.user.screen_name,
@@ -261,7 +261,7 @@ class ViewTests(TestCase):
 
     def test_tweet_detail_context(self):
         "Sends the correct data to templates"
-        account = factories.AccountFactory.create()
+        account = factories.AccountFactory()
         tweets = factories.TweetFactory.create_batch(3, user=account.user)
         response = self.client.get(reverse('twitter:tweet_detail',
             kwargs={'screen_name': account.user.screen_name,
@@ -275,7 +275,7 @@ class ViewTests(TestCase):
 
     def test_tweet_detail_context_no_account(self):
         "Sends correct data to templates when showing a tweet with no account"
-        user = factories.UserFactory.create()
+        user = factories.UserFactory()
         tweets = factories.TweetFactory.create_batch(3, user=user)
         response = self.client.get(reverse('twitter:tweet_detail',
             kwargs={'screen_name': user.screen_name,
@@ -289,8 +289,8 @@ class ViewTests(TestCase):
 
     def test_tweet_detail_privacy(self):
         "It does not show private Tweets"
-        user = factories.UserFactory.create(is_private=True)
-        account = factories.AccountFactory.create(user=user)
+        user = factories.UserFactory(is_private=True)
+        account = factories.AccountFactory(user=user)
         tweets = factories.TweetFactory.create_batch(3, user=user)
         response = self.client.get(reverse('twitter:tweet_detail',
             kwargs={'screen_name': account.user.screen_name,

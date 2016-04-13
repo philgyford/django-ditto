@@ -54,3 +54,66 @@ class ViewTests(TestCase):
         self.assertEqual(photos[0].pk, public_photo_1.pk)
         self.assertEqual(photos[1].pk, public_photo_2.pk)
 
+    def test_user_detail_templates(self):
+        "Uses the correct templates"
+        account = factories.AccountFactory()
+        response = self.client.get(reverse('flickr:user_detail',
+                                        kwargs={'nsid': account.user.nsid}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'flickr/user_detail.html')
+        self.assertTemplateUsed(response, 'flickr/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_user_detail_context_no_account(self):
+        "Sends correct data to templates for a User with no Account."
+        user = factories.UserFactory()
+        users_photos = factories.PhotoFactory.create_batch(2, user=user)
+        other_photos = factories.PhotoFactory.create_batch(2)
+
+        response = self.client.get(reverse('flickr:user_detail',
+                                                kwargs={'nsid': user.nsid}))
+        self.assertIn('account', response.context)
+        self.assertIsNone(response.context['account'])
+
+        self.assertIn('flickr_user', response.context)
+        self.assertEqual(user.pk, response.context['flickr_user'].pk)
+
+        self.assertIn('photo_list', response.context)
+        self.assertEqual(len(response.context['photo_list']), 2)
+        # ie, only user's photos.
+        self.assertIn(users_photos[0], response.context['photo_list'])
+        self.assertIn(users_photos[1], response.context['photo_list'])
+
+    def test_user_detail_context_with_account(self):
+        "Sends correct data to templates for a User with an Account."
+        user = factories.UserFactory()
+        account = factories.AccountFactory(user=user)
+        users_photos = factories.PhotoFactory.create_batch(2, user=user)
+        other_photos = factories.PhotoFactory.create_batch(2)
+
+        response = self.client.get(reverse('flickr:user_detail',
+                                                kwargs={'nsid': user.nsid}))
+        self.assertIn('account', response.context)
+        self.assertEqual(response.context['account'], account)
+
+        self.assertIn('flickr_user', response.context)
+        self.assertEqual(user.pk, response.context['flickr_user'].pk)
+
+        self.assertIn('photo_list', response.context)
+        self.assertEqual(len(response.context['photo_list']), 2)
+        # ie, only user's photos.
+        self.assertIn(users_photos[0], response.context['photo_list'])
+        self.assertIn(users_photos[1], response.context['photo_list'])
+
+    def test_user_detail_privacy(self):
+        "It doesn't show private photos."
+        user = factories.UserFactory()
+        public_photo = factories.PhotoFactory(user=user)
+        private_photo = factories.PhotoFactory(user=user, is_private=True)
+
+        response = self.client.get(reverse('flickr:user_detail',
+                                                kwargs={'nsid': user.nsid}))
+        self.assertIn('photo_list', response.context)
+        self.assertEqual(len(response.context['photo_list']), 1)
+        self.assertIn(public_photo, response.context['photo_list'])
+

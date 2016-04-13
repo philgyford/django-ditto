@@ -31,13 +31,6 @@
                         </li>
                     {% endcomment %}
                 </ul>
-            {% else %}
-                <p class="lead">
-                    Favorited by 
-                    {% for account in accounts %}
-                        {% if not forloop.first %},{% endif %}
-                            <a href="{% url 'flickr:user_detail' nsid=account.user.nsid %}">{{ account.user }}</a>{% endfor %}.
-                </p>
             {% endif %}
 
             {% include 'flickr/includes/photo_list.html' with photo_list=photo_list page_obj=page_obj perms=perms only %}

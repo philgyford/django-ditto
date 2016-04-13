@@ -75,7 +75,7 @@ Expects:
             <p class="m-b-0 text-muted twitter-tweet-meta"><small>
                 {{ tweet.retweet_count }} Retweet{{ tweet.retweet_count|pluralize }}
                 • {{ tweet.favorite_count }} Like{{ tweet.favorite_count|pluralize }}
-                • As of <time datetime="{{ tweet.fetch_time|date:'Y-m-d H:i:s' }}">{{ tweet.fetch_time|date:"j M Y g:i A" }}</time>
+                • As of {% time_link tweet.fetch_time %}
             </small></p>
         {% endif %}
     </div><!-- .media-body -->
