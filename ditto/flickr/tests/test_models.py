@@ -65,13 +65,13 @@ class PhotoTestCase(TestCase):
         self.assertEqual(photo.__str__(), 'My test photo')
 
     def test_ordering(self):
-        "Latest photo should come first by default."
+        "Latest photo (uploaded) should come first by default."
         photo_1 = PhotoFactory(title='Earliest',
-            taken_time=datetime.datetime.strptime(
+            post_time=datetime.datetime.strptime(
                 '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
             ).replace(tzinfo=pytz.utc))
         photo_2 = PhotoFactory(title='Latest',
-            taken_time=datetime.datetime.strptime(
+            post_time=datetime.datetime.strptime(
                 '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
             ).replace(tzinfo=pytz.utc))
         photos = Photo.objects.all()
