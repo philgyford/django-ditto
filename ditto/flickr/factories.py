@@ -3,6 +3,7 @@ import pytz
 import factory
 
 from . import models
+from ..ditto.utils import datetime_now
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -17,13 +18,11 @@ class UserFactory(factory.DjangoModelFactory):
     timezone_id = 'America/Los_Angeles'
 
     photos_first_date = factory.LazyAttribute(lambda o:
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-                        - datetime.timedelta(weeks=52)
-                    )
+                               datetime_now() - datetime.timedelta(weeks=52)
+                            )
     photos_first_date_taken = factory.LazyAttribute(lambda o:
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-                        - datetime.timedelta(weeks=52)
-                    )
+                                datetime_now() - datetime.timedelta(weeks=52)
+                            )
 
 
 class AccountFactory(factory.DjangoModelFactory):
@@ -51,6 +50,7 @@ class PhotoFactory(factory.DjangoModelFactory):
     original_secret = factory.Sequence(lambda n: (n * 10001))
     server = '987'
     farm = 2
+    post_time = datetime_now()
 
 
 
