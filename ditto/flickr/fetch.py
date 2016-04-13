@@ -196,24 +196,29 @@ class PhotoSaver(FlickrUtilsMixin, object):
             defaults['geo_is_private']      = (photo['info']['geoperms']['ispublic'] == 0)
 
         if 'location' in photo['info']:
-            defaults['latitude']            = photo['info']['location']['latitude']
-            defaults['longitude']           = photo['info']['location']['longitude']
-            defaults['location_accuracy']   = photo['info']['location']['accuracy']
-            defaults['location_context']    = photo['info']['location']['context']
-            defaults['location_place_id']   = photo['info']['location']['place_id']
-            defaults['location_woeid']      = photo['info']['location']['woeid']
-            defaults['locality_name']       = photo['info']['location']['locality']['_content']
-            defaults['locality_place_id']   = photo['info']['location']['locality']['place_id']
-            defaults['locality_woeid']      = photo['info']['location']['locality']['woeid']
-            defaults['county_name']         = photo['info']['location']['county']['_content']
-            defaults['county_place_id']     = photo['info']['location']['county']['place_id']
-            defaults['county_woeid']        = photo['info']['location']['county']['woeid']
-            defaults['region_name']         = photo['info']['location']['region']['_content']
-            defaults['region_place_id']     = photo['info']['location']['region']['place_id']
-            defaults['region_woeid']        = photo['info']['location']['region']['woeid']
-            defaults['country_name']        = photo['info']['location']['country']['_content']
-            defaults['country_place_id']    = photo['info']['location']['country']['place_id']
-            defaults['country_woeid']       = photo['info']['location']['country']['woeid']
+            loc = photo['info']['location']
+            defaults['latitude']            = loc['latitude']
+            defaults['longitude']           = loc['longitude']
+            defaults['location_accuracy']   = loc['accuracy']
+            defaults['location_context']    = loc['context']
+            defaults['location_place_id']   = loc['place_id']
+            defaults['location_woeid']      = loc['woeid']
+            if 'locality' in loc:
+                defaults['locality_name']       = loc['locality']['_content']
+                defaults['locality_place_id']   = loc['locality']['place_id']
+                defaults['locality_woeid']      = loc['locality']['woeid']
+            if 'county' in loc:
+                defaults['county_name']         = loc['county']['_content']
+                defaults['county_place_id']     = loc['county']['place_id']
+                defaults['county_woeid']        = loc['county']['woeid']
+            if 'region' in loc:
+                defaults['region_name']         = loc['region']['_content']
+                defaults['region_place_id']     = loc['region']['place_id']
+                defaults['region_woeid']        = loc['region']['woeid']
+            if 'country' in loc:
+                defaults['country_name']        = loc['country']['_content']
+                defaults['country_place_id']    = loc['country']['place_id']
+                defaults['country_woeid']       = loc['country']['woeid']
 
         # Go through each of the sizes from the API.
         # If the label (eg, "Small 320") exists, set the size variables
