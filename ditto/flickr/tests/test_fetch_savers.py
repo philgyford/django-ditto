@@ -53,6 +53,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
                                     '1956-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))
         self.assertEqual(user.photos_views, 227227)
+        self.assertEqual(user.timezone_id, 'Europe/London')
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_updates_existing_user(self):

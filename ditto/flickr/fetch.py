@@ -100,6 +100,7 @@ class UserSaver(FlickrUtilsMixin, object):
                                 user['photos']['firstdate']['_content']),
             'photos_first_date_taken': self._api_datetime_to_datetime(
                                 user['photos']['firstdatetaken']['_content']),
+            'timezone_id':  user['timezone']['timezone_id'],
         }
 
         if 'views' in user['photos']:
