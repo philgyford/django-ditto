@@ -1,3 +1,6 @@
+from django.http import Http404
+from django.utils.translation import ugettext as _
+from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 
 from ..ditto.views import PaginatedListView
@@ -54,5 +57,34 @@ class UserDetail(UserDetailMixin, PaginatedListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['photo_list'] = context['object_list']
+        return context
+
+
+class PhotoDetail(DetailView):
+    """Show a single Photo. It might be posted by one of the Accounts, or might
+    be a Photo by someone else, favorited.
+    """
+    model = Photo
+    slug_field = 'flickr_id'
+    slug_url_kwarg = 'flickr_id'
+
+    def get_object(self, queryset=None):
+        """Do standard DetailView.get_object(), but return 404 if the Photo is
+        private."""
+        obj = super().get_object(queryset)
+        if obj.is_private:
+            raise Http404(_("No %(verbose_name)s found matching the query") %
+                                      {'verbose_name': obj._meta.verbose_name})
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['flickr_user'] = context['photo'].user
+        # We can show favorited Photos; they won't have an associated Account.
+        try:
+            context['account'] = Account.objects.get(
+                                                user=context['flickr_user'])
+        except Account.DoesNotExist:
+            context['account'] = None
         return context
 

@@ -18,8 +18,12 @@ Expects:
         <div class="row flickr-photos">
             {% for photo in row %}
                 <div class="col-md-3 col-sm-6 flickr-photo">
-                    <h3 class="h6"><a href="">{{ photo.title }}</a></h3>
-                    <p class="flickr-photo m-b-0"><a href="#"><img src="{{ photo.small_url }}" alt="" class="img-responsive"></a></p>
+                    <h3 class="h6">
+                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
+                    </h3>
+                    <p class="flickr-photo-img m-b-0">
+                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}"><img src="{{ photo.small_url }}" width="{{ photo.width_m }}" height="{{ photo.height_m }}" alt="" class="img-responsive"></a>
+                    </p>
                     {% if photo.summary or photo.media == 'video' %}
                         <p class="flickr-photo-summary m-b-0">
                             {{ photo.summary|safe }}

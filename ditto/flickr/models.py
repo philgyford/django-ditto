@@ -99,7 +99,35 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         ('6', 'Attribution-NoDerivs License'),
         ('7', 'No known copyright restrictions'),
         ('8', 'United States Government Work'),
+        ('9', 'Public Domain Dedication (CC0)'),
+        ('10', 'Public Domain Mark'),
+        # Adding these so we'll at least have options for any future licenses:
+        ('11', 'Unused'),
+        ('12', 'Unused'),
+        ('13', 'Unused'),
+        ('14', 'Unused'),
+        ('15', 'Unused'),
+        ('16', 'Unused'),
+        ('17', 'Unused'),
+        ('18', 'Unused'),
+        ('19', 'Unused'),
+        ('20', 'Unused'),
     )
+
+    # Used in ditto/flickr/templatetags/flickr.py
+    LICENSE_URLS = {
+        '0': '',
+        '1': 'https://creativecommons.org/licenses/by-nc-sa/2.0/',
+        '2': 'https://creativecommons.org/licenses/by-nc/2.0/',
+        '3': 'https://creativecommons.org/licenses/by-nc-nd/2.0/',
+        '4': 'https://creativecommons.org/licenses/by/2.0/',
+        '5': 'https://creativecommons.org/licenses/by-sa/2.0/',
+        '6': 'https://creativecommons.org/licenses/by-nd/2.0/',
+        '7': 'https://www.flickr.com/commons/usage/',
+        '8': 'http://www.usa.gov/copyright.shtml',
+        '9': 'https://creativecommons.org/publicdomain/zero/1.0/',
+        '10': 'https://creativecommons.org/publicdomain/mark/1.0/',
+    }
 
     # https://www.flickr.com/services/api/flickr.photos.setSafetyLevel.html
     SAFETY_LEVELS = (
@@ -112,9 +140,16 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # From https://www.flickr.com/services/api/misc.dates.html
     DATE_GRANULARITIES = (
         (0, 'Y-m-d H:i:s'),
+        (1, 'Unused'),
+        (2, 'Unused'),
+        (3, 'Unused'),
         (4, 'Y-m'),
+        (5, 'Unused'),
         (6, 'Y'),
+        (7, 'Unused'),
         (8, 'Circa...'),
+        (9, 'Unused'),
+        (10, 'Unused'),
     )
 
     MEDIA_TYPES = (
@@ -312,40 +347,73 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         return variables
 
     @property
+    def location_str(self):
+        "eg 'Abbey Dore, Herefordshire, England, United Kingdom'."
+        strs = [
+            self.locality_name,
+            self.county_name,
+            self.region_name,
+            self.country_name,
+        ]
+        return ', '.join(filter(None, strs))
+
+    @property
+    def has_exif(self):
+        "Do we have any EXIF info to display?"
+        props = ['exif_camera', 'exif_lens_model', 'exif_aperture',
+                'exif_exposure', 'exif_flash', 'exif_focal_length', 'exif_iso',]
+        has_exif = False
+
+        for prop in props:
+            if getattr(self, prop):
+                has_exif = True
+                break
+
+        return has_exif
+
+    @property
+    def small_square_url(self):
+        return self._image_url('s')
+
+    @property
+    def large_square_url(self):
+        return self._image_url('q')
+
+    @property
     def thumbnail_url(self):
-        return self.image_url('t')
+        return self._image_url('t')
 
     @property
     def small_url(self):
-        return self.image_url('m')
+        return self._image_url('m')
 
     @property
     def small_320_url(self):
-        return self.image_url('n')
+        return self._image_url('n')
 
     @property
     def medium_url(self):
-        return self.image_url('-')
+        return self._image_url('-')
 
     @property
     def medium_640_url(self):
-        return self.image_url('z')
+        return self._image_url('z')
 
     @property
     def medium_800_url(self):
-        return self.image_url('c')
+        return self._image_url('c')
 
     @property
     def large_url(self):
-        return self.image_url('b')
+        return self._image_url('b')
 
     @property
     def large_1600_url(self):
-        return self.image_url('h')
+        return self._image_url('h')
 
     @property
     def large_2048_url(self):
-        return self.image_url('k')
+        return self._image_url('k')
 
     @property
     def original_url(self):
@@ -353,7 +421,8 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 self.farm, self.server, self.flickr_id, self.original_secret,
                 self.original_format)
 
-    def image_url(self, size):
+    def _image_url(self, size):
+        "Helper for the size property methods."
         size_ext = ''
         if size != '-':
             # All non-Medium-size images:

@@ -50,7 +50,7 @@ class UserAdmin(admin.ModelAdmin):
                 'is_pro', 'location', 'description',
                 'photos_url', 'profile_url',
                 'photos_count', 'photos_views',
-                'photos_first_date', 'photos_first_date_taken', )
+                'photos_first_date', 'photos_first_date_taken', 'timezone_id',)
         }),
         ('Data', {
             'fields': ('iconserver', 'iconfarm', 'raw',

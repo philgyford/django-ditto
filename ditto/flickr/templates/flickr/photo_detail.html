@@ -1,0 +1,117 @@
+{% extends 'flickr/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li><a href="{% url 'flickr:user_detail' nsid=flickr_user.nsid %}">{{ flickr_user }}</a></li>
+    <li class="active">Photo</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="m-y-md">
+        {% block title %}
+            {{ photo.title }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9 flickr-photo">
+            {% load l10n %}
+            <p class="flickr-photo-img">
+                <img src="{{ photo.large_url }}" width="{{ photo.width_b|unlocalize }}" height="{{ photo.height_b|unlocalize }}" alt="" class="img-responsive">
+            </p>
+            {% if photo.description %}
+                <p class="flickr-photo-description">{{ photo.description|safe }}</p>
+            {% endif %}
+
+            {% load ditto %}
+            {% load flickr %}
+            <dl class="dl-horizontal row photo-times">
+                <dt class="col-sm-3">Taken time</dt>
+                <dd class="col-sm-9">
+                    {% if photo.taken_unknown %}
+                        Unknown
+                    {% else %}
+                        {% taken_time photo.taken_time photo.taken_granularity %}
+                    {% endif %}
+                </dd>
+
+                <dt class="col-sm-3">Uploaded</dt>
+                <dd class="col-sm-9">{% time_link photo.post_time True %}</dd>
+
+                {% if photo.geo_is_private == False %}
+                    <dt class="col-sm-3">Location</dt>
+                    <dd class="col-sm-9">{{ photo.location_str }}</dd>
+
+                    {% if photo.location_accuracy >= 16 %}
+                        <dt class="col-sm-3">Lat/long</dt>
+                        <dd class="col-sm-9">
+                            <a href="https://maps.google.com/maps?ll={{ photo.latitude}},{{ photo.longitude }}&q={{ photo.latitude }},{{ photo.longitude }}&hl=en&t=m&z=15" title="See on Google Maps">{{ photo.latitude }}, {{ photo.longitude }}</a>
+                        </dd>
+                    {% endif %}
+                {% endif %}
+            </dl>
+
+            <dl class="dl-horizontal row photo-about">
+                <dt class="col-sm-3">Views</dt>
+                <dd class="col-sm-9">{{ photo.view_count }}</dd>
+
+                <dt class="col-sm-3">Comments</dt>
+                <dd class="col-sm-9">{{ photo.comment_count }}</dd>
+
+                <dt class="col-sm-3">License</dt>
+                <dd class="col-sm-9">{% photo_license photo.license %}</dd>
+
+                <dt class="col-sm-3">Safety level</dt>
+                <dd class="col-sm-9">{% photo_safety_level photo.safety_level %}</dd>
+            </dl>
+
+            {% if photo.has_exif %}
+                <dl class="dl-horizontal row photo-exif">
+                    {% if photo.exif_camera %}
+                        <dt class="col-sm-3">Camera</dt>
+                        <dd class="col-sm-9">{{ photo.exif_camera }}</dd>
+                    {% endif %}
+                    {% if photo.exif_lens_model %}
+                        <dt class="col-sm-3">Lens model</dt>
+                        <dd class="col-sm-9">{{ photo.exif_lens_model }}</dd>
+                    {% endif %}
+                    {% if photo.exif_aperture %}
+                        <dt class="col-sm-3">Aperture</dt>
+                        <dd class="col-sm-9">{{ photo.exif_aperture }}</dd>
+                    {% endif %}
+                    {% if photo.exif_exposure %}
+                        <dt class="col-sm-3">Exposure</dt>
+                        <dd class="col-sm-9">{{ photo.exif_exposure }}</dd>
+                    {% endif %}
+                    {% if photo.exif_flash %}
+                        <dt class="col-sm-3">Flash</dt>
+                        <dd class="col-sm-9">{{ photo.exif_flash }}</dd>
+                    {% endif %}
+                    {% if photo.exif_focal_length %}
+                        <dt class="col-sm-3">Focal length</dt>
+                        <dd class="col-sm-9">{{ photo.exif_focal_length }}</dd>
+                    {% endif %}
+                    {% if photo.exif_iso %}
+                        <dt class="col-sm-3">ISO</dt>
+                        <dd class="col-sm-9">{{ photo.exif_iso }}</dd>
+                    {% endif %}
+                </dl>
+            {% endif %}
+
+            <ul>
+                <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
+                <li>Last updated on Flickr at {% time_link photo.last_update_time True %}</li>
+                <li>Data last fetched at {% time_link photo.fetch_time True %}</li>
+            </ul>
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+            {% include 'flickr/includes/user.html' with user=flickr_user account=account only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+
+

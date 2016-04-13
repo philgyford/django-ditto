@@ -56,7 +56,7 @@ class UserTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             user_2 = UserFactory(nsid='12345678901@N01')
 
-    def test_permalink(self):
+    def test_flickr_url(self):
         user = UserFactory()
         self.assertEqual(user.permalink, user.photos_url)
 
@@ -103,6 +103,62 @@ class PhotoTestCase(TestCase):
         photo = PhotoFactory(
                 description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
         self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
+
+    def test_location_str(self):
+        photo = PhotoFactory(
+                    locality_name='Abbey Dore',
+                    county_name='',
+                    region_name='England',
+                    country_name='United Kingdom')
+        self.assertEqual(photo.location_str,
+                'Abbey Dore, England, United Kingdom')
+
+    def test_has_exif_no(self):
+        photo = PhotoFactory()
+        self.assertFalse(photo.has_exif)
+
+    def test_has_exif_yes_1(self):
+        photo = PhotoFactory(exif_camera='foo')
+        self.assertTrue(photo.has_exif)
+
+    def test_has_exif_yes_2(self):
+        photo = PhotoFactory(exif_flash='foo')
+        self.assertTrue(photo.has_exif)
+
+    def test_original_url(self):
+        photo = PhotoFactory(farm=3, server='1234', flickr_id=4567,
+                                original_secret='9876', original_format='gif')
+        self.assertEqual(photo.original_url,
+            'https://farm3.static.flickr.com/1234/4567_9876_o.gif')
+
+    def test_medium_url(self):
+        photo = PhotoFactory(farm=3, server='1234', flickr_id=4567,
+                                                                secret='9876')
+        self.assertEqual(photo.medium_url,
+            'https://farm3.static.flickr.com/1234/4567_9876.jpg')
+
+    def test_image_urls(self):
+        """Test all but the Original and Medium image URL properties."""
+        photo = PhotoFactory(farm=3, server='1234', flickr_id=4567,
+                                                                secret='9876')
+        # Map size letters to property names:
+        sizes = {
+            's': 'small_square_url',
+            'q': 'large_square_url',
+            't': 'thumbnail_url',
+            'm': 'small_url',
+            'n': 'small_320_url',
+            'z': 'medium_640_url',
+            'c': 'medium_800_url',
+            'b': 'large_url',
+            'h': 'large_1600_url',
+            'k': 'large_2048_url',
+        }
+
+        for size, prop in sizes.items():
+            self.assertEqual(getattr(photo, prop),
+                'https://farm3.static.flickr.com/1234/4567_9876_%s.jpg' % size)
+
 
     def test_default_manager_recent(self):
         "The default manager includes public AND private photos."

@@ -54,6 +54,15 @@ class PhotoFactory(factory.DjangoModelFactory):
     server = '987'
     farm = 2
     post_time = datetime_now()
+    taken_time = factory.LazyAttribute(lambda o:
+                                datetime_now() - datetime.timedelta(weeks=3)
+                            )
+    last_update_time = factory.LazyAttribute(lambda o:
+                                datetime_now() - datetime.timedelta(weeks=2)
+                            )
+    fetch_time = factory.LazyAttribute(lambda o:
+                                datetime_now() - datetime.timedelta(weeks=1)
+                            )
 
 
 

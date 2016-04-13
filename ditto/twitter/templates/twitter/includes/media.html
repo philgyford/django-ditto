@@ -8,11 +8,12 @@ Expects:
 {% endcomment %}
 
 <li class="m-b">
+	{% load l10n %}
 	{% if media.media_type == 'video' %}
 		{% if detail %}
-			<video width="{{ media.large_w|safe }}" height="{{ media.large_h|safe }}" controls preload="none" class="img-responsive">
+			<video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="none" class="img-responsive">
 		{% else %}
-			<video width="{{ media.small_w|safe }}" height="{{ media.small_h|safe }}" controls preload="none">
+			<video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" controls preload="none">
 		{% endif %}
 			{% if media.mp4_url_3 %}
 				<source src="{{ media.mp4_url_3 }}" type="video/mp4">
@@ -28,9 +29,9 @@ Expects:
 	{% else %}
 		{# Photo #}
 		{% if detail %}
-			<a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|safe }}" height="{{ media.large_h|safe }}" alt="" class="img-responsive"></a>
+			<a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-responsive"></a>
 		{% else %}
-			<img src="{{ media.small_url }}" width="{{ media.small_w|safe }}" height="{{ media.small_h|safe }}" alt="">
+			<img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt="">
 		{% endif %}
 	{% endif %}
 </li>
