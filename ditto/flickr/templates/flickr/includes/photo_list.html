@@ -29,7 +29,12 @@ Expects:
                         </p>
                     {% endif %}
                     <p><small class="text-muted">
-                        Uploaded at {% time_link photo.post_time view %}
+                        Uploaded at
+                        {% if view == 'day' %}
+                            {% time_link photo.post_time False %}
+                        {% else %}
+                            {% time_link photo.post_time True %}
+                        {% endif %}
                     </small></p>
                 </div>
             {% endfor %}

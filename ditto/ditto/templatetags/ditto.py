@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 register = template.Library()
 
 @register.simple_tag
-def time_link(dt, view_type):
+def time_link(dt, link_to_day=False):
     """Return the HTML to display the time a Photo, Tweet, etc.
 
     dt -- The datetime.
@@ -19,12 +19,10 @@ def time_link(dt, view_type):
     """
 
     # The date and time formats for display:
-    d_fmt = '%-d %b %Y'
+    d_fmt = '%-d&nbsp;%b&nbsp;%Y'
     t_fmt = '%H:%M'
 
-    if view_type == 'day':
-        visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
-    else:
+    if link_to_day:
         url = reverse('ditto:day_archive', kwargs={
                     'year':     dt.strftime('%Y'),
                     'month':    dt.strftime('%m'),
@@ -36,6 +34,8 @@ def time_link(dt, view_type):
                 'url': url,
                 'date': dt.strftime(d_fmt),
             }
+    else:
+        visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
 
     return '<time datetime="%(stamp)s">%(visible)s</time>' % {
                 'stamp': dt.strftime('%Y-%m-%d %H:%M:%S'),

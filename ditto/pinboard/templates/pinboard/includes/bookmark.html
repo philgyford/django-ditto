@@ -37,7 +37,11 @@ Expects:
             By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
             • 
             {% load ditto %}
-            {% time_link bookmark.post_time view %}
+            {% if view == 'day' %}
+                {% time_link bookmark.post_time False %}
+            {% else %}
+                {% time_link bookmark.post_time True %}
+            {% endif %}
 
             {% if not view or view != 'detail' %}
                 • <a href="{{ bookmark.get_absolute_url }}" title="See only this bookmark">#</a>

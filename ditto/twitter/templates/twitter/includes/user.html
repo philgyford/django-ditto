@@ -41,7 +41,8 @@
 <div class="card twitter-user">
     <div class="card-block">
         <p class="card-text text-muted">
-            <small>As of <time datetime="{{ user.fetch_time|date:'Y-m-d H:i:s' }}">{{ user.fetch_time|date:"j M Y g:i A" }}</time></small>
+            {% load ditto %}
+            <small>As of {% time_link user.fetch_time %}</small>
         </p>
     </div>
 </div>

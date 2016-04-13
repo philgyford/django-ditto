@@ -20,7 +20,11 @@ Expects:
             <small class="text-muted">
                 •
 				{% load ditto %}
-				{% time_link tweet.post_time view %}
+				{% if view == 'day' %}
+					{% time_link tweet.post_time False %}
+				{% else %}
+					{% time_link tweet.post_time True %}
+				{% endif %}
 
                 {% if view and view == 'detail' %}
                     • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>
