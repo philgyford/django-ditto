@@ -5,6 +5,7 @@ from .models import Account, Photo, User
 
 class Home(PaginatedListView):
     template_name = 'flickr/index.html'
+    paginate_by = 48
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
