@@ -12,17 +12,29 @@ Expects:
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 
-	{% load ditto %}
+    {% load ditto %}
 
-	{% for row in photo_list|split_by:4 %}
-		<div class="row flickr-photos">
-			{% for photo in row %}
-				<div class="col-md-3 flickr-photo">
-					{% include 'flickr/includes/photo.html' with photo=photo perms=perms view=view|default:False only %}
-				</div>
-			{% endfor %}
-		</div> <!-- .row.flickr-photos -->
-	{% endfor %}
+    {% for row in photo_list|split_by:4 %}
+        <div class="row flickr-photos">
+            {% for photo in row %}
+                <div class="col-md-3 col-sm-6 flickr-photo">
+                    <h3 class="h6"><a href="">{{ photo.title }}</a></h3>
+                    <p class="flickr-photo m-b-0"><a href="#"><img src="{{ photo.small_url }}" alt="" class="img-responsive"></a></p>
+                    {% if photo.summary or photo.media == 'video' %}
+                        <p class="flickr-photo-summary m-b-0">
+                            {{ photo.summary|safe }}
+                            {% if photo.media == 'video' %}
+                                <span class="text-muted">(Video)</span>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                    <p><small class="text-muted">
+                        {% time_link photo.post_time view %}
+                    </small></p>
+                </div>
+            {% endfor %}
+        </div> <!-- .row.flickr-photos -->
+    {% endfor %}
 
     {% if page_obj|default:False %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
