@@ -71,7 +71,7 @@ def time_link(dt, link_to_day=False):
 
 @register.filter
 def split_by(items, n):
-    """Splits a list into n chunks. Returns a list of n lists."""
+    """Splits a list into chunks of n items."""
 
     def make_chunks(items, n):
         """Yield successive n-sized chunks from items."""
