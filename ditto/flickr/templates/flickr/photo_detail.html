@@ -30,7 +30,7 @@
                 </video>
             {% else %}
                 <p class="flickr-photo-img">
-                    <img src="{{ photo.medium_url }}" {% width_height photo.medium_width photo.medium_height 867 600 %} alt="" class="img-responsive">
+                    <img src="{{ photo.medium_800_url }}" {% width_height photo.medium_800_width photo.medium_800_height 867 600 %} alt="" class="img-responsive">
                 </p>
             {% endif %}
             {% if photo.description %}
@@ -48,7 +48,7 @@
                     {% endif %}
                 </dd>
 
-                <dt class="col-sm-3">Uploaded</dt>
+                <dt class="col-sm-3">Uploaded time</dt>
                 <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
 
                 {% if photo.geo_is_private == False %}

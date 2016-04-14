@@ -16,13 +16,13 @@ def taken_time(dt, granularity):
     """
     s = ''
     if granularity == 0:
-        s = "Taken at %s" % display_time(dt, True)
+        s = "%s" % display_time(dt, True)
     elif granularity == 4:
-        s = "Taken some time in %s" % dt.strftime('%B %Y')
+        s = "Some time in %s" % dt.strftime('%B %Y')
     elif granularity == 6:
-        s = "Taken some time in %s" % dt.strftime('%Y')
+        s = "Some time in %s" % dt.strftime('%Y')
     elif granularity == 8:
-        s = "Taken circa %s" % dt.strftime('%Y')
+        s = "Circa %s" % dt.strftime('%Y')
 
     return s
 
