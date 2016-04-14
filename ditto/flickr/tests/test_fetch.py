@@ -43,6 +43,8 @@ class FlickrFetchTestCase(TestCase):
         'photos.getSizes': 'ditto/flickr/fixtures/api/photos_getsizes.json',
         'photos.getExif': 'ditto/flickr/fixtures/api/photos_getexif.json',
         'test.login': 'ditto/flickr/fixtures/api/test_login.json',
+        # Variation including video sizes:
+        'photos.getSizes_video': 'ditto/flickr/fixtures/api/photos_getsizes_video.json',
     }
 
     def load_raw_fixture(self, method):

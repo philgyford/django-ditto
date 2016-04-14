@@ -11,7 +11,7 @@ Expects:
 	{% load l10n %}
 	{% if media.media_type == 'video' %}
 		{% if detail %}
-			<video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="none" class="img-responsive">
+			<video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="metadata" class="img-responsive">
 		{% else %}
 			<video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" controls preload="none">
 		{% endif %}

@@ -199,6 +199,26 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
 
         save_tags.assert_called_once_with(photo, photo_data['info']['tags']['tag'])
 
+    @patch('ditto.flickr.fetch.PhotoSaver._save_tags')
+    def test_saves_video_data(self, save_tags):
+        photo_data = self.make_photo_data()
+        # Change to use the getSizes fixture including video data:
+        photo_data['sizes'] = self.load_fixture('photos.getSizes_video')['sizes']
+        photo_data['info']['media'] = 'video'
+
+        photo = self.make_photo_object( photo_data )
+
+        self.assertEqual(photo.media, 'video')
+
+        sizes = {
+            'mp4_mobile':       (480, 360),
+            'mp4_site':         (640, 360),
+            'mp4_hd':           (1282, 720),
+            'video_original':   (1280, 720),
+        }
+        for letter, wh in sizes.items():
+            self.assertEqual(getattr(photo, 'width_'+letter), wh[0])
+            self.assertEqual(getattr(photo, 'height_'+letter), wh[1])
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @patch('ditto.flickr.fetch.PhotoSaver._save_tags')

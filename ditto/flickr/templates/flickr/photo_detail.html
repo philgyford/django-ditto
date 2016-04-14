@@ -18,9 +18,19 @@
     <div class="row">
         <div class="col-md-9 flickr-photo">
             {% load l10n %}
-            <p class="flickr-photo-img">
-                <img src="{{ photo.large_url }}" width="{{ photo.width_b|unlocalize }}" height="{{ photo.height_b|unlocalize }}" alt="" class="img-responsive">
-            </p>
+            {% if photo.media == 'video' %}
+                <video width="{{ photo.width_mp4_site|unlocalize }}" height="{{ photo.height_mp4_site|unlocalize }}" poster="{{ photo.large_url }}" controls preload="metadata" class="img-responsive">
+                    {% if photo.site_mp4_url %}
+                        <source src="{{ photo.site_mp4_url }}" type="video/mp4">
+                    {% elif photo.mobile_mp4_url %}
+                        <source src="{{ photo.mobile_mp4_url }}" type="video/mp4">
+                    {% endif %}
+                </video>
+            {% else %}
+                <p class="flickr-photo-img">
+                    <img src="{{ photo.large_url }}" width="{{ photo.width_b|unlocalize }}" height="{{ photo.height_b|unlocalize }}" alt="" class="img-responsive">
+                </p>
+            {% endif %}
             {% if photo.description %}
                 <p class="flickr-photo-description">{{ photo.description|safe }}</p>
             {% endif %}
@@ -41,8 +51,10 @@
                 <dd class="col-sm-9">{% time_link photo.post_time True %}</dd>
 
                 {% if photo.geo_is_private == False %}
-                    <dt class="col-sm-3">Location</dt>
-                    <dd class="col-sm-9">{{ photo.location_str }}</dd>
+                    {% if photo.location_str %}
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">{{ photo.location_str }}</dd>
+                    {% endif %}
 
                     {% if photo.location_accuracy >= 16 %}
                         <dt class="col-sm-3">Lat/long</dt>
@@ -101,6 +113,9 @@
             {% endif %}
 
             <ul>
+                {% if perms.twitter.can_change_tweet %}
+                    <li><a href="{% url 'admin:flickr_photo_change' photo.id %}">Edit</a></li>
+                {% endif %}
                 <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
                 <li>Last updated on Flickr at {% time_link photo.last_update_time True %}</li>
                 <li>Data last fetched at {% time_link photo.fetch_time True %}</li>

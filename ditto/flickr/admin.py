@@ -86,7 +86,13 @@ class PhotoAdmin(admin.ModelAdmin):
             'fields': ('view_count', 'comment_count', 'secret', 'original_secret', 'server', 'farm',                 'rotation', 'original_format', 'safety_level', 'has_people')
         }),
         ('Sizes', {
-            'fields': ('width_t', 'height_t', 'width_m', 'height_m', 'width_n', 'height_n', 'width', 'height', 'width_z', 'height_z', 'width_c', 'height_c', 'width_b', 'height_b', 'width_h', 'height_h', 'width_k', 'height_k', 'width_o', 'height_o', )
+            'fields': (
+                'width_t', 'height_t', 'width_m', 'height_m', 'width_n', 'height_n', 'width', 'height', 'width_z', 'height_z', 'width_c', 'height_c', 'width_b', 'height_b', 'width_h', 'height_h', 'width_k', 'height_k', 'width_o', 'height_o', 
+                'width_mp4_mobile', 'height_mp4_mobile',
+                'width_mp4_site', 'height_mp4_site', 
+                'width_mp4_hd', 'height_mp4_hd', 
+                'width_video_original', 'height_video_original', 
+            )
         }),
         ('Location', {
             'fields': ('geo_is_private', 'latitude', 'longitude', 'location_accuracy', 'location_context', 'location_place_id', 'location_woeid',

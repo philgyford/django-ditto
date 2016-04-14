@@ -159,6 +159,33 @@ class PhotoTestCase(TestCase):
             self.assertEqual(getattr(photo, prop),
                 'https://farm3.static.flickr.com/1234/4567_9876_%s.jpg' % size)
 
+    def test_video_urls_video(self):
+        "Videos should return the correct URLs from the video url properties."
+        permalink = 'https://www.flickr.com/photos/philgyford/25743649964/'
+        photo = PhotoFactory(media='video', permalink=permalink, secret=9876)
+        # Map size letters to property names:
+        sizes = {
+            'mobile':   'mobile_mp4_url',
+            'site':     'site_mp4_url',
+            'hd':       'hd_mp4_url',
+            'orig':     'original_video_url',
+        }
+        for size, prop in sizes.items():
+            self.assertEqual(getattr(photo, prop),
+                                    '%splay/%s/%s/' % (permalink, size, 9876))
+
+    def test_video_urls_photo(self):
+        "Photos should have None for all video URLs."
+        photo = PhotoFactory(media='photo')
+        # Map size letters to property names:
+        sizes = {
+            'mobile':   'mobile_mp4_url',
+            'site':     'site_mp4_url',
+            'hd':       'hd_mp4_url',
+            'orig':     'original_video_url',
+        }
+        for size, prop in sizes.items():
+            self.assertIsNone(getattr(photo, prop))
 
     def test_default_manager_recent(self):
         "The default manager includes public AND private photos."

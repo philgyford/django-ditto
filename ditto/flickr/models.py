@@ -167,6 +167,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # From https://www.flickr.com/services/api/misc.urls.html
     # Before 2010-05-25 large photos only exist for very large original images.
     # Medium 800, large 1600, and large 2048 photos only exist after 2012-03-01.
+    # Used in fetch.PhotoSaver()
     SIZES = {
         'Small square':    's',  # 75x75
         'Large square':    'q',  # 150x150
@@ -180,6 +181,16 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         'Large 1600':      'h',
         'Large 2048':      'k',
         'Original':        'o',
+    }
+
+    # Mapping the terms used in the API's photos.getSizes to the terms used
+    # in the Photo model's width_* and height_* variables.
+    # Used in fetch.PhotoSaver()
+    VIDEO_SIZES = {
+        'Mobile MP4':       'mp4_mobile',
+        'Site MP4':         'mp4_site',
+        'HD MP4':           'mp4_hd',
+        'Video Original':   'video_original',
     }
 
     user = models.ForeignKey('User')
@@ -268,6 +279,25 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     height_o = models.PositiveSmallIntegerField("Original height",
                                                         null=True, blank=True)
 
+    # Video sizes; when media='video'.
+    width_mp4_mobile = models.PositiveSmallIntegerField("Mobile MP4 width",
+                                                        null=True, blank=True)
+    height_mp4_mobile = models.PositiveSmallIntegerField("Mobile MP4 height",
+                                                        null=True, blank=True)
+    width_mp4_site = models.PositiveSmallIntegerField("Site MP4 width",
+                                                        null=True, blank=True)
+    height_mp4_site = models.PositiveSmallIntegerField("Site MP4 height",
+                                                        null=True, blank=True)
+    width_mp4_hd = models.PositiveSmallIntegerField("HD MP4 width",
+                                                        null=True, blank=True)
+    height_mp4_hd = models.PositiveSmallIntegerField("HD MP4 height",
+                                                        null=True, blank=True)
+    width_video_original = models.PositiveSmallIntegerField(
+                                "Original video width", null=True, blank=True)
+    height_video_original = models.PositiveSmallIntegerField(
+                                "Original video height", null=True, blank=True)
+
+
     # LOCATION ###############################################################
 
     geo_is_private = models.BooleanField(default=False, null=False, blank=False,
@@ -328,23 +358,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """Make the summary that's created when the Photo is saved."""
         return truncate_string(self.description,
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
-
-    def get_size_variables(self, label):
-        """Get the names of the width and height variables for a specific
-        photo size.
-        label -- The name of a size, eg 'Small square' or 'Large'.
-        Returns a list of 0 or 2 variable names, width first.
-        eg, ['width_s', 'height_s']
-        """
-        variables = []
-        if label in self.SIZES:
-            letter = self.SIZES[label]
-            if letter:
-                variables = ['width_'+letter, 'height_'+letter]
-            else:
-                # Medium size.
-                variables = ['width', 'height']
-        return variables
 
     @property
     def location_str(self):
@@ -421,8 +434,36 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 self.farm, self.server, self.flickr_id, self.original_secret,
                 self.original_format)
 
+    @property
+    def mobile_mp4_url(self):
+        return self._video_url('mobile')
+
+    @property
+    def site_mp4_url(self):
+        return self._video_url('site')
+
+    @property
+    def hd_mp4_url(self):
+        return self._video_url('hd')
+
+    @property
+    def original_video_url(self):
+        return self._video_url('orig')
+
+    def _video_url(self, size):
+        """Helper for the video URL property methods.
+        Returns None for photos, or a URL like
+        https://www.flickr.com/photos/philgyford/25743649964/play/site/a8bd5ddf59/
+        for videos.
+        size -- 'site', 'mobile', 'hd', or 'orig'
+        """
+        if self.media == 'photo':
+            return None
+        else:
+            return '%splay/%s/%s/' % (self.permalink, size, self.secret)
+
     def _image_url(self, size):
-        "Helper for the size property methods."
+        "Helper for the photo url property methods."
         size_ext = ''
         if size != '-':
             # All non-Medium-size images:

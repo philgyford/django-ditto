@@ -225,7 +225,7 @@ class PhotoSaver(FlickrUtilsMixin, object):
         # If the label (eg, "Small 320") exists, set the size variables
         # (eg, "width_n" and "height_n" with the pixel sizes.
         for size in photo['sizes']['size']:
-            variables = Photo().get_size_variables(size['label'])
+            variables = self._photo_size_variables(size['label'])
             if len(variables) == 2:
                 defaults[variables[0]] = int(size['width'])
                 defaults[variables[1]] = int(size['height'])
@@ -256,6 +256,28 @@ class PhotoSaver(FlickrUtilsMixin, object):
         self._save_tags(photo_obj, photo['info']['tags']['tag'])
 
         return photo_obj
+
+    def _photo_size_variables(self, label):
+        """Get the names of the width and height variables for a specific
+        photo/video size.
+        label -- The name of a size, eg 'Small square' or 'HD MP4'.
+        Returns a list of 0 or 2 variable names, width first.
+        eg, ['width_s', 'height_s']
+        or, ['width_mp4_hd', 'height_mp4_hd']
+        """
+        # Combine SIZES and VIDEO_SIZES into one dict:
+        sizes = Photo.SIZES.copy()
+        sizes.update(Photo.VIDEO_SIZES)
+
+        variables = []
+        if label in sizes:
+            letter = sizes[label]
+            if letter:
+                variables = ['width_'+letter, 'height_'+letter]
+            else:
+                # Medium size.
+                variables = ['width', 'height']
+        return variables
 
     def _save_tags(self, photo_obj, tags_data):
         """
