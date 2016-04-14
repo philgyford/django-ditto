@@ -1,7 +1,7 @@
 from django import template
 
 from ..models import Photo
-from ...ditto.templatetags.ditto import time_link
+from ...ditto.templatetags.ditto import display_time
 
 
 register = template.Library()
@@ -16,7 +16,7 @@ def taken_time(dt, granularity):
     """
     s = ''
     if granularity == 0:
-        s = "Taken at %s" % time_link(dt, True)
+        s = "Taken at %s" % display_time(dt, True)
     elif granularity == 4:
         s = "Taken some time in %s" % dt.strftime('%B %Y')
     elif granularity == 6:

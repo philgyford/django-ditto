@@ -49,7 +49,7 @@
                 </dd>
 
                 <dt class="col-sm-3">Uploaded</dt>
-                <dd class="col-sm-9">{% time_link photo.post_time True %}</dd>
+                <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
 
                 {% if photo.geo_is_private == False %}
                     {% if photo.location_str %}
@@ -118,8 +118,8 @@
                     <li><a href="{% url 'admin:flickr_photo_change' photo.id %}">Edit</a></li>
                 {% endif %}
                 <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
-                <li>Last updated on Flickr at {% time_link photo.last_update_time True %}</li>
-                <li>Data last fetched at {% time_link photo.fetch_time True %}</li>
+                <li>Last updated on Flickr at {% display_time photo.last_update_time True %}</li>
+                <li>Data last fetched at {% display_time photo.fetch_time True %}</li>
             </ul>
         </div> <!-- .col -->
 

@@ -32,7 +32,7 @@ def width_height(w, h, max_w, max_h):
 
 
 @register.simple_tag
-def time_link(dt, link_to_day=False):
+def display_time(dt, link_to_day=False):
     """Return the HTML to display the time a Photo, Tweet, etc.
 
     dt -- The datetime.

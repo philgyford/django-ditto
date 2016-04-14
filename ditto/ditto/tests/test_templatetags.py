@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ..templatetags.ditto import width_height, split_by, time_link
+from ..templatetags.ditto import width_height, split_by, display_time 
 
 
 class WidthHeightTestCase(TestCase):
@@ -47,14 +47,14 @@ class WidthHeightTestCase(TestCase):
         )
 
 
-class TimeLinkTestCase(TestCase):
+class DisplayTimeTestCase(TestCase):
 
     @freeze_time("2015-08-14 13:34:56")
     def test_returns_time_with_no_link(self):
         dt = datetime.datetime.now().replace(tzinfo=pytz.utc)
 
         self.assertEqual(
-            time_link(dt),
+            display_time(dt),
             '<time datetime="2015-08-14 13:34:56">13:34 on 14&nbsp;Aug&nbsp;2015</time>'
         )
 
@@ -65,7 +65,7 @@ class TimeLinkTestCase(TestCase):
         dt = datetime.datetime.now().replace(tzinfo=pytz.utc)
 
         self.assertEqual(
-            time_link(dt, True),
+            display_time(dt, True),
             '<time datetime="2015-08-14 13:34:56">13:34 on <a href="/2015/08/14/" title="All items from this day">14&nbsp;Aug&nbsp;2015</a></time>'
         )
 

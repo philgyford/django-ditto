@@ -38,9 +38,9 @@ Expects:
             • 
             {% load ditto %}
             {% if view == 'day' %}
-                {% time_link bookmark.post_time False %}
+                {% display_time bookmark.post_time False %}
             {% else %}
-                {% time_link bookmark.post_time True %}
+                {% display_time bookmark.post_time True %}
             {% endif %}
 
             {% if not view or view != 'detail' %}

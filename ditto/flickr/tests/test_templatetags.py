@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ...ditto.templatetags.ditto import time_link
+from ...ditto.templatetags.ditto import display_time
 from ...ditto.utils import datetime_now
 from ..templatetags import flickr
 
@@ -16,7 +16,7 @@ class TakenTimeTestCase(TestCase):
     def test_taken_time_0(self):
         "taken_time() with granularity 0"
         self.assertEqual(flickr.taken_time(self.dt, 0),
-                'Taken at %s' % time_link(self.dt, True))
+                'Taken at %s' % display_time(self.dt, True))
 
     def test_taken_time_4(self):
         "taken_time() with granularity 4"

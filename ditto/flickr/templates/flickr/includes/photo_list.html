@@ -35,9 +35,9 @@ Expects:
                     <p><small class="text-muted">
                         Uploaded at
                         {% if view == 'day' %}
-                            {% time_link photo.post_time False %}
+                            {% display_time photo.post_time False %}
                         {% else %}
-                            {% time_link photo.post_time True %}
+                            {% display_time photo.post_time True %}
                         {% endif %}
                     </small></p>
                 </div>
