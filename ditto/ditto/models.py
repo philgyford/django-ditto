@@ -93,9 +93,9 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     # Obviously not relevant to some items, like Bookmarks.
     latitude = models.DecimalField(null=True, blank=True,
-                                            max_digits=12, decimal_places=9)
+                                            max_digits=9, decimal_places=6)
     longitude = models.DecimalField(null=True, blank=True,
-                                            max_digits=12, decimal_places=9)
+                                            max_digits=9, decimal_places=6)
 
     raw = models.TextField(blank=True,
                                     help_text="eg, the raw JSON from the API.")
