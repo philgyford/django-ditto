@@ -16,22 +16,22 @@ class TakenTimeTestCase(TestCase):
     def test_taken_time_0(self):
         "taken_time() with granularity 0"
         self.assertEqual(flickr.taken_time(self.dt, 0),
-                'Taken at %s' % display_time(self.dt, True))
+                        '%s' % display_time(self.dt, True))
 
     def test_taken_time_4(self):
         "taken_time() with granularity 4"
         self.assertEqual(flickr.taken_time(self.dt, 4),
-                        'Taken some time in August 2015')
+                        'Some time in August 2015')
 
     def test_taken_time_6(self):
         "taken_time() with granularity 6"
         self.assertEqual(flickr.taken_time(self.dt, 6),
-                        'Taken some time in 2015')
+                        'Some time in 2015')
 
     def test_taken_time_8(self):
         "taken_time() with granularity 8"
         self.assertEqual(flickr.taken_time(self.dt, 8),
-                        'Taken circa 2015')
+                        'Circa 2015')
 
     def test_taken_time_9(self):
         "taken_time() with granularity 9"
