@@ -164,35 +164,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         (2, 'outdoors'),
     )
 
-    # From https://www.flickr.com/services/api/misc.urls.html
-    # Before 2010-05-25 large photos only exist for very large original images.
-    # Medium 800, large 1600, and large 2048 photos only exist after 2012-03-01.
-    # Used in fetch.PhotoSaver()
-    SIZES = {
-        'Small square':    's',  # 75x75
-        'Large square':    'q',  # 150x150
-        'Thumbnail':       't',  # 100
-        'Small':           'm',  # 240
-        'Small 320':       'n',
-        'Medium':          '',   # 500
-        'Medium 640':      'z',
-        'Medium 800':      'c',
-        'Large':           'b',  # 1024
-        'Large 1600':      'h',
-        'Large 2048':      'k',
-        'Original':        'o',
-    }
-
-    # Mapping the terms used in the API's photos.getSizes to the terms used
-    # in the Photo model's width_* and height_* variables.
-    # Used in fetch.PhotoSaver()
-    VIDEO_SIZES = {
-        'Mobile MP4':       'mp4_mobile',
-        'Site MP4':         'mp4_site',
-        'HD MP4':           'mp4_hd',
-        'Video Original':   'video_original',
-    }
-
     user = models.ForeignKey('User')
 
     flickr_id = models.BigIntegerField(unique=True, db_index=True,
@@ -238,64 +209,44 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     sizes_raw = models.TextField(blank=True,
             help_text="eg, the raw JSON from the API - flickr.photos.getSizes.")
 
-    width_t = models.PositiveSmallIntegerField("Thumbnail width",
-                                                        null=True, blank=True)
-    height_t = models.PositiveSmallIntegerField("Thumbnail height",
-                                                        null=True, blank=True)
-    width_m = models.PositiveSmallIntegerField("Small width",
-                                                        null=True, blank=True)
-    height_m = models.PositiveSmallIntegerField("Small height",
-                                                        null=True, blank=True)
-    width_n = models.PositiveSmallIntegerField("Small 320 width",
-                                                        null=True, blank=True)
-    height_n = models.PositiveSmallIntegerField("Small 320 height",
-                                                        null=True, blank=True)
-    width = models.PositiveSmallIntegerField("Medium width",
-                                                        null=True, blank=True)
-    height = models.PositiveSmallIntegerField("Medium height",
-                                                        null=True, blank=True)
-    width_z = models.PositiveSmallIntegerField("Medium 640 width",
-                                                        null=True, blank=True)
-    height_z = models.PositiveSmallIntegerField("Medium 640 height",
-                                                        null=True, blank=True)
-    width_c = models.PositiveSmallIntegerField("Medium 800 width",
-                                                        null=True, blank=True)
-    height_c = models.PositiveSmallIntegerField("Medium 800 height",
-                                                        null=True, blank=True)
-    width_b = models.PositiveSmallIntegerField("Large width",
-                                                        null=True, blank=True)
-    height_b = models.PositiveSmallIntegerField("Large height",
-                                                        null=True, blank=True)
-    width_h = models.PositiveSmallIntegerField("Large 1600 width",
-                                                        null=True, blank=True)
-    height_h = models.PositiveSmallIntegerField("Large 1600 height",
-                                                        null=True, blank=True)
-    width_k = models.PositiveSmallIntegerField("Large 2048 width",
-                                                        null=True, blank=True)
-    height_k = models.PositiveSmallIntegerField("Large 2048 height",
-                                                        null=True, blank=True)
-    width_o = models.PositiveSmallIntegerField("Original width",
-                                                        null=True, blank=True)
-    height_o = models.PositiveSmallIntegerField("Original height",
-                                                        null=True, blank=True)
+    thumbnail_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    thumbnail_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    small_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    small_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    small_320_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    small_320_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_640_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_640_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_800_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    medium_800_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_1600_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_1600_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_2048_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    large_2048_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    original_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    original_height = models.PositiveSmallIntegerField(null=True, blank=True)
 
     # Video sizes; when media='video'.
-    width_mp4_mobile = models.PositiveSmallIntegerField("Mobile MP4 width",
+    mobile_mp4_width = models.PositiveSmallIntegerField("Mobile MP4 width",
                                                         null=True, blank=True)
-    height_mp4_mobile = models.PositiveSmallIntegerField("Mobile MP4 height",
+    mobile_mp4_height = models.PositiveSmallIntegerField("Mobile MP4 height",
                                                         null=True, blank=True)
-    width_mp4_site = models.PositiveSmallIntegerField("Site MP4 width",
+    site_mp4_width = models.PositiveSmallIntegerField("Site MP4 width",
                                                         null=True, blank=True)
-    height_mp4_site = models.PositiveSmallIntegerField("Site MP4 height",
+    site_mp4_height = models.PositiveSmallIntegerField("Site MP4 height",
                                                         null=True, blank=True)
-    width_mp4_hd = models.PositiveSmallIntegerField("HD MP4 width",
+    hd_mp4_width = models.PositiveSmallIntegerField("HD MP4 width",
                                                         null=True, blank=True)
-    height_mp4_hd = models.PositiveSmallIntegerField("HD MP4 height",
+    hd_mp4_height = models.PositiveSmallIntegerField("HD MP4 height",
                                                         null=True, blank=True)
-    width_video_original = models.PositiveSmallIntegerField(
-                                "Original video width", null=True, blank=True)
-    height_video_original = models.PositiveSmallIntegerField(
-                                "Original video height", null=True, blank=True)
+    video_original_width = models.PositiveSmallIntegerField(
+                                                        null=True, blank=True)
+    video_original_height = models.PositiveSmallIntegerField(
+                                                        null=True, blank=True)
 
 
     # LOCATION ###############################################################
@@ -385,7 +336,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         return has_exif
 
     @property
-    def small_square_url(self):
+    def square_url(self):
         return self._image_url('s')
 
     @property

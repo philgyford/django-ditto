@@ -221,14 +221,32 @@ class PhotoSaver(FlickrUtilsMixin, object):
                 defaults['country_place_id']    = loc['country']['place_id']
                 defaults['country_woeid']       = loc['country']['woeid']
 
-        # Go through each of the sizes from the API.
-        # If the label (eg, "Small 320") exists, set the size variables
-        # (eg, "width_n" and "height_n" with the pixel sizes.
+        # The size labels for all possible sizes an image might have, that we
+        # also have width/height parameters for on Photo:
+        sizes = [
+            #'Square',
+            #'Large square',
+            'Thumbnail',
+            'Small',
+            'Small 320',
+            'Medium',
+            'Medium 640',
+            'Medium 800',
+            'Large',
+            'Large 1600',
+            'Large 2048',
+            'Original',
+            'Mobile MP4',
+            'Site MP4',
+            'HD MP4',
+            'Video Original',
+        ]
         for size in photo['sizes']['size']:
-            variables = self._photo_size_variables(size['label'])
-            if len(variables) == 2:
-                defaults[variables[0]] = int(size['width'])
-                defaults[variables[1]] = int(size['height'])
+            if size['label'] in sizes:
+                # eg, 'Small 320' becomes 'small_320':
+                name = size['label'].lower().replace(" ", "_")
+                defaults[name+'_width'] = int(size['width'])
+                defaults[name+'_height'] = int(size['height'])
 
         try:
             import logging
@@ -256,28 +274,6 @@ class PhotoSaver(FlickrUtilsMixin, object):
         self._save_tags(photo_obj, photo['info']['tags']['tag'])
 
         return photo_obj
-
-    def _photo_size_variables(self, label):
-        """Get the names of the width and height variables for a specific
-        photo/video size.
-        label -- The name of a size, eg 'Small square' or 'HD MP4'.
-        Returns a list of 0 or 2 variable names, width first.
-        eg, ['width_s', 'height_s']
-        or, ['width_mp4_hd', 'height_mp4_hd']
-        """
-        # Combine SIZES and VIDEO_SIZES into one dict:
-        sizes = Photo.SIZES.copy()
-        sizes.update(Photo.VIDEO_SIZES)
-
-        variables = []
-        if label in sizes:
-            letter = sizes[label]
-            if letter:
-                variables = ['width_'+letter, 'height_'+letter]
-            else:
-                # Medium size.
-                variables = ['width', 'height']
-        return variables
 
     def _save_tags(self, photo_obj, tags_data):
         """

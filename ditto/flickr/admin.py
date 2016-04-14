@@ -87,11 +87,11 @@ class PhotoAdmin(admin.ModelAdmin):
         }),
         ('Sizes', {
             'fields': (
-                'width_t', 'height_t', 'width_m', 'height_m', 'width_n', 'height_n', 'width', 'height', 'width_z', 'height_z', 'width_c', 'height_c', 'width_b', 'height_b', 'width_h', 'height_h', 'width_k', 'height_k', 'width_o', 'height_o', 
-                'width_mp4_mobile', 'height_mp4_mobile',
-                'width_mp4_site', 'height_mp4_site', 
-                'width_mp4_hd', 'height_mp4_hd', 
-                'width_video_original', 'height_video_original', 
+                'thumbnail_width', 'thumbnail_height', 'small_width', 'small_height', 'small_320_width', 'small_320_height', 'medium_width', 'medium_height', 'medium_640_width', 'medium_640_height', 'medium_800_width', 'medium_800_height', 'large_width', 'large_height', 'large_1600_width', 'large_1600_height', 'large_2400_width', 'large_2400_height', 'original_width', 'original_height',
+                'mobile_mp4_width', 'mobile_mp4_height',
+                'site_mp4_width', 'site_mp4_height',
+                'hd_mp4_width', 'hd_mp4_height',
+                'video_original_width', 'video_original_height',
             )
         }),
         ('Location', {
@@ -123,7 +123,7 @@ class PhotoAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
     def show_thumb(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.thumbnail_url, instance.width_t, instance.height_t)
+        return '<img src="%s" width="%s" height="%s" />' % (instance.thumbnail_url, instance.thumbnail_width, instance.thumbnail_height)
     show_thumb.allow_tags = True
     show_thumb.short_description = ''
 

@@ -143,7 +143,7 @@ class PhotoTestCase(TestCase):
                                                                 secret='9876')
         # Map size letters to property names:
         sizes = {
-            's': 'small_square_url',
+            's': 'square_url',
             'q': 'large_square_url',
             't': 'thumbnail_url',
             'm': 'small_url',

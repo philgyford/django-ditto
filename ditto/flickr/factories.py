@@ -63,8 +63,8 @@ class PhotoFactory(factory.DjangoModelFactory):
     fetch_time = factory.LazyAttribute(lambda o:
                                 datetime_now() - datetime.timedelta(weeks=1)
                             )
-    width = 300
-    height = 200
+    medium_width = 300
+    medium_height = 200
 
 
 

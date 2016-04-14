@@ -22,7 +22,7 @@ Expects:
                         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
                     </h3>
                     <p class="flickr-photo-img m-b-0">
-                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}"><img src="{{ photo.small_url }}" width="{{ photo.width_m }}" height="{{ photo.height_m }}" alt="" class="img-responsive"></a>
+                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}"><img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-responsive"></a>
                     </p>
                     {% if photo.summary or photo.media == 'video' %}
                         <p class="flickr-photo-summary m-b-0">

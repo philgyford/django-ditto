@@ -170,22 +170,20 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         # Sizes fields
         self.assertEqual(photo.sizes_raw, json.dumps(photo_data['sizes']))
         sizes = {
-            't': (100, 77),
-            'm': (240, 186),
-            'n': (320, 248),
-            'z': (640, 496),
-            'c': (800, 620),
-            'b': (1024, 793),
-            'h': (1600, 1239),
-            'k': (2048, 1585),
-            'o': (3772, 2920),
+            'thumbnail':    (100, 77),
+            'small':        (240, 186),
+            'small_320':    (320, 248),
+            'medium':       (500, 387),
+            'medium_640':   (640, 496),
+            'medium_800':   (800, 620),
+            'large':        (1024, 793),
+            'large_1600':   (1600, 1239),
+            'large_2048':   (2048, 1585),
+            'original':     (3772, 2920),
         }
-        for letter, wh in sizes.items():
-            self.assertEqual(getattr(photo, 'width_'+letter), wh[0])
-            self.assertEqual(getattr(photo, 'height_'+letter), wh[1])
-        # Medium sizes don't have a 'letter':
-        self.assertEqual(photo.width, 500)
-        self.assertEqual(photo.height, 387)
+        for name, wh in sizes.items():
+            self.assertEqual(getattr(photo, name+'_width'), wh[0])
+            self.assertEqual(getattr(photo, name+'_height'), wh[1])
 
         # EXIF
         self.assertEqual(photo.exif_raw, json.dumps(photo_data['exif']))
@@ -211,14 +209,14 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(photo.media, 'video')
 
         sizes = {
-            'mp4_mobile':       (480, 360),
-            'mp4_site':         (640, 360),
-            'mp4_hd':           (1282, 720),
+            'mobile_mp4':       (480, 360),
+            'site_mp4':         (640, 360),
+            'hd_mp4':           (1282, 720),
             'video_original':   (1280, 720),
         }
-        for letter, wh in sizes.items():
-            self.assertEqual(getattr(photo, 'width_'+letter), wh[0])
-            self.assertEqual(getattr(photo, 'height_'+letter), wh[1])
+        for name, wh in sizes.items():
+            self.assertEqual(getattr(photo, name+'_width'), wh[0])
+            self.assertEqual(getattr(photo, name+'_height'), wh[1])
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @patch('ditto.flickr.fetch.PhotoSaver._save_tags')
@@ -237,8 +235,8 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
                             title="An abbey",
                             description="A description",
                             is_private=True,
-                            width=300,
-                            height=200,
+                            medium_width=300,
+                            medium_height=200,
                             exif_camera='Sony')
         existing_photo.save()
 
@@ -254,8 +252,8 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(photo.description,
                         "Some <b>test HTML</b>.\n\nAnd another paragraph.")
         self.assertFalse(photo.is_private)
-        self.assertEqual(photo.width, 500)
-        self.assertEqual(photo.height, 387)
+        self.assertEqual(photo.medium_width, 500)
+        self.assertEqual(photo.medium_height, 387)
         self.assertEqual(photo.exif_camera, 'Sony NEX-6')
 
     def test_creates_tags(self):
