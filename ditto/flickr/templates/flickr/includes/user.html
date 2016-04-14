@@ -8,9 +8,6 @@
     <div class="card-block">
         <img src="{{ user.icon_url }}" class="pull-left m-r-1" alt="user icon" width="48" height="48">
         <strong>{{ user }}</strong>
-        {% if user.is_pro %}
-            <span class="text-muted">(Pro)</span>
-        {% endif %}
     </div>
     <ul class="list-group list-group-flush flickr-user-about">
         {% if user.description %}
