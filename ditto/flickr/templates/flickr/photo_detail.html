@@ -48,9 +48,6 @@
                     {% endif %}
                 </dd>
 
-                <dt class="col-sm-3">Uploaded time</dt>
-                <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
-
                 {% if photo.geo_is_private == False %}
                     {% if photo.location_str %}
                         <dt class="col-sm-3">Location</dt>
@@ -64,6 +61,10 @@
                         </dd>
                     {% endif %}
                 {% endif %}
+
+                <dt class="col-sm-3">Uploaded time</dt>
+                <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
+
             </dl>
 
             <dl class="dl-horizontal row photo-about">
@@ -90,18 +91,6 @@
                         <dt class="col-sm-3">Lens model</dt>
                         <dd class="col-sm-9">{{ photo.exif_lens_model }}</dd>
                     {% endif %}
-                    {% if photo.exif_aperture %}
-                        <dt class="col-sm-3">Aperture</dt>
-                        <dd class="col-sm-9">{{ photo.exif_aperture }}</dd>
-                    {% endif %}
-                    {% if photo.exif_exposure %}
-                        <dt class="col-sm-3">Exposure</dt>
-                        <dd class="col-sm-9">{{ photo.exif_exposure }}</dd>
-                    {% endif %}
-                    {% if photo.exif_flash %}
-                        <dt class="col-sm-3">Flash</dt>
-                        <dd class="col-sm-9">{{ photo.exif_flash }}</dd>
-                    {% endif %}
                     {% if photo.exif_focal_length %}
                         <dt class="col-sm-3">Focal length</dt>
                         <dd class="col-sm-9">{{ photo.exif_focal_length }}</dd>
@@ -110,7 +99,29 @@
                         <dt class="col-sm-3">ISO</dt>
                         <dd class="col-sm-9">{{ photo.exif_iso }}</dd>
                     {% endif %}
+                    {% if photo.exif_exposure %}
+                        <dt class="col-sm-3">Exposure</dt>
+                        <dd class="col-sm-9">{{ photo.exif_exposure }}</dd>
+                    {% endif %}
+                    {% if photo.exif_aperture %}
+                        <dt class="col-sm-3">Aperture</dt>
+                        <dd class="col-sm-9">{{ photo.exif_aperture }}</dd>
+                    {% endif %}
+                    {% if photo.exif_flash %}
+                        <dt class="col-sm-3">Flash</dt>
+                        <dd class="col-sm-9">{{ photo.exif_flash }}</dd>
+                    {% endif %}
                 </dl>
+            {% endif %}
+
+            {% if photo.tags.all|length %}
+                <ul class="list-inline flickr-photo-tags">
+                    {% for tag in photo.tags.all %}
+                        <li class="flick-photo-tag">
+                            {{ tag.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
 
             <ul>

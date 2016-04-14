@@ -1,10 +1,12 @@
 from django.http import Http404
 from django.utils.translation import ugettext as _
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
+from taggit.models import Tag
+
 from ..ditto.views import PaginatedListView
-from .models import Account, Photo, User
+from .models import Account, Photo, TaggedPhoto, User
 
 
 class Home(PaginatedListView):
@@ -88,3 +90,62 @@ class PhotoDetail(DetailView):
             context['account'] = None
         return context
 
+
+class TagList(ListView):
+    template_name = 'flickr/tag_list.html'
+    context_object_name = 'tag_list'
+
+    def get_queryset(self):
+        return Photo.tags.most_common()[:100]
+
+
+class TagDetail(SingleObjectMixin, PaginatedListView):
+    "All Photos with a certain tag from all Accounts"
+    template_name = 'flickr/tag_detail.html'
+    allow_empty = False
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Tag.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.object
+        context['account_list'] = Account.objects.all()
+        context['photo_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        """Show all the public Photos associated with this
+        tag."""
+        return Photo.public_objects.filter(
+                                            tags__slug__in=[self.object.slug])
+        
+
+class UserTagDetail(UserDetailMixin, PaginatedListView):
+    "All Photos with a certain Tag from one User"
+    template_name = 'flickr/user_tag_detail.html'
+    allow_empty = False
+
+    def get(self, request, *args, **kwargs):
+        self.tag_object = self.get_tag_object()
+        return super().get(request, *args, **kwargs)
+
+    def get_tag_object(self):
+        """Custom method for fetching the Tag."""
+        try:
+            obj = Tag.objects.get(slug=self.kwargs['tag_slug'])
+        except Tag.DoesNotExist:
+            raise Http404(_("No Tags found matching the query"))
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag_object
+        context['photo_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        """Show all the public Photos associated with this user."""
+        return Photo.public_objects.filter(user=self.object,
+                                    tags__slug__in=[self.kwargs['tag_slug']])

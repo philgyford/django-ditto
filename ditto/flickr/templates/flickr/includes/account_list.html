@@ -17,7 +17,7 @@ Expects:
                 favorited
             {% endif %}
             {% if account_list|length == 1 %}
-                by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0 }}</a>
+                by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.user.name }}</a>
             {% else %}
                 by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}
             {% endif %}
@@ -29,7 +29,7 @@ Expects:
             {% for account in account_list %}
                 <li class="list-group-item">
                     <a href="{{ account.get_absolute_url }}">
-                        {{ account }}
+                        {{ account.user.name }}
                     </a>
                 </li>
             {% endfor %}

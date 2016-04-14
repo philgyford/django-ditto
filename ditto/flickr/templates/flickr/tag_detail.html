@@ -1,10 +1,10 @@
-{% extends 'pinboard/base.html' %}
+{% extends 'flickr/base.html' %}
 {% load l10n %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
-    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
-    <li><a href="{% url 'pinboard:tag_list' %}">Tags</a></li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li><a href="{% url 'flickr:tag_list' %}">Tags</a></li>
     <li class="active">{{ tag.name }}</li>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 
     <h1 class="m-y-md">
         {% block title %}
-            Bookmarks tagged with “{{ tag.name}}”
+            Photos tagged with “{{ tag.name}}”
         {% endblock %}
     </h1>
 
@@ -21,9 +21,9 @@
             <div class="card">
                 <div class="card-block">
                     <p class="card-text">
-                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+                        {{ page_obj.paginator.count|localize }} photo{{ page_obj.paginator.count|pluralize }}
                         {% if account_list|length == 1 %}
-                            by <a href="{% url 'pinboard:account_tag_detail' username=account_list.0.username tag_slug=tag.slug %}" title="Bookmarks by {{ account_list.0.username }} tagged with “{{ tag.slug }}”">{{ account_list.0.username }}</a>
+                            by <a href="{% url 'flickr:user_tag_detail' nsid=account_list.0.user.nsid tag_slug=tag.slug %}" title="Photos by {{ account_list.0.user.name }} tagged with “{{ tag.name }}”">{{ account_list.0.user.name }}</a>
                         {% else %}
                             by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}:
                         {% endif %}
@@ -34,8 +34,8 @@
                     <ul class="list-group list-group-flush">
                         {% for account in account_list %}
                             <li class="list-group-item">
-                                <a class="card-link" href="{% url 'pinboard:account_tag_detail' username=account.username tag_slug=tag.slug %}">
-                                    {{ account.username }}
+                                <a class="card-link" href="{% url 'flickr:user_tag_detail' nsid=account.user.nsid tag_slug=tag.slug %}">
+                                    {{ account.user.name }}
                                 </a>
                             </li>
                         {% endfor %}
@@ -45,16 +45,17 @@
             <div class="card">
                 <div class="card-block">
                     <p class="card-text">
-                        <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
+                        <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
                     </p>
                 </div>
             </div>
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photo_list.html' with photo_list=photo_list page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 
 {% endblock content %}
+
 

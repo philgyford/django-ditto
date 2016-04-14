@@ -34,7 +34,7 @@ urlpatterns = [
         name='account_toread'
     ),
     url(
-        regex=r"^(?P<username>\w+)/tag/(?P<tag_slug>[^/]+)$",
+        regex=r"^(?P<username>\w+)/tags/(?P<tag_slug>[^/]+)$",
         view=views.AccountTagDetail.as_view(),
         name='account_tag_detail'
     ),

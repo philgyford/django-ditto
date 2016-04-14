@@ -1,10 +1,10 @@
-{% extends 'pinboard/base.html' %}
+{% extends 'flickr/base.html' %}
 {% load l10n %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
-    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
-    <li><a href="{% url 'pinboard:account_detail' username=account.username %}">{{ account.username }}</a></li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li><a href="{% url 'flickr:user_detail' nsid=user.nsid %}">{{ user.name }}</a></li>
     <li class="active">{{ tag.name }}</li>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 
     <h1 class="m-y-md">
         {% block title %}
-            Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”
+            Photos by {{ user.name }} tagged with “{{ tag.name }}”
         {% endblock %}
     </h1>
 
@@ -21,22 +21,22 @@
             <div class="card">
                 <div class="card-block">
                     <p class="card-text">
-                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+                        {{ page_obj.paginator.count|localize }} photo{{ page_obj.paginator.count|pluralize }}
                     </p>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
+                        <a href="{% url 'flickr:user_detail' nsid=user.nsid %}">All {{ user.name }}’s photos</a>
                     </li>
                     <li class="list-group-item">
-                        <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
+                        <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
                     </li>
                 </ul>
             </div>
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photo_list.html' with photo_list=photo_list page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 
