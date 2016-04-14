@@ -135,7 +135,7 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(photo.rotation, 0)
         self.assertEqual(photo.original_format, 'jpg')
         self.assertEqual(photo.safety_level, 0)
-        self.assertEqual(photo.has_people, 0)
+        self.assertFalse(photo.has_people)
         self.assertEqual(photo.last_update_time, datetime.datetime.strptime(
                                     '2016-04-04 13:21:11', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))
@@ -143,13 +143,13 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
                             '2016-03-17 16:25:15', '%Y-%m-%d %H:%M:%S'
                         ).replace(tzinfo=pytz.timezone('America/Los_Angeles')))
         self.assertEqual(photo.taken_granularity, 0)
-        self.assertEqual(photo.taken_unknown, 0)
+        self.assertFalse(photo.taken_unknown)
         self.assertEqual(photo.view_count, 55)
         self.assertEqual(photo.comment_count, 2)
         self.assertEqual(photo.media, 'photo')
 
         # Location fields
-        self.assertEqual(photo.geo_is_private, 0)
+        self.assertFalse(photo.geo_is_private)
         self.assertEqual(photo.location_accuracy, 16)
         self.assertEqual(photo.location_context, 0)
         self.assertEqual(photo.location_place_id, "RZ9p3HlQUrt5wg")
@@ -278,13 +278,13 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         for tp in tagged_photos:
             if tp.tag.slug == 'abbeydore':
                 self.assertEqual(tp.tag.name, 'Abbey Dore')
-                self.assertEqual(tp.machine_tag, False)
+                self.assertFalse(tp.machine_tag)
                 self.assertEqual(tp.author, user_2)
                 self.assertEqual(tp.flickr_id, '5827-26069027966-1200699')
             else:
                 self.assertEqual(tp.author, user_1)
             if tp.tag.slug == 'tester:foo=bar':
-                self.assertEqual(tp.machine_tag, True)
+                self.assertTrue(tp.machine_tag)
 
     def test_syncs_tags(self):
         """If a photo already has some tags, and we save_tags, the final set

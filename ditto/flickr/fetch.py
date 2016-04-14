@@ -86,7 +86,7 @@ class UserSaver(FlickrUtilsMixin, object):
             'fetch_time':   fetch_time,
             'raw':          raw_json,
             'nsid':         user['nsid'],
-            'is_pro':       True if user['ispro'] == 1 else False,
+            'is_pro':       (int(user['ispro']) == 1),
             'iconserver':   user['iconserver'],
             'iconfarm':     user['iconfarm'],
             'username':     user['username']['_content'],
@@ -170,14 +170,14 @@ class PhotoSaver(FlickrUtilsMixin, object):
             'rotation':             photo['info']['rotation'],
             'original_format':      photo['info']['originalformat'],
             'safety_level':         photo['info']['safety_level'],
-            'has_people':           photo['info']['people']['haspeople'],
+            'has_people':           (int(photo['info']['people']['haspeople']) == 1),
             'last_update_time':     self._unixtime_to_datetime(
                                         photo['info']['dates']['lastupdate']),
             'taken_time':           self._api_datetime_to_datetime(
                                                 photo['info']['dates']['taken'],
                                                 photo['user_obj'].timezone_id),
-            'taken_granularity':    photo['info']['dates']['takengranularity'],
-            'taken_unknown':        photo['info']['dates']['takenunknown'],
+            'taken_granularity':    int(photo['info']['dates']['takengranularity']),
+            'taken_unknown':        (int(photo['info']['dates']['takenunknown']) == 1),
             'view_count':           photo['info']['views'],
             'comment_count':        photo['info']['comments']['_content'],
             'media':                photo['info']['media'],
@@ -194,7 +194,7 @@ class PhotoSaver(FlickrUtilsMixin, object):
 
         # Photos with no location have these fields missing entirely:
         if 'geoperms' in photo['info']:
-            defaults['geo_is_private']      = (photo['info']['geoperms']['ispublic'] == 0)
+            defaults['geo_is_private']      = (int(photo['info']['geoperms']['ispublic']) == 0)
 
         if 'location' in photo['info']:
             loc = photo['info']['location']
