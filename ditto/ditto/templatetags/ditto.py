@@ -5,6 +5,32 @@ from django.core.urlresolvers import reverse
 
 register = template.Library()
 
+
+@register.simple_tag
+def width_height(w, h, max_w, max_h):
+    """Returns a string like:
+        width="200" height="150"
+    with the values limited to max_w and max_h, and scaled appropriately.
+
+    If both w and h are smaller than their maximums, they're returned as is.
+    """
+    ratio = 1
+
+    if w > max_w and h > max_h:
+        ratio = min( (max_w / w), (max_h / h) )
+
+    elif w > max_w:
+        ratio = max_w / w
+
+    elif h > max_h:
+        ratio = max_h / h
+
+    width = int(round(w * ratio))
+    height = int(round(h * ratio))
+
+    return 'width="%s" height="%s"' % (width, height)
+
+
 @register.simple_tag
 def time_link(dt, link_to_day=False):
     """Return the HTML to display the time a Photo, Tweet, etc.
