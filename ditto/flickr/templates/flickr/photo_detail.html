@@ -62,6 +62,21 @@
                     {% endif %}
                 {% endif %}
 
+                <dt class="col-sm-3">Tags</dt>
+                <dd class="col-sm-9">
+                    {% if photo.tags.all|length %}
+                        <ul class="list-inline flickr-photo-tags">
+                            {% for tag in photo.tags.all %}
+                                <li class="flickr-photo-tag">
+                                    <a class="label label-pill label-primary" href="{% url 'flickr:user_tag_detail' nsid=photo.user.nsid tag_slug=tag.slug %}" title="See all photos by {{ photo.user.name }} tagged with '{{ tag.name }}'">{{ tag.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        None
+                    {% endif %}
+                </dd>
+
                 <dt class="col-sm-3">Uploaded time</dt>
                 <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
 
@@ -114,19 +129,9 @@
                 </dl>
             {% endif %}
 
-            {% if photo.tags.all|length %}
-                <ul class="list-inline flickr-photo-tags">
-                    {% for tag in photo.tags.all %}
-                        <li class="flick-photo-tag">
-                            {{ tag.name }}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-
             <ul>
                 {% if perms.twitter.can_change_tweet %}
-                    <li><a href="{% url 'admin:flickr_photo_change' photo.id %}">Edit</a></li>
+                    <li><a href="{% url 'admin:flickr_photo_change' photo.id %}" title="Edit this photo in the Django Admin">Edit</a></li>
                 {% endif %}
                 <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
                 <li>Last updated on Flickr at {% display_time photo.last_update_time True %}</li>

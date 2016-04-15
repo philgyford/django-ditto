@@ -20,7 +20,7 @@ Expects:
         <ul class="{% if not view or view != 'detail' %}m-b-0 {% endif %}list-inline pinboard-bookmark-tags">
             {% for tag in bookmark.tags.all %}
                 <li class="pinboard-bookmark-tag">
-                    <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
+                    <a class="label label-pill label-primary" href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
                         {% if not view or view != 'detail' %}
                             <small>{{ tag.name }}</small>
                         {% else %}
@@ -34,8 +34,8 @@ Expects:
 
     <p class="m-b-0 text-muted pinboard-bookmark-about">
         {% if not view or view != 'detail' %}<small>{% endif %}
-            By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a>
-            • 
+            By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
+
             {% load ditto %}
             {% if view == 'day' %}
                 {% display_time bookmark.post_time False %}
