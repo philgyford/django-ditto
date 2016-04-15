@@ -6,6 +6,7 @@ from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from ...flickr import factories as flickrfactories
 from ...pinboard import factories as pinboardfactories
 from ...twitter import factories as twitterfactories
 
@@ -19,27 +20,33 @@ class DittoViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
+    def test_home_context_flickr(self):
+        "Overall home page sends correct Flickr data to templates"
+        accounts = flickrfactories.AccountFactory.create_batch(3)
+        photos_1 = flickrfactories.PhotoFactory.create_batch(3,
+                                                        user=accounts[0].user)
+        photos_2 = flickrfactories.PhotoFactory.create_batch(3,
+                                                        user=accounts[1].user)
+
+        response = self.client.get(reverse('ditto:index'))
+
+        self.assertTrue('flickr_photo_list' in response.context)
+        # It shows 4 of all the photos:
+        self.assertEqual(len(response.context['flickr_photo_list']), 4)
+
     def test_home_context_pinboard(self):
         "Overall home page sends correct Pinboard data to templates"
         accounts = pinboardfactories.AccountFactory.create_batch(3)
         bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
-                                            6, account=accounts[0])
+                                            2, account=accounts[0])
         bookmarks_2 = pinboardfactories.BookmarkFactory.create_batch(
-                                            6, account=accounts[1])
-        bookmark_private = pinboardfactories.BookmarkFactory.create(
-                                            account=accounts[1],
-                                            title='Private bookmark',
-                                            is_private=True)
+                                            2, account=accounts[1])
 
         response = self.client.get(reverse('ditto:index'))
 
         self.assertTrue('pinboard_bookmark_list' in response.context)
-        # It shows 10 of all the bookmarks:
+        # It shows 3 of all the bookmarks:
         self.assertEqual(len(response.context['pinboard_bookmark_list']), 3)
-        # It doesn't include the most recent one, which is private:
-        self.assertNotEqual(
-                        response.context['pinboard_bookmark_list'][0].title,
-                        'Private bookmark')
 
     def test_home_context_twitter(self):
         "Overall home page sends correct Twitter data to templates"
@@ -73,6 +80,16 @@ class DittoViewTests(TestCase):
             [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
                 favoritable_tweets[3].pk,]
         )
+
+    def test_home_privacy_flickr(self):
+        "Overall home page does not display private Photos"
+        public_photo = flickrfactories.PhotoFactory(is_private=False)
+        private_photo = flickrfactories.PhotoFactory(is_private=True)
+        response = self.client.get(reverse('ditto:index'))
+
+        self.assertEqual(len(response.context['flickr_photo_list']), 1)
+        self.assertTrue(response.context['flickr_photo_list'][0].pk,
+                                                            public_photo.pk)
 
     def test_home_privacy_pinboard(self):
         "Overall home page does not display private Bookmarks"
@@ -122,6 +139,18 @@ class DittoViewTests(TestCase):
         tweets = response.context['twitter_favorite_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
+
+    def test_home_no_flickr(self):
+        "Shouldn't try to get photos if flickr app isn't installed"
+        with patch.object(apps, 'is_installed') as mock_method:
+            # Fake it so it looks like ditto.flickr isn't installed:
+            mock_method.side_effect = lambda x: {
+                'ditto.flickr': False,
+                'ditto.pinboard': True,
+                'ditto.twitter': True,
+            }[x]
+            response = self.client.get(reverse('ditto:index'))
+            self.assertFalse('flickr_photo_list' in response.context)
 
     def test_home_no_pinboard(self):
         "Shouldn't try to get bookmarks if pinboard app isn't installed"

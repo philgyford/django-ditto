@@ -8,6 +8,16 @@ May specifically have:
 
 {% endcomment %}
 
+{% if flickr_photo_list and flickr_photo_list|length > 0 %}
+
+    <h2 class="m-y-md">
+        <a href="{% url 'flickr:index' %}">Flickr photos</a>
+    </h2>
+
+    {% include 'flickr/includes/photo_list.html' with photo_list=flickr_photo_list view=view|default:False %}
+
+{% endif %}
+
 {% if pinboard_bookmark_list and pinboard_bookmark_list|length > 0 %}
 
     <h2 class="m-y-md">

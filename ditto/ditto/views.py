@@ -11,6 +11,8 @@ from django.views.generic.dates import DateMixin, YearMixin, MonthMixin, DayMixi
 from .apps import ditto_apps
 from .paginator import DiggPaginator
 
+if ditto_apps.is_installed('flickr'):
+    from ..flickr.models import Photo
 
 if ditto_apps.is_installed('pinboard'):
     from ..pinboard.models import Bookmark
@@ -42,7 +44,9 @@ class DittoQuerysetsMixin:
         names = []
 
         for app_name in ditto_apps.enabled():
-            if app_name == 'pinboard':
+            if app_name == 'flickr':
+                names.append('flickr_photo_list')
+            elif app_name == 'pinboard':
                 names.append('pinboard_bookmark_list')
             elif app_name == 'twitter':
                 names.append('twitter_tweet_list')
@@ -59,7 +63,9 @@ class DittoQuerysetsMixin:
         querysets = {}
 
         for app_name in ditto_apps.enabled():
-            if app_name == 'pinboard':
+            if app_name == 'flickr':
+                querysets['flickr_photo_list'] = Photo.public_objects.all()
+            elif app_name == 'pinboard':
                 querysets['pinboard_bookmark_list'] = Bookmark.public_objects.all()
             elif app_name == 'twitter':
                 querysets['twitter_tweet_list'] = Tweet.public_tweet_objects.all().select_related()
@@ -84,7 +90,10 @@ class Home(DittoQuerysetsMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         for qs_name, qs in self.get_app_querysets().items():
-            context[qs_name] = qs[:3]
+            if qs_name == 'flickr_photo_list':
+                context[qs_name] = qs[:4]
+            else:
+                context[qs_name] = qs[:3]
 
         return context
 
