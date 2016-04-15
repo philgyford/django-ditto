@@ -328,6 +328,3 @@ class TagViewTests(TestCase):
             kwargs={'nsid': self.carp_photo.user.nsid, 'tag_slug': 'mammal'}))
         self.assertEquals(response.status_code, 404)
 
-
-
-# TODO: Photo model test of _PhotoTaggableManager ?
