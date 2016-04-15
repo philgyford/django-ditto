@@ -65,7 +65,7 @@
                 <dt class="col-sm-3">Tags</dt>
                 <dd class="col-sm-9">
                     {% if photo.tags.all|length %}
-                        <ul class="list-inline flickr-photo-tags">
+                        <ul class="list-inline m-b-0 flickr-photo-tags">
                             {% for tag in photo.tags.all %}
                                 <li class="flickr-photo-tag">
                                     <a class="label label-pill label-primary" href="{% url 'flickr:user_tag_detail' nsid=photo.user.nsid tag_slug=tag.slug %}" title="See all photos by {{ photo.user.name }} tagged with '{{ tag.name }}'">{{ tag.name }}</a>
