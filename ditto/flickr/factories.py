@@ -2,6 +2,8 @@ import datetime
 import pytz
 import factory
 
+from taggit import models as taggit_models
+
 from . import models
 from ..ditto.utils import datetime_now
 
@@ -83,4 +85,24 @@ class PhotoFactory(factory.DjangoModelFactory):
     large_2048_height = 1365
     original_width = 3000
     original_height = 2000
+
+
+class TagFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = taggit_models.Tag
+
+    slug = factory.Sequence(lambda n: 'slug%d' % n)
+    name = slug 
+
+
+class TaggedPhotoFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.TaggedPhoto
+
+    tag = factory.SubFactory(TagFactory)
+    flickr_id = factory.Sequence(lambda n: (n * 1000))
+    author = factory.SubFactory(UserFactory)
+    machine_tag = False
+    content_object = factory.SubFactory(PhotoFactory)
 

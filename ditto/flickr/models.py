@@ -300,7 +300,8 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # TODO: NOTES
     # TODO: PEOPLE
 
-    tags = TaggableManager(blank=True, through=TaggedPhoto)
+    tags = TaggableManager(blank=True, manager=managers._PhotoTaggableManager,
+                                                        through=TaggedPhoto)
 
     class Meta:
         ordering = ('-post_time',)

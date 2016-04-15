@@ -287,7 +287,8 @@ class PhotoSaver(FlickrUtilsMixin, object):
         """
 
         # The existing tag-photo relationships.
-        tagged_photos = Photo.tags.through.objects.filter(content_object=photo_obj)
+        tagged_photos = Photo.tags.through.objects.filter(
+                                                       content_object=photo_obj)
 
         local_flickr_ids = set([])
         remote_flickr_ids = set([])

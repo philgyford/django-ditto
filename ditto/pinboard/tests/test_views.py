@@ -259,6 +259,8 @@ class PinboardViewTests(TestCase):
                                                     kwargs={'slug': 'fish'}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/tag_detail.html')
+        self.assertTemplateUsed(response, 'pinboard/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_tag_detail_context(self):
         "Sends the correct data to the templates"
@@ -283,7 +285,7 @@ class PinboardViewTests(TestCase):
         self.assertEqual(response.context['bookmark_list'][0].title, 'Cod')
         self.assertEqual(response.context['bookmark_list'][1].title, 'Carp')
 
-    def test_tag_detail_privacy_1(self):
+    def test_tag_detail_privacy(self):
         "Does not display private bookmarks"
         bookmark = BookmarkFactory(is_private=True)
         bookmark.tags.set('fish')
