@@ -29,6 +29,9 @@
                         <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
                     </li>
                     <li class="list-group-item">
+                        <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">All bookmarks tagged with “{{ tag.name }}”</a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
                     </li>
                 </ul>

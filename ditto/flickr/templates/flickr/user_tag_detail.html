@@ -29,6 +29,9 @@
                         <a href="{% url 'flickr:user_detail' nsid=user.nsid %}">All {{ user.name }}’s photos</a>
                     </li>
                     <li class="list-group-item">
+                        <a href="{% url 'flickr:tag_detail' slug=tag.slug %}">All photos tagged with “{{ tag.name }}”</a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
                     </li>
                 </ul>
