@@ -31,7 +31,7 @@ May specifically have:
 {% if twitter_tweet_list and twitter_tweet_list|length > 0 %}
 
     <h2 class="m-y-md">
-        <a href="{% url 'twitter:index' %}">Recent Tweets</a>
+        <a href="{% url 'twitter:index' %}">Twitter tweets</a>
     </h2>
 
     {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_tweet_list view=view|default:False %}
@@ -41,7 +41,7 @@ May specifically have:
 {% if twitter_favorite_list and twitter_favorite_list|length > 0 %}
 
     <h2 class="m-y-md">
-        <a href="{% url 'twitter:favorites' %}">Favorited Tweets</a>
+        <a href="{% url 'twitter:favorites' %}">Favorited tweets</a>
     </h2>
 
     {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_favorite_list view=view|default:False %}

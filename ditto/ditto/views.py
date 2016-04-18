@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
@@ -33,157 +34,173 @@ class PaginatedListView(ListView):
         return super().__init__(**kwargs)
 
 
-class DittoQuerysetsMixin:
+class DittoAppsMixin:
     """Contains methods for getting querysets for all the enabled Ditto apps.
     """
 
-    def get_queryset_names(self):
-        """A list of all the queryset names for DittoItem-inheriting objects
-        for all enabled Ditto apps.
-        The order is reasonably important - the first in the returned list will
-        be used as the primary queryset in some views.
-        """
-        names = []
+    def __init__(self, *args, **kwargs):
 
-        for app_name in ditto_apps.enabled():
-            if app_name == 'flickr':
-                names.append('flickr_photo_list')
-            elif app_name == 'pinboard':
-                names.append('pinboard_bookmark_list')
-            elif app_name == 'twitter':
-                names.append('twitter_tweet_list')
-                names.append('twitter_favorite_list')
+        self.apps = []
 
-        return names
+        enabled_apps = ditto_apps.enabled()
 
-    def get_first_queryset_name(self):
-        """A string.
-        eg, 'flickr_photo_list'."""
-        return self.get_queryset_names()[0]
+        # The order is important - the first app, and its first variety,
+        # will be the defaults.
 
-    def get_app_querysets(self):
-        """Returns a dict of querysets for all the DittoItem-inheriting objects
-        """
-        querysets = {}
+        if 'flickr' in enabled_apps:
+            self.apps.append({
+                'slug': 'flickr',
+                'name': 'flickr',
+                'varieties': [
+                    {
+                        'slug': 'photos',
+                        'name': 'photo',
+                        'context_object_name': 'flickr_photo_list',
+                        'queryset': Photo.public_objects.all(),
+                    },
+                ],
+            })
 
-        for app_name in ditto_apps.enabled():
-            if app_name == 'flickr':
-                querysets['flickr_photo_list'] = Photo.public_objects.all()
-            elif app_name == 'pinboard':
-                querysets['pinboard_bookmark_list'] = Bookmark.public_objects.all()
-            elif app_name == 'twitter':
-                querysets['twitter_tweet_list'] = Tweet.public_tweet_objects.all().select_related()
-                querysets['twitter_favorite_list'] = Tweet.public_favorite_objects.all().select_related()
+        if 'pinboard' in enabled_apps:
+            self.apps.append({
+                'slug': 'pinboard',
+                'name': 'pinboard',
+                'varieties': [
+                    {
+                        'slug': 'bookmarks',
+                        'name': 'bookmark',
+                        'context_object_name': 'pinboard_bookmark_list',
+                        'queryset': Bookmark.public_objects.all(),
+                    },
+                ],
+            })
 
-        return querysets
+        if 'twitter' in enabled_apps:
+            self.apps.append({
+                'slug': 'twitter',
+                'name': 'twitter',
+                'varieties': [
+                    {
+                        'slug': 'tweets',
+                        'name': 'tweet',
+                        'context_object_name': 'twitter_tweet_list',
+                        'queryset': Tweet.public_tweet_objects.all().select_related(),
+                    },
+                    {
+                        'slug': 'likes',
+                        'name': 'favorite',
+                        'context_object_name': 'twitter_favorite_list',
+                        'queryset': Tweet.public_favorite_objects.all().select_related(),
+                    },
+                ],
+            })
 
-    def get_first_queryset(self):
-        """A single queryset.
-        eg, Photo.public_objects.all()."""
-        qs_name = self.get_first_queryset_name()
-        return self.get_app_querysets()[qs_name]
+        super().__init__(*args, **kwargs)
 
-    def get_other_querysets(self):
-        """A list of querysets.
-        eg, [Bookmark.public_objects.all(), Tweet.public_objects.all()...]"""
-        querysets = self.get_app_querysets()
-        del querysets[ self.get_first_queryset_name() ]
-        return querysets
+    def get_app_varieties(self):
+        """A list of tuples mapping app_name to each variety_name.
+        May have duplicate app_names if the app has more than one variety."""
+        app_varieties = []
+        for app in self.apps:
+            for variety in app['varieties']:
+                app_varieties.append( (app['name'], variety['name']) )
+        return app_varieties
 
-    def get_queryset_for_app(self, app, variety=None):
-        """Get the queryset for a particular app and, optionally, the variety
-        of object.
+    def get_app_slugs(self):
+        """eg ['flickr', 'pinboard', 'twitter']."""
+        return [app['slug'] for app in self.apps]
 
-        app -- eg, 'flickr' or 'twitter'.
-        variety -- eg, 'tweet', 'favorite'. If None, we return the first
-                    queryset we find for the app.
+    def get_variety_slugs(self, app_slug):
+        "A list of the slugs for the varieties of the app indicated by app_slug"
+        app = self.get_app_from_slug(app_slug)
+        return [ variety['slug'] for variety in app['varieties'] ]
 
-        Returns the queryset or None if no matching queryset is found.
-        """
-        queryset = None
+    def is_valid_app_slug(self, app_slug):
+        "Does this app slug exist in self.apps?"
+        return (app_slug in self.get_app_slugs())
 
-        for qs_name in self.get_queryset_names():
-            if app == self.get_app_from_queryset_name(qs_name):
-                if variety is None or variety == self.get_variety_from_queryset_name(qs_name):
-                    queryset = self.get_app_querysets()[qs_name]
-                    break
+    def is_valid_variety_slug(self, app_slug, variety_slug):
+        "Does this variety slug exist for app_slug's app in self.apps?"
+        return (variety_slug in self.get_variety_slugs(app_slug))
 
-        return queryset
+    def get_default_app_slug(self):
+        "Just the slug of the first app in the list."
+        return self.apps[0]['slug']
 
-    def get_context_object_name_for_app(self, app, variety=None):
-        """Get the name of the context object for this page based on app and,
-        optionally, variety (eg, 'tweets', 'favorites').
+    def get_default_variety_slug(self):
+        "Just the slug of the first variety of the first app in the list."
+        return self.apps[0]['varieties'][0]['slug']
 
-        app -- eg, 'flickr' or 'twitter'.
-        variety -- eg, 'tweet', 'favorite'. If None, we return the first
-                    name we find for the app.
+    def get_default_variety_slug_for_app_slug(self, app_slug):
+        "The slug of the first variety for the app indicated by app_slug."
+        return self.get_app_from_slug(app_slug)['varieties'][0]['slug']
 
-        Returns the name (eg, 'flickr_photo_list') or None.
-        """
-        context_object_name = None
+    def get_app_name_from_slug(self, app_slug):
+        "What's the name of the app that has the slug app_slug?"
+        return self.get_app_from_slug(app_slug)['name']
 
-        for qs_name in self.get_queryset_names():
-            if app == self.get_app_from_queryset_name(qs_name):
-                if variety is None or variety == self.get_variety_from_queryset_name(qs_name):
-                    context_object_name = qs_name
-                    break
+    def get_variety_name_from_slugs(self, app_slug, variety_slug):
+        """What's the name of the variety that has the slug variety_slug, in
+        the app that has the slug app_slug?"""
+        variety = self.get_variety_from_slugs(app_slug, variety_slug)
+        return variety['name']
 
-        return context_object_name
+    def get_app_from_slug(self, app_slug):
+        "Get all the data in self.apps for the app with the slug app_slug"
+        return list(filter(lambda a: a['slug'] == app_slug, self.apps))[0]
 
-    def get_app_from_queryset_name(self, name):
-        return name.split('_')[0]
+    def get_variety_from_slugs(self, app_slug, variety_slug):
+        """Given app_slug and variety_slug, return the data in self.apps for
+        that variety."""
+        app = self.get_app_from_slug(app_slug)
+        varieties = app['varieties']
+        return list(filter(lambda v: v['slug'] == variety_slug, varieties))[0]
 
-    def get_variety_from_queryset_name(self, name):
-        return name.split('_')[1]
+    def get_app_from_name(self, app_name):
+        "Get all the data in self.apps for the app with the name app_name"
+        return list(filter(lambda a: a['name'] == app_name, self.apps))[0]
 
-    def get_default_app(self):
-        app = self.get_queryset_names()[0]
-        return self.get_app_from_queryset_name(app)
+    def get_variety_from_names(self, app_name, variety_name):
+        """Given app_name and variety_name, return the data in self.apps for
+        that variety."""
+        app = self.get_app_from_name(app_name)
+        varieties = app['varieties']
+        return list(filter(lambda v: v['name'] == variety_name, varieties))[0]
 
-    def get_default_variety_for_app(self, app):
-        for qs_name in self.get_queryset_names():
-            if app == self.get_app_from_queryset_name(qs_name):
-                variety = self.get_variety_from_queryset_name(qs_name)
-                return variety
+    def get_app_slug_from_name(self, app_name):
+        return self.get_app_from_name(app_name)['slug']
 
-    def is_valid_app(self, app):
-        """Is this app an enabled one?
-        app -- eg, 'flickr', 'twitter'.
-        """
-        return app in ditto_apps.enabled()
+    def get_variety_slug_from_names(self, app_name, variety_name):
+        return self.get_variety_from_names(app_name, variety_name)['slug']
 
-    def is_valid_variety(self, app, variety):
-        """Is this variety valid for this app?
-        app -- eg, 'flickr', 'twitter'.
-        variety -- eg, 'tweet', 'favorite'.
-        """
-        if self.is_valid_app(app):
-            # eg, if app is 'twitter':
-            #   ['twitter_tweet_list', 'twitter_favorite_list']
-            qs_names = list(filter(
-                lambda x: x.split('_')[0] == app, self.get_queryset_names()
-            ))
-            # eg, ['tweet', 'favorite']
-            varieties = [qs_name.split('_')[1] for qs_name in qs_names]
-            if variety in varieties:
-                return True
-            else:
-                return False
-        else:
-            return False
+    def get_context_object_name_for_app_variety(self, app_name, variety_name):
+        """Given app_name and variety_name, return the context_object_name in
+        self.apps for that variety."""
+        variety = self.get_variety_from_names(app_name, variety_name)
+        return variety['context_object_name']
+
+    def get_queryset_for_app_variety(self, app_name, variety_name):
+        """Given app_name and variety_name, return the queryset in
+        self.apps for that variety."""
+        variety = self.get_variety_from_names(app_name, variety_name)
+        return variety['queryset']
 
 
-class Home(DittoQuerysetsMixin, TemplateView):
+class Home(DittoAppsMixin, TemplateView):
     template_name = 'ditto/index.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        for qs_name, qs in self.get_app_querysets().items():
-            if qs_name == 'flickr_photo_list':
-                context[qs_name] = qs[:4]
+        for app_name, variety_name in self.get_app_varieties():
+            queryset = self.get_queryset_for_app_variety(app_name, variety_name)
+            context_object_name = self.get_context_object_name_for_app_variety(
+                                                        app_name, variety_name)
+
+            if context_object_name == 'flickr_photo_list':
+                context[context_object_name] = queryset[:4]
             else:
-                context[qs_name] = qs[:3]
+                context[context_object_name] = queryset[:3]
 
         return context
 
@@ -206,7 +223,7 @@ class TagDetail(TemplateView):
         return context
 
 
-class DayArchive(DittoQuerysetsMixin, DayArchiveView):
+class DayArchive(DittoAppsMixin, DayArchiveView):
     template_name = 'ditto/archive_day.html'
     month_format = '%m'
 
@@ -218,50 +235,51 @@ class DayArchive(DittoQuerysetsMixin, DayArchiveView):
     allow_future = False
 
     # eg, 'flickr', or 'twitter'
-    app = None
+    app_name = None
 
-    # eg, 'favorite'.
-    # Or None for the default/only kind of thing self.app has.
-    variety = None
+    # eg, 'tweet' or 'favorite'.
+    variety_name = None
 
     def get(self, request, *args, **kwargs):
         """
-        Set the value of self.app and self.variety based on URL kwargs.
+        Set the value of self.app_name and self.variety_name based on URL
+        kwargs.
         """
-        app = kwargs.get('app', None)
-        variety = kwargs.get('variety', None)
+        app_slug = kwargs.get('app', None)
+        variety_slug = kwargs.get('variety', None)
 
-        if app is None and variety is None:
+        if not app_slug and not variety_slug:
             # Redirect to default app and variety for this date.
-            default_app = self.get_default_app()
             return redirect(
                 reverse('ditto:day_archive', kwargs={
-                    'year': self.get_year(),
-                    'month': self.get_month(),
-                    'day': self.get_day(),
-                    'app': default_app,
-                    'variety': self.get_default_variety_for_app(default_app),
-            }) ) 
+                    'year':     self.get_year(),
+                    'month':    self.get_month(),
+                    'day':      self.get_day(),
+                    'app':      self.get_default_app_slug(),
+                    'variety':  self.get_default_variety_slug(),
+            }) )
 
-        if self.is_valid_app(app):
-            self.app = app
+        if self.is_valid_app_slug(app_slug):
+            self.app_name = self.get_app_name_from_slug(app_slug)
 
-            if variety is None:
+            if variety_slug is None:
                 # Redirect to the default variety for this app.
                 return redirect(
                     reverse('ditto:day_archive', kwargs={
                         'year': self.get_year(),
                         'month': self.get_month(),
                         'day': self.get_day(),
-                        'app': self.app,
-                        'variety': self.get_default_variety_for_app(self.app),
-                }) ) 
+                        'app': app_slug,
+                        'variety': self.get_default_variety_slug_for_app_slug(app_slug),
+                }) )
 
-        if self.is_valid_variety(self.app, variety):
-            self.variety = variety
+        if self.is_valid_variety_slug(app_slug, variety_slug):
+            self.variety_name = self.get_variety_name_from_slugs(
+                                                        app_slug, variety_slug)
         else:
-            raise Http404("'%s' is not a valid variety for the '%s' app." %\
-                                                    (self.variety, self.app))
+            raise Http404(
+                "'%s' is not a valid variety slug for the '%s' app slug." %\
+                                                    (variety_slug, app_slug))
 
         return super().get(request, *args, **kwargs)
 
@@ -269,11 +287,15 @@ class DayArchive(DittoQuerysetsMixin, DayArchiveView):
         """
         Get the name of the item to be used in the context.
         eg, 'twitter_favorite_list'.
+
+        Overriding MultipleObjectMixin
         """
-        return self.get_context_object_name_for_app(self.app, self.variety)
+        return self.get_context_object_name_for_app_variety(
+                                            self.app_name, self.variety_name)
 
     def get_queryset(self):
-        queryset = self.get_queryset_for_app(self.app, self.variety)
+        queryset = self.get_queryset_for_app_variety(
+                                            self.app_name, self.variety_name)
 
         if queryset is None:
             raise ImproperlyConfigured(
@@ -289,9 +311,12 @@ class DayArchive(DittoQuerysetsMixin, DayArchiveView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item_counts'] = self.get_all_counts()
-        context['context_object_name'] = self.get_context_object_name_for_app(self.app, self.variety)
-        context['ditto_app'] = self.app
-        context['ditto_variety'] = self.variety
+        context['context_object_name'] = \
+            self.get_context_object_name_for_app_variety(
+                                            self.app_name, self.variety_name)
+        context['ditto_app_slug'] = self.get_app_slug_from_name(self.app_name)
+        context['ditto_variety_slug'] = self.get_variety_slug_from_names(
+                                            self.app_name, self.variety_name)
         return context
 
     def get_all_counts(self):
@@ -327,9 +352,8 @@ class DayArchive(DittoQuerysetsMixin, DayArchiveView):
         # Want to keep them in the same order as get_queryset_names() provides.
         counts = []
 
-        querysets = self.get_app_querysets()
-        for qs_name in self.get_queryset_names():
-            qs = querysets[qs_name]
+        for app_name, variety_name in self.get_app_varieties():
+            qs = self.get_queryset_for_app_variety(app_name, variety_name)
             qs = qs.filter(**lookup_kwargs)
             paginate_by = self.get_paginate_by(qs)
             if not allow_future:
@@ -344,10 +368,11 @@ class DayArchive(DittoQuerysetsMixin, DayArchiveView):
                         'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                     })
             counts.append({
-                'context_object_name':  qs_name,
-                'count':                qs.count(),
-                'app':          self.get_app_from_queryset_name(qs_name),
-                'variety':      self.get_variety_from_queryset_name(qs_name),
+                'context_object_name': self.get_context_object_name_for_app_variety(
+                                                    app_name, variety_name),
+                'count':        qs.count(),
+                'app_slug':     self.get_app_slug_from_name(app_name),
+                'variety_slug': self.get_variety_slug_from_names(app_name, variety_name),
             })
 
         return counts

@@ -3,7 +3,7 @@ Displays links to varieties of a page, each one for a different kind of item (tw
 
 Expects:
 
-* item_counts -- A list of dicts, each dict with 'context_object_name', 'count', 'app' and 'variety' elements.
+* item_counts -- A list of dicts, each dict with 'context_object_name', 'count', 'app_slug' and 'variety_slug' elements.
 
 * context_object_name -- The name of the queryset that we're currently viewing,
                           eg 'twitter_favorite_list'.
@@ -11,6 +11,7 @@ Expects:
 And one of:
 
 * day -- If this is the Day Archive page, the date we're viewing.
+* tag_slug -- If this is the Tag page we're viewing.
 
 {% endcomment %}
 
@@ -18,7 +19,7 @@ And one of:
     {% for item in item_counts %}
     <a href="{% spaceless %}
         {% if day %}
-            {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=item.app variety=item.variety %}
+            {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=item.app_slug variety=item.variety_slug %}
         {% endif %}
     {% endspaceless %}" class="list-group-item{% if item.context_object_name == context_object_name %} active{% endif %}">
             <span class="label label-default label-pill pull-xs-right">{{ item.count }}</span>

@@ -226,61 +226,55 @@ class DittoViewTests(TestCase):
 class DittoDayArchiveTestCase(TestCase):
 
     def setUp(self):
-        self.url = reverse('ditto:day_archive', kwargs={
-            'year': 2015, 'month': '11', 'day': '10',
-        })
-
         self.today = datetime.datetime.strptime(
                     '2015-11-10 12:00:00', '%Y-%m-%d %H:%M:%S'
                 ).replace(tzinfo=pytz.utc)
         self.tomorrow = self.today + datetime.timedelta(days=1)
         self.yesterday = self.today - datetime.timedelta(days=1)
 
-        self.bookmark_1 = pinboardfactories.BookmarkFactory.create(
+        fl_account = flickrfactories.AccountFactory()
+        self.photo_1 = flickrfactories.PhotoFactory(
+                                    post_time=self.today, user=fl_account.user)
+        self.photo_2 = flickrfactories.PhotoFactory(
+                                post_time=self.tomorrow, user=fl_account.user)
+
+        self.bookmark_1 = pinboardfactories.BookmarkFactory(
                                                         post_time=self.today)
-        self.bookmark_2 = pinboardfactories.BookmarkFactory.create(
+        self.bookmark_2 = pinboardfactories.BookmarkFactory(
                                                     post_time=self.tomorrow)
 
-        tw_account = twitterfactories.AccountFactory.create()
-        self.tweet_1 = twitterfactories.TweetFactory.create(
+        tw_account = twitterfactories.AccountFactory()
+        self.tweet_1 = twitterfactories.TweetFactory(
                                     post_time=self.today, user=tw_account.user)
-        self.tweet_2 = twitterfactories.TweetFactory.create(
+        self.tweet_2 = twitterfactories.TweetFactory(
                                 post_time=self.tomorrow, user=tw_account.user)
 
-        self.favorite_1 = twitterfactories.TweetFactory.create(
-                                                        post_time=self.today)
-        self.favorite_2 = twitterfactories.TweetFactory.create(
-                                                    post_time=self.tomorrow)
+        self.favorite_1 = twitterfactories.TweetFactory(post_time=self.today)
+        self.favorite_2 = twitterfactories.TweetFactory(post_time=self.tomorrow)
         tw_account.user.favorites.add(self.favorite_1)
+
+    def make_url(self, app_slug=None, variety_slug=None):
+        kwargs = { 'year': 2015, 'month': '11', 'day': '10', }
+
+        if app_slug is not None:
+            kwargs['app'] = app_slug
+
+        if variety_slug is not None:
+            kwargs['variety'] = variety_slug
+
+        return reverse('ditto:day_archive', kwargs=kwargs)
+
+    def test_no_app(self):
+        "Should redirect to default app and variety."
+        response = self.client.get(self.make_url())
+        self.assertRedirects(response, '/2015/11/10/flickr/photos')
 
     def test_day_templates(self):
         "Day archive page uses the correct templates"
-        response = self.client.get(self.url)
+        response = self.client.get(self.make_url('pinboard', 'bookmarks'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/archive_day.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
-
-    def test_day_context(self):
-        "Only shows items from the specified day."
-        response = self.client.get(self.url)
-
-        self.assertTrue('total_count' in response.context)
-        self.assertEqual(3, response.context['total_count'])
-
-        self.assertTrue('pinboard_bookmark_list' in response.context)
-        self.assertEqual(1, len(response.context['pinboard_bookmark_list']))
-        self.assertEqual(response.context['pinboard_bookmark_list'][0].pk,
-                                                            self.bookmark_1.pk)
-
-        self.assertTrue('twitter_tweet_list' in response.context)
-        self.assertEqual(1, len(response.context['twitter_tweet_list']))
-        self.assertEqual(response.context['twitter_tweet_list'][0].pk,
-                                                                self.tweet_1.pk)
-
-        self.assertTrue('twitter_favorite_list' in response.context)
-        self.assertEqual(1, len(response.context['twitter_favorite_list']))
-        self.assertEqual(response.context['twitter_favorite_list'][0].pk,
-                                                            self.favorite_1.pk)
 
         self.assertTrue('day' in response.context)
         self.assertEqual(response.context['day'], self.today.date())
@@ -290,18 +284,60 @@ class DittoDayArchiveTestCase(TestCase):
         self.assertTrue('next_day' in response.context)
         self.assertEqual(response.context['next_day'], self.tomorrow.date())
 
-    def test_day_privacy(self):
+    def test_day_context_flickr_photos(self):
+        response = self.client.get(self.make_url('flickr', 'photos'))
+        self.assertTrue('flickr_photo_list' in response.context)
+        self.assertEqual(1, len(response.context['flickr_photo_list']))
+        self.assertEqual(response.context['flickr_photo_list'][0].pk,
+                                                            self.photo_1.pk)
+
+    def test_day_context_pinboard_bookmarks(self):
+        response = self.client.get(self.make_url('pinboard', 'bookmarks'))
+        self.assertTrue('pinboard_bookmark_list' in response.context)
+        self.assertEqual(1, len(response.context['pinboard_bookmark_list']))
+        self.assertEqual(response.context['pinboard_bookmark_list'][0].pk,
+                                                            self.bookmark_1.pk)
+
+    def test_day_context_twitter_tweets(self):
+        "Only shows items from the specified day."
+        response = self.client.get(self.make_url('twitter', 'tweets'))
+        self.assertTrue('twitter_tweet_list' in response.context)
+        self.assertEqual(1, len(response.context['twitter_tweet_list']))
+        self.assertEqual(response.context['twitter_tweet_list'][0].pk,
+                                                                self.tweet_1.pk)
+
+    def test_day_context_twitter_favorites(self):
+        response = self.client.get(self.make_url('twitter', 'likes'))
+        self.assertTrue('twitter_favorite_list' in response.context)
+        self.assertEqual(1, len(response.context['twitter_favorite_list']))
+        self.assertEqual(response.context['twitter_favorite_list'][0].pk,
+                                                            self.favorite_1.pk)
+
+    def test_day_privacy_flickr_photos(self):
+        "Doesn't show private items."
+        self.photo_1.is_private = True
+        self.photo_1.save()
+        response = self.client.get(self.make_url('flickr', 'photos'))
+        self.assertEqual(0, len(response.context['flickr_photo_list']))
+
+    def test_day_privacy_pinboard_bookmarks(self):
         "Doesn't show private items."
         self.bookmark_1.is_private = True
         self.bookmark_1.save()
+        response = self.client.get(self.make_url('pinboard', 'bookmarks'))
+        self.assertEqual(0, len(response.context['pinboard_bookmark_list']))
+
+    def test_day_privacy_twitter_tweets(self):
+        "Doesn't show private items."
         self.tweet_1.user.is_private = True
         self.tweet_1.user.save()
+        response = self.client.get(self.make_url('twitter', 'tweets'))
+        self.assertEqual(0, len(response.context['twitter_tweet_list']))
+
+    def test_day_privacy_twitter_favorites(self):
+        "Doesn't show private items."
         self.favorite_1.user.is_private = True
         self.favorite_1.user.save()
-
-        response = self.client.get(self.url)
-        self.assertEqual(0, response.context['total_count'])
-        self.assertEqual(0, len(response.context['pinboard_bookmark_list']))
-        self.assertEqual(0, len(response.context['twitter_tweet_list']))
+        response = self.client.get(self.make_url('twitter', 'likes'))
         self.assertEqual(0, len(response.context['twitter_favorite_list']))
 
