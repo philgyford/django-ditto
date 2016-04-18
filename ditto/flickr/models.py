@@ -312,6 +312,14 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
 
     @property
+    def account(self):
+        "The Account whose photo this is, if any. Otherwise, None."
+        try:
+            return self.user.account_set.all()[0]
+        except IndexError:
+            return None
+
+    @property
     def location_str(self):
         "eg 'Abbey Dore, Herefordshire, England, United Kingdom'."
         strs = [

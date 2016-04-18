@@ -130,18 +130,18 @@ class Media(TimeStampedModelMixin, models.Model):
 
     # These will be in order from lowest bitrate to highest.
     mp4_url_1 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (1)')
+                        verbose_name='MP4 URL (1)', help_text="Lowest bitrate")
     mp4_url_2 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (2)')
+                        verbose_name='MP4 URL (2)', help_text="Medium bitrate")
     mp4_url_3 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (3)')
+                        verbose_name='MP4 URL (3)', help_text="Highest bitrate")
 
     mp4_bitrate_1 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (1)')
+                    verbose_name='MP4 Bitrate (1)', help_text="Lowest bitrate")
     mp4_bitrate_2 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (2)')
+                    verbose_name='MP4 Bitrate (2)', help_text="Medium bitrate")
     mp4_bitrate_3 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (3)')
+                    verbose_name='MP4 Bitrate (3)', help_text="Highest bitrate")
 
     webm_url = models.URLField(null=True, blank=True, verbose_name='WebM URL')
     webm_bitrate = models.PositiveIntegerField(null=True, blank=True,
@@ -307,6 +307,14 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
                 self.place_full_name,
                 self.place_country,
             )))
+
+    @property
+    def account(self):
+        "The Account whose tweet this is, if any. Otherwise, None."
+        try:
+            return self.user.account_set.all()[0]
+        except IndexError:
+            return None
 
     def summary_source(self):
         "The text that will be truncated to make a summary for this Tweet"

@@ -268,6 +268,18 @@ class TweetTestCase(TestCase):
         tweet = TweetFactory(text='This is my tweet text')
         self.assertEqual(tweet.summary, 'This is my tweet text')
 
+    def test_account_exists(self):
+        "If the tweet is from an Account the account property should return it."
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        tweet = TweetFactory(text='This is my tweet text', user=user)
+        self.assertEqual(tweet.account, account)
+
+    def test_account_none(self):
+        "If the tweet isn't from an Account its account property should be None."
+        tweet = TweetFactory(text='This is my tweet text', user=UserFactory())
+        self.assertIsNone(tweet.account)
+
     def test_default_manager_recent(self):
         "The default manager includes tweets from public AND private users"
         public_user = UserFactory(is_private=False)

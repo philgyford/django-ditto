@@ -104,6 +104,18 @@ class PhotoTestCase(TestCase):
                 description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
         self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
 
+    def test_account_exists(self):
+        "If the photo is from an Account the account property should return it."
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        photo = PhotoFactory(user=user)
+        self.assertEqual(photo.account, account)
+
+    def test_account_none(self):
+        "If the photo isn't from an Account its account property should be None."
+        photo = PhotoFactory(user=UserFactory())
+        self.assertIsNone(photo.account)
+
     def test_location_str(self):
         photo = PhotoFactory(
                     locality_name='Abbey Dore',

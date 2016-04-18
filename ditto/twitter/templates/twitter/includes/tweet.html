@@ -27,15 +27,21 @@ Expects:
                     {% display_time tweet.post_time True %}
                 {% endif %}
 
-                {% if view and view == 'detail' %}
-                    • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>
-                {% else %}
-                    • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
-                {% endif %}
-
                 {% if tweet.is_reply %}
                     • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
                 {% endif %}
+
+                {% if not view or view != 'detail' %}
+                    • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
+                {% endif %}
+
+                {% if view and view == 'detail' %}
+                    {% if tweet.account and tweet.account.is_active %}
+                        {# Favorited tweets won't have an account, so we'll link to them whatever. #}
+                        • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
+                    {% endif %}
+                {% endif %}
+
                 {% if perms.twitter.can_change_tweet %}
                     • <a href="{% url 'admin:twitter_tweet_change' tweet.id %}">Edit</a>
                 {% endif %}

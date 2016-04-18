@@ -133,7 +133,9 @@
                 {% if perms.twitter.can_change_tweet %}
                     <li><a href="{% url 'admin:flickr_photo_change' photo.id %}" title="Edit this photo in the Django Admin">Edit</a></li>
                 {% endif %}
-                <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
+                {% if photo.account and photo.account.is_active %}
+                    <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
+                {% endif %}
                 <li>Last updated on Flickr at {% display_time photo.last_update_time True %}</li>
                 <li>Data last fetched at {% display_time photo.fetch_time True %}</li>
             </ul>
