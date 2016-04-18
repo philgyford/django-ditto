@@ -205,22 +205,22 @@ class Home(DittoAppsMixin, TemplateView):
         return context
 
 
-class TagList(TemplateView):
-    "Doesn't really do anything at the moment."
-    template_name = 'ditto/tag_list.html'
+#class TagList(TemplateView):
+    #"Doesn't really do anything at the moment."
+    #template_name = 'ditto/tag_list.html'
 
 
-class TagDetail(TemplateView):
-    "All items with a certain tag"
-    template_name = 'ditto/tag_detail.html'
+#class TagDetail(TemplateView):
+    #"All items with a certain tag"
+    #template_name = 'ditto/tag_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tag'] = kwargs['slug']
-        if ditto_apps.is_enabled('pinboard'):
-            context['pinboard_bookmark_list'] = Bookmark.public_objects.filter(
-                                            tags__slug__in=[kwargs['slug']])
-        return context
+    #def get_context_data(self, **kwargs):
+        #context = super().get_context_data(**kwargs)
+        #context['tag'] = kwargs['slug']
+        #if ditto_apps.is_enabled('pinboard'):
+            #context['pinboard_bookmark_list'] = Bookmark.public_objects.filter(
+                                            #tags__slug__in=[kwargs['slug']])
+        #return context
 
 
 class DayArchive(DittoAppsMixin, DayArchiveView):
