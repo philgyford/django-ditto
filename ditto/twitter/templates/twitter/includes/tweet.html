@@ -3,7 +3,8 @@ A single Tweet.
 
 Expects:
  * tweet, a Tweet object.
- * view, optional, 'detail' or 'day' - True if this we're showing a single Tweet, False if this Tweet is in a list.
+ * view, optional, 'detail' or 'day' - 'detail' is the Tweet's own page.
+    'day' is the page listing all things on that day.
  * perms - The Django perms object.
 {% endcomment %}
 
@@ -19,12 +20,12 @@ Expects:
             </a>
             <small class="text-muted">
                 •
-				{% load ditto %}
-				{% if view == 'day' %}
-					{% display_time tweet.post_time False %}
-				{% else %}
-					{% display_time tweet.post_time True %}
-				{% endif %}
+                {% load ditto %}
+                {% if view == 'day' %}
+                    {% display_time tweet.post_time False %}
+                {% else %}
+                    {% display_time tweet.post_time True %}
+                {% endif %}
 
                 {% if view and view == 'detail' %}
                     • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>
