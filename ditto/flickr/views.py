@@ -120,7 +120,7 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
         tag."""
         return Photo.public_objects.filter(
                                             tags__slug__in=[self.object.slug])
-        
+
 
 class UserTagDetail(UserDetailMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
