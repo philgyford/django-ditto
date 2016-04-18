@@ -16,9 +16,11 @@ class PinboardViewTests(TestCase):
 
     def test_home_context(self):
         "The Pinboard home page sends the correct data to templates"
-        accounts = AccountFactory.create_batch(3)
-        bookmarks_1 = BookmarkFactory.create_batch(5, account=accounts[0])
-        bookmarks_2 = BookmarkFactory.create_batch(5, account=accounts[1])
+        account_1 = AccountFactory(username='abby')
+        account_2 = AccountFactory(username='bobby')
+        account_3 = AccountFactory(username='charlie')
+        bookmarks_1 = BookmarkFactory.create_batch(5, account=account_1)
+        bookmarks_2 = BookmarkFactory.create_batch(5, account=account_2)
         response = self.client.get(reverse('pinboard:index'))
         self.assertIn('account_list', response.context)
         self.assertIn('bookmark_list', response.context)
