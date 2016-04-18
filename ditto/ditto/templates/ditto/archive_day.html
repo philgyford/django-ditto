@@ -13,10 +13,14 @@
     </h1>
 
     <div class="row">
-        <div class="col-md-9">
-            {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}
+        <div class="col-md-3">
+            {% include 'ditto/includes/item_nav.html' with item_counts=item_counts context_object_name=context_object_name day=day only %}
+        </div>
 
-            {% if total_count > 0 %}
+        <div class="col-md-9">
+            {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day ditto_app=ditto_app only %}
+
+            {% if object_list|length > 0 %}
                 {% include 'ditto/includes/item_lists.html' with view='day' %}
 
                 {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}

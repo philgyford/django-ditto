@@ -1,0 +1,37 @@
+{% comment %}
+Displays links to varieties of a page, each one for a different kind of item (tweet, favorite tweet, photo, etc).
+
+Expects:
+
+* item_counts -- A list of dicts, each dict with 'context_object_name', 'count', 'app' and 'variety' elements.
+
+* context_object_name -- The name of the queryset that we're currently viewing,
+                          eg 'twitter_favorite_list'.
+
+And one of:
+
+* day -- If this is the Day Archive page, the date we're viewing.
+
+{% endcomment %}
+
+<div class="list-group">
+    {% for item in item_counts %}
+    <a href="{% spaceless %}
+        {% if day %}
+            {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=item.app variety=item.variety %}
+        {% endif %}
+    {% endspaceless %}" class="list-group-item{% if item.context_object_name == context_object_name %} active{% endif %}">
+            <span class="label label-default label-pill pull-xs-right">{{ item.count }}</span>
+            {% if item.context_object_name == 'pinboard_bookmark_list' %}
+                Pinboard bookmarks
+            {% elif item.context_object_name == 'flickr_photo_list' %}
+                Flickr photos
+            {% elif item.context_object_name == 'twitter_tweet_list' %}
+                Twitter tweets
+            {% elif item.context_object_name == 'twitter_favorite_list' %}
+                Twitter favorites
+            {% endif %}
+        </a>
+    {% endfor %}
+</div>
+
