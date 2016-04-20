@@ -36,18 +36,27 @@ class PaginatedListView(ListView):
 
 class DittoAppsMixin:
     """Contains methods for getting querysets for all the enabled Ditto apps.
+
+    Contains a structure about all the apps and their 'varieties' (eg,
+    'tweets' or 'favorites').
+
+    Provides for 'pages' that will show one app+variety per page, based on a
+    URL with app_slug and variety_slug keywords.
+
+    NOTE: we have both *_name and *_slug to allow for us to change URLs. Which
+    is the case, for example, with using /twitter/likes/ which has a
+    variety_name of 'favorite' (rather than 'likes').
     """
-    # eg, 'flickr', or 'twitter'.
-    app_name = None
+    
+    # These all set in set_app_and_variety():
+    app_name = None  # eg, 'flickr', or 'twitter'.
+    app_slug = None  # eg, 'flickr', or 'twitter'.
+    variety_name = None  # eg, 'tweet' or 'favorite'.
+    variety_slug = None  # eg, 'tweets' or 'likes'.
 
-    # eg, 'flickr', or 'twitter'.
-    app_slug = None
+    # Set in __init__():
+    apps = None
 
-    # eg, 'tweet' or 'favorite'.
-    variety_name = None
-
-    # eg, 'tweets' or 'likes'.
-    variety_slug = None
 
     def __init__(self, *args, **kwargs):
 
@@ -288,34 +297,17 @@ class Home(DittoAppsMixin, TemplateView):
         return context
 
 
-#class TagList(TemplateView):
-    #"Doesn't really do anything at the moment."
-    #template_name = 'ditto/tag_list.html'
-
-
-#class TagDetail(TemplateView):
-    #"All items with a certain tag"
-    #template_name = 'ditto/tag_detail.html'
-
-    #def get_context_data(self, **kwargs):
-        #context = super().get_context_data(**kwargs)
-        #context['tag'] = kwargs['slug']
-        #if ditto_apps.is_enabled('pinboard'):
-            #context['pinboard_bookmark_list'] = Bookmark.public_objects.filter(
-                                            #tags__slug__in=[kwargs['slug']])
-        #return context
-
-
 class DayArchive(DittoAppsMixin, DayArchiveView):
+    """A single app+variety for a single day.
+    eg /2016/04/20/twitter/likes
+    """
     template_name = 'ditto/archive_day.html'
     month_format = '%m'
+    allow_empty = True
+    allow_future = False
 
     # All DittoItem-inheriting classes have 'post_time':
     date_field = 'post_time'
-
-    allow_empty = True
-
-    allow_future = False
 
     def get(self, request, *args, **kwargs):
         """Sets up self.app_name etc, and handles redirects to defaults if
@@ -412,6 +404,24 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
             })
 
         return counts
+
+
+#class TagList(TemplateView):
+    #"Doesn't really do anything at the moment."
+    #template_name = 'ditto/tag_list.html'
+
+
+#class TagDetail(TemplateView):
+    #"All items with a certain tag"
+    #template_name = 'ditto/tag_detail.html'
+
+    #def get_context_data(self, **kwargs):
+        #context = super().get_context_data(**kwargs)
+        #context['tag'] = kwargs['slug']
+        #if ditto_apps.is_enabled('pinboard'):
+            #context['pinboard_bookmark_list'] = Bookmark.public_objects.filter(
+                                            #tags__slug__in=[kwargs['slug']])
+        #return context
 
 
 def _date_from_string(year, year_format, month, month_format, day='', day_format='', delim='__'):
