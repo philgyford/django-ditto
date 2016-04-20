@@ -27,7 +27,11 @@ And one of:
             {% if item.app_name == 'pinboard' %}
                 Pinboard bookmarks
             {% elif item.app_name == 'flickr' %}
-                Flickr photos
+                {% if item.variety_name == 'photo-taken' %}
+                    Flickr photos (taken)
+                {% else %}
+                    Flickr photos (uploaded)
+                {% endif %}
             {% elif item.app_name == 'twitter' %}
                 {% if item.variety_name == 'favorite' %}
                     Twitter favorites

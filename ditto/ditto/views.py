@@ -47,7 +47,7 @@ class DittoAppsMixin:
     is the case, for example, with using /twitter/likes/ which has a
     variety_name of 'favorite' (rather than 'likes').
     """
-    
+
     # These all set in set_app_and_variety():
     app_name = None  # eg, 'flickr', or 'twitter'.
     app_slug = None  # eg, 'flickr', or 'twitter'.
@@ -75,6 +75,13 @@ class DittoAppsMixin:
                     {
                         'slug': 'photos',
                         'name': 'photo',
+                        'context_object_name': 'flickr_photo_list',
+                        'queryset': Photo.public_objects.all(),
+                    },
+                    {
+                        'slug': 'photos-taken',
+                        'name': 'photo-taken',
+                        'date_field': 'taken_time',
                         'context_object_name': 'flickr_photo_list',
                         'queryset': Photo.public_objects.all(),
                     },
@@ -152,6 +159,10 @@ class DittoAppsMixin:
         self.app_slug = app_slug
         self.variety_slug = variety_slug
 
+    def get_date_field(self):
+        return self.get_date_field_for_app_variety(
+                                            self.app_name, self.variety_name)
+
     def get_context_object_name(self, object_list):
         """
         Get the name of the item to be used in the context.
@@ -185,6 +196,7 @@ class DittoAppsMixin:
         context['ditto_variety_name'] = self.variety_name
         context['ditto_variety_slug'] = self.variety_slug
         return context
+
 
     # Below -- convenience methods for getting bits of data from the self.apps
     # structure.
@@ -277,6 +289,13 @@ class DittoAppsMixin:
         variety = self.get_variety_from_names(app_name, variety_name)
         return variety['queryset']
 
+    def get_date_field_for_app_variety(self, app_name, variety_name):
+        variety = self.get_variety_from_names(app_name, variety_name)
+        try:
+            return variety['date_field']
+        except KeyError:
+            return 'post_time'
+
 
 class Home(DittoAppsMixin, TemplateView):
     template_name = 'ditto/index.html'
@@ -307,7 +326,7 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
     allow_future = False
 
     # All DittoItem-inheriting classes have 'post_time':
-    date_field = 'post_time'
+    #date_field = 'post_time'
 
     def get(self, request, *args, **kwargs):
         """Sets up self.app_name etc, and handles redirects to defaults if
@@ -345,6 +364,9 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item_counts'] = self.get_all_counts()
+        # Useful to display photos-taken properly:
+        context['date_field'] = self.get_date_field_for_app_variety(
+                                            self.app_name, self.variety_name)
         return context
 
     def get_all_counts(self):
@@ -358,6 +380,9 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
         Most of this is adapted from standard DayArchiveView methods, so that
         we can run it against each queryset in turn, rather than only
         self.queryset.
+
+        And we need to set date_field for each variety in turn, rather than
+        assume each variety uses self.date_field.
         """
 
         # From get_dated_items():
@@ -368,12 +393,12 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
                                  month, self.get_month_format(),
                                  day, self.get_day_format())
 
-        # From _get_dated_items():
-        lookup_kwargs = self._make_single_date_lookup(date)
+        # From _make_single_date_lookup():
+        since = self._make_date_lookup_arg(date)
+        until = self._make_date_lookup_arg(date + datetime.timedelta(days=1))
 
         # Adapted from get_dated_queryset():
 
-        date_field = self.get_date_field()
         allow_future = self.get_allow_future()
         allow_empty = self.get_allow_empty()
 
@@ -381,8 +406,13 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
         counts = []
 
         for app_name, variety_name in self.get_app_varieties():
+            date_field = self.get_date_field_for_app_variety(
+                                                        app_name, variety_name)
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
-            qs = qs.filter(**lookup_kwargs)
+            qs = qs.filter(**{
+                '%s__gte' % date_field: since,
+                '%s__lt' % date_field: until,
+            })
             paginate_by = self.get_paginate_by(qs)
             if not allow_future:
                 now = timezone.now() if self.uses_datetime_field else timezone_today()
@@ -395,6 +425,7 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
                     raise Http404(_("No %(verbose_name_plural)s available") % {
                         'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                     })
+
             counts.append({
                 'count':        qs.count(),
                 'app_name':     app_name,

@@ -10,11 +10,18 @@ May specifically have:
 
 {% if flickr_photo_list and flickr_photo_list|length > 0 %}
 
-    <h2>
-        <a href="{% url 'flickr:index' %}">Flickr photos</a>
+    <h2 class="m-b-2">
+        <a href="{% url 'flickr:index' %}">
+            Flickr photos
+            {% if order == 'taken' %}
+                (taken)
+            {% elif view == 'day' %}
+                (uploaded)
+            {% endif %}
+        </a>
     </h2>
 
-    {% include 'flickr/includes/photo_list.html' with photo_list=flickr_photo_list view=view|default:False %}
+    {% include 'flickr/includes/photo_list.html' with order=order photo_list=flickr_photo_list view=view|default:False %}
 
 {% endif %}
 
