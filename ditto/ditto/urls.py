@@ -20,7 +20,7 @@ urlpatterns = [
     #),
     url(
         # /2016/04/18/twitter/favorites
-        regex=r"^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})(?:/(?P<app>[a-z]+))?(?:/(?P<variety>[a-z\-]+|))?$",
+        regex=r"^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})(?:/(?P<app>[a-z]+))?(?:/(?P<variety>[a-z\/]+|))?$",
         view=views.DayArchive.as_view(),
         name='day_archive'
     ),

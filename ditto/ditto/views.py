@@ -74,12 +74,13 @@ class DittoAppsMixin:
                 'varieties': [
                     {
                         'slug': 'photos',
-                        'name': 'photo',
+                        'name': 'photo-uploaded',
                         'context_object_name': 'flickr_photo_list',
                         'queryset': Photo.public_objects.all(),
                     },
                     {
-                        'slug': 'photos-taken',
+                        # A bit cheeky as a slug, but seems to work:
+                        'slug': 'photos/taken',
                         'name': 'photo-taken',
                         'date_field': 'taken_time',
                         'context_object_name': 'flickr_photo_list',
