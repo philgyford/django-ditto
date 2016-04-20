@@ -6,6 +6,23 @@ from django.core.urlresolvers import reverse
 register = template.Library()
 
 
+@register.simple_tag(takes_context=True)
+def query_string(context, key, value):
+    """
+    For adding/replacing a key=value pair to the GET string for a URL.
+
+    eg, if we're viewing ?p=3 and we do {% url_replace order 'taken' %}
+    then this returns "p=3&order=taken"
+
+    And, if we're viewing ?p=3&order=uploaded and we do the same thing, we get
+    the same result (ie, the existing "order=uploaded" is replaced).
+    """
+    request = context['request']
+    args = request.GET.copy()
+    args[key] = value
+    return args.urlencode()
+
+
 @register.simple_tag
 def width_height(w, h, max_w, max_h):
     """Returns a string like:

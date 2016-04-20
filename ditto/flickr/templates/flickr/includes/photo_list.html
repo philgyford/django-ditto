@@ -1,15 +1,17 @@
 {% comment %}
 
 Expects:
+ * request, the request object.
  * photo_list, a queryset of Photos.
  * perms - The Django perms object.
  * page_obj, optional, a DiggPaginator instance or False (default).
+ * order - Either 'uploaded' or 'taken'.
  * view - optional, 'detail' or 'day'.
 {% endcomment %}
 
 {% if photo_list|length > 0 %}
     {% if page_obj and page_obj.number > 1 %}
-        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
     {% endif %}
 
     {% load ditto %}
@@ -33,11 +35,20 @@ Expects:
                         </p>
                     {% endif %}
                     <p><small class="text-muted">
-                        Uploaded at
-                        {% if view == 'day' %}
-                            {% display_time photo.post_time False %}
+                        {% if order == 'taken' %}
+                            Taken at
+                            {% if view == 'day' %}
+                                {% display_time photo.taken_time False %}
+                            {% else %}
+                                {% display_time photo.taken_time True %}
+                            {% endif %}
                         {% else %}
-                            {% display_time photo.post_time True %}
+                            Uploaded at
+                            {% if view == 'day' %}
+                                {% display_time photo.post_time False %}
+                            {% else %}
+                                {% display_time photo.post_time True %}
+                            {% endif %}
                         {% endif %}
                     </small></p>
                 </div>
@@ -46,7 +57,7 @@ Expects:
     {% endfor %}
 
     {% if page_obj|default:False %}
-        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
     {% endif %}
 {% else %}
 

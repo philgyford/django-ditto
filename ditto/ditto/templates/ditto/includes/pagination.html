@@ -1,11 +1,18 @@
-{# Expects page_obj to be a DiggPaginator instance. #}
+{% comment %}
+
+Expects:
+ * request, the request object.
+ * page_obj, a DiggPaginator instance.
+{% endcomment %}
+
 
 {% if page_obj.paginator.num_pages > 1 %}
+    {% load ditto %}
     <nav>
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?p={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <a class="page-link" href="?{% query_string 'p' page_obj.previous_page_number %}" aria-label="Previous">
                         <span aria-hidden="true">&larr;</span>
                         <span class="sr-only">Previous</span>
                     </a>
@@ -33,14 +40,14 @@
                     </li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="?p={{ p }}">{{ p }}</a>
+                        <a class="page-link" href="?{% query_string 'p' p %}">{{ p }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?p={{ page_obj.next_page_number }}" aria-label="Next">
+                    <a class="page-link" href="?{% query_string 'p' page_obj.next_page_number %}" aria-label="Next">
                         <span aria-hidden="true">&rarr;</span>
                         <span class="sr-only">Next</span>
                     </a>

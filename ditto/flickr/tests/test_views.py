@@ -1,9 +1,11 @@
+from datetime import timedelta
+
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from ..factories import AccountFactory, PhotoFactory, TagFactory,\
         TaggedPhotoFactory, UserFactory
-
+from ...ditto.utils import datetime_now
 
 class ViewTests(TestCase):
 
@@ -25,16 +27,43 @@ class ViewTests(TestCase):
         response = self.client.get(reverse('flickr:index'))
         self.assertIn('account_list', response.context)
         self.assertIn('photo_list', response.context)
+        self.assertEqual(len(response.context['photo_list']), 4)
+        self.assertIn('order', response.context)
+        self.assertEqual(response.context['order'], 'uploaded')
         # Three accounts, only two of which have Photos:
         self.assertEqual(
             [account.pk for account in response.context['account_list']],
             [1,2,3]
         )
-        # Photos for both accounts that have them:
-        self.assertEqual(
-            [photo.pk for photo in response.context['photo_list']],
-            [1,2,3,4]
-        )
+
+    def test_home_ordering_posted(self):
+        "By default, photos should be in reverse-post_time order."
+        dt = datetime_now()
+        ac = AccountFactory()
+        photo_1 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=1))
+        photo_3 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=3))
+        photo_2 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=2))
+        response = self.client.get(reverse('flickr:index'))
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, photo_1.pk)
+        self.assertEqual(pl[1].pk, photo_2.pk)
+        self.assertEqual(pl[2].pk, photo_3.pk)
+
+    def test_home_ordering_taken(self):
+        """With ?order=taken, photos should be in reverse-taken_time order.
+        And Photos with taken_unknown=True should not appear."""
+        dt = datetime_now()
+        ac = AccountFactory()
+        photo_1 = PhotoFactory(user=ac.user, taken_time=dt - timedelta(days=1))
+        photo_3 = PhotoFactory(user=ac.user, taken_time=dt - timedelta(days=3))
+        photo_2 = PhotoFactory(user=ac.user, taken_time=dt - timedelta(days=2))
+        photo_4 = PhotoFactory(user=ac.user, taken_unknown=True)
+        response = self.client.get(reverse('flickr:index')+'?order=taken')
+        pl = response.context['photo_list']
+        self.assertEqual(len(pl), 3)
+        self.assertEqual(pl[0].pk, photo_1.pk)
+        self.assertEqual(pl[1].pk, photo_2.pk)
+        self.assertEqual(pl[2].pk, photo_3.pk)
 
     def test_home_privacy(self):
         "Only public Photos should appear."
@@ -81,6 +110,9 @@ class ViewTests(TestCase):
         self.assertIn('flickr_user', response.context)
         self.assertEqual(user.pk, response.context['flickr_user'].pk)
 
+        self.assertIn('order', response.context)
+        self.assertEqual(response.context['order'], 'uploaded')
+
         self.assertIn('photo_list', response.context)
         self.assertEqual(len(response.context['photo_list']), 2)
         # ie, only user's photos.
@@ -102,11 +134,49 @@ class ViewTests(TestCase):
         self.assertIn('flickr_user', response.context)
         self.assertEqual(user.pk, response.context['flickr_user'].pk)
 
+        self.assertIn('order', response.context)
+        self.assertEqual(response.context['order'], 'uploaded')
+
         self.assertIn('photo_list', response.context)
         self.assertEqual(len(response.context['photo_list']), 2)
         # ie, only user's photos.
         self.assertIn(users_photos[0], response.context['photo_list'])
         self.assertIn(users_photos[1], response.context['photo_list'])
+
+    def test_user_detail_ordering_posted(self):
+        "By default, photos should be in reverse-post_time order."
+        dt = datetime_now()
+        user = UserFactory()
+        ac = AccountFactory(user=user)
+        photo_1 = PhotoFactory(user=user, post_time=dt - timedelta(days=1))
+        photo_3 = PhotoFactory(user=user, post_time=dt - timedelta(days=3))
+        photo_2 = PhotoFactory(user=user, post_time=dt - timedelta(days=2))
+        response = self.client.get(reverse('flickr:user_detail',
+                                                kwargs={'nsid': user.nsid}))
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, photo_1.pk)
+        self.assertEqual(pl[1].pk, photo_2.pk)
+        self.assertEqual(pl[2].pk, photo_3.pk)
+
+    def test_user_detail_ordering_taken(self):
+        """With ?order=taken, photos should be in reverse-taken_time order.
+        And Photos with taken_unknown=True should not appear."""
+        dt = datetime_now()
+        user = UserFactory()
+        ac = AccountFactory(user=user)
+        photo_1 = PhotoFactory(user=user, taken_time=dt - timedelta(days=1))
+        photo_3 = PhotoFactory(user=user, taken_time=dt - timedelta(days=3))
+        photo_2 = PhotoFactory(user=user, taken_time=dt - timedelta(days=2))
+        photo_4 = PhotoFactory(user=user, taken_unknown=True)
+        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(
+            reverse('flickr:user_detail', kwargs={'nsid': user.nsid}) + \
+                    '?order=taken')
+        pl = response.context['photo_list']
+        self.assertEqual(len(pl), 3)
+        self.assertEqual(pl[0].pk, photo_1.pk)
+        self.assertEqual(pl[1].pk, photo_2.pk)
+        self.assertEqual(pl[2].pk, photo_3.pk)
 
     def test_user_detail_privacy(self):
         "It doesn't show private photos."
@@ -255,10 +325,40 @@ class TagViewTests(TestCase):
         )
         self.assertIn('tag', response.context)
         self.assertEqual(response.context['tag'].slug, 'fish')
+        self.assertIn('order', response.context)
+        self.assertEqual(response.context['order'], 'uploaded')
         self.assertIn('photo_list', response.context)
         self.assertEqual(len(response.context['photo_list']), 2)
         self.assertEqual(response.context['photo_list'][0].title, 'Carp')
         self.assertEqual(response.context['photo_list'][1].title, 'Cod')
+
+    def test_tag_detail_ordering_posted(self):
+        "By default, photos should be in reverse-post_time order."
+        dt = datetime_now()
+        self.carp_photo.post_time = dt - timedelta(days=2)
+        self.carp_photo.save()
+        self.cod_photo.post_time = dt - timedelta(days=1)
+        self.cod_photo.save()
+        response = self.client.get(reverse('flickr:tag_detail',
+                                                    kwargs={'slug': 'fish'}))
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, self.cod_photo.pk)
+        self.assertEqual(pl[1].pk, self.carp_photo.pk)
+
+    def test_tag_detail_ordering_taken(self):
+        """With ?order=taken, photos should be in reverse-taken_time order.
+        And Photos with taken_unknown=True should not appear."""
+        dt = datetime_now()
+        self.carp_photo.taken_time = dt - timedelta(days=2)
+        self.carp_photo.save()
+        self.cod_photo.taken_time = dt - timedelta(days=1)
+        self.cod_photo.save()
+        response = self.client.get(
+            reverse('flickr:tag_detail', kwargs={'slug': 'fish'}) + \
+                    '?order=taken')
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, self.cod_photo.pk)
+        self.assertEqual(pl[1].pk, self.carp_photo.pk)
 
     def test_tag_detail_privacy(self):
         "Does not display private Photos"
@@ -301,12 +401,48 @@ class TagViewTests(TestCase):
 
         self.assertIn('tag', response.context)
         self.assertEqual(response.context['tag'].name, 'Fish')
+        self.assertIn('order', response.context)
+        self.assertEqual(response.context['order'], 'uploaded')
         self.assertIn('photo_list', response.context)
         self.assertEqual(len(response.context['photo_list']), 2)
         self.assertEqual(
             [photo.pk for photo in response.context['photo_list']],
             [1,2]
         )
+
+    def test_user_tag_detail_ordering_posted(self):
+        "By default, photos should be in reverse-post_time order."
+        dt = datetime_now()
+        # Need two photos by same user to test ordering:
+        self.carp_photo.user = self.cod_photo.user
+
+        self.carp_photo.post_time = dt - timedelta(days=2)
+        self.carp_photo.save()
+        self.cod_photo.post_time = dt - timedelta(days=1)
+        self.cod_photo.save()
+        response = self.client.get(reverse('flickr:user_tag_detail',
+            kwargs={'nsid': self.carp_photo.user.nsid, 'tag_slug': 'fish'}))
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, self.cod_photo.pk)
+        self.assertEqual(pl[1].pk, self.carp_photo.pk)
+
+    def test_user_tag_detail_ordering_taken(self):
+        """With ?order=taken, photos should be in reverse-taken_time order.
+        And Photos with taken_unknown=True should not appear."""
+        dt = datetime_now()
+        # Need two photos by same user to test ordering:
+        self.carp_photo.user = self.cod_photo.user
+
+        self.carp_photo.taken_time = dt - timedelta(days=2)
+        self.carp_photo.save()
+        self.cod_photo.taken_time = dt - timedelta(days=1)
+        self.cod_photo.save()
+        response = self.client.get(reverse('flickr:user_tag_detail',
+            kwargs={'nsid': self.carp_photo.user.nsid, 'tag_slug': 'fish'}) + \
+                    '?order=taken')
+        pl = response.context['photo_list']
+        self.assertEqual(pl[0].pk, self.cod_photo.pk)
+        self.assertEqual(pl[1].pk, self.carp_photo.pk)
 
     def test_user_tag_detail_privacy(self):
         "Does not display private photos"

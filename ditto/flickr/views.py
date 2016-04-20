@@ -9,19 +9,59 @@ from ..ditto.views import PaginatedListView
 from .models import Account, Photo, TaggedPhoto, User
 
 
-class Home(PaginatedListView):
+class PhotosOrderMixin(object):
+    """
+    For pages which list Photos and can change the order they're viewed in.
+    Can have 'order' in the GET string, with values of 'uploaded' or 'taken'.
+
+    Adds an 'order' key to the context_data, with value of 'uploaded'/'taken'.
+    """
+
+    def get_ordering(self):
+        args = self.request.GET
+        if 'order' in args and args['order'] == 'taken':
+            return '-taken_time'
+        else:
+            return '-post_time'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order'] = 'uploaded' if self.get_ordering() == '-post_time' else 'taken'
+        return context
+
+    def get_queryset(self):
+        """Order by -taken_time or -post_time.
+        If ordering by taken_time, exclude Photos where taken_unknown = True.
+        """
+        queryset = super().get_queryset()
+
+        # Not sure why we need to repeat some of this from
+        # ListView.get_queryset() here, but the UserDetail page, for one,
+        # wasn't ordering by taken_time without this.
+        ordering = self.get_ordering()
+        if ordering:
+
+            if ordering == '-taken_time':
+                # Exclude where we don't know the taken time.
+                queryset = queryset.filter(taken_unknown=False)
+
+            import six
+            if isinstance(ordering, six.string_types):
+                ordering = (ordering,)
+            queryset = queryset.order_by(*ordering)
+
+        return queryset
+
+
+class Home(PhotosOrderMixin, PaginatedListView):
     template_name = 'flickr/index.html'
     paginate_by = 48
+    queryset = Photo.public_photo_objects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['account_list'] = Account.objects.all()
         return context
-
-    def get_queryset(self):
-        "Get Photos by all of the Accounts that have Users."
-        # Use select_related to fetch user details too. Could be nasty...
-        return Photo.public_photo_objects.all().select_related()
 
 
 class UserDetailMixin(SingleObjectMixin):
@@ -45,16 +85,18 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetail(UserDetailMixin, PaginatedListView):
+class UserDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     """A single Flickr User and its Photos.
     The user might have an Account associated with it, or might not.
     """
     template_name = 'flickr/user_detail.html'
     paginate_by = 48
+    queryset = Photo.public_objects
 
     def get_queryset(self):
         "All public Photos from this Account."
-        return Photo.public_objects.filter(user=self.object).select_related()
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.object).select_related()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,10 +141,11 @@ class TagList(ListView):
         return Photo.tags.most_common()[:100]
 
 
-class TagDetail(SingleObjectMixin, PaginatedListView):
+class TagDetail(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
     "All Photos with a certain tag from all Accounts"
     template_name = 'flickr/tag_detail.html'
     allow_empty = False
+    queryset = Photo.public_objects
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Tag.objects.all())
@@ -116,16 +159,16 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
         return context
 
     def get_queryset(self):
-        """Show all the public Photos associated with this
-        tag."""
-        return Photo.public_objects.filter(
-                                            tags__slug__in=[self.object.slug])
+        """Show all the public Photos associated with this tag."""
+        queryset = super().get_queryset()
+        return queryset.filter(tags__slug__in=[self.object.slug])
 
 
-class UserTagDetail(UserDetailMixin, PaginatedListView):
+class UserTagDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
     template_name = 'flickr/user_tag_detail.html'
     allow_empty = False
+    queryset = Photo.public_objects
 
     def get(self, request, *args, **kwargs):
         self.tag_object = self.get_tag_object()
@@ -147,5 +190,6 @@ class UserTagDetail(UserDetailMixin, PaginatedListView):
 
     def get_queryset(self):
         """Show all the public Photos associated with this user."""
-        return Photo.public_objects.filter(user=self.object,
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.object,
                                     tags__slug__in=[self.kwargs['tag_slug']])

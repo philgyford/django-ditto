@@ -336,10 +336,11 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
                         'day': self.get_day(),
                         'app': self.app_slug,
                         'variety': self.get_default_variety_slug_for_app_slug(
-                                                                    self.app_slug),
+                                                                self.app_slug),
                 }) )
 
         return super().get(request, *args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
