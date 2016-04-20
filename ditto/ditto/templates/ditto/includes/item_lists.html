@@ -10,7 +10,7 @@ May specifically have:
 
 {% if flickr_photo_list and flickr_photo_list|length > 0 %}
 
-    <h2 class="m-y-md">
+    <h2>
         <a href="{% url 'flickr:index' %}">Flickr photos</a>
     </h2>
 
@@ -20,7 +20,7 @@ May specifically have:
 
 {% if pinboard_bookmark_list and pinboard_bookmark_list|length > 0 %}
 
-    <h2 class="m-y-md">
+    <h2>
         <a href="{% url 'pinboard:index' %}">Pinboard bookmarks</a>
     </h2>
 
@@ -30,7 +30,7 @@ May specifically have:
 
 {% if twitter_tweet_list and twitter_tweet_list|length > 0 %}
 
-    <h2 class="m-y-md">
+    <h2>
         <a href="{% url 'twitter:index' %}">Twitter tweets</a>
     </h2>
 
@@ -40,7 +40,7 @@ May specifically have:
 
 {% if twitter_favorite_list and twitter_favorite_list|length > 0 %}
 
-    <h2 class="m-y-md">
+    <h2>
         <a href="{% url 'twitter:favorites' %}">Favorited tweets</a>
     </h2>
 

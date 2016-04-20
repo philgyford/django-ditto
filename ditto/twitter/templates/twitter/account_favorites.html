@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="m-y-md">
+    <h1 class="m-y-2">
         {% block title %}
             Tweets liked by {{ account.user.name }}
         {% endblock %}
@@ -21,7 +21,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            <ul class="nav nav-tabs m-b-md">
+            <ul class="nav nav-tabs m-b-2">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
                 <li class="nav-item">
