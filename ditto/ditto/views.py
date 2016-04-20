@@ -37,6 +37,17 @@ class PaginatedListView(ListView):
 class DittoAppsMixin:
     """Contains methods for getting querysets for all the enabled Ditto apps.
     """
+    # eg, 'flickr', or 'twitter'.
+    app_name = None
+
+    # eg, 'flickr', or 'twitter'.
+    app_slug = None
+
+    # eg, 'tweet' or 'favorite'.
+    variety_name = None
+
+    # eg, 'tweets' or 'likes'.
+    variety_slug = None
 
     def __init__(self, *args, **kwargs):
 
@@ -96,6 +107,78 @@ class DittoAppsMixin:
             })
 
         super().__init__(*args, **kwargs)
+
+    def set_app_and_variety(self, **kwargs):
+        """
+        MUST be called by childs' get() methods, before they do much else.
+        I don't like this reliance, but not sure how else to set app_name and
+        variety_name before doing other get() stuff.
+
+        Child get() methods should handle what happens if one or both of
+        self.app_name and self.variety_name are left as None after this.
+
+        Based on URL kwargs, sets the values of:
+            * self.app_name
+            * self.app_slug
+            * self.variety_name
+            * self.variety_slug
+        So long as the 'app' and 'variety' slugs are valid.
+        """
+        app_slug = kwargs.get('app', None)
+        variety_slug = kwargs.get('variety', None)
+
+        if self.is_valid_app_slug(app_slug):
+            self.app_name = self.get_app_name_from_slug(app_slug)
+
+            if self.is_valid_variety_slug(app_slug, variety_slug):
+                self.variety_name = self.get_variety_name_from_slugs(
+                                                        app_slug, variety_slug)
+            elif variety_slug:
+                raise Http404(
+                    "'%s' is not a valid variety slug for the '%s' app slug."%\
+                                                    (variety_slug, app_slug))
+        elif app_slug:
+            raise Http404("'%s' is not a valid app slug."% app_slug)
+
+        self.app_slug = app_slug
+        self.variety_slug = variety_slug
+
+    def get_context_object_name(self, object_list):
+        """
+        Get the name of the item to be used in the context.
+        eg, 'twitter_favorite_list'.
+
+        Overriding MultipleObjectMixin.get_context_object_name()
+        """
+        return self.get_context_object_name_for_app_variety(
+                                            self.app_name, self.variety_name)
+
+    def get_queryset(self):
+        queryset = self.get_queryset_for_app_variety(
+                                            self.app_name, self.variety_name)
+
+        if queryset is None:
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a QuerySet. "
+                "%(cls)s.get_queryset() can't find the correct "
+                "queryset for this app and variety."% {
+                    'cls': self.__class__.__name__
+                }
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """Add context stuff related to apps, varieties, etc."""
+        context = super().get_context_data(**kwargs)
+        context['ditto_app_name'] = self.app_name
+        context['ditto_app_slug'] = self.app_slug
+        context['ditto_variety_name'] = self.variety_name
+        context['ditto_variety_slug'] = self.variety_slug
+        return context
+
+    # Below -- convenience methods for getting bits of data from the self.apps
+    # structure.
 
     def get_app_varieties(self):
         """A list of tuples mapping app_name to each variety_name.
@@ -234,89 +317,41 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
 
     allow_future = False
 
-    # eg, 'flickr', or 'twitter'
-    app_name = None
-
-    # eg, 'tweet' or 'favorite'.
-    variety_name = None
-
     def get(self, request, *args, **kwargs):
+        """Sets up self.app_name etc, and handles redirects to defaults if
+        both are missing, or if app_name is valid but has no variety.
         """
-        Set the value of self.app_name and self.variety_name based on URL
-        kwargs.
-        """
-        app_slug = kwargs.get('app', None)
-        variety_slug = kwargs.get('variety', None)
 
-        if not app_slug and not variety_slug:
-            # Redirect to default app and variety for this date.
-            return redirect(
-                reverse('ditto:day_archive', kwargs={
-                    'year':     self.get_year(),
-                    'month':    self.get_month(),
-                    'day':      self.get_day(),
-                    'app':      self.get_default_app_slug(),
-                    'variety':  self.get_default_variety_slug(),
-            }) )
+        self.set_app_and_variety(**kwargs)
 
-        if self.is_valid_app_slug(app_slug):
-            self.app_name = self.get_app_name_from_slug(app_slug)
-
-            if variety_slug is None:
+        if self.variety_name is None:
+            if self.app_name is None:
+                # Redirect to default app and variety for this date.
+                return redirect(
+                    reverse('ditto:day_archive', kwargs={
+                        'year':     self.get_year(),
+                        'month':    self.get_month(),
+                        'day':      self.get_day(),
+                        'app':      self.get_default_app_slug(),
+                        'variety':  self.get_default_variety_slug(),
+                }) )
+            else:
                 # Redirect to the default variety for this app.
                 return redirect(
                     reverse('ditto:day_archive', kwargs={
                         'year': self.get_year(),
                         'month': self.get_month(),
                         'day': self.get_day(),
-                        'app': app_slug,
-                        'variety': self.get_default_variety_slug_for_app_slug(app_slug),
+                        'app': self.app_slug,
+                        'variety': self.get_default_variety_slug_for_app_slug(
+                                                                    self.app_slug),
                 }) )
 
-        if self.is_valid_variety_slug(app_slug, variety_slug):
-            self.variety_name = self.get_variety_name_from_slugs(
-                                                        app_slug, variety_slug)
-        else:
-            raise Http404(
-                "'%s' is not a valid variety slug for the '%s' app slug." %\
-                                                    (variety_slug, app_slug))
-
         return super().get(request, *args, **kwargs)
-
-    def get_context_object_name(self, object_list):
-        """
-        Get the name of the item to be used in the context.
-        eg, 'twitter_favorite_list'.
-
-        Overriding MultipleObjectMixin
-        """
-        return self.get_context_object_name_for_app_variety(
-                                            self.app_name, self.variety_name)
-
-    def get_queryset(self):
-        queryset = self.get_queryset_for_app_variety(
-                                            self.app_name, self.variety_name)
-
-        if queryset is None:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing a QuerySet. "
-                "%(cls)s.get_queryset() can't find the correct "
-                "queryset for this app and variety."% {
-                    'cls': self.__class__.__name__
-                }
-            )
-
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item_counts'] = self.get_all_counts()
-        context['context_object_name'] = \
-            self.get_context_object_name_for_app_variety(
-                                            self.app_name, self.variety_name)
-        context['ditto_app_slug'] = self.get_app_slug_from_name(self.app_name)
-        context['ditto_variety_slug'] = self.get_variety_slug_from_names(
-                                            self.app_name, self.variety_name)
         return context
 
     def get_all_counts(self):
@@ -368,137 +403,15 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
                         'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                     })
             counts.append({
-                'context_object_name': self.get_context_object_name_for_app_variety(
-                                                    app_name, variety_name),
                 'count':        qs.count(),
+                'app_name':     app_name,
+                'variety_name': variety_name,
                 'app_slug':     self.get_app_slug_from_name(app_name),
-                'variety_slug': self.get_variety_slug_from_names(app_name, variety_name),
+                'variety_slug': self.get_variety_slug_from_names(
+                                                    app_name, variety_name),
             })
 
         return counts
-
-
-#class DayArchive2(DittoQuerysetsMixin, DateMixin, YearMixin, MonthMixin, DayMixin, TemplateView):
-    #"""Display all items from a single day, across multiple apps.
-
-    #More complicated than I'd like, mainly because we're avoiding using
-    #BaseDateListView/BaseDayArchiveView/DayArchiveView which assume you have a
-    #single self.queryset, which we don't. Working around that proved even
-    #more complicated than this.
-    #"""
-    #template_name = 'ditto/archive_day.html'
-    #month_format = '%m'
-
-    ## All DittoItem-inheriting classes have 'post_time':
-    #date_field = 'post_time'
-
-    ## Things will break if allow_empty=False, because _get_next_prev() in
-    ## django.views.generic.dates will then try and check the queryset for
-    ## objects... we don't have a single queryset.
-    #allow_empty = True
-
-    #allow_future = False
-
-    #def get(self, request, *args, **kwargs):
-        #"404 if allow_future is False and this page is in the future."
-        #date = self._get_date()
-
-        #if not self.get_allow_future() and date > datetime.date.today():
-            #raise Http404(_(
-                #"Future items not available because "
-                #"%(class_name)s.allow_future is False.") % {
-                #'class_name': self.__class__.__name__,
-                #},
-            #)
-
-        #return super().get(request, *args, **kwargs)
-
-    #def get_context_data(self, **kwargs):
-        #"""
-        #Get all the items for today for enabled Ditto apps, add to context.
-        #Also add a `total_count` parameter.
-        #"""
-        #context = super().get_context_data(**kwargs)
-
-        #date_field = self.get_date_field()
-        #date = self._get_date()
-        #total_count = 0
-
-        #for qs_name, qs in self.get_app_querysets().items():
-            #lookup_kwargs = self._make_single_date_lookup(date)
-            #dated_qs = self.get_dated_queryset(qs, **lookup_kwargs)
-            #total_count += len(dated_qs)
-            #context[qs_name] = dated_qs
-
-        #context.update(self.get_dated_items())
-        #context['total_count'] = total_count
-        #return context
-
-    #def get_dated_items(self):
-        #"""
-        #Return (date_list, items, extra_context) for this request.
-
-        #Originally based on the method in BaseDayArchiveView().
-        #"""
-        #date = self._get_date()
-
-        #return self._get_dated_items(date)
-
-    #def get_dated_queryset(self, qs, **lookup):
-        #"""
-        #Get a queryset properly filtered according to `allow_future` and any
-        #extra lookup kwargs.
-
-        #Based on the method in BaseDateListView.
-        #"""
-        #qs = qs.filter(**lookup)
-        #date_field = self.get_date_field()
-        #allow_future = self.get_allow_future()
-
-        #if not allow_future:
-            #now = timezone.now() if self.uses_datetime_field else timezone_today()
-            #qs = qs.filter(**{'%s__lte' % date_field: now})
-
-        #return qs
-
-    #def uses_datetime_field(self):
-        #"Overriding the method in DateMixin."
-        #return True
-
-    #def _get_date(self):
-        #"Abstracted from BaseDayArchiveView.get_dated_items()."
-        #year = self.get_year()
-        #month = self.get_month()
-        #day = self.get_day()
-
-        #date = _date_from_string(year, self.get_year_format(),
-                                 #month, self.get_month_format(),
-                                 #day, self.get_day_format())
-        #return date
-
-    #def _get_dated_items(self, date):
-        #"""
-        #Do the actual heavy lifting of getting the dated items; this accepts a
-        #date object so that TodayArchiveView can be trivial.
-
-        #Based on the method in BaseDayArchiveView().
-        #"""
-        #return {
-            #'day': date,
-            #'previous_day': self.get_previous_day(date),
-            #'next_day': self.get_next_day(date),
-            #'previous_month': self.get_previous_month(date),
-            #'next_month': self.get_next_month(date)
-        #}
-
-    #def get_allow_empty(self):
-        #"""
-        #Returns ``True`` if the view should display empty lists, and ``False``
-        #if a 404 should be raised instead.
-
-        #From MultipleObjectMixin()
-        #"""
-        #return self.allow_empty
 
 
 def _date_from_string(year, year_format, month, month_format, day='', day_format='', delim='__'):

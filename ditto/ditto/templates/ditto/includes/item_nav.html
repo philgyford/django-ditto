@@ -5,8 +5,9 @@ Expects:
 
 * item_counts -- A list of dicts, each dict with 'context_object_name', 'count', 'app_slug' and 'variety_slug' elements.
 
-* context_object_name -- The name of the queryset that we're currently viewing,
-                          eg 'twitter_favorite_list'.
+* ditto_app_name -- eg 'twitter' or 'flickr'.
+
+* ditto_variety_name -- eg 'tweets' or 'favorites'.
 
 And one of:
 
@@ -17,20 +18,22 @@ And one of:
 
 <div class="list-group">
     {% for item in item_counts %}
-    <a href="{% spaceless %}
-        {% if day %}
-            {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=item.app_slug variety=item.variety_slug %}
-        {% endif %}
-    {% endspaceless %}" class="list-group-item{% if item.context_object_name == context_object_name %} active{% endif %}">
+        <a href="{% spaceless %}
+            {% if day %}
+                {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=item.app_slug variety=item.variety_slug %}
+            {% endif %}
+        {% endspaceless %}" class="list-group-item{% if item.app_name == ditto_app_name and item.variety_name == ditto_variety_name %} active{% endif %}">
             <span class="label label-default label-pill pull-xs-right">{{ item.count }}</span>
-            {% if item.context_object_name == 'pinboard_bookmark_list' %}
+            {% if item.app_name == 'pinboard' %}
                 Pinboard bookmarks
-            {% elif item.context_object_name == 'flickr_photo_list' %}
+            {% elif item.app_name == 'flickr' %}
                 Flickr photos
-            {% elif item.context_object_name == 'twitter_tweet_list' %}
-                Twitter tweets
-            {% elif item.context_object_name == 'twitter_favorite_list' %}
-                Twitter favorites
+            {% elif item.app_name == 'twitter' %}
+                {% if item.variety_name == 'favorite' %}
+                    Twitter favorites
+                {% else %}
+                    Twitter tweets
+                {% endif %}
             {% endif %}
         </a>
     {% endfor %}
