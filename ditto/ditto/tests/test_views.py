@@ -284,12 +284,25 @@ class DittoDayArchiveTestCase(TestCase):
         self.assertTrue('next_day' in response.context)
         self.assertEqual(response.context['next_day'], self.tomorrow.date())
 
-    def test_day_context_flickr_photos(self):
+    def test_day_context_flickr_photos_uploaded(self):
         response = self.client.get(self.make_url('flickr', 'photos'))
+        self.assertTrue('date_field' in response.context)
+        self.assertEqual(response.context['date_field'], 'post_time')
         self.assertTrue('flickr_photo_list' in response.context)
         self.assertEqual(1, len(response.context['flickr_photo_list']))
         self.assertEqual(response.context['flickr_photo_list'][0].pk,
                                                             self.photo_1.pk)
+
+    def test_day_context_flickr_photos_taken(self):
+        self.photo_2.taken_time = self.today
+        self.photo_2.save()
+        response = self.client.get(self.make_url('flickr', 'photos-taken'))
+        self.assertTrue('date_field' in response.context)
+        self.assertEqual(response.context['date_field'], 'taken_time')
+        self.assertTrue('flickr_photo_list' in response.context)
+        self.assertEqual(1, len(response.context['flickr_photo_list']))
+        self.assertEqual(response.context['flickr_photo_list'][0].pk,
+                                                            self.photo_2.pk)
 
     def test_day_context_pinboard_bookmarks(self):
         response = self.client.get(self.make_url('pinboard', 'bookmarks'))
