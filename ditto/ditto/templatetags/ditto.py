@@ -1,6 +1,7 @@
 from datetime import datetime
 from django import template
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 
 
 register = template.Library()
@@ -16,9 +17,15 @@ def query_string(context, key, value):
 
     And, if we're viewing ?p=3&order=uploaded and we do the same thing, we get
     the same result (ie, the existing "order=uploaded" is replaced).
+
+    Expects the request object in context to do the above; otherwise it will
+    just return a query string with the supplied key=value pair.
     """
-    request = context['request']
-    args = request.GET.copy()
+    try:
+        request = context['request']
+        args = request.GET.copy()
+    except KeyError:
+        args = QueryDict('').copy()
     args[key] = value
     return args.urlencode()
 
