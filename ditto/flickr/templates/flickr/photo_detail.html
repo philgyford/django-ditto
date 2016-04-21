@@ -30,7 +30,11 @@
                 </video>
             {% else %}
                 <p class="flickr-photo-img">
-                    <img src="{{ photo.medium_800_url }}" {% width_height photo.medium_800_width photo.medium_800_height 867 600 %} alt="" class="img-fluid">
+                    {% if photo.medium_800_width %}
+                        <img src="{{ photo.medium_800_url }}" {% width_height photo.medium_800_width photo.medium_800_height 867 600 %} alt="" class="img-fluid">
+                    {% else %}
+                        <img src="{{ photo.medium_640_url }}" {% width_height photo.medium_640_width photo.medium_640_height 867 600 %} alt="" class="img-fluid">
+                    {% endif %}
                 </p>
             {% endif %}
             {% if photo.description %}
