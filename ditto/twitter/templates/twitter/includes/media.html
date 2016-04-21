@@ -8,31 +8,31 @@ Expects:
 {% endcomment %}
 
 <li class="m-b">
-	{% load l10n %}
-	{% if media.media_type == 'video' %}
-		{% if detail %}
-			<video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="metadata" class="img-fluid">
-		{% else %}
-			<video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" controls preload="none">
-		{% endif %}
-			{% if media.mp4_url_3 %}
-				<source src="{{ media.mp4_url_3 }}" type="video/mp4">
-			{% elif media.mp4_url_2 %}
-				<source src="{{ media.mp4_url_2 }}" type="video/mp4">
-			{% elif media.mp4_url_1 %}
-				<source src="{{ media.mp4_url_1 }}" type="video/mp4">
-			{% endif %}
-			{% if media.webm_url %}
-				<source src="{{ media.webm_url }}" type="video/webm">
-			{% endif %}
-		</video>
-	{% else %}
-		{# Photo #}
-		{% if detail %}
-			<a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
-		{% else %}
-			<img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt="">
-		{% endif %}
-	{% endif %}
+    {% load l10n %}
+    {% if media.media_type == 'video' %}
+        {% if detail %}
+            <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="metadata" class="img-fluid">
+        {% else %}
+            <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" controls preload="none">
+        {% endif %}
+            {% if media.mp4_url_3 %}
+                <source src="{{ media.mp4_url_3 }}" type="video/mp4">
+            {% elif media.mp4_url_2 %}
+                <source src="{{ media.mp4_url_2 }}" type="video/mp4">
+            {% elif media.mp4_url_1 %}
+                <source src="{{ media.mp4_url_1 }}" type="video/mp4">
+            {% endif %}
+            {% if media.webm_url %}
+                <source src="{{ media.webm_url }}" type="video/webm">
+            {% endif %}
+        </video>
+    {% else %}
+        {# Photo #}
+        {% if detail %}
+            <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
+        {% else %}
+            <img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt="">
+        {% endif %}
+    {% endif %}
 </li>
 
