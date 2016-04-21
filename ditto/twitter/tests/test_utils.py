@@ -44,8 +44,8 @@ class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
         "Makes 'hashtags' entities into clickable #links."
         api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
         tweet_html = htmlify_tweet( self.getJson(api_fixture) )
-        self.assertTrue(' <a href="https://twitter.com/hashtag/testing" rel="external">#testing</a> and' in tweet_html)
-        self.assertTrue(' <a href="https://twitter.com/hashtag/hashtag" rel="external">#hashtag</a>' in tweet_html)
+        self.assertTrue(' <a href="https://twitter.com/search?q=%23testing" rel="external">#testing</a> and' in tweet_html)
+        self.assertTrue(' <a href="https://twitter.com/search?q=%23hashtag" rel="external">#hashtag</a>' in tweet_html)
 
     def test_links_symbols(self):
         api_fixture = 'ditto/twitter/fixtures/api/tweet_with_symbols.json'
@@ -79,8 +79,9 @@ class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
     "Further tests for specific problems with URLs."
 
     def test_urls_in_archived_tweets(self):
-        """Old Tweets included in the downloaded archive files don't have 'entities'
-        elements, so we need to manually link any URLs in their tweets.
+        """Old Tweets included in the downloaded archive files don't have
+        'entities' elements, so we need to manually link any URLs in their
+        tweets.
         """
         api_fixture = 'ditto/twitter/fixtures/api/tweet_from_archive_2006.json'
         tweet_html = htmlify_tweet( self.getJson(api_fixture) )
@@ -99,7 +100,7 @@ class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
         """
         api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities_3.json'
         tweet_html = htmlify_tweet( self.getJson(api_fixture) )
-        self.assertTrue('prototyping!  <a href="https://medium.com/@BuckleyWilliams/hello-from-buckley-williams-announcing-our-new-studio-c48e20c847d0" rel="external">medium.com/@BuckleyWillia…</a> h' in tweet_html)
+        self.assertTrue('prototyping!  <a href="https://medium.com/@BuckleyWilliams/hello-from-buckley-williams-announcing-our-new-studio-c48e20c847d0" rel="external">medium.com/@BuckleyWillia…</a>' in tweet_html)
 
 
 class UtilsHtmlifyPhotosTestCase(UtilsHtmlifyTestCase):
