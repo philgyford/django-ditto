@@ -37,7 +37,9 @@ Expects:
 
                 {% if view and view == 'detail' %}
                     {% if tweet.account and tweet.account.is_active %}
-                        {# Favorited tweets won't have an account, so we'll link to them whatever. #}
+                        • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
+                    {% elif tweet.account == None %}
+                        {# A favorited tweet; always link to it. #}
                         • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
                     {% endif %}
                 {% endif %}
