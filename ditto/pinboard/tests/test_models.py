@@ -31,7 +31,7 @@ class PinboardAccountTestCase(TestCase):
     def test_get_absolute_url(self):
         """Has the correct URL on this site"""
         account = AccountFactory(username='billy')
-        self.assertEqual(account.get_absolute_url(), '/pinboard/billy')
+        self.assertEqual(account.get_absolute_url(), '/pinboard/billy/')
 
     def test_ordering(self):
         """Multiple accounts are ordered alphabetically"""
@@ -95,7 +95,7 @@ class PinboardBookmarkTestCase(TestCase):
         "Has the correct URL on this site"
         account = AccountFactory(username='billy')
         bookmark = BookmarkFactory(account=account)
-        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1')
+        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1/')
 
     def test_ordering(self):
         "Bookmarks are ordered correctly, most-recently-posted first"
