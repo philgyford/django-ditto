@@ -5,9 +5,13 @@ Ditto
 A collection of Django apps for copying things from third-party sites and
 services. Very much in-progress. Python 3, Django 1.8.
 
-Currently only copies bookmarks from `Pinboard <https://pinboard.in/>`_ and tweets from Twitter. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as it's still in development.
+Currently, it copies bookmarks from `Pinboard <https://pinboard.in/>`_, tweets from Twitter, and photos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
 
-There is a demo Django project website for viewing fetched items in the ``/demo/`` directory.
+Public and private Tweets, Photos and Bookmarks are copied, but only public
+ones are displayed in the included views and templates; non-public ones are
+only visible in the Django admin.
+
+There is a demo Django project website for viewing fetched items in the ``demo/`` directory.
 
 The docs below are hasty; I'm not expecting anyone else to use this yet.
 
@@ -26,16 +30,18 @@ Development with the demo website::
 Add to INSTALLED_APPS
 *********************
 
-To use Ditto in your own project (untested as yet), add the core ``ditto.ditto`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the appropriate application for which services you need. eg, to use Pinboard::
+To use Ditto in your own project (untested as yet), add the core ``ditto.ditto`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This includes Flickr, Pinboard and Twitter::
 
     INSTALLED_APPS = (
         # other apps listed here.
         'taggit',
         'ditto.ditto',
+        'ditto.flickr',
         'ditto.pinboard',
+        'ditto.twitter',
     )
 
-Note that ``ditto.pinboard`` also requires ``taggit`` to be included, as shown.
+Note that both ``ditto.flickr`` and ``ditto.pinboard`` also require ``taggit`` to be included, as shown.
 
 Add the project's context processor in your settings::
 
@@ -56,7 +62,8 @@ Add to urls.py
 **************
 
 To use Ditto's views you can include each app's URLs in your project's own
-``urls.py``. eg::
+``urls.py``. Note that each app requires the correct namespace (``flickr``,
+``pinboard`` or ``twitter``), eg::
 
     from django.conf.urls import include, url
     from django.contrib import admin
@@ -64,7 +71,7 @@ To use Ditto's views you can include each app's URLs in your project's own
     urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
 
-        # If you're using the ditto.pinbaord app:
+        # If you're using the ditto.pinboard app:
         url(r'^ditto/pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
 
         # To include the overall, aggregated views:
@@ -72,20 +79,25 @@ To use Ditto's views you can include each app's URLs in your project's own
     ]
 
 Change the URL include paths (eg, ``r'^ditto/pinboard/'`` as appropriate) to
-suit your project.
+suit your project. See the ``urls.py`` in the ``demo/`` project for a full
+example.
 
 
 Services
 ########
 
+As well as including the apps and URLs, you need to link each one with your
+account(s) on the related services. Each app has an ``Account`` model, which
+parallels an account on the related service (eg, a Twitter account). The method of linking the two varies with each service.
+
 
 Flickr
 ******
 
-In the Django admin, add your Flickr account(s) with API key and secret from https://www.flickr.com/services/apps/create/apply/
+In the Django admin, create a new Account in the Flickr app, and add your Flickr API key and secret from https://www.flickr.com/services/apps/create/apply/
 
 By default this will only allow the fetching of fully public photos. To fetch
-all photos your Flickr account can see, you'll need to do this:
+all photos your Flickr account can access, you'll need to do this:
 
 1. Enter your API key and secret in the indicated place in the file
    ``scripts/flickr_authorize.py``.
@@ -98,51 +110,48 @@ all photos your Flickr account can see, you'll need to do this:
    authorize your Flickr account. You'll then get a code to paste into your
    Terminal.
 
-Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user::
+Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user (replacing ``1`` with your ID, if different)::
 
-    $ ./demo/manage.py fetch_flickr_account_user --id=1
+    $ ./manage.py fetch_flickr_account_user --id=1
 
-Now you can fetch Photos. This will fetch ALL Photos for ALL Accounts (it'll
-take a while)::
+Now you can fetch data about your Photos (it doesn't currently fetch the photo files themselves). This will fetch ALL Photos for ALL Accounts (it might take a while)::
 
-    $ ./demo/manage.py fetch_flickr_photos --days=all
+    $ ./manage.py fetch_flickr_photos --days=all
 
 This will only fetch Photos uploaded in the past 3 days::
 
-    $ ./demo/manage.py fetch_flickr_photos --days=3
+    $ ./manage.py fetch_flickr_photos --days=3
 
 Both options can be restricted to only fetch for a single Account by adding the NSID of the Account's Flickr User, eg::
 
-    $ ./demo/manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
-
+    $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
 
 
 Pinboard
 ********
 
-In the Django admin, add your Pinboard account(s) with the API token from https://pinboard.in/settings/password .
+In the Django admin, add an Account in the Pinboard app with your API token from https://pinboard.in/settings/password .
 
 Import all of your bookmarks::
 
-    $ ./demo/manage.py fetch_pinboard_bookmarks --all
+    $ ./manage.py fetch_pinboard_bookmarks --all
 
 Periodically fetch the most recent bookmarks, eg 20 of them::
 
-    $ ./demo/manage.py fetch_pinboard_bookmarks --recent=20
+    $ ./manage.py fetch_pinboard_bookmarks --recent=20
 
 Or fetch bookmarks posted on one date::
 
-    $ ./demo/manage.py fetch_pinboard_bookmarks --date=2015-06-20
+    $ ./manage.py fetch_pinboard_bookmarks --date=2015-06-20
 
 Or fetch a single bookmark by its URL (eg, if you've changed the description
 of a particular bookmark you've alread fetched)::
 
-    $ ./demo/manage.py fetch_pinboard_bookmarks --url=http://new-aesthetic.tumblr.com/
+    $ ./manage.py fetch_pinboard_bookmarks --url=http://new-aesthetic.tumblr.com/
 
-The above fetch those bookmark(s) for all Accounts you've added. To restrict to
-a single account use ``--account``, eg::
+The above commands fetch bookmark(s) for all Accounts you've added. To restrict to a single account use ``--account`` with the Pinboard username, eg::
 
-    $ ./demo/manage.py fetch_pinboard_bookmarks --all --account=philgyford
+    $ ./manage.py fetch_pinboard_bookmarks --all --account=philgyford
 
 Be aware of the rate limits: https://pinboard.in/api/#limits
 
@@ -150,55 +159,47 @@ Be aware of the rate limits: https://pinboard.in/api/#limits
 Twitter
 *******
 
-In the Django admin, add a new Account, with Twitter API credentials from https://apps.twitter.com/ .
+In the Django admin, add a new Account in the Twitter app, with your API credentials from https://apps.twitter.com/ .
 
 Then you *must* do::
 
-    $ ./demo/manage.py fetch_twitter_accounts
+    $ ./manage.py fetch_twitter_accounts
 
-which will fetch the data for that account's Twitter user.
+which will fetch the data for that Account's Twitter user.
 
-If you have more than 3,200 Tweets, request your Twitter archive at https://twitter.com/settings/account . When you've downloaded it, do::
+If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at https://twitter.com/settings/account . When you've downloaded it, do::
 
-    $ ./demo/manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
+    $ ./manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 
-using the correct path to the directory you've downloaded and unzipped. This
-will import all of the Tweets found in the archive. The data in the archive
-isn't complete, so to fully-populate those Tweets you should run this::
+using the correct path to the directory you've downloaded and unzipped. This will import all of the Tweets found in the archive. The data in the archive isn't complete, so to fully-populate those Tweets you should run this (replacing ``philgyford`` with your Twitter screen name)::
 
-    $ ./demo/manage.py update_twitter_tweets --account=[your screen name]
+    $ ./manage.py update_twitter_tweets --account=philgyford
 
-with the Twitter screen name of the Account you added. This will fetch data for
-up to 6000 Tweets. You can run it every 15 minutes if you have more than 6000
-Tweets from your archive. It will fetch data for the least-recently fetched.
-It's worth running every so often in the future, to fetch the latest data (such
-as Retweet and Like counts).
+This will fetch data for up to 6000 Tweets. You can run it every 15 minutes if you have more than 6000 Tweets in your archive. It will fetch data for the least-recently fetched.  It's worth running every so often in the future, to fetch the latest data (such as Retweet and Like counts).
 
 If there are newer Tweets, not in your downloaded archive, then run this::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent=3200
+    $ ./manage.py fetch_twitter_tweets --recent=3200
 
 The ``3200`` is the number of recent Tweets to fetch, with ``3200`` being the maximum allowed in one go.
 
-Run this version periodically to fetch the most recent Tweets::
+Run this version periodically to fetch the Tweets since you last fetched any::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=new
 
-That will fetch all the Tweets since last time you fetched any. You might also,
-or instead, want to fetch more than that, eg::
+You might also, or instead, want to fetch more than that, eg::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=200
 
-This would update data such as the retweet and like counts for all of the 200
+This would update data such as the Retweet and Like counts for all of the 200
 fetched Tweets, even if they're older than your last fetch.
 
-And one or both of these to fetch recent Tweets that your accounts have favorited::
+And one or both of these to fetch recent Tweets that your accounts have liked::
 
     $ ./demo/manage.py fetch_twitter_favorites --recent=new
     $ ./demo/manage.py fetch_twitter_favorites --recent=200
 
-All of the above will fetch Tweets and favorites for all Accounts that have API credentials set. To restrict to a single Account add `--account` with the
-Twitter screen name. eg::
+All of the above commands will fetch Tweets and favorites for all Accounts that have API credentials set. To restrict to a single Account add `--account` with the Twitter screen name. eg::
 
     $ ./demo/manage.py fetch_twitter_tweets --recent=new --account=philgyford
 
@@ -206,9 +207,6 @@ You may periodically want to update the stored data about all Twitter users
 (numbers of Tweets, descriptions, etc). This will fetch the latest data::
 
     $ ./demo/manage.py fetch_twitter_users --account=philgyford
-
-TODO: Summary of the commands you might want to run via cron etc, and how
-often.
 
 
 Other things
