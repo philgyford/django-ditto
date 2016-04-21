@@ -11,9 +11,9 @@ Expects:
     {% load l10n %}
     {% if media.media_type == 'video' %}
         {% if detail %}
-            <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" controls preload="metadata" class="img-fluid">
+            <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
         {% else %}
-            <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" controls preload="none">
+            <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
         {% endif %}
             {% if media.mp4_url_3 %}
                 <source src="{{ media.mp4_url_3 }}" type="video/mp4">
