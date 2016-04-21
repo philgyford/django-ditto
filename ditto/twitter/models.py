@@ -20,7 +20,7 @@ class Account(TimeStampedModelMixin, models.Model):
                                                     on_delete=models.SET_NULL)
 
     consumer_key = models.CharField(null=False, blank=True, max_length=255,
-            help_text="(API Key)")
+            help_text="(API Key) From https://apps.twitter.com")
     consumer_secret = models.CharField(null=False, blank=True, max_length=255,
             help_text="(API Secret)")
     access_token = models.CharField(null=False, blank=True, max_length=255)
@@ -72,7 +72,7 @@ class Account(TimeStampedModelMixin, models.Model):
         """
         from .fetch import FetchVerify
 
-        if self.hasCredentials():
+        if self.has_credentials():
             results = FetchVerify(account=self).fetch()
             if 'user' in results and isinstance(results['user'], User):
                 self.user = results['user']
@@ -80,7 +80,7 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return False
 
-    def hasCredentials(self):
+    def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
         if self.consumer_key and self.consumer_secret and self.access_token and self.access_token_secret:
             return True
@@ -130,18 +130,18 @@ class Media(TimeStampedModelMixin, models.Model):
 
     # These will be in order from lowest bitrate to highest.
     mp4_url_1 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (1)')
+                        verbose_name='MP4 URL (1)', help_text="Lowest bitrate")
     mp4_url_2 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (2)')
+                        verbose_name='MP4 URL (2)', help_text="Medium bitrate")
     mp4_url_3 = models.URLField(null=True, blank=True,
-                                                    verbose_name='MP4 URL (3)')
+                        verbose_name='MP4 URL (3)', help_text="Highest bitrate")
 
     mp4_bitrate_1 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (1)')
+                    verbose_name='MP4 Bitrate (1)', help_text="Lowest bitrate")
     mp4_bitrate_2 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (2)')
+                    verbose_name='MP4 Bitrate (2)', help_text="Medium bitrate")
     mp4_bitrate_3 = models.PositiveIntegerField(null=True, blank=True,
-                                                verbose_name='MP4 Bitrate (3)')
+                    verbose_name='MP4 Bitrate (3)', help_text="Highest bitrate")
 
     webm_url = models.URLField(null=True, blank=True, verbose_name='WebM URL')
     webm_bitrate = models.PositiveIntegerField(null=True, blank=True,
@@ -308,6 +308,14 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
                 self.place_country,
             )))
 
+    @property
+    def account(self):
+        "The Account whose tweet this is, if any. Otherwise, None."
+        try:
+            return self.user.account_set.all()[0]
+        except IndexError:
+            return None
+
     def summary_source(self):
         "The text that will be truncated to make a summary for this Tweet"
         return self.text
@@ -388,7 +396,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     # As on DittoItemModel:
     fetch_time = models.DateTimeField(null=True, blank=True,
-        help_text="The time the data was last fetched, and was new or changed.")
+                            help_text="The time the data was last fetched.")
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
 

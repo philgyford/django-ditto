@@ -1,0 +1,14 @@
+{
+	"photos": {
+		"page": 1,
+		"pages": "1",
+		"perpage": 3,
+		"total": "3", 
+		"photo": [
+		  { "id": "25822158530", "owner": "35034346050@N01", "secret": "123456abcd", "server": "1471", "farm": 2, "title": "Public footpath", "ispublic": 1, "isfriend": 0, "isfamily": 0 },
+		  { "id": "26069027966", "owner": "35034346050@N01", "secret": "abcd123456", "server": "1576", "farm": 2, "title": "Dore Abbey", "ispublic": 1, "isfriend": 0, "isfamily": 0 },
+		  { "id": "25822102530", "owner": "35034346050@N01", "secret": "098765abcd", "server": "1585", "farm": 2, "title": "Mary mowing the lawn", "ispublic": 0, "isfriend": 1, "isfamily": 1 }
+		]
+	},
+	"stat": "ok"
+}

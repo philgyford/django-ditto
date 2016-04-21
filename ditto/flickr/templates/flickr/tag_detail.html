@@ -1,0 +1,63 @@
+{% extends 'flickr/base.html' %}
+{% load l10n %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li><a href="{% url 'flickr:tag_list' %}">Tags</a></li>
+    <li class="active">{{ tag.name }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="m-y-2">
+        {% block title %}
+            Photos tagged with “{{ tag.name}}”
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-block">
+                    <p class="card-text">
+                        {{ page_obj.paginator.count|localize }} photo{{ page_obj.paginator.count|pluralize }}
+                        {% if account_list|length == 1 %}
+                            by <a href="{% url 'flickr:user_tag_detail' nsid=account_list.0.user.nsid tag_slug=tag.slug %}" title="Photos by {{ account_list.0.user.name }} tagged with “{{ tag.name }}”">{{ account_list.0.user.name }}</a>
+                        {% else %}
+                            by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}:
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if account_list|length > 1 %}
+                    <ul class="list-group list-group-flush">
+                        {% for account in account_list %}
+                            <li class="list-group-item">
+                                <a class="card-link" href="{% url 'flickr:user_tag_detail' nsid=account.user.nsid tag_slug=tag.slug %}">
+                                    {{ account.user.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="card">
+                <div class="card-block">
+                    <p class="card-text">
+                        <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
+                    </p>
+                </div>
+            </div>
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% include 'flickr/includes/sorting.html' with request=request order=order only %}
+
+            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+
+

@@ -1,0 +1,67 @@
+{% comment %}
+
+Expects:
+ * request, the request object.
+ * photo_list, a queryset of Photos.
+ * perms - The Django perms object.
+ * page_obj, optional, a DiggPaginator instance or False (default).
+ * order - Either 'uploaded' or 'taken'.
+ * view - optional, 'detail' or 'day'.
+{% endcomment %}
+
+{% if photo_list|length > 0 %}
+    {% if page_obj and page_obj.number > 1 %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+    {% endif %}
+
+    {% load ditto %}
+
+    {% for row in photo_list|split_by:3 %}
+        <div class="row flickr-photos">
+            {% for photo in row %}
+                <div class="col-md-4 flickr-photo">
+                    <h3 class="h6">
+                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
+                    </h3>
+                    <p class="flickr-photo-img m-b-0">
+                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}"><img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-fluid"></a>
+                    </p>
+                    {% if photo.summary or photo.media == 'video' %}
+                        <p class="flickr-photo-summary m-b-0">
+                            {{ photo.summary|safe }}
+                            {% if photo.media == 'video' %}
+                                <span class="text-muted">(Video)</span>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                    <p><small class="text-muted">
+                        {% if order == 'taken' %}
+                            Taken at
+                            {% if view == 'day' %}
+                                {% display_time photo.taken_time link_to_day=False granularity=photo.taken_granularity %}
+                            {% else %}
+                                {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
+                            {% endif %}
+                        {% else %}
+                            Uploaded at
+                            {% if view == 'day' %}
+                                {% display_time photo.post_time link_to_day=False granularity=photo.taken_granularity %}
+                            {% else %}
+                                {% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}
+                            {% endif %}
+                        {% endif %}
+                    </small></p>
+                </div>
+            {% endfor %}
+        </div> <!-- .row.flickr-photos -->
+    {% endfor %}
+
+    {% if page_obj|default:False %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+    {% endif %}
+{% else %}
+
+    <p>There are no Photos to show.</p>
+{% endif %}
+
+

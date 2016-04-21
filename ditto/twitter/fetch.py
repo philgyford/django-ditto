@@ -36,7 +36,7 @@ from .models import Account, Media, Tweet, User
 # The *Fetcher classes are the ones that should be used externally, like:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
-#   fetcher.fetch(count=20)
+#   results = fetcher.fetch(count=20)
 
 
 class FetchError(Exception):
@@ -310,10 +310,15 @@ class TweetMixin(UserMixin):
 
         if 'quoted_status_id' in tweet:
             defaults['quoted_status_id'] = tweet['quoted_status_id']
-            # We'll also create/update the quoted User object, and quoted Tweet.
-            quoted_user = self.save_user(
+
+            if 'quoted_status' in tweet:
+                # If tweet 1 quotes tweet 2 that quotes tweet 3, then
+                # tweet 2 will have 'quoted_status_id' but not 'quoted_status'.
+                # But the tweet does have quoted_status, we'll create/update
+                # the quoted User object, and quoted Tweet.
+                quoted_user = self.save_user(
                                     tweet['quoted_status']['user'], fetch_time)
-            quoted_tweet_obj = self.save_tweet(
+                quoted_tweet_obj = self.save_tweet(
                                             tweet['quoted_status'], fetch_time)
 
         tweet_obj, created = Tweet.objects.update_or_create(
@@ -380,7 +385,7 @@ class Fetch(object):
         else:
             self.return_value['account'] = 'Unsaved Account'
 
-        if self.account.hasCredentials():
+        if self.account.has_credentials():
             self.api = Twython(
                 self.account.consumer_key, self.account.consumer_secret,
                 self.account.access_token, self.account.access_token_secret)
@@ -427,6 +432,13 @@ class Fetch(object):
         """
         raise FetchError("Children of the Fetch class should define their own _call_api() method.")
 
+    def _save_results(self):
+        """Define in child classes.
+        Should go through self._results() and, probably, call
+        self.save_tweet() or self.save_user() for each one.
+        """
+        self.objects = []
+
     def _post_save(self):
         """Can optionally be defined in child classes.
         Do any extra things that need to be done after saving a page of data.
@@ -438,13 +450,6 @@ class Fetch(object):
         Do any extra things that need to be done after we've fetched all data.
         """
         pass
-
-    def _save_results(self):
-        """Define in child classes.
-        Should go through self._results() and, probably, call
-        self.save_tweet() or self.save_user() for each one.
-        """
-        self.objects = []
 
 
 class FetchVerify(UserMixin, Fetch):
@@ -741,7 +746,7 @@ class TwitterFetcher(object):
     for one or several Accounts.
 
     Use like:
-        fetcher = ChildFetcher(screen_name='philgyford')
+        fetcher = ChildTwitterFetcher(screen_name='philgyford')
         fetcher.fetch()
 
     Or, for all accounts:
@@ -783,12 +788,12 @@ class TwitterFetcher(object):
 
     def _get_account_fetcher(self, account):
         """Should be changed for each child class.
-        Should return an instance of a child of TwitterAccountFetcher().
+        Should return an instance of a child of Fetch().
 
         Keyword arguments:
         account -- An Account object.
         """
-        return TwitterAccountFetcher(account)
+        return Fetch(account)
 
     def _add_to_return_values(self, return_value):
         """Add return_value to the list in self.return_values."""

@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-md">
+    <h1 class="m-y-2">
         {% block title %}
             Bookmarks tagged with “{{ tag.name}}”
         {% endblock %}
@@ -23,7 +23,7 @@
                     <p class="card-text">
                         {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
                         {% if account_list|length == 1 %}
-                            by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a> (“<a href="{% url 'pinboard:account_tag_detail' username=account_list.0.username tag_slug=tag.slug %}">{{ tag.name }}</a>”)
+                            by <a href="{% url 'pinboard:account_tag_detail' username=account_list.0.username tag_slug=tag.slug %}" title="Bookmarks by {{ account_list.0.username }} tagged with “{{ tag.slug }}”">{{ account_list.0.username }}</a>
                         {% else %}
                             by {{ account_list|length }}&nbsp;user{{ account_list|length|pluralize }}:
                         {% endif %}
@@ -41,6 +41,13 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+            </div>
+            <div class="card">
+                <div class="card-block">
+                    <p class="card-text">
+                        <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
+                    </p>
+                </div>
             </div>
         </div> <!-- .col -->
 

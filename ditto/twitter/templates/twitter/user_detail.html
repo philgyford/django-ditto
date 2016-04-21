@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-md">
+    <h1 class="m-y-2">
         {% block title %}
             Tweets by {{ twitter_user.name }}
         {% endblock %}
@@ -22,7 +22,7 @@
 
         <div class="col-md-9">
             {% if account %}
-                <ul class="nav nav-tabs m-b-md">
+                <ul class="nav nav-tabs m-b-2">
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">Tweets</a>
                     </li>
@@ -32,6 +32,9 @@
                 </ul>
             {% else %}
                 <p class="lead">
+					{% comment %}
+					Not sure this is showing what is implied here... isn't this just listing ALL accounts? 
+					{% endcomment %}
                     Liked by 
                     {% for account in public_accounts %}
                         {% if not forloop.first %},{% endif %}

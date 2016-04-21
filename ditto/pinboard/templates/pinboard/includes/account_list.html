@@ -9,12 +9,12 @@ Expects:
 
 {% load l10n %}
 
-<div class="card m-b-md">
+<div class="card">
     <div class="card-block">
         <p class="card-text">
             {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
             {% if list_type == 'toread' %}
-                marked “to read”
+                marked “to&nbsp;read”
             {% endif %}
             {% if account_list|length == 1 %}
                 by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.username }}</a>

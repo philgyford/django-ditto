@@ -6,7 +6,7 @@ from taggit.managers import TaggableManager
 from taggit.models import GenericTaggedItemBase, TagBase
 
 from .managers import _BookmarkTaggableManager, PublicToreadManager, ToreadManager
-from ditto.ditto.models import DittoItemModel, TimeStampedModelMixin
+from ..ditto.models import DittoItemModel, TimeStampedModelMixin
 
 
 class Account(TimeStampedModelMixin, models.Model):
@@ -15,11 +15,13 @@ class Account(TimeStampedModelMixin, models.Model):
                 help_text="eg, 'philgyford'")
     url = models.URLField(max_length=255, null=False, blank=False,
                 unique=True,
+                verbose_name='URL',
                 help_text="eg, 'https://pinboard.in/u:philgyford'")
     # max_length derived from DittoAccount.username max_length plus
     # 21 characters for ':12345...'.
     api_token = models.CharField(null=False, blank=False, max_length=51,
-                    help_text='From https://pinboard.in/settings/password eg, "philgyford:1234567890ABCDEFGHIJ"')
+                    verbose_name='API Token',
+                    help_text='eg, "philgyford:1234567890ABCDEFGHIJ"')
     is_active = models.BooleanField(default=True, null=False, blank=False,
                         help_text="If false, new Bookmarks won't be fetched.")
 

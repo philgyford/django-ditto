@@ -1,0 +1,44 @@
+{% extends 'flickr/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li class="active">{{ flickr_user }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="m-y-2">
+        {% block title %}
+            Photos by {{ flickr_user.name }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'flickr/includes/user.html' with user=flickr_user account=account only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% if account %}
+                <ul class="nav nav-tabs m-b-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'flickr:user_detail' nsid=account.user.nsid %}">Photos</a>
+                    </li>
+                    {% comment %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'flickr:account_favorites' nsid=account.user.nsid %}">Favoites</a>
+                        </li>
+                    {% endcomment %}
+                </ul>
+            {% endif %}
+
+            {% include 'flickr/includes/sorting.html' with request=request order=order only %}
+
+            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+
+

@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'taggit',
     'ditto.ditto',
+    'ditto.flickr',
     'ditto.pinboard',
     'ditto.twitter',
 )

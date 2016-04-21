@@ -3,6 +3,7 @@ import pytz
 import factory
 
 from . import models
+from ..ditto.utils import datetime_now
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -14,12 +15,12 @@ class UserFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'User Name %d' % n)
 
     created_at = factory.LazyAttribute(lambda o:
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-                        - datetime.timedelta(weeks=52)
-                    )
+                               datetime_now() - datetime.timedelta(weeks=52)
+                            )
 
     description = factory.Sequence(lambda n: 'A description %d' % n)
     is_private = False
+    fetch_time = datetime_now()
 
 
 class AccountFactory(factory.DjangoModelFactory):
@@ -49,11 +50,11 @@ class TweetFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     text = factory.Sequence(lambda n: 'The text of tweet %d' % n)
     twitter_id = factory.Sequence(lambda n: (n * 10000000))
+    fetch_time = datetime_now()
 
     post_time = factory.LazyAttribute(lambda o:
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-                        - datetime.timedelta(weeks=4)
-                    )
+                                datetime_now() - datetime.timedelta(weeks=4)
+                            )
     source = 'web'
 
 

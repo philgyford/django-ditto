@@ -1,0 +1,34 @@
+{% comment %}
+Displays the 'Sort by:  Uploaded time  Taken time' photo list navigation.
+
+Expects:
+* request -- The Request object.
+* order -- A string indicating the current ordering. 'uploaded' or 'taken'.
+{% endcomment %}
+
+{% load ditto %}
+<div class="row m-b-2">
+	<div class="col-xs-12">
+		<nav class="pull-xs-right">
+			<ul class="nav nav-inline">
+				<li class="nav-item">
+					Sort:
+				</li>
+				<li class="nav-item">
+					{% if order == 'uploaded' %}
+						<strong>Uploaded time</strong>
+					{% else %}
+					<a class="nav-link" href="?{% query_string 'order' 'uploaded' %} ">Uploaded time</a>
+					{% endif %}
+				</li>
+				<li class="nav-item">
+					{% if order == 'taken' %}
+						<strong>Taken time</strong>
+					{% else %}
+						<a class="nav-link" href="?{% query_string 'order' 'taken' %}">Taken time</a>
+					{% endif %}
+				</li>
+			</ul>
+		</nav>
+	</div>
+</div>

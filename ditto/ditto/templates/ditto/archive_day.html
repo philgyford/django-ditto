@@ -6,26 +6,36 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="m-y-md">
+    <h1 class="m-y-2">
         {% block title %}
             {{ day|date:'l, j F Y' }}
         {% endblock %}
     </h1>
 
+    {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day ditto_app_slug=ditto_app_slug ditto_variety_slug=ditto_variety_slug only %}
+
     <div class="row">
+        <div class="col-md-3 m-t-3 m-b-2">
+            {% include 'ditto/includes/variety_nav.html' with variety_counts=variety_counts ditto_app_name=ditto_app_name ditto_variety_name=ditto_variety_name day=day only %}
+        </div> <!-- .col -->
+
         <div class="col-md-9">
-            {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}
 
-            {% if total_count > 0 %}
-                {% include 'ditto/includes/item_lists.html' with view='day' %}
+            {% if object_list|length > 0 %}
+                {% if date_field == 'taken_time' %}
+                    {% include 'ditto/includes/item_lists.html' with view='day' order='taken' %}
+                {% else %}
+                    {% include 'ditto/includes/item_lists.html' with view='day' order='uploaded' %}
+                {% endif %}
 
-                {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day only %}
 
             {% else %}
                 <p>There is nothing to display for this day.</p>
             {% endif %}
-        </div>
+        </div> <!-- .col -->
     </div> <!-- .row -->
+
+    {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day ditto_app_slug=ditto_app_slug ditto_variety_slug=ditto_variety_slug only %}
 
 
 {% endblock content %}

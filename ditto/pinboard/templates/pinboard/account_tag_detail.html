@@ -10,9 +10,9 @@
 
 {% block content %}
 
-    <h1 class="m-y-md">
+    <h1 class="m-y-2">
         {% block title %}
-            Bookmarks by {{ account.username }}
+            Bookmarks by {{ account.username }} tagged with “{{ tag.name }}”
         {% endblock %}
     </h1>
 
@@ -21,17 +21,18 @@
             <div class="card">
                 <div class="card-block">
                     <p class="card-text">
-                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} tagged with “{{ tag.name }}”
+                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
                     </p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% if account.is_active %}
-                        <li class="list-group-item">
-                            <a href="{{ account.url }}/t:{{ tag.slug }}">At Pinboard.in</a>
-                        </li>
-                    {% endif %}
                     <li class="list-group-item">
                         <a href="{% url 'pinboard:account_detail' username=account.username %}">All {{ account.username }}’s bookmarks</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">All bookmarks tagged with “{{ tag.name }}”</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
                     </li>
                 </ul>
             </div>

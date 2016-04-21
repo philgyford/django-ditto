@@ -1,0 +1,32 @@
+{
+	"person": {
+		"id": "35034346050@N01",
+		"nsid": "35034346050@N01",
+		"ispro": 1,
+		"can_buy_pro": 0,
+		"iconserver": "7420",
+		"iconfarm": 8,
+		"path_alias": "philgyford",
+		"has_stats": 1,
+		"expire": 0, 
+		"username": { "_content": "Phil Gyford" }, 
+		"realname": { "_content": "Phil Gyford" }, 
+		"location": { "_content": "London, UK" }, 
+		"timezone": {
+			"label": "GMT: Dublin, Edinburgh, Lisbon, London",
+			"offset": "+00:00",
+			"timezone_id": "Europe\/London"
+		}, 
+		"description": { "_content": "A test description." }, 
+		"photosurl": { "_content": "https:\/\/www.flickr.com\/photos\/philgyford\/" }, 
+		"profileurl": { "_content": "https:\/\/www.flickr.com\/people\/philgyford\/" }, 
+		"mobileurl": { "_content": "https:\/\/m.flickr.com\/photostream.gne?id=5827" }, 
+		"photos": { 
+			"firstdatetaken": { "_content": "1956-01-01 00:00:00" }, 
+			"firstdate": { "_content": "1093459273" }, 
+			"count": { "_content": "2876" },
+			"views": { "_content": "227227" }
+		}
+	},
+	"stat": "ok"
+}

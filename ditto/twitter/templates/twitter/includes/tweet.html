@@ -3,14 +3,14 @@ A single Tweet.
 
 Expects:
  * tweet, a Tweet object.
- * view, optional, 'detail' or 'day' - True if this we're showing a single Tweet, False if this
-                        Tweet is in a list.
+ * view, optional, 'detail' or 'day' - 'detail' is the Tweet's own page.
+    'day' is the page listing all things on that day.
  * perms - The Django perms object.
 {% endcomment %}
 
 {% if tweet %}
     <div class="media-left">
-        <img class="media-object twitter-tweet-avatar" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar">
+        <img class="media-object twitter-tweet-avatar" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.screen_name }}’s avatar" width="48" height="48">
     </div>
     <div class="media-body">
         <p class="m-b-0 twitter-tweet-about">
@@ -20,23 +20,30 @@ Expects:
             </a>
             <small class="text-muted">
                 •
-                <time datetime="{{ tweet.post_time|date:'Y-m-d H:i:s' }}">
-                    {% if view and view == 'day' %}
-                        {{ tweet.post_time|date:'j M Y, g:i A' }}
-                    {% else %}
-                        <a href="{% url 'ditto:day_archive' year=tweet.post_time|date:'Y' month=tweet.post_time|date:'m' day=tweet.post_time|date:'d' %}" title="All items from this day">{{ tweet.post_time|date:'j M Y' }}</a>{{ tweet.post_time|date:', g:i A' }}
-                    {% endif %}
-                </time>
-
-                {% if view and view == 'detail' %}
-                    • <a href="{{ tweet.permalink }}" title="See on Twitter">#</a>
+                {% load ditto %}
+                {% if view == 'day' %}
+                    {% display_time tweet.post_time False %}
                 {% else %}
-                    • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
+                    {% display_time tweet.post_time True %}
                 {% endif %}
 
                 {% if tweet.is_reply %}
                     • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
                 {% endif %}
+
+                {% if not view or view != 'detail' %}
+                    • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
+                {% endif %}
+
+                {% if view and view == 'detail' %}
+                    {% if tweet.account and tweet.account.is_active %}
+                        • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
+                    {% elif tweet.account == None %}
+                        {# A favorited tweet; always link to it. #}
+                        • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
+                    {% endif %}
+                {% endif %}
+
                 {% if perms.twitter.can_change_tweet %}
                     • <a href="{% url 'admin:twitter_tweet_change' tweet.id %}">Edit</a>
                 {% endif %}
@@ -77,7 +84,7 @@ Expects:
             <p class="m-b-0 text-muted twitter-tweet-meta"><small>
                 {{ tweet.retweet_count }} Retweet{{ tweet.retweet_count|pluralize }}
                 • {{ tweet.favorite_count }} Like{{ tweet.favorite_count|pluralize }}
-                • As of <time datetime="{{ tweet.fetch_time|date:'Y-m-d H:i:s' }}">{{ tweet.fetch_time|date:"j M Y g:i A" }}</time>
+                • As of {% display_time tweet.fetch_time %}
             </small></p>
         {% endif %}
     </div><!-- .media-body -->

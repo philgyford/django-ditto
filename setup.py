@@ -13,6 +13,7 @@ setup(
     packages=['ditto'],
     install_requires=[
         'django-taggit',
+        'flickrapi',
         'pytz',
         'twython',
     ],

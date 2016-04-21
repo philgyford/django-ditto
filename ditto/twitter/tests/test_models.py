@@ -14,7 +14,7 @@ from ..factories import AccountFactory, AccountWithCredentialsFactory, PhotoFact
 from ..models import Account, Media, Tweet, User
 
 
-class TwitterAccountTestCase(TestCase):
+class AccountTestCase(TestCase):
 
     api_url = 'https://api.twitter.com/1.1'
 
@@ -141,11 +141,11 @@ class TwitterAccountTestCase(TestCase):
         self.add_response(body=self.make_verify_credentials_body(),
                             call='account/verify_credentials')
         account = AccountWithCredentialsFactory.build(user=None)
-        self.assertTrue(account.hasCredentials())
+        self.assertTrue(account.has_credentials())
 
     def test_has_credentials_false(self):
         account = AccountFactory.build(user=None)
-        self.assertFalse(account.hasCredentials())
+        self.assertFalse(account.has_credentials())
 
     def test_get_absolute_url_with_user(self):
         user = UserFactory(screen_name='bill')
@@ -158,7 +158,7 @@ class TwitterAccountTestCase(TestCase):
         self.assertEqual(account.get_absolute_url(), '')
 
 
-class TwitterPhotoTestCase(TestCase):
+class PhotoTestCase(TestCase):
     "Testing things like ordering, privacy. Not individual properties. Sorry."
 
     def test_str(self):
@@ -229,7 +229,7 @@ class TwitterPhotoTestCase(TestCase):
         self.assertEqual(photo.small_url,  '%s:small' % url)
         self.assertEqual(photo.thumb_url,  '%s:thumb' % url)
 
-class TwitterVideoTestCase(TestCase):
+class VideoTestCase(TestCase):
     "Most things are the same for photos and videos, so not re-testing here."
 
     def test_str(self):
@@ -241,7 +241,7 @@ class TwitterVideoTestCase(TestCase):
         self.assertEqual(video.media_type, 'video')
 
 
-class TwitterTweetTestCase(TestCase):
+class TweetTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"
@@ -267,6 +267,18 @@ class TwitterTweetTestCase(TestCase):
         "Creates the Tweet's summary correctly on save"
         tweet = TweetFactory(text='This is my tweet text')
         self.assertEqual(tweet.summary, 'This is my tweet text')
+
+    def test_account_exists(self):
+        "If the tweet is from an Account the account property should return it."
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        tweet = TweetFactory(text='This is my tweet text', user=user)
+        self.assertEqual(tweet.account, account)
+
+    def test_account_none(self):
+        "If the tweet isn't from an Account its account property should be None."
+        tweet = TweetFactory(text='This is my tweet text', user=UserFactory())
+        self.assertIsNone(tweet.account)
 
     def test_default_manager_recent(self):
         "The default manager includes tweets from public AND private users"
@@ -379,10 +391,7 @@ class TwitterTweetTestCase(TestCase):
         self.assertEqual(get_method.call_count, 1)
 
 
-
-
-
-class TwitterUserTestCase(TestCase):
+class UserTestCase(TestCase):
 
     def test_str(self):
         "Has the correct string represntation"

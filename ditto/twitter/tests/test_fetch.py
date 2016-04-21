@@ -99,8 +99,8 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
         self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
-        self.assertEqual(tweet.latitude, Decimal('40.05701649'))
-        self.assertEqual(tweet.longitude, Decimal('-75.14310264'))
+        self.assertEqual(tweet.latitude, Decimal('40.057016'))
+        self.assertEqual(tweet.longitude, Decimal('-75.143103'))
         self.assertFalse(tweet.is_private)
         self.assertEqual(tweet.fetch_time, self.fetch_time)
         self.assertEqual(tweet.permalink,
@@ -151,6 +151,22 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(quoted_tweet.text, 'Very quiet in the basement of #Innovate2015 come say hi and talk #iot')
         self.assertEqual(quoted_tweet.user.screen_name, 'iotwatch')
 
+    def test_saves_double_quoted_tweets(self):
+        """Saving Tweet 1 that quotes Tweet 2 that quotes Tweet 3 should save
+        Tweet 2, and cope with Tweet 3 not being savable."""
+        self.api_fixture = 'ditto/twitter/fixtures/api/tweets_with_double_quoted_tweet.json'
+        tweet1 = self.make_tweet()
+
+        self.assertEqual(tweet1.text, 'Anyone fancy meeting sometime today/tomorrow to see @genmon\u2019s book vending machine at Google Campus, EC2? https://t.co/1ScaCLOUxb')
+        # ie, tweet2's ID:
+        self.assertEqual(tweet1.quoted_status_id, 714528026650869760)
+
+        tweet2 = Tweet.objects.get(twitter_id=714528026650869760)
+        self.assertEqual(tweet2.text, 'Ludicrous hobby is ludicrous. But here we go https://t.co/DqYZB2gtQv')
+        self.assertEqual(tweet2.user.screen_name, 'genmon')
+
+        # ie, tweet3's ID:
+        self.assertEqual(tweet2.quoted_status_id, 714527559946473474)
 
 class TweetMixinMediaTestCase(FetchTwitterTestCase):
     "Parent class for testing the save_media() method of the TweetMixin."
@@ -257,6 +273,9 @@ class UserMixinTestCase(FetchTwitterTestCase):
         return user_data
 
     def make_user_object(self, user_data):
+        """"Creates/updates a User from API data, then fetches that User from
+        the DB and returns it.
+        """
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
         user_mixin = UserMixin()
         saved_user = user_mixin.save_user(user_data, fetch_time)
