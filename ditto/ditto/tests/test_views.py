@@ -32,7 +32,7 @@ class DittoViewTests(TestCase):
 
         self.assertTrue('flickr_photo_list' in response.context)
         # It shows 4 of all the photos:
-        self.assertEqual(len(response.context['flickr_photo_list']), 4)
+        self.assertEqual(len(response.context['flickr_photo_list']), 3)
 
     def test_home_context_pinboard(self):
         "Overall home page sends correct Pinboard data to templates"

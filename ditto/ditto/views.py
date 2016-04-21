@@ -308,11 +308,7 @@ class Home(DittoAppsMixin, TemplateView):
             queryset = self.get_queryset_for_app_variety(app_name, variety_name)
             context_object_name = self.get_context_object_name_for_app_variety(
                                                         app_name, variety_name)
-
-            if context_object_name == 'flickr_photo_list':
-                context[context_object_name] = queryset[:4]
-            else:
-                context[context_object_name] = queryset[:3]
+            context[context_object_name] = queryset[:3]
 
         return context
 
