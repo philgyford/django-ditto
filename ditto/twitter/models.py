@@ -129,11 +129,11 @@ class Media(TimeStampedModelMixin, models.Model):
     # VIDEO-ONLY PROPERTIES.
 
     # These will be in order from lowest bitrate to highest.
-    mp4_url_1 = models.URLField(null=True, blank=True,
+    mp4_url_1 = models.URLField(null=False, blank=True,
                         verbose_name='MP4 URL (1)', help_text="Lowest bitrate")
-    mp4_url_2 = models.URLField(null=True, blank=True,
+    mp4_url_2 = models.URLField(null=False, blank=True,
                         verbose_name='MP4 URL (2)', help_text="Medium bitrate")
-    mp4_url_3 = models.URLField(null=True, blank=True,
+    mp4_url_3 = models.URLField(null=False, blank=True,
                         verbose_name='MP4 URL (3)', help_text="Highest bitrate")
 
     mp4_bitrate_1 = models.PositiveIntegerField(null=True, blank=True,
@@ -143,15 +143,15 @@ class Media(TimeStampedModelMixin, models.Model):
     mp4_bitrate_3 = models.PositiveIntegerField(null=True, blank=True,
                     verbose_name='MP4 Bitrate (3)', help_text="Highest bitrate")
 
-    webm_url = models.URLField(null=True, blank=True, verbose_name='WebM URL')
+    webm_url = models.URLField(null=False, blank=True, verbose_name='WebM URL')
     webm_bitrate = models.PositiveIntegerField(null=True, blank=True,
                                                 verbose_name='WebM Bitrate')
-    dash_url = models.URLField(null=True, blank=True,
+    dash_url = models.URLField(null=False, blank=True,
                                                 verbose_name='MPEG-DASH URL')
-    xmpeg_url = models.URLField(null=True, blank=True,
+    xmpeg_url = models.URLField(null=False, blank=True,
                                                     verbose_name='X-MPEG URL')
 
-    aspect_ratio = models.CharField(max_length=5,
+    aspect_ratio = models.CharField(null=False, blank=True, max_length=5,
                                             help_text='eg, "4:3" or "16:9"')
     duration = models.PositiveIntegerField(null=True, blank=True,
                                                 help_text="In milliseconds")

@@ -249,7 +249,7 @@ class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
         self.assertEqual(video.mp4_bitrate_1, 320000)
         self.assertEqual(video.mp4_url_2, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.mp4')
         self.assertEqual(video.mp4_bitrate_2, 832000)
-        self.assertEqual(video.mp4_url_3, None)
+        self.assertEqual(video.mp4_url_3, '')
         self.assertEqual(video.mp4_bitrate_3, None)
         self.assertEqual(video.webm_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.webm')
         self.assertEqual(video.webm_bitrate, 832000)
