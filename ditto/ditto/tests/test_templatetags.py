@@ -6,7 +6,8 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ..templatetags.ditto import width_height, split_by, display_time 
+from ..templatetags.ditto import width_height, split_by, display_time
+from ..utils import datetime_now
 
 
 class WidthHeightTestCase(TestCase):
@@ -51,10 +52,8 @@ class DisplayTimeTestCase(TestCase):
 
     @freeze_time("2015-08-14 13:34:56")
     def test_returns_time_with_no_link(self):
-        dt = datetime.datetime.now().replace(tzinfo=pytz.utc)
-
         self.assertEqual(
-            display_time(dt),
+            display_time(datetime_now()),
             '<time datetime="2015-08-14 13:34:56">13:34 on 14&nbsp;Aug&nbsp;2015</time>'
         )
 
@@ -62,11 +61,54 @@ class DisplayTimeTestCase(TestCase):
     @patch('ditto.ditto.templatetags.ditto.reverse')
     def test_returns_time_with_link(self, reverse):
         reverse.return_value = '/2015/08/14/'
-        dt = datetime.datetime.now().replace(tzinfo=pytz.utc)
-
         self.assertEqual(
-            display_time(dt, True),
+            display_time(datetime_now(), True),
             '<time datetime="2015-08-14 13:34:56">13:34 on <a href="/2015/08/14/" title="All items from this day">14&nbsp;Aug&nbsp;2015</a></time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_4_no_link(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=4),
+            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_6_no_link(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=6),
+            '<time datetime="2015">Sometime in 2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_8_no_link(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=8),
+            '<time datetime="2015">Circa 2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_4_with_link(self):
+        "Doesn't actually have a link as there's no exact day."
+        self.assertEqual(
+            display_time(datetime_now(), link_to_day=True, granularity=4),
+            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_6_with_link(self):
+        "Doesn't actually have a link as there's no exact day."
+        self.assertEqual(
+            display_time(datetime_now(), link_to_day=True, granularity=6),
+            '<time datetime="2015">Sometime in 2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_8_with_link(self):
+        "Doesn't actually have a link as there's no exact day."
+        self.assertEqual(
+            display_time(datetime_now(), link_to_day=True, granularity=8),
+            '<time datetime="2015">Circa 2015</time>'
         )
 
 

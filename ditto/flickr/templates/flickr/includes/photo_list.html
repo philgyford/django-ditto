@@ -16,10 +16,10 @@ Expects:
 
     {% load ditto %}
 
-    {% for row in photo_list|split_by:4 %}
+    {% for row in photo_list|split_by:3 %}
         <div class="row flickr-photos">
             {% for photo in row %}
-                <div class="col-md-3 col-sm-6 flickr-photo">
+                <div class="col-md-4 flickr-photo">
                     <h3 class="h6">
                         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
                     </h3>
@@ -38,16 +38,16 @@ Expects:
                         {% if order == 'taken' %}
                             Taken at
                             {% if view == 'day' %}
-                                {% display_time photo.taken_time False %}
+                                {% display_time photo.taken_time link_to_day=False granularity=photo.taken_granularity %}
                             {% else %}
-                                {% display_time photo.taken_time True %}
+                                {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
                             {% endif %}
                         {% else %}
                             Uploaded at
                             {% if view == 'day' %}
-                                {% display_time photo.post_time False %}
+                                {% display_time photo.post_time link_to_day=False granularity=photo.taken_granularity %}
                             {% else %}
-                                {% display_time photo.post_time True %}
+                                {% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}
                             {% endif %}
                         {% endif %}
                     </small></p>

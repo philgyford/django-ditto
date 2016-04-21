@@ -50,25 +50,6 @@ def day_photos(date, nsid=None):
         photos = photos.filter(user__nsid=nsid)
     return photos
 
-@register.simple_tag
-def taken_time(dt, granularity):
-    """Returns a string for the taken on date time of a photo, based on its
-    granularity.
-
-    dt is a datetime.
-    granularity is a number from 0 to 10. ish.
-    """
-    s = ''
-    if granularity == 0:
-        s = "%s" % display_time(dt, True)
-    elif granularity == 4:
-        s = "Some time in %s" % dt.strftime('%B %Y')
-    elif granularity == 6:
-        s = "Some time in %s" % dt.strftime('%Y')
-    elif granularity == 8:
-        s = "Circa %s" % dt.strftime('%Y')
-
-    return s
 
 @register.simple_tag
 def photo_license(n):

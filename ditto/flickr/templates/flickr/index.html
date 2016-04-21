@@ -13,25 +13,31 @@
         {% endblock %}
     </h1>
 
-    {% include 'flickr/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='recent' only %}
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'flickr/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='recent' only %}
 
-    <div class="card">
-        <div class="card-block">
-            <p class="card-text">
-                <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
-            </p>
-        </div>
-    </div>
+            <div class="card">
+                <div class="card-block">
+                    <p class="card-text">
+                        <a href="{% url 'flickr:tag_list' %}">The most common tags</a>
+                    </p>
+                </div>
+            </div>
+        </div> <!-- .col -->
 
-    <ul class="nav nav-tabs m-b-1">
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'flickr:index' %}">Photos</a>
-        </li>
-    </ul>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs m-b-1">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'flickr:index' %}">Photos</a>
+                </li>
+            </ul>
 
-    {% include 'flickr/includes/sorting.html' with request=request order=order only %}
+            {% include 'flickr/includes/sorting.html' with request=request order=order only %}
 
-    {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 

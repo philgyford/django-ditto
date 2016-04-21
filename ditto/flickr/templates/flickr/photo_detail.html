@@ -44,7 +44,7 @@
                     {% if photo.taken_unknown %}
                         Unknown
                     {% else %}
-                        {% taken_time photo.taken_time photo.taken_granularity %}
+                        {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
                     {% endif %}
                 </dd>
 
@@ -78,7 +78,7 @@
                 </dd>
 
                 <dt class="col-sm-3">Uploaded time</dt>
-                <dd class="col-sm-9">{% display_time photo.post_time True %}</dd>
+                <dd class="col-sm-9">{% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}</dd>
 
             </dl>
 

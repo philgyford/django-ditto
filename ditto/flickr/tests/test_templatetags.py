@@ -76,37 +76,6 @@ class TemplatetagsDayPhotosTestCase(TestCase):
         self.assertEqual(photos[0].pk, self.photos_1[0].pk)
 
 
-class TakenTimeTestCase(TestCase):
-
-    @freeze_time("2015-08-14 13:34:56", tz_offset=-8)
-    def setUp(self):
-        self.dt = datetime_now()
-
-    def test_taken_time_0(self):
-        "taken_time() with granularity 0"
-        self.assertEqual(flickr.taken_time(self.dt, 0),
-                        '%s' % display_time(self.dt, True))
-
-    def test_taken_time_4(self):
-        "taken_time() with granularity 4"
-        self.assertEqual(flickr.taken_time(self.dt, 4),
-                        'Some time in August 2015')
-
-    def test_taken_time_6(self):
-        "taken_time() with granularity 6"
-        self.assertEqual(flickr.taken_time(self.dt, 6),
-                        'Some time in 2015')
-
-    def test_taken_time_8(self):
-        "taken_time() with granularity 8"
-        self.assertEqual(flickr.taken_time(self.dt, 8),
-                        'Circa 2015')
-
-    def test_taken_time_9(self):
-        "taken_time() with granularity 9"
-        self.assertEqual(flickr.taken_time(self.dt, 9), '')
-
-
 class PhotoLicenseTestCase(TestCase):
 
     def test_license_0(self):

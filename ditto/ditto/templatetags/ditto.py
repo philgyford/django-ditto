@@ -49,39 +49,61 @@ def width_height(w, h, max_w, max_h):
 
 
 @register.simple_tag
-def display_time(dt, link_to_day=False):
+def display_time(dt, link_to_day=False, granularity=0):
     """Return the HTML to display the time a Photo, Tweet, etc.
 
     dt -- The datetime.
     view -- Nothing or 'detail' or 'day', probably.
+    granularity -- A number indicating how detailed the datetime is, based on
+                    https://www.flickr.com/services/api/misc.dates.html
 
     For a 'day' view, just returns the date/time as text.
     For other views returns it including a link to the ditto:day_archive page
         for that date.
     Both wrapped in a <time> tag.
+
+    See also http://www.brucelawson.co.uk/2012/best-of-time/ for <time> tag.
     """
 
-    # The date and time formats for display:
-    d_fmt = '%-d&nbsp;%b&nbsp;%Y'
-    t_fmt = '%H:%M'
+    if granularity == 8:
+        visible_time = 'Circa %s' % dt.strftime('%Y')
+        stamp = dt.strftime('%Y')
 
-    if link_to_day:
-        url = reverse('ditto:day_archive', kwargs={
-                    'year':     dt.strftime('%Y'),
-                    'month':    dt.strftime('%m'),
-                    'day':      dt.strftime('%d'),
-                })
+    elif granularity == 6:
+        visible_time = 'Sometime in %s' % dt.strftime('%Y')
+        stamp = dt.strftime('%Y')
 
-        visible_time = '%(time)s on <a href="%(url)s" title="All items from this day">%(date)s</a>' % {
-                'time': dt.strftime(t_fmt),
-                'url': url,
-                'date': dt.strftime(d_fmt),
-            }
+    elif granularity == 4:
+        visible_time = 'Sometime in %s' % dt.strftime('%b&nbsp;%Y')
+        stamp = dt.strftime('%Y-%m')
+
     else:
-        visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
+        # Exact time and date.
+        # We can link to the date, if link_to_day=True.
+
+        stamp = dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        # The date and time formats for display:
+        d_fmt = '%-d&nbsp;%b&nbsp;%Y'
+        t_fmt = '%H:%M'
+
+        if link_to_day:
+            url = reverse('ditto:day_archive', kwargs={
+                        'year':     dt.strftime('%Y'),
+                        'month':    dt.strftime('%m'),
+                        'day':      dt.strftime('%d'),
+                    })
+
+            visible_time = '%(time)s on <a href="%(url)s" title="All items from this day">%(date)s</a>' % {
+                    'time': dt.strftime(t_fmt),
+                    'url': url,
+                    'date': dt.strftime(d_fmt),
+                }
+        else:
+            visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
 
     return '<time datetime="%(stamp)s">%(visible)s</time>' % {
-                'stamp': dt.strftime('%Y-%m-%d %H:%M:%S'),
+                'stamp': stamp,
                 'visible': visible_time
             }
 
