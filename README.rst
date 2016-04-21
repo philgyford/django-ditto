@@ -5,7 +5,7 @@ Ditto
 A collection of Django apps for copying things from third-party sites and
 services. Very much in-progress. Python 3, Django 1.8.
 
-Currently, it copies bookmarks from `Pinboard <https://pinboard.in/>`_, tweets from Twitter, and photos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
+Currently, it copies your Bookmarks from `Pinboard <https://pinboard.in/>`_, your Tweets and Favorites from `Twitter <https://twitter.com/>`_, and your Photos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
 
 Public and private Tweets, Photos and Bookmarks are copied, but only public
 ones are displayed in the included views and templates; non-public ones are
@@ -185,28 +185,28 @@ The ``3200`` is the number of recent Tweets to fetch, with ``3200`` being the ma
 
 Run this version periodically to fetch the Tweets since you last fetched any::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent=new
+    $ ./manage.py fetch_twitter_tweets --recent=new
 
 You might also, or instead, want to fetch more than that, eg::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent=200
+    $ ./manage.py fetch_twitter_tweets --recent=200
 
 This would update data such as the Retweet and Like counts for all of the 200
 fetched Tweets, even if they're older than your last fetch.
 
 And one or both of these to fetch recent Tweets that your accounts have liked::
 
-    $ ./demo/manage.py fetch_twitter_favorites --recent=new
-    $ ./demo/manage.py fetch_twitter_favorites --recent=200
+    $ ./manage.py fetch_twitter_favorites --recent=new
+    $ ./manage.py fetch_twitter_favorites --recent=200
 
 All of the above commands will fetch Tweets and favorites for all Accounts that have API credentials set. To restrict to a single Account add `--account` with the Twitter screen name. eg::
 
-    $ ./demo/manage.py fetch_twitter_tweets --recent=new --account=philgyford
+    $ ./manage.py fetch_twitter_tweets --recent=new --account=philgyford
 
 You may periodically want to update the stored data about all Twitter users
 (numbers of Tweets, descriptions, etc). This will fetch the latest data::
 
-    $ ./demo/manage.py fetch_twitter_users --account=philgyford
+    $ ./manage.py fetch_twitter_users --account=philgyford
 
 
 Other things
@@ -223,7 +223,7 @@ Other notes for development
 
 Using coverage.py to check test coverage::
 
-    $ coverage run --source='.' ./demo/manage.py test
+    $ coverage run --source='.' ./manage.py test
     $ coverage report
 
 Instead of the in-terminal report, get an HTML version::
