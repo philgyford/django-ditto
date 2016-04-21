@@ -283,6 +283,7 @@ class DittoDayArchiveTestCase(TestCase):
                                                         self.yesterday.date())
         self.assertTrue('next_day' in response.context)
         self.assertEqual(response.context['next_day'], self.tomorrow.date())
+        self.assertTrue('variety_counts' in response.context)
 
     def test_day_context_flickr_photos_uploaded(self):
         response = self.client.get(self.make_url('flickr', 'photos'))
@@ -296,7 +297,7 @@ class DittoDayArchiveTestCase(TestCase):
     def test_day_context_flickr_photos_taken(self):
         self.photo_2.taken_time = self.today
         self.photo_2.save()
-        response = self.client.get(self.make_url('flickr', 'photos-taken'))
+        response = self.client.get(self.make_url('flickr', 'photos/taken'))
         self.assertTrue('date_field' in response.context)
         self.assertEqual(response.context['date_field'], 'taken_time')
         self.assertTrue('flickr_photo_list' in response.context)

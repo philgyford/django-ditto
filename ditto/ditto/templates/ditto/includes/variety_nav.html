@@ -1,0 +1,54 @@
+{% comment %}
+Displays links to varieties of a page, each one for a different kind of item (tweet, favorite tweet, photo, etc).
+
+Expects:
+
+* variety_counts -- A list of dicts, each dict with 'count', 'app_name', 'app_slug', 'variety_name' and 'variety_slug' elements.
+
+* ditto_app_name -- eg 'twitter' or 'flickr'.
+
+* ditto_variety_name -- eg 'tweets' or 'favorites'.
+
+And one of:
+
+* day -- If this is the Day Archive page, the date we're viewing.
+* tag_slug -- If this is the Tag page we're viewing.
+
+{% endcomment %}
+
+<div class="list-group">
+    {% for variety in variety_counts %}
+        {% if variety.count == 0 or variety.is_active %}
+            <span
+        {% else %}
+            <a href="
+                {% if day %}
+                    {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=variety.app_slug variety=variety.variety_slug %}
+                {% endif %}
+            "
+        {% endif %}
+        class="list-group-item{% if variety.is_active %} active{% endif %}">
+            <span class="label label-default label-pill pull-xs-right">{{ variety.count }}</span>
+            {% if variety.app_name == 'pinboard' %}
+                Pinboard bookmarks
+            {% elif variety.app_name == 'flickr' %}
+                {% if variety.variety_name == 'photo-taken' %}
+                    Flickr photos (taken)
+                {% else %}
+                    Flickr photos (uploaded)
+                {% endif %}
+            {% elif variety.app_name == 'twitter' %}
+                {% if variety.variety_name == 'favorite' %}
+                    Twitter favorites
+                {% else %}
+                    Twitter tweets
+                {% endif %}
+            {% endif %}
+        {% if variety.count == 0 or variety.is_active %}
+            </span>
+        {% else %}
+            </a>
+        {% endif %}
+    {% endfor %}
+</div>
+

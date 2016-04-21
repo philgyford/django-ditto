@@ -364,13 +364,13 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['item_counts'] = self.get_all_counts()
+        context['variety_counts'] = self.get_variety_counts()
         # Useful to display photos-taken properly:
         context['date_field'] = self.get_date_field_for_app_variety(
                                             self.app_name, self.variety_name)
         return context
 
-    def get_all_counts(self):
+    def get_variety_counts(self):
         """
         For all of the querysets for all enabled apps, get the count of items
         they have for this day.
@@ -434,6 +434,8 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
                 'app_slug':     self.get_app_slug_from_name(app_name),
                 'variety_slug': self.get_variety_slug_from_names(
                                                     app_name, variety_name),
+                # Is this the current variety of the page?
+                'is_active':    (app_name == self.app_name and variety_name == self.variety_name),
             })
 
         return counts
