@@ -59,6 +59,7 @@ def htmlify_tweet(json_data):
                                 '')
 
     # Twython doesn't do symbols, so:
+    # (Pending https://github.com/ryanmcgrath/twython/pull/415 )
     if symbols_count > 0:
         # Just using the regex here:
         # https://blog.twitter.com/2013/symbols-entities-for-tweets

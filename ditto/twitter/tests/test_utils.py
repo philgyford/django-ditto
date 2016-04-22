@@ -13,6 +13,7 @@ class UtilsHtmlifyTestCase(TestCase):
     def getJson(self, filepath):
         json_file = open(filepath)
         json_data = json.loads(json_file.read())
+        print(json_data)
         json_file.close()
         return json_data
 
@@ -46,6 +47,12 @@ class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
         tweet_html = htmlify_tweet( self.getJson(api_fixture) )
         self.assertTrue(' <a href="https://twitter.com/search?q=%23testing" rel="external">#testing</a> and' in tweet_html)
         self.assertTrue(' <a href="https://twitter.com/search?q=%23hashtag" rel="external">#hashtag</a>' in tweet_html)
+
+    def test_links_substringed_hashtags(self):
+        "If a hashtag is a substring of another, it should cope OK."
+        api_fixture = 'ditto/twitter/fixtures/api/tweet_with_substringed_hashtags.json'
+        tweet_html = htmlify_tweet( self.getJson(api_fixture) )
+        self.assertTrue('@denisewilton</a> <a href="https://twitter.com/search?q=%23LOVEWHATYOUDO" rel="external">#LOVEWHATYOUDO</a> <a href="https://twitter.com/search?q=%23DOWHATYOULOVE" rel="external">#DOWHATYOULOVE</a>' in tweet_html)
 
     def test_links_symbols(self):
         api_fixture = 'ditto/twitter/fixtures/api/tweet_with_symbols.json'
