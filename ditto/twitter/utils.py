@@ -3,7 +3,52 @@ import re
 
 from django.utils.html import urlize
 
+from ttp import ttp
 from twython import Twython
+
+
+def htmlify_description(json_data):
+    """Passed the raw JSON data about a User from Twitter's API, it returns an
+    HTMLified version of the User's description.
+    * Replaces t.co URLs with clickable, full links.
+    * Makes #hashtags into clickable links.
+    * Makes @usernames into clickable links.
+
+    Different to htmlify_tweet() because:
+
+        * Twitter user data only includes entities for urls, not hashtags etc.
+          https://twittercommunity.com/t/why-do-user-entities-have-only-urls-field-and-not-others/59181
+
+        * So we manually make the t.co links into their full, clickable version.
+        * And then use twitter-text-python to linkify everything else.
+    """
+
+    # I don't think users in the Twitter archive JSON have description
+    # elements:
+    try:
+        desc = json_data['description']
+    except KeyError:
+        return ''
+
+    # Make t.co URLs into their original URLs, clickable.
+    if 'entities' in json_data and 'description' in json_data['entities']:
+        entities = json_data['entities']['description']
+
+        if 'urls' in entities:
+            for entity in entities['urls']:
+                start, end = entity['indices'][0], entity['indices'][1]
+                shown_url = entity['display_url']
+                link_url = entity['expanded_url']
+
+                url_html = '<a href="%s" rel="external">%s</a>'
+                desc = desc.replace(json_data['description'][start:end],
+                                            url_html % (link_url, shown_url))
+
+    # Make #hashtags and @usernames clickable.
+    parser = ttp.Parser()
+    parsed = parser.parse(desc)
+
+    return parsed.html
 
 
 def htmlify_tweet(json_data):

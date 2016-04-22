@@ -19,7 +19,7 @@ Expects:
     </div>
     <ul class="list-group list-group-flush twitter-user-about">
         {% if user.description %}
-            <li class="list-group-item twitter-user-description">{{ user.description }}</li>
+            <li class="list-group-item twitter-user-description">{{ user.description_html|safe }}</li>
         {% endif %}
         {% if user.location %}
             <li class="list-group-item twitter-user-location">{{ user.location }}</li>

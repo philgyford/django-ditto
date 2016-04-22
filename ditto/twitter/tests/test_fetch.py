@@ -751,7 +751,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
         self.add_response(body=self.make_response_body())
         result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
         self.assertIn('users/lookup.json?', responses.calls[0][0].url)
-        self.assertIn('include_entities=false', responses.calls[0][0].url)
+        self.assertIn('include_entities=true', responses.calls[0][0].url)
         self.assertIn('user_id=460060168%2C26727655%2C6795192',
                                                     responses.calls[0][0].url)
 
@@ -809,7 +809,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
             end = (n+1) * 100
             qs = {
                 'user_id': '%2C'.join(map(str, ids[start:end])),
-                'include_entities': 'false'}
+                'include_entities': 'true'}
             self.add_response(body=body, querystring=qs, match_querystring=True)
         # Then add the final 301-350 ids.
         qs['user_id'] = '%2C'.join(map(str, ids[-50:]))

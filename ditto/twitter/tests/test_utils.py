@@ -2,10 +2,10 @@
 import json
 from django.test import TestCase
 
-from ..utils import htmlify_tweet
+from ..utils import htmlify_description, htmlify_tweet
 
 
-class UtilsHtmlifyTestCase(TestCase):
+class HtmlifyTestCase(TestCase):
 
     # Define in child classes.
     api_fixture = None
@@ -13,12 +13,22 @@ class UtilsHtmlifyTestCase(TestCase):
     def getJson(self, filepath):
         json_file = open(filepath)
         json_data = json.loads(json_file.read())
-        print(json_data)
         json_file.close()
         return json_data
 
 
-class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
+class HtmlifyDescriptionTestCase(HtmlifyTestCase):
+    "Linkify hashtags, URLs and screen_names in user descriptions."
+
+    api_fixture = 'ditto/twitter/fixtures/api/user_with_description.json'
+
+    def test_htmlify_description(self):
+        description_html = htmlify_description( self.getJson(self.api_fixture) )
+        self.assertEqual(description_html,
+            'Testing <a href="https://twitter.com/search?q=%23testing">#testing</a> <a href="http://www.gyford.com" rel="external">gyford.com</a> $IBM <a href="https://twitter.com/search?q=%23test">#test</a> <a href="https://twitter.com/philgyford">@philgyford</a>')
+
+
+class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     "Linkify URLs from entities: urls, screen_names, hashtags."
 
     def test_links_urls(self):
@@ -61,7 +71,7 @@ class UtilsHtmlifyEntitiesTestCase(UtilsHtmlifyTestCase):
             'Some symbols: <a href="https://twitter.com/search?q=%24AAPL" rel="external">$AAPL</a> and <a href="https://twitter.com/search?q=%24PEP" rel="external">$PEP</a> and $ANOTHER and <a href="https://twitter.com/search?q=%24A" rel="external">$A</a>.'
         )
 
-class UtilsHtmlifyFormattingTestCase(UtilsHtmlifyTestCase):
+class HtmlifyTweetTestCase(HtmlifyTestCase):
 
     api_fixture = 'ditto/twitter/fixtures/api/tweet_with_entities.json'
 
@@ -82,7 +92,7 @@ class UtilsHtmlifyFormattingTestCase(UtilsHtmlifyTestCase):
         self.assertEqual('Y', tweet_html[-1])
 
 
-class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
+class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
     "Further tests for specific problems with URLs."
 
     def test_urls_in_archived_tweets(self):
@@ -110,7 +120,7 @@ class UtilsHtmlifyUrlsTestCase(UtilsHtmlifyTestCase):
         self.assertTrue('prototyping!  <a href="https://medium.com/@BuckleyWilliams/hello-from-buckley-williams-announcing-our-new-studio-c48e20c847d0" rel="external">medium.com/@BuckleyWillia…</a>' in tweet_html)
 
 
-class UtilsHtmlifyPhotosTestCase(UtilsHtmlifyTestCase):
+class HtmlifyTweetPhotosTestCase(HtmlifyTestCase):
     "Remove links to photos in the tweet text."
 
     api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'

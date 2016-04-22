@@ -473,3 +473,14 @@ class UserTestCase(TestCase):
         self.assertEqual(users_with_accounts[0].pk, users[0].pk)
         self.assertEqual(users_with_accounts[1].pk, users[2].pk)
 
+    @patch('ditto.twitter.models.htmlify_description')
+    def test_makes_description_html(self, htmlify_method):
+        "When save() is called description_html should be created from raw JSON"
+        htmlify_method.return_value = 'my test description'
+        user = UserFactory()
+        user.raw = '{"description":"my test description"}'
+        user.save()
+        htmlify_method.assert_called_once_with(
+                                        {'description': 'my test description'})
+        self.assertEqual(user.description_html, 'my test description')
+

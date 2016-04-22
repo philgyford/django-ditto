@@ -551,7 +551,7 @@ class FetchUsers(UserMixin, FetchLookup):
         ids = [str(id) for id in self._ids_to_fetch_in_query()]
         self.results = self.api.lookup_user(
                             user_id=ids,
-                            include_entities=False
+                            include_entities=True
                         )
 
     def _save_results(self):

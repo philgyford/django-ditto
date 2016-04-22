@@ -134,13 +134,22 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('screen_name', 'name',
                 'is_private', 'is_verified',
                 'profile_image_url_https',
-                'url', 'description', 'location', 'time_zone',
-                'twitter_id', 'created_at', )
+                'url', 'description', 'description_html', 'location',
+                'time_zone', 'twitter_id', 'created_at', )
         }),
         ('Data', {
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
         }),
     )
 
-    readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
+    formfield_overrides = {
+        # Make the inputs full-width.
+        models.CharField: {'widget': TextInput(
+            attrs={
+                'class': 'vLargeTextField',
+            }
+        )},
+    }
+
+    readonly_fields = ('description_html' ,'raw', 'fetch_time', 'time_created', 'time_modified',)
 

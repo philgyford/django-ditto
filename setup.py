@@ -15,6 +15,7 @@ setup(
         'django-taggit',
         'flickrapi',
         'pytz',
+        'twitter-text-python',
         'twython==3.3.0',
     ],
     dependency_links=[

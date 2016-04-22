@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from . import managers
-from .utils import htmlify_tweet
+from .utils import htmlify_description, htmlify_tweet
 from ..ditto.managers import PublicItemManager
 from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
@@ -371,6 +371,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="UTC time when this account was created on Twitter")
 
     description = models.CharField(null=False, blank=True, max_length=255)
+    description_html = models.TextField(null=False, blank=True,
+                help_text="An HTMLified version of the User's description")
     location = models.CharField(null=False, blank=True, max_length=255)
     time_zone = models.CharField(null=False, blank=True, max_length=255)
 
@@ -415,14 +417,27 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def save(self, *args, **kwargs):
         """If the user's privacy status has changed, we need to change the
         privacy of all their tweets
+        And we also HTMLify their description.
         """
         if self.get_field_diff('is_private') is not None:
             Tweet.objects.filter(user=self).update(is_private=self.is_private)
+        result = self.make_description_html()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('twitter:user_detail',
                     kwargs={'screen_name': self.screen_name})
+
+    def make_description_html(self):
+        """Uses the raw JSON for the user to set self.description_html to a nice
+        HTML version of the description.
+        """
+        try:
+            json_data = json.loads(self.raw)
+        except ValueError as error:
+            return False
+        self.description_html = htmlify_description(json_data)
+        return True
 
     @property
     def permalink(self):
