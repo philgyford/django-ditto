@@ -420,6 +420,10 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
             Tweet.objects.filter(user=self).update(is_private=self.is_private)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse('twitter:user_detail',
+                    kwargs={'screen_name': self.screen_name})
+
     @property
     def permalink(self):
         return 'https://twitter.com/%s' % self.screen_name

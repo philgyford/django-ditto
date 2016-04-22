@@ -478,6 +478,9 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     class Meta:
         ordering = ['realname']
 
+    def get_absolute_url(self):
+        return reverse('flickr:user_detail', kwargs={'nsid': self.nsid})
+
     @property
     def name(self):
         return self.realname
