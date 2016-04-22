@@ -1,4 +1,3 @@
-from django.apps import apps as camelot_apps
 from django.conf import settings
 from django.core.checks import register, Error
 from django.core.checks import Tags as DjangoTags
@@ -41,3 +40,4 @@ def check_taggit_is_installed(app_configs=None, **kwargs):
             )
 
     return errors
+

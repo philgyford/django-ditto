@@ -1,5 +1,10 @@
 # coding: utf-8
-from django.apps import apps
+from django.apps import apps, AppConfig
+
+
+class DittoDittoConfig(AppConfig):
+    name = 'ditto.ditto'
+    verbose_name = "Ditto Ditto"
 
 
 class Apps(object):
