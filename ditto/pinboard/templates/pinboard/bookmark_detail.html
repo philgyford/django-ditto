@@ -24,7 +24,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-3">
-            {% include 'pinboard/includes/account.html' with account=bookmark.account only %}
+            {% include 'pinboard/includes/account.html' with account=bookmark.account perms=perms only %}
         </div> <!-- .col -->
     </div>
 

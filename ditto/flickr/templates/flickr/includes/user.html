@@ -1,6 +1,13 @@
-{# Display information about a Flickr user. #}
-{# Expects a single `user` which is a Flickr User object. #}
-{# And an optional 'account' if this user has an Account here. #}
+{% comment %}
+Display information about a Flickr user.
+
+Expects:
+
+* user -- A single Flickr User object.
+* account -- Optional, a Flickr Account object if this user has one.
+* perms -- Optional, Django perms.
+
+{% endcomment %}
 
 {% load l10n %}
 
@@ -20,6 +27,9 @@
         <li class="list-group-item flickr-user-first-date-taken">First photo: {{ user.photos_first_date_taken|date:"M Y" }}</li>
         {% if account == None or account.is_active %}
             <li class="list-group-item flickr-user-link"><a href="{{ user.permalink }}">At Flickr.com</a></li>
+        {% endif %}
+        {% if perms and perms.flickr.can_change_user %}
+            <li class="list-group-item"><a href="{% url 'admin:flickr_user_change' user.id %}" title="Edit this user in the Django Admin">Edit</a></li>
         {% endif %}
     </ul>
 </div>

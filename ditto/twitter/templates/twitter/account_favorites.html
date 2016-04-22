@@ -17,7 +17,7 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'twitter/includes/user.html' with user=account.user account=account only %}
+            {% include 'twitter/includes/user.html' with user=account.user account=account perms=perms only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

@@ -1,6 +1,12 @@
-{# Display information about a Twitter user. #}
-{# Expects a single `user` which is a Twitter User object. #}
-{# And an optional 'account' if this user has an Account here. #}
+{% comment %}
+Display information about a Twitter user.
+Expects:
+
+* user -- A single Twitter User object.
+* account -- Optional, a Twitter Account object if this user has one.
+* perms -- Optional, Django perms.
+
+{% endcomment %}
 
 {% load l10n %}
 
@@ -24,6 +30,9 @@
         <li class="list-group-item twitter-user-joined">Joined {{ user.created_at|date:"M Y" }}</li>
         {% if account == None or account.is_active %}
             <li class="list-group-item twitter-user-link"><a href="{{ user.permalink }}">At Twitter.com</a></li>
+        {% endif %}
+        {% if perms and perms.twitter.can_change_user %}
+            <li class="list-group-item"><a href="{% url 'admin:twitter_user_change' user.id %}" title="Edit this user in the Django Admin">Edit</a></li>
         {% endif %}
     </ul>
 </div>

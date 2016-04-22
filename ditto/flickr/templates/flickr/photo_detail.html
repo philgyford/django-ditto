@@ -134,7 +134,7 @@
             {% endif %}
 
             <ul>
-                {% if perms.twitter.can_change_tweet %}
+                {% if perms.flickr.can_change_photo %}
                     <li><a href="{% url 'admin:flickr_photo_change' photo.id %}" title="Edit this photo in the Django Admin">Edit</a></li>
                 {% endif %}
                 {% if photo.account and photo.account.is_active %}
@@ -146,7 +146,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-3">
-            {% include 'flickr/includes/user.html' with user=flickr_user account=account only %}
+            {% include 'flickr/includes/user.html' with user=flickr_user account=account perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

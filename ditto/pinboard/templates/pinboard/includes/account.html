@@ -1,5 +1,12 @@
-{# Display information about a Pinboard account. #}
-{# Expects a single `account` object. #}
+{% comment %}
+Display information about a Pinboard account.
+
+Expects:
+
+* account -- A Pinboard Account object.
+* perms -- Optional, Django perms.
+
+{% endcomment %}
 
 {% load l10n %}
 
@@ -15,6 +22,14 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                 <a class="card-link" href="{{ account.url }}">At Pinboard.in</a>
+            </li>
+        </ul>
+    {% endif %}
+
+    {% if perms and perms.pinboard.can_change_account %}
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <a href="{% url 'admin:pinboard_account_change' account.id %}" title="Edit this account in the Django Admin">Edit</a>
             </li>
         </ul>
     {% endif %}
