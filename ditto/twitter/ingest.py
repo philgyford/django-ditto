@@ -6,6 +6,7 @@ import pytz
 
 from .fetch import TweetMixin
 from .models import User
+from ..ditto.utils import datetime_now
 
 
 class IngestError(Exception):
@@ -28,7 +29,7 @@ class TweetIngester(TweetMixin, object):
 
     def __init__(self):
         # Used as the 'fetch_time' for each tweet.
-        self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.fetch_time = datetime_now()
 
         # How many .js files we loaded the tweets from:
         self.file_count = 0

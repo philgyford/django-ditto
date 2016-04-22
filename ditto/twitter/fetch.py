@@ -7,6 +7,7 @@ import time
 from twython import Twython, TwythonError
 
 from .models import Account, Media, Tweet, User
+from ..ditto.utils import datetime_now
 
 
 # CLASSES HERE:
@@ -400,7 +401,7 @@ class Fetch(object):
         return self.return_value
 
     def _reset(self):
-        self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.fetch_time = datetime_now()
         self.results = []
         self.objects = []
         self.return_value = {}

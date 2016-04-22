@@ -6,6 +6,7 @@ import requests
 import urllib
 
 from .models import Account, Bookmark
+from ..ditto.utils import datetime_now
 
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"
@@ -44,7 +45,7 @@ class BookmarksFetcher(object):
         accounts = self._get_accounts(username)
 
         for account in accounts:
-            fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+            fetch_time = datetime_now()
 
             response = self._send_request(fetch_type, params, account.api_token)
 

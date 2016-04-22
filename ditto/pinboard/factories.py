@@ -3,6 +3,7 @@ import pytz
 import factory
 
 from . import models
+from ..ditto.utils import datetime_now
 
 
 class AccountFactory(factory.DjangoModelFactory):
@@ -28,7 +29,7 @@ class BookmarkFactory(factory.DjangoModelFactory):
     url = factory.Sequence(lambda n: 'http://www.example.com/%d' % n)
 
     post_time = factory.LazyAttribute(lambda o:
-                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+                        datetime_now()
                         - datetime.timedelta(hours=1)
                     )
     description = factory.Sequence(lambda n: 'A description of %d' % n)
