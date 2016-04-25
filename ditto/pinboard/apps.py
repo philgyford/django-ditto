@@ -6,6 +6,6 @@ class DittoPinboardConfig(AppConfig):
     verbose_name = "Ditto Pinboard"
 
     def ready(self):
-        # import myapp.signals
+        # import ditto.pinboard.signals
         import ditto.pinboard.checks
 
