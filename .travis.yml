@@ -2,9 +2,11 @@ language: python
 python: 3.5
 env:
   - TOX_ENV=py33-django18
+  - TOX_ENV=py33-django19
   - TOX_ENV=py34-django18
+  - TOX_ENV=py34-django19
   - TOX_ENV=py35-django18
-  #- TOX_ENV=py35-19
+  - TOX_ENV=py35-django19
 # command to install dependencies
 install:
   - pip install tox

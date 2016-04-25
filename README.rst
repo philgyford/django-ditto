@@ -229,7 +229,7 @@ Development
 ***********
 
 There's a basic Django project in ``devproject/`` to make it easier to work on
-the app. This might be enough to get things up and running:
+the app. This might be enough to get things up and running::
 
     $ pip install -r devproject/requirements.txt
     $ python setup.py develop
@@ -240,11 +240,13 @@ the app. This might be enough to get things up and running:
 Tests
 *****
 
-Run tests using:
+Run tests using::
 
     $ python setup.py test
 
-Or using tox:
+Or using tox. You'll need to have all versions of python available that are
+tested against (see ``tox.ini``). This might mean deactivating a virtualenv if
+you're using one with ``devproject/``. Then::
 
     $ pip install tox
     $ tox
