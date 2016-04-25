@@ -11,9 +11,9 @@ def check_taggit_is_installed(app_configs=None, **kwargs):
     except ImportError:
         checks.append(
             Error(
-                "The django-taggit app is required to use ditto.pinboard.",
+                "The django-taggit app is required to use ditto.flickr.",
                 hint=("Install django-taggit"),
-                id='ditto.pinboard.E001',
+                id='ditto.flickr.E001',
             )
         )
 
@@ -24,9 +24,10 @@ def check_taggit_is_installed(app_configs=None, **kwargs):
                     "The django-taggit app must be in INSTALLED_APPS",
                     hint=("Add 'taggit' to INSTALLED_APPS "
                             "in your settings file."),
-                    id='ditto.pinboard.E002',
+                    id='ditto.flickr.E002',
                 )
             )
 
     return checks
+
 
