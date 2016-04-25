@@ -23,7 +23,6 @@ Development with the demo website::
 
     $ pip install -r demo/requirements.txt
     $ python setup.py develop
-    $ ./demo/manage.py test
     $ ./demo/manage.py runserver
 
 
@@ -216,6 +215,19 @@ To have large numbers formatted nicely, ensure these are in your ``settings.py``
 
     USE_L10N = True
     USE_THOUSAND_SEPARATOR = True
+
+
+Tests
+#####
+
+Run tests using:
+
+    $ python setup.py test
+
+Or using tox:
+
+    $ pip install tox
+    $ tox
 
 
 Other notes for development

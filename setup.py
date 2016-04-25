@@ -24,8 +24,12 @@ setup(
         'git+ssh://github.com/ryanmcgrath/twython.git@3.3.0#egg=twython-3.3.0',
     ],
     tests_require=[
-        'factoryboy',
+        #'Django>=1.8',
+        'factory-boy',
+        'freezegun',
+        'responses',
     ],
+    test_suite='runtests.runtests',
     include_package_data=True,
     license='MIT License',
     description='A Django app to copy stuff from your accounts on other services.',
