@@ -1,0 +1,14 @@
+Django==1.9.5
+django-debug-toolbar==1.4
+-e git+git@github.com:philgyford/django-ditto.git@6537738825b9f833fa8419d16b3e34726bce79dd#egg=django_ditto
+django-taggit==0.18.1
+flickrapi==2.1.2
+oauthlib==1.0.3
+pytz==2016.4
+requests==2.9.1
+requests-oauthlib==0.6.1
+requests-toolbelt==0.6.0
+six==1.10.0
+sqlparse==0.1.19
+twitter-text-python==1.1.0
+twython==3.3.0

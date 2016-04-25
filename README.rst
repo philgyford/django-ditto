@@ -15,21 +15,14 @@ Public and private Tweets, Photos and Bookmarks are copied, but only public
 ones are displayed in the included views and templates; non-public ones are
 only visible in the Django admin.
 
-There is a demo Django project website for viewing fetched items in the ``demo/`` directory.
-
 The docs below are hasty; I'm not expecting anyone else to use this yet.
 
 
-Getting started
-###############
+############
+Installation
+############
 
-Development with the demo website::
-
-    $ pip install -r demo/requirements.txt
-    $ python setup.py develop
-    $ ./demo/manage.py runserver
-
-
+*********************
 Add to INSTALLED_APPS
 *********************
 
@@ -60,7 +53,7 @@ Add the project's context processor in your settings::
         }
     ]
 
-
+**************
 Add to urls.py
 **************
 
@@ -86,6 +79,7 @@ suit your project. See the ``urls.py`` in the ``demo/`` project for a full
 example.
 
 
+########
 Services
 ########
 
@@ -94,6 +88,7 @@ account(s) on the related services. Each app has an ``Account`` model, which
 parallels an account on the related service (eg, a Twitter account). The method of linking the two varies with each service.
 
 
+******
 Flickr
 ******
 
@@ -130,6 +125,7 @@ Both options can be restricted to only fetch for a single Account by adding the 
     $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
 
 
+********
 Pinboard
 ********
 
@@ -159,6 +155,7 @@ The above commands fetch bookmark(s) for all Accounts you've added. To restrict 
 Be aware of the rate limits: https://pinboard.in/api/#limits
 
 
+*******
 Twitter
 *******
 
@@ -212,8 +209,14 @@ You may periodically want to update the stored data about all Twitter users
     $ ./manage.py fetch_twitter_users --account=philgyford
 
 
+############
 Other things
 ############
+
+
+*****************
+Optional settings
+*****************
 
 To have large numbers formatted nicely, ensure these are in your ``settings.py``::
 
@@ -221,8 +224,21 @@ To have large numbers formatted nicely, ensure these are in your ``settings.py``
     USE_THOUSAND_SEPARATOR = True
 
 
+***********
+Development
+***********
+
+There's a basic Django project in ``devproject/`` to make it easier to work on
+the app. This might be enough to get things up and running:
+
+    $ pip install -r devproject/requirements.txt
+    $ python setup.py develop
+    $ ./devproject/manage.py runserver
+
+
+*****
 Tests
-#####
+*****
 
 Run tests using:
 
@@ -234,8 +250,9 @@ Or using tox:
     $ tox
 
 
+***************************
 Other notes for development
-###########################
+***************************
 
 Using coverage.py to check test coverage::
 
