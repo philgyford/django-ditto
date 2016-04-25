@@ -2,6 +2,10 @@
 Ditto
 =====
 
+.. image:: https://img.shields.io/travis/philgyford/django-ditto.svg?style=flat-square
+  :target: https://travis-ci.org/philgyford/django-ditto
+
+
 A collection of Django apps for copying things from third-party sites and
 services. Very much in-progress. Python 3, Django 1.8.
 
