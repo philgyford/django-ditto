@@ -32,7 +32,7 @@ class TweetsManager(models.Manager):
     def get_queryset(self):
         from .models import User
         users = User.objects_with_accounts.all()
-        return super().get_queryset().filter(user=users)
+        return super().get_queryset().filter(user__in=users)
 
 
 class PublicTweetsManager(PublicItemManager):
@@ -43,7 +43,7 @@ class PublicTweetsManager(PublicItemManager):
     def get_queryset(self):
         from .models import User
         users = User.objects_with_accounts.all()
-        return super().get_queryset().filter(user=users)
+        return super().get_queryset().filter(user__in=users)
 
 
 class WithAccountsManager(models.Manager):

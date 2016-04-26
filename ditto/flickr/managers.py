@@ -14,7 +14,7 @@ class PhotosManager(models.Manager):
     def get_queryset(self):
         from .models import User
         users = User.objects_with_accounts.all()
-        return super().get_queryset().filter(user=users)
+        return super().get_queryset().filter(user__in=users)
 
 
 class PublicPhotosManager(PublicItemManager):
@@ -25,7 +25,7 @@ class PublicPhotosManager(PublicItemManager):
     def get_queryset(self):
         from .models import User
         users = User.objects_with_accounts.all()
-        return super().get_queryset().filter(user=users)
+        return super().get_queryset().filter(user__in=users)
 
 
 class WithAccountsManager(models.Manager):
@@ -43,7 +43,7 @@ class _PhotoTaggableManager(_TaggableManager):
 
     def most_common(self):
         """Gets the most commonly-used tags but:
-            * Doesn't count tags on private Photos 
+            * Doesn't count tags on private Photos
         Overriding django-taggit's standard `most_common()` method.
         """
         extra_filters = {

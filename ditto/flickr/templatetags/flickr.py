@@ -20,11 +20,9 @@ def recent_photos(nsid=None, limit=10):
                     Photos for all Flickr users that have Accounts.
     limit -- Maximum number to fetch. Default is 10.
     """
-    if nsid is None:
-        users = User.objects_with_accounts.all()
-        photos = Photo.public_objects.filter(user=users)
-    else:
-        photos = Photo.public_objects.filter(user__nsid=nsid)
+    photos = Photo.public_photo_objects.all()
+    if nsid is not None:
+        photos = photos.filter(user__nsid=nsid)
     return photos.select_related()[:limit]
 
 @register.assignment_tag
@@ -42,11 +40,8 @@ def day_photos(date, nsid=None):
                                                             tzinfo=pytz.utc)
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
-    photos = Photo.public_objects.filter(post_time__range=[start, end])
-    if nsid is None:
-        users = User.objects_with_accounts.all()
-        photos = photos.filter(user=users)
-    else:
+    photos = Photo.public_photo_objects.filter(post_time__range=[start, end])
+    if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
     return photos
 

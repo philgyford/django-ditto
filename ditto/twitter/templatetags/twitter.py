@@ -18,11 +18,9 @@ def recent_tweets(screen_name=None, limit=10):
                     Tweets for all Twitter users that have Accounts.
     limit -- Maximum number to fetch. Default is 10.
     """
-    if screen_name is None:
-        users = User.objects_with_accounts.all()
-        tweets = Tweet.public_objects.filter(user=users)
-    else:
-        tweets = Tweet.public_objects.filter(user__screen_name=screen_name)
+    tweets = Tweet.public_tweet_objects.all()
+    if screen_name is not None:
+        tweets = tweets.filter(user__screen_name=screen_name)
     return tweets.select_related()[:limit]
 
 @register.assignment_tag
@@ -61,11 +59,8 @@ def day_tweets(date, screen_name=None):
                                                             tzinfo=pytz.utc)
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
-    tweets = Tweet.public_objects.filter(post_time__range=[start, end])
-    if screen_name is None:
-        users = User.objects_with_accounts.all()
-        tweets = tweets.filter(user=users)
-    else:
+    tweets = Tweet.public_tweet_objects.filter(post_time__range=[start, end])
+    if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
     return tweets
 
@@ -88,8 +83,6 @@ def day_favorites(date, screen_name=None):
                                                             tzinfo=pytz.utc)
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
-    tweets = Tweet.public_favorite_objects.filter(
-                                                post_time__range=[start, end])
     if screen_name is None:
         tweets = Tweet.public_favorite_objects.filter(
                                                 post_time__range=[start, end])
