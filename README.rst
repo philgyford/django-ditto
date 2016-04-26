@@ -243,7 +243,7 @@ the app. This might be enough to get things up and running::
 Tests
 *****
 
-Run tests tox. Install it with::
+Run tests with tox. Install it with::
 
     $ pip install tox
 
