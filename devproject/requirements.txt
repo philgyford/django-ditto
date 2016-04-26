@@ -4,15 +4,12 @@ django-debug-toolbar==1.4
 django-taggit==0.18.1
 flickrapi==2.1.2
 oauthlib==1.0.3
-pluggy==0.3.1
-py==1.4.31
 pytz==2016.4
 requests==2.9.1
 requests-oauthlib==0.6.1
 requests-toolbelt==0.6.0
 six==1.10.0
 sqlparse==0.1.19
-tox==2.3.1
 twitter-text-python==1.1.0
 twython==3.3.0
-virtualenv==15.0.1
+
