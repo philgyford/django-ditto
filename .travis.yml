@@ -13,8 +13,6 @@ install:
 script:
   - tox -e $TOX_ENV
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TOX_ENV" == "coverage" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      coveralls
-    fi
+  - bash scripts/coveralls.sh
 # containers
 sudo: false
