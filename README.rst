@@ -7,7 +7,8 @@ Ditto
 
 
 A collection of Django apps for copying things from third-party sites and
-services. Very much in-progress. Python 3, Django 1.8.
+services. Very much in-progress. Requires Python 3.4 or 3.5, and Django 1.8 or
+1.9.
 
 Currently, it copies your Bookmarks from `Pinboard <https://pinboard.in/>`_, your Tweets and Favorites from `Twitter <https://twitter.com/>`_, and your Photos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
 
