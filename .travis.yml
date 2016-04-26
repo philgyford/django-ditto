@@ -12,7 +12,9 @@ install:
 # command to run tests
 script:
   - tox -e $TOX_ENV
-#after_success:
-  #- coveralls
+after_success:
+  if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TOX_ENV" == "coverage" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
+    coveralls
+  fi
 # containers
 sudo: false
