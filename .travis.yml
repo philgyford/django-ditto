@@ -11,7 +11,7 @@ install:
 # command to run tests
 script:
   - coverage run tox -e $TOX_ENV
-after_success:
-  - coveralls
+#after_success:
+  #- coveralls
 # containers
 sudo: false
