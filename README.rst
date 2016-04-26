@@ -2,9 +2,11 @@
 Ditto
 =====
 
-.. image:: https://img.shields.io/travis/philgyford/django-ditto.svg?style=flat-square
-  :target: https://travis-ci.org/philgyford/django-ditto
+.. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
+  :target: https://travis-ci.org/philgyford/django-ditto?branch=master
 
+.. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
+  :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
 
 A collection of Django apps for copying things from third-party sites and
 services. Very much in-progress. Requires Python 3.4 or 3.5, and Django 1.8 or
