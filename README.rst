@@ -241,16 +241,22 @@ the app. This might be enough to get things up and running::
 Tests
 *****
 
-Run tests using::
-
-    $ python setup.py test
-
-Or using tox. You'll need to have all versions of python available that are
-tested against (see ``tox.ini``). This might mean deactivating a virtualenv if
-you're using one with ``devproject/``. Then::
+Run tests tox. Install it with::
 
     $ pip install tox
+
+You'll need to have all versions of python available that are tested against (see ``tox.ini``). This might mean deactivating a virtualenv if you're using one with ``devproject/``. Then run all tests in all environments like::
+
     $ tox
+
+To run tests in only one environment, specify it. In this case, Python 3.5 and
+Django 1.9::
+
+    $ tox -e py35-django19
+
+To run a specific test, add its path after ``--``, eg::
+
+    $ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
 
 
 ***************************
