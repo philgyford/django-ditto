@@ -258,6 +258,12 @@ To run a specific test, add its path after ``--``, eg::
 
     $ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
 
+Running the tests in all environments will generate coverage output. There will
+also be an ``htmlcov/`` directory containing an HTML report. You can also
+generaet these reports without running all the other tests::
+
+    $ tox -e coverage
+
 
 ***************************
 Other notes for development

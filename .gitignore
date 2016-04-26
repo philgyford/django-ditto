@@ -1,2 +1,4 @@
+.coverage
 devproject/db.sqlite3
 django_ditto.egg-info
+htmlcov

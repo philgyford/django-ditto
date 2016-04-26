@@ -7,9 +7,11 @@ env:
   - TOX_ENV=py35-django19
 # command to install dependencies
 install:
-  - pip install tox
+  - pip install tox coverage coveralls
 # command to run tests
 script:
-  - tox -e $TOX_ENV
+  - coverage run tox -e $TOX_ENV
+after_success:
+  - coveralls
 # containers
 sudo: false
