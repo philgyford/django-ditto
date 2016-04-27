@@ -1,13 +1,50 @@
 import datetime
 import pytz
-from unittest.mock import patch
+from unittest.mock import patch, Mock, MagicMock
 
+from django.http import QueryDict
 from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.ditto.templatetags.ditto import width_height, split_by, display_time
+from ditto.ditto.templatetags.ditto import display_time, split_by,\
+        query_string, width_height
 from ditto.ditto.utils import datetime_now
+
+
+class QueryStringTestCase(TestCase):
+
+    def test_adds_arg(self):
+        "It adds your key/value to the existing GET string."
+        context = {'request': Mock( GET=QueryDict('a=1') ) } 
+        self.assertEqual(
+            query_string(context, 'foo', 'bar'),
+            'foo=bar&a=1'
+        )
+
+    def test_replaces_arg(self):
+        "It replaces an existing GET arg with what you supply."
+        context = {'request': Mock( GET=QueryDict('a=1') ) } 
+        self.assertEqual(
+            query_string(context, 'a', 'bar'),
+            'a=bar'
+        )
+
+    def test_handles_missing_request(self):
+        "If there's no request object, it doesn't complain."
+        context = {} 
+        self.assertEqual(
+            query_string(context, 'foo', 'bar'),
+            'foo=bar'
+        )
+
+    def test_urlencodes(self):
+        "It URL-encodes the returned string."
+        context = {'request': Mock( GET=QueryDict('a=1') ) } 
+        self.assertEqual(
+            query_string(context, 'foo', 'bar&bar'),
+            'foo=bar%26bar&a=1'
+        )
 
 
 class WidthHeightTestCase(TestCase):
