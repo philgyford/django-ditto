@@ -29,6 +29,14 @@ class AccountTestCase(TestCase):
         account_2 = AccountFactory(api_key='', api_secret='')
         self.assertFalse(account_2.has_credentials())
 
+    def test_get_absolute_url_no_user(self):
+        account = AccountFactory(user=None)
+        self.assertEqual(account.get_absolute_url(), '')
+
+    def test_get_absolute_url_with_user(self):
+        account = AccountFactory(user=UserFactory(nsid='1234567890@N01'))
+        self.assertEqual(account.get_absolute_url(), '/flickr/1234567890@N01/')
+
 
 class UserTestCase(TestCase):
 
@@ -69,6 +77,10 @@ class UserTestCase(TestCase):
         user = UserFactory(iconserver=0)
         self.assertEqual(user.icon_url,
                                 'https://www.flickr.com/images/buddyicon.gif')
+
+    def test_get_absolute_url(self):
+        user=UserFactory(nsid='1234567890@N01')
+        self.assertEqual(user.get_absolute_url(), '/flickr/1234567890@N01/')
 
 
 class PhotoTestCase(TestCase):

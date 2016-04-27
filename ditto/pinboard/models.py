@@ -54,7 +54,14 @@ class ExtraBookmarkManagers(models.Model):
 
 
 class BookmarkTag(TimeStampedModelMixin, TagBase):
-    "Our custom version of a Taggit Tag model, for use with Bookmarks."
+    """Our custom version of a Taggit Tag model, for use with Bookmarks.
+    
+    NOTE: If you create two tags in Pinboard, with names "dog" and "DOG",
+    they will both get the slug "dog". Taggit doesn't work like that by
+    default, as both Name and Slug are unique. So the second of those
+    tags that you create will have a slug of "dog_1". Not sure how best to fix
+    that, if at all.
+    """
 
     class Meta:
         verbose_name = "Tag"
@@ -72,6 +79,9 @@ class BookmarkTag(TimeStampedModelMixin, TagBase):
         This is inherited from TagBase.
 
         `tag` is a string, like 'mytag'
+        `i` is either None or an integer, which signifies how many times the
+            slug for this tag has been attempted to be calculated, it is None
+            on the first time, and the counting begins at 1 thereafter.
         """
         tag = tag.lower()
         tag = tag.replace('%', '%25')
@@ -93,6 +103,9 @@ class BookmarkTag(TimeStampedModelMixin, TagBase):
 
         for f, r in replace.items():
             tag = tag.replace(f, r)
+
+        # So if you slugify "dog" for one tag and then "DOG" for another,
+        # the first will have a slug of "dog" and the second will have "dog_1".
 
         if i is not None:
             tag += "_%d" % i

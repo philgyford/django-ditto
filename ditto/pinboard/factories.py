@@ -37,3 +37,4 @@ class BookmarkFactory(factory.DjangoModelFactory):
 
     # Leave tags empty by default.
 
+
