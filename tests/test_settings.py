@@ -22,8 +22,6 @@ INSTALLED_APPS = (
     'ditto.twitter',
 )
 
-TAGGIT_CASE_INSENSITIVE = True
-
 ROOT_URLCONF = 'tests.urls'
 
 TEMPLATES = [
