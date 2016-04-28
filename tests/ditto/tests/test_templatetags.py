@@ -17,9 +17,9 @@ class QueryStringTestCase(TestCase):
     def test_adds_arg(self):
         "It adds your key/value to the existing GET string."
         context = {'request': Mock( GET=QueryDict('a=1') ) }
-        self.assertEqual(
+        self.assertIn(
             query_string(context, 'foo', 'bar'),
-            'foo=bar&a=1'
+            ['foo=bar&a=1', 'a=1&foo=bar']
         )
 
     def test_replaces_arg(self):
@@ -41,9 +41,9 @@ class QueryStringTestCase(TestCase):
     def test_urlencodes(self):
         "It URL-encodes the returned string."
         context = {'request': Mock( GET=QueryDict('a=1') ) }
-        self.assertEqual(
+        self.assertIn(
             query_string(context, 'foo', 'bar&bar'),
-            'foo=bar%26bar&a=1'
+            ['foo=bar%26bar&a=1', 'a=1&foo=bar%26bar']
         )
 
 
