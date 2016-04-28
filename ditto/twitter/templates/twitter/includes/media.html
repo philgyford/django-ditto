@@ -2,15 +2,15 @@
 A single Tweet Media item (ie, a photo or video).
 
 Expects:
+ * tweet, a Tweet object (that hte Media belongs to).
  * media, a Media object.
- * detail, boolean - True if this we're showing a single Tweet, False if the 
-                        containing Tweet is in a list.
+ * view, 'day' or 'detail' or maybe False.
 {% endcomment %}
 
 <li class="m-b">
     {% load l10n %}
     {% if media.media_type == 'video' %}
-        {% if detail %}
+        {% if view and view == 'detail' %}
             <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
         {% else %}
             <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
@@ -28,10 +28,10 @@ Expects:
         </video>
     {% else %}
         {# Photo #}
-        {% if detail %}
+        {% if view and view == 'detail' %}
             <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
         {% else %}
-            <img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt="">
+            <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>
         {% endif %}
     {% endif %}
 </li>
