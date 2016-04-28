@@ -2,6 +2,7 @@ from datetime import datetime
 from django import template
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+from django.utils.html import format_html
 
 
 register = template.Library()
@@ -109,10 +110,10 @@ def display_time(dt, link_to_day=False, granularity=0):
         else:
             visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
 
-    return '<time datetime="%(stamp)s">%(visible)s</time>' % {
+    return format_html('<time datetime="%(stamp)s">%(visible)s</time>' % {
                 'stamp': stamp,
                 'visible': visible_time
-            }
+            })
 
 
 @register.filter
