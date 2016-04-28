@@ -91,6 +91,18 @@ class HtmlifyTweetTestCase(HtmlifyTestCase):
         self.assertEqual('X', tweet_html[0])
         self.assertEqual('Y', tweet_html[-1])
 
+    # Currently failing because twython's html_for_tweet() method can't
+    # cope if tweet has no entities.
+    # https://github.com/ryanmcgrath/twython/pull/416
+    #def test_no_entities(self):
+        #"Doesn't link items if tweet has no entities."
+        #tweet = self.json_data
+        #del(tweet['entities'])
+        #tweet_html = htmlify_tweet(tweet)
+        #self.assertEqual("""A<br>test for @philgyford and @samuelpepys with http://t.co/cOu05x0Chi #testing and http://t.co/S9fH3CkgV4 #hashtag""",
+                #tweet_html)
+
+
 
 class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
     "Further tests for specific problems with URLs."
