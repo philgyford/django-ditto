@@ -170,7 +170,8 @@ class PinboardViewTests(TestCase):
         "Uses the correct templates"
         bookmark = BookmarkFactory()
         response = self.client.get(reverse('pinboard:bookmark_detail',
-            kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
+            kwargs={'username': bookmark.account.username,
+                    'hash': bookmark.url_hash}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/bookmark_detail.html')
 
@@ -178,7 +179,8 @@ class PinboardViewTests(TestCase):
         "Sends the correct data to templates"
         bookmark = BookmarkFactory()
         response = self.client.get(reverse('pinboard:bookmark_detail',
-            kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
+            kwargs={'username': bookmark.account.username,
+                    'hash': bookmark.url_hash}))
         self.assertIn('bookmark', response.context)
         self.assertEqual(bookmark.pk, response.context['bookmark'].pk)
 
@@ -186,7 +188,8 @@ class PinboardViewTests(TestCase):
         "Does not display private bookmarks"
         bookmark = BookmarkFactory(is_private=True)
         response = self.client.get(reverse('pinboard:bookmark_detail',
-            kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
+            kwargs={'username': bookmark.account.username,
+                    'hash': bookmark.url_hash}))
         self.assertEquals(response.status_code, 404)
 
     def test_bookmark_detail_tag_privacy(self):
@@ -194,7 +197,8 @@ class PinboardViewTests(TestCase):
         bookmark = BookmarkFactory()
         bookmark.tags.set('publictag', '.notpublic', 'alsopublic')
         response = self.client.get(reverse('pinboard:bookmark_detail',
-            kwargs={'username': bookmark.account.username, 'pk': bookmark.pk}))
+            kwargs={'username': bookmark.account.username,
+                    'hash': bookmark.url_hash}))
         # The private/public logic happens in the templates, so check output:
         self.assertIn('publictag', response.content.decode('utf8'))
         self.assertIn('alsopublic', response.content.decode('utf8'))
@@ -204,7 +208,8 @@ class PinboardViewTests(TestCase):
         "Returns a 404 if a non-existent bookmark's page is requested"
         bookmark = BookmarkFactory()
         response = self.client.get(reverse('pinboard:bookmark_detail',
-                    kwargs={'username': bookmark.account.username, 'pk':2}))
+                    kwargs={'username': bookmark.account.username,
+                            'hash':'1234567890ab'}))
         self.assertEquals(response.status_code, 404)
 
     ## TAG LIST

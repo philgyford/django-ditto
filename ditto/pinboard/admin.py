@@ -33,7 +33,7 @@ class BookmarkAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('account', 'title', 'url', 'description', 'summary', 'tags', 'post_time',)
+            'fields': ('account', 'title', 'url', 'description', 'summary', 'tags', 'post_time', 'url_hash', )
         }),
         ('Options', {
             'fields': ('is_private', 'to_read',)

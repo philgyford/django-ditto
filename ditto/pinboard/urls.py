@@ -39,7 +39,7 @@ urlpatterns = [
         name='account_tag_detail'
     ),
     url(
-        regex=r"^(?P<username>\w+)/(?P<pk>\d+)/$",
+        regex=r"^(?P<username>\w+)/(?P<hash>\w+)/$",
         view=views.BookmarkDetail.as_view(),
         name='bookmark_detail'
     ),

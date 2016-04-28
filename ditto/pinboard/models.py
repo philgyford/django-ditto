@@ -1,4 +1,5 @@
 # coding: utf-8
+import hashlib
 from django.core.validators import URLValidator
 from django.db import models
 
@@ -55,7 +56,7 @@ class ExtraBookmarkManagers(models.Model):
 
 class BookmarkTag(TimeStampedModelMixin, TagBase):
     """Our custom version of a Taggit Tag model, for use with Bookmarks.
-    
+
     NOTE: If you create two tags in Pinboard, with names "dog" and "DOG",
     they will both get the slug "dog". Taggit doesn't work like that by
     default, as both Name and Slug are unique. So the second of those
@@ -135,6 +136,12 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     # 'shared' in the Pinboard API is inverted and saved as
     # DittoItem::is_private.
 
+    # Pinboard usese some kind of hash for each individual URL, but these
+    # don't come back via the API. So we'll make our own (in self.save()).
+    url_hash = models.CharField(
+        null=False, blank=True, max_length=12, db_index=True,
+                                help_text="Slug in the Bookmark's local URL.")
+
     # Up to 100 tags
     # Up to 255 chars each. No commas or whitespace.
     # Private tags start with a period.
@@ -145,10 +152,20 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         ordering = ['-post_time']
         unique_together = (('account', 'url'),)
 
+    def save(self, *args, **kwargs):
+        """Create a url_hash for this bookmark if it doesn't have one.
+        This is not the best ever way to do this. For one, there's a very slim
+        chance of clashes. But it seems good enough for now.
+        """
+        if not self.url_hash:
+            self.url_hash = hashlib.md5(
+                                    self.url.encode('utf-8')).hexdigest()[:12]
+        super().save(*args, **kwargs)
+
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         return reverse('pinboard:bookmark_detail',
-                    kwargs={'username': self.account.username, 'pk': self.id})
+            kwargs={'username': self.account.username, 'hash': self.url_hash})
 
     def summary_source(self):
         "The text that will be truncated to make a summary for this Bookmark"

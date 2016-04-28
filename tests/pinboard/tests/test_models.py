@@ -59,6 +59,11 @@ class PinboardBookmarkTestCase(TestCase):
         b = Bookmark.objects.get(title='My title')
         self.assertEqual(b.pk, bookmark.pk)
 
+    def test_url_hash_creation(self):
+        "Should create a URL hash based on the URL when the model is saved."
+        bookmark = BookmarkFactory(url='http://www.example.com')
+        self.assertEqual(bookmark.url_hash, '847310eb455f')
+
     def test_url_constraint(self):
         """Ensures bookmarks have unique URLs within an Account"""
         account = AccountFactory()
@@ -95,8 +100,10 @@ class PinboardBookmarkTestCase(TestCase):
     def test_get_absolute_url(self):
         "Has the correct URL on this site"
         account = AccountFactory(username='billy')
-        bookmark = BookmarkFactory(account=account)
-        self.assertEqual(bookmark.get_absolute_url(), '/pinboard/billy/1/')
+        bookmark = BookmarkFactory(
+                                account=account, url='http://www.example.com')
+        self.assertEqual(
+                bookmark.get_absolute_url(), '/pinboard/billy/847310eb455f/')
 
     def test_ordering(self):
         "Bookmarks are ordered correctly, most-recently-posted first"

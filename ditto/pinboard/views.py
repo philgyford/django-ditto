@@ -76,6 +76,8 @@ class BookmarkDetail(DetailView):
     model = Bookmark
     # Only display public bookmarks; private ones will 404.
     queryset = Bookmark.public_objects.all()
+    slug_field = 'url_hash'
+    slug_url_kwarg = 'hash'
 
 
 class TagList(ListView):
