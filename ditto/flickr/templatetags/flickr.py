@@ -4,7 +4,7 @@ import pytz
 from django import template
 
 from ..models import Photo, User
-from ...ditto.templatetags.ditto import display_time
+from ...core.templatetags.ditto import display_time
 
 
 register = template.Library()

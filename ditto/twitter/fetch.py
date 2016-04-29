@@ -7,7 +7,7 @@ import time
 from twython import Twython, TwythonError
 
 from .models import Account, Media, Tweet, User
-from ..ditto.utils import datetime_now
+from ..core.utils import datetime_now
 
 
 # CLASSES HERE:

@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.ditto.utils import datetime_now, truncate_string
+from ditto.core.utils import datetime_now, truncate_string
 
 
 class DatetimeNowTestCase(TestCase):

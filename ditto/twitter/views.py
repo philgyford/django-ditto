@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 
-from ..ditto.views import PaginatedListView
+from ..core.views import PaginatedListView
 from .models import Account, Tweet, User
 
 

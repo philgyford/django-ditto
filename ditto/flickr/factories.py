@@ -5,7 +5,7 @@ import factory
 from taggit import models as taggit_models
 
 from . import models
-from ..ditto.utils import datetime_now
+from ..core.utils import datetime_now
 
 
 class UserFactory(factory.DjangoModelFactory):

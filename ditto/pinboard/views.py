@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
-from ..ditto.views import PaginatedListView
+from ..core.views import PaginatedListView
 from .models import Account, Bookmark, BookmarkTag
 
 

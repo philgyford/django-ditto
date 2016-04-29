@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import django.db.models.deletion
-import ditto.ditto.models
+import ditto.core.models
 
 
 class Migration(migrations.Migration):
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ['-created_at'],
             },
-            bases=(ditto.ditto.models.DiffModelMixin, models.Model),
+            bases=(ditto.core.models.DiffModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='User',
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ['screen_name'],
             },
-            bases=(ditto.ditto.models.DiffModelMixin, models.Model),
+            bases=(ditto.core.models.DiffModelMixin, models.Model),
         ),
         migrations.AlterField(
             model_name='account',

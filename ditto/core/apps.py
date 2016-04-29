@@ -2,9 +2,9 @@
 from django.apps import apps, AppConfig
 
 
-class DittoDittoConfig(AppConfig):
-    name = 'ditto.ditto'
-    verbose_name = "Ditto Ditto"
+class DittoCoreConfig(AppConfig):
+    name = 'ditto.core'
+    verbose_name = "Ditto Core"
 
 
 class Apps(object):

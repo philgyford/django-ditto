@@ -6,7 +6,7 @@ import pytz
 
 from .fetch import TweetMixin
 from .models import User
-from ..ditto.utils import datetime_now
+from ..core.utils import datetime_now
 
 
 class IngestError(Exception):

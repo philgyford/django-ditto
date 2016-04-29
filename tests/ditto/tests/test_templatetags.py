@@ -7,9 +7,9 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.ditto.templatetags.ditto import display_time, split_by,\
+from ditto.core.templatetags.ditto import display_time, split_by,\
         query_string, width_height
-from ditto.ditto.utils import datetime_now
+from ditto.core.utils import datetime_now
 
 
 class QueryStringTestCase(TestCase):
@@ -95,7 +95,7 @@ class DisplayTimeTestCase(TestCase):
         )
 
     @freeze_time("2015-08-14 13:34:56")
-    @patch('ditto.ditto.templatetags.ditto.reverse')
+    @patch('ditto.core.templatetags.ditto.reverse')
     def test_returns_time_with_link(self, reverse):
         reverse.return_value = '/2015/08/14/'
         self.assertEqual(

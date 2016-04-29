@@ -6,8 +6,8 @@ from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
 from . import managers
-from ..ditto.utils import truncate_string
-from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ..core.utils import truncate_string
+from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
 class Account(TimeStampedModelMixin, models.Model):

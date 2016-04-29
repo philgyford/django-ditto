@@ -6,7 +6,7 @@ import requests
 import urllib
 
 from .models import Account, Bookmark
-from ..ditto.utils import datetime_now
+from ..core.utils import datetime_now
 
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"

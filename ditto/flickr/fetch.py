@@ -9,7 +9,7 @@ from flickrapi.exceptions import FlickrError
 from taggit.models import Tag
 
 from .models import Account, Photo, User
-from ..ditto.utils import datetime_now
+from ..core.utils import datetime_now
 
 # Classes here:
 #

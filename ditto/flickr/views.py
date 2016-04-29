@@ -5,7 +5,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from taggit.models import Tag
 
-from ..ditto.views import PaginatedListView
+from ..core.views import PaginatedListView
 from .models import Account, Photo, TaggedPhoto, User
 
 

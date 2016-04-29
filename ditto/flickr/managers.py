@@ -2,7 +2,7 @@ from django.db import models
 
 from taggit.managers import _TaggableManager
 
-from ..ditto.managers import PublicItemManager
+from ..core.managers import PublicItemManager
 
 
 class PhotosManager(models.Manager):

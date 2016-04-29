@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from ditto.flickr.factories import AccountFactory, PhotoFactory, TagFactory,\
         TaggedPhotoFactory, UserFactory
-from ditto.ditto.utils import datetime_now
+from ditto.core.utils import datetime_now
 
 class ViewTests(TestCase):
 

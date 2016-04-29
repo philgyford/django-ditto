@@ -4,8 +4,8 @@ from django.db import models
 
 from . import managers
 from .utils import htmlify_description, htmlify_tweet
-from ..ditto.managers import PublicItemManager
-from ..ditto.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ..core.managers import PublicItemManager
+from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 import json
 

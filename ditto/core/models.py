@@ -2,7 +2,7 @@
 from django.db import models
 from django.forms.models import model_to_dict
 
-from ditto.ditto.utils import truncate_string
+from .utils import truncate_string
 from .managers import PublicItemManager
 
 

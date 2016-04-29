@@ -29,12 +29,12 @@ Installation
 Add to INSTALLED_APPS
 *********************
 
-To use Ditto in your own project (untested as yet), add the core ``ditto.ditto`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This includes Flickr, Pinboard and Twitter::
+To use Ditto in your own project (untested as yet), add the core ``ditto.core`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This includes Flickr, Pinboard and Twitter::
 
     INSTALLED_APPS = (
         # other apps listed here.
         'taggit',
-        'ditto.ditto',
+        'ditto.core',
         'ditto.flickr',
         'ditto.pinboard',
         'ditto.twitter',
@@ -50,7 +50,7 @@ Add the project's context processor in your settings::
             'OPTIONS': {
                 'context_processors': [
                     # other context processors listed here.
-                    'ditto.ditto.context_processors.ditto',
+                    'ditto.core.context_processors.ditto',
                 ]
             }
         }
@@ -74,7 +74,7 @@ To use Ditto's views you can include each app's URLs in your project's own
         url(r'^ditto/pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
 
         # To include the overall, aggregated views:
-        url(r'ditto/', include('ditto.ditto.urls', namespace='ditto')),
+        url(r'ditto/', include('ditto.core.urls', namespace='ditto')),
     ]
 
 Change the URL include paths (eg, ``r'^ditto/pinboard/'`` as appropriate) to

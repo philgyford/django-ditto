@@ -5,8 +5,8 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.ditto.templatetags.ditto import display_time
-from ditto.ditto.utils import datetime_now
+from ditto.core.templatetags.ditto import display_time
+from ditto.core.utils import datetime_now
 from ditto.flickr.templatetags import flickr
 from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
 

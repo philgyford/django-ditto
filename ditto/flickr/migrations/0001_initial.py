@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import django.db.models.deletion
-import ditto.ditto.models
+import ditto.core.models
 import taggit.managers
 
 
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ('-taken_time',),
             },
-            bases=(ditto.ditto.models.DiffModelMixin, models.Model),
+            bases=(ditto.core.models.DiffModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='TaggedPhoto',
@@ -151,7 +151,7 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ['realname'],
             },
-            bases=(ditto.ditto.models.DiffModelMixin, models.Model),
+            bases=(ditto.core.models.DiffModelMixin, models.Model),
         ),
         migrations.AddField(
             model_name='taggedphoto',

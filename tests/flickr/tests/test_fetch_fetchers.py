@@ -5,7 +5,7 @@ from unittest.mock import call, patch
 import responses
 from freezegun import freeze_time
 
-from ditto.ditto.utils import datetime_now
+from ditto.core.utils import datetime_now
 from ditto.flickr.factories import AccountFactory, UserFactory
 from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher, PhotosFetcher,\
         RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserFetcher,\
