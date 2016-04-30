@@ -1,16 +1,18 @@
 {% extends 'flickr/base.html' %}
+{% load l10n %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
     <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
-    <li class="active">{{ flickr_user }}</li>
+    <li><a href="{% url 'flickr:user_detail' nsid=user.nsid %}">{{ user.name }}</a></li>
+    <li class="active">Albums</li>
 {% endblock %}
 
 {% block content %}
 
     <h1 class="m-y-2">
         {% block title %}
-            Photos by {{ flickr_user.name }}
+            Albums by {{ user.name }}
         {% endblock %}
     </h1>
 
@@ -20,13 +22,12 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'flickr/includes/nav_tabs.html' with user=flickr_user active='photos' only %}
+            {% include 'flickr/includes/nav_tabs.html' with user=flickr_user active='photosets' only %}
 
-            {% include 'flickr/includes/sorting.html' with request=request order=order only %}
-
-            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photoset_list.html' with photoset_list=photoset_list only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
+
 
 {% endblock content %}
 

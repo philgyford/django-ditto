@@ -27,11 +27,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            <ul class="nav nav-tabs m-b-1">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'flickr:index' %}">Photos</a>
-                </li>
-            </ul>
+            {% include 'flickr/includes/nav_tabs.html' with active='photos' only %}
 
             {% include 'flickr/includes/sorting.html' with request=request order=order only %}
 

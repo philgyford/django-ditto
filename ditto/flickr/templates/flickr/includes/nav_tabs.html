@@ -1,0 +1,45 @@
+{% comment %}
+The Photos / Favorites / Albums tabs.
+
+Expects:
+
+* user - Optional. A User object. If present, we link to the User's
+            photos/favorites/albums. Otherwise the overall ones.
+* active - Optional. String. 'photos' (default), 'favorites' or 'photosets'.
+{% endcomment %}
+
+
+{% with active=active|default_if_none:'photos' %}
+    <ul class="nav nav-tabs m-b-2">
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'photos' %} active{% endif %}" href="{% spaceless %}
+            {% if user %}
+                {% url 'flickr:user_detail' nsid=user.nsid %}
+            {% else %}
+                {% url 'flickr:index' %}
+            {% endif %}
+        {% endspaceless %}">Photos</a>
+        </li>
+        {% comment %}
+            <li class="nav-item">
+                <a class="nav-link{% if active == 'favorites' %} active{% endif %}" href="{% spaceless %}
+            {% if user %}
+                {% url 'flickr:user_favorite_list' nsid=user.nsid %}
+            {% else %}
+                {% url 'flickr:favorite_list' %}
+            {% endif %}
+        {% endspaceless %}">Favorites</a>
+            </li>
+        {% endcomment %}
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'photosets' %} active{% endif %}" href="{% spaceless %}
+            {% if user %}
+                {% url 'flickr:user_photoset_list' nsid=user.nsid %}
+            {% else %}
+            {% comment %}  {% url 'flickr:photoset_list' %} {% endcomment %}
+            {% endif %}
+        {% endspaceless %}">Albums</a>
+        </li>
+    </ul>
+{% endwith %}
+

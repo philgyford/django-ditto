@@ -48,7 +48,7 @@ May specifically have:
 {% if twitter_favorite_list and twitter_favorite_list|length > 0 %}
 
     <h2>
-        <a href="{% url 'twitter:favorites' %}">Favorited tweets</a>
+        <a href="{% url 'twitter:favorite_list' %}">Liked tweets</a>
     </h2>
 
     {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_favorite_list view=view|default:False %}

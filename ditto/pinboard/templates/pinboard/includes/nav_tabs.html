@@ -1,0 +1,32 @@
+{% comment %}
+The bookmarks / toread tabs.
+
+Expects:
+
+* account - Optional. An Account object. If present, we link to the Account's
+            bookmarks/toread. Otherwise the overall ones.
+* active - Optional. String. 'bookmarks' (default) or 'toread'.
+{% endcomment %}
+
+{% with active=active|default_if_none:'bookmarks' %}
+    <ul class="nav nav-tabs m-b-2">
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'bookmarks' %} active{% endif %}" href="{% spaceless %}
+            {% if account %}
+                {% url 'pinboard:account_detail' username=account.username %}
+            {% else %}
+                {% url 'pinboard:index' %}
+            {% endif %}
+        {% endspaceless %}">All bookmarks</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'toread' %} active{% endif %}" href="{% spaceless %}
+            {% if account %}
+                {% url 'pinboard:account_toread' username=account.username %}
+            {% else %}
+                {% url 'pinboard:toread' %}
+            {% endif %}
+        {% endspaceless %}">To read</a>
+        </li>
+    </ul>
+{% endwith %}

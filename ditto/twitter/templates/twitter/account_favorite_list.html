@@ -21,13 +21,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            <ul class="nav nav-tabs m-b-2">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'twitter:user_detail' screen_name=account.user.screen_name %}">Tweets</a></li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'twitter:account_favorites' screen_name=account.user.screen_name %}">Likes</a>
-                </li>
-            </ul>
+            {% include 'twitter/includes/nav_tabs.html' with user=account.user active='favorites' only %}
 
             {% if account.user.is_private %}
                 <p>This user is private.</p>

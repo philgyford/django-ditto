@@ -19,14 +19,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            <ul class="nav nav-tabs m-b-2">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pinboard:index' %}">All bookmarks</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'pinboard:toread' %}">To read</a>
-                </li>
-            </ul>
+            {% include 'pinboard/includes/nav_tabs.html' with active='toread' only %}
 
             {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->

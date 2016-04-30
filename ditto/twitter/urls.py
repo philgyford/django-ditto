@@ -10,8 +10,8 @@ urlpatterns = [
     ),
     url(
         regex=r"^likes/$",
-        view=views.Favorites.as_view(),
-        name='favorites'
+        view=views.FavoriteList.as_view(),
+        name='favorite_list'
     ),
     url(
         regex=r"^(?P<screen_name>\w+)/$",
@@ -20,8 +20,8 @@ urlpatterns = [
     ),
     url(
         regex=r"^(?P<screen_name>\w+)/likes/$",
-        view=views.AccountFavorites.as_view(),
-        name='account_favorites'
+        view=views.AccountFavoriteList.as_view(),
+        name='account_favorite_list'
     ),
     url(
         regex=r"^(?P<screen_name>\w+)/(?P<twitter_id>\d+)/$",

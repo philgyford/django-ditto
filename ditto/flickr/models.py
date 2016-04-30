@@ -199,7 +199,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     view_count = models.PositiveIntegerField(default=0,
                 help_text="How many times this had been viewed when fetched")
     comment_count = models.PositiveIntegerField(default=0,
-                    help_text="How many comments this had been when fetched")
+                        help_text="How many comments this had when fetched")
 
     media = models.CharField(default=MEDIA_TYPES[0][0], choices=MEDIA_TYPES,
                                                                 max_length=10)
@@ -207,7 +207,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # SIZES ##################################################################
 
     sizes_raw = models.TextField(blank=True,
-            help_text="eg, the raw JSON from the API - flickr.photos.getSizes.")
+            help_text="The raw JSON from the API - flickr.photos.getSizes.")
 
     thumbnail_width = models.PositiveSmallIntegerField(null=True, blank=True)
     thumbnail_height = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -300,11 +300,17 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # TODO: NOTES
     # TODO: PEOPLE
 
+    photosets = models.ManyToManyField('Photoset')
+
     tags = TaggableManager(blank=True, manager=managers._PhotoTaggableManager,
                                                         through=TaggedPhoto)
 
     class Meta:
         ordering = ('-post_time',)
+
+    def get_absolute_url(self):
+        return reverse('flickr:photo_detail',
+                kwargs={'nsid': self.user.nsid, 'flickr_id': self.flickr_id})
 
     def summary_source(self):
         """Make the summary that's created when the Photo is saved."""
@@ -432,6 +438,43 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 self.farm, self.server, self.flickr_id, self.secret, size_ext)
 
 
+class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
+    user = models.ForeignKey('User')
+    flickr_id = models.BigIntegerField(null=False, blank=False, unique=True)
+    primary_photo = models.ForeignKey('Photo', null=True)
+    title = models.CharField(null=False, blank=False, max_length=255)
+    description = models.TextField(null=False, blank=True,
+                                                help_text="Can contain HTML")
+    photo_count = models.PositiveIntegerField(null=False, blank=False,
+                                                                    default=0)
+    video_count = models.PositiveIntegerField(null=False, blank=False,
+                                                                    default=0)
+    view_count = models.PositiveIntegerField(default=0,
+                help_text="How many times this had been viewed when fetched")
+    comment_count = models.PositiveIntegerField(default=0,
+                        help_text="How many comments this had when fetched")
+
+    last_update_time = models.DateTimeField(null=True, blank=True,
+                help_text="The last time the set was modified on Flickr. UTC.")
+    flickr_created_time = models.DateTimeField(null=True, blank=True,
+                        help_text="When the set was created on Flickr. UTC.")
+
+    fetch_time = models.DateTimeField(null=True, blank=True,
+                        help_text="The time the item's data was last fetched.")
+    raw = models.TextField(blank=True,
+                                    help_text="The raw JSON from the API.")
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-flickr_created_time']
+
+    def get_absolute_url(self):
+        return reverse('flickr:photoset_detail',
+                kwargs={'nsid': self.user.nsid, 'flickr_id': self.flickr_id})
+
+
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     nsid = models.CharField(null=False, blank=False, unique=True,
                                         max_length=50, verbose_name='NSID')
@@ -464,7 +507,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     fetch_time = models.DateTimeField(null=True, blank=True,
                             help_text="The time the data was last fetched.")
     raw = models.TextField(null=False, blank=True,
-                                    help_text="eg, the raw JSON from the API.")
+                                    help_text="The raw JSON from the API.")
     timezone_id = models.CharField(null=False, blank=False, max_length=50,
                                             help_text="eg, 'Europe/London'.")
 

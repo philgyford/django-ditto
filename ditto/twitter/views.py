@@ -21,8 +21,8 @@ class Home(PaginatedListView):
         return Tweet.public_tweet_objects.all().select_related()
 
 
-class Favorites(PaginatedListView):
-    template_name = 'twitter/favorites.html'
+class FavoriteList(PaginatedListView):
+    template_name = 'twitter/favorite_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,9 +72,9 @@ class UserDetail(UserDetailMixin, PaginatedListView):
         return context
 
 
-class AccountFavorites(UserDetailMixin, PaginatedListView):
-    "A single Twitter User that has an Account, and its Favorites."
-    template_name = 'twitter/account_favorites.html'
+class AccountFavoriteList(UserDetailMixin, PaginatedListView):
+    "A single Twitter User associated with an Account, and its Favorites."
+    template_name = 'twitter/account_favorite_list.html'
 
     def get_queryset(self):
         "All public favorites from this Account."

@@ -1,0 +1,33 @@
+{% comment %}
+Displaying a list of Photosets.
+
+Expects:
+ * photoset_list, a queryset of Photosets.
+{% endcomment %}
+
+{% if photoset_list|length > 0 %}
+
+    {% load ditto %}
+
+    {% for row in photoset_list|split_by:3 %}
+        <div class="row flickr-photosets">
+            {% for photoset in row %}
+                <div class="col-md-4 flickr-photoset">
+                    {% if photoset.primary_photo %}
+                        <p class="flickr-photoset-img m-b-1">
+                            <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}"><img src="{{ photoset.primary_photo.small_url }}" width="{{ photoset.primary_photo.small_width }}" height="{{ photoset.primary_photo.small_height }}" alt="" class="img-fluid"></a>
+                        </p>
+                    {% endif %}
+                    <h3 class="h6">
+                        <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">{{ photoset.title }}</a>
+                    </h3>
+                </div>
+            {% endfor %}
+        </div> <!-- .row.flickr-photosets -->
+    {% endfor %}
+{% else %}
+
+    <p>There are no Albums to show.</p>
+{% endif %}
+
+

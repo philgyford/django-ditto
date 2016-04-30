@@ -1,0 +1,32 @@
+{% comment %}
+The Tweets / Likes tabs.
+
+Expects:
+
+* user - Optional. A User object. If present, we link to the User's
+            tweets/likes. Otherwise the overall ones.
+* active - Optional. String. 'tweets' (default) or 'favorites'.
+{% endcomment %}
+
+{% with active=active|default_if_none:'tweets' %}
+    <ul class="nav nav-tabs m-b-2">
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'tweets' %} active{% endif %}" href="{% spaceless %}
+                {% if user %}
+                    {% url 'twitter:user_detail' screen_name=user.screen_name %}
+                {% else %}
+                    {% url 'twitter:index' %}
+                {% endif %}
+        {% endspaceless %}">Tweets</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'favorites' %} active{% endif %}" href="{% spaceless %}
+                {% if user %}
+                    {% url 'twitter:account_favorite_list' screen_name=user.screen_name %}
+                {% else %}
+                    {% url 'twitter:favorite_list' %}
+                {% endif %}
+            {% endspaceless %}">Likes</a>
+        </li>
+    </ul>
+{% endwith %}

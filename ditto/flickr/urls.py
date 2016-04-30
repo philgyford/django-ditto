@@ -24,6 +24,16 @@ urlpatterns = [
         name='user_detail'
     ),
     url(
+        regex=r"^(?P<nsid>[\dN@]+)/albums/$",
+        view=views.UserPhotosetList.as_view(),
+        name='user_photoset_list'
+    ),
+    url(
+        regex=r"^(?P<nsid>[\dN@]+)/albums/(?P<flickr_id>[^/]+)/$",
+        view=views.PhotosetDetail.as_view(),
+        name='photoset_detail'
+    ),
+    url(
         regex=r"^(?P<nsid>[\dN@]+)/tags/(?P<tag_slug>[^/]+)/$",
         view=views.UserTagDetail.as_view(),
         name='user_tag_detail'

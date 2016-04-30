@@ -54,15 +54,15 @@ class ViewTests(TestCase):
         self.assertEqual(tweets[0].pk, public_tweet_2.pk)
         self.assertEqual(tweets[1].pk, public_tweet_1.pk)
 
-    def test_favorites_templates(self):
+    def test_favorite_list_templates(self):
         "The Twitter favorites page uses the correct templates"
         response = self.client.get(reverse('twitter:favorites'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'twitter/favorites.html')
+        self.assertTemplateUsed(response, 'twitter/favorite_list.html')
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_favorites_context(self):
+    def test_favorite_list_context(self):
         "The Twitter favorites page sends the correct data to templates"
         accounts = factories.AccountFactory.create_batch(3)
 
@@ -73,7 +73,7 @@ class ViewTests(TestCase):
         recent_tweets = factories.TweetFactory.create_batch(4,
                                                         user=accounts[0].user)
 
-        response = self.client.get(reverse('twitter:favorites'))
+        response = self.client.get(reverse('twitter:favorite_list'))
 
         self.assertIn('tweet_list', response.context)
         self.assertEqual(6, len(response.context['tweet_list']))
@@ -84,7 +84,7 @@ class ViewTests(TestCase):
                 favoritable_tweets[1].pk, favoritable_tweets[0].pk]
         )
 
-    def test_favorites_privacy_tweets(self):
+    def test_favorite_list_privacy_tweets(self):
         "Only public Tweets should appear."
         private_user = factories.UserFactory(is_private=True)
         public_users = factories.UserFactory.create_batch(2, is_private=False)
@@ -96,13 +96,13 @@ class ViewTests(TestCase):
         favoriting_account.user.favorites.add(private_tweet)
         favoriting_account.user.favorites.add(public_tweet)
 
-        response = self.client.get(reverse('twitter:favorites'))
+        response = self.client.get(reverse('twitter:favorite_list'))
 
         tweets = response.context['tweet_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
 
-    def test_favorites_privacy_accounts(self):
+    def test_favorite_list_privacy_accounts(self):
         "Only Tweets favorited by Accounts with public Users should appear."
         user = factories.UserFactory(is_private=True)
         account = factories.AccountFactory(user=user)
@@ -111,7 +111,7 @@ class ViewTests(TestCase):
         # Check it is there:
         self.assertEqual(account.user.favorites.count(), 1)
 
-        response = self.client.get(reverse('twitter:favorites'))
+        response = self.client.get(reverse('twitter:favorite_list'))
         tweets = response.context['tweet_list']
         # Check it doesn't appear on the page:
         self.assertEqual(len(tweets), 0)
@@ -180,17 +180,17 @@ class ViewTests(TestCase):
         self.assertIn('account', response.context)
         self.assertEqual(len(response.context['tweet_list']), 0)
 
-    def test_account_favorites_templates(self):
+    def test_account_favorite_list_templates(self):
         "Uses the correct templates"
         account = factories.AccountFactory()
-        response = self.client.get(reverse('twitter:account_favorites',
+        response = self.client.get(reverse('twitter:account_favorite_list',
                             kwargs={'screen_name': account.user.screen_name}))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'twitter/account_favorites.html')
+        self.assertTemplateUsed(response, 'twitter/account_favorite_list.html')
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_account_favorites_context(self):
+    def test_account_favorite_list_context(self):
         "Sends the correct data to templates"
         accounts = factories.AccountFactory.create_batch(3)
 
@@ -199,7 +199,7 @@ class ViewTests(TestCase):
             accounts[0].user.favorites.add(tweet)
             accounts[2].user.favorites.add(tweet)
 
-        response = self.client.get(reverse('twitter:account_favorites',
+        response = self.client.get(reverse('twitter:account_favorite_list',
                         kwargs={'screen_name': accounts[0].user.screen_name}))
 
         self.assertIn('account', response.context)
@@ -214,7 +214,7 @@ class ViewTests(TestCase):
                 favoritable_tweets[1].pk, favoritable_tweets[0].pk]
         )
 
-    def test_account_favorites_privacy_tweets(self):
+    def test_account_favorite_list_privacy_tweets(self):
         "It does not show private Tweets"
         private_user = factories.UserFactory(is_private=True)
         public_users = factories.UserFactory.create_batch(2, is_private=False)
@@ -226,14 +226,14 @@ class ViewTests(TestCase):
         favoriting_account.user.favorites.add(private_tweet)
         favoriting_account.user.favorites.add(public_tweet)
 
-        response = self.client.get(reverse('twitter:account_favorites',
+        response = self.client.get(reverse('twitter:account_favorite_list',
                 kwargs={'screen_name': favoriting_account.user.screen_name}))
 
         tweets = response.context['tweet_list']
         self.assertEqual(len(tweets), 1)
         self.assertEqual(tweets[0].pk, public_tweet.pk)
 
-    def test_account_favorites_privacy_account(self):
+    def test_account_favorite_list_privacy_account(self):
         "It does not show favorites if the account's user is private"
         user = factories.UserFactory(is_private=True)
         account = factories.AccountFactory(user=user)
@@ -241,7 +241,7 @@ class ViewTests(TestCase):
         account.user.favorites.add(tweet)
         # Check it is there:
         self.assertEqual(account.user.favorites.count(), 1)
-        response = self.client.get(reverse('twitter:account_favorites',
+        response = self.client.get(reverse('twitter:account_favorite_list',
                 kwargs={'screen_name': account.user.screen_name}))
         tweets = response.context['tweet_list']
         # Check it doesn't appear on the page:

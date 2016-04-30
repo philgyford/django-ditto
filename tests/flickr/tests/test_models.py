@@ -4,8 +4,9 @@ import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 
-from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
-from ditto.flickr.models import Account, Photo, User
+from ditto.flickr.factories import AccountFactory, PhotoFactory,\
+        PhotosetFactory, UserFactory
+from ditto.flickr.models import Account, Photo, Photoset, User
 
 
 class AccountTestCase(TestCase):
@@ -83,12 +84,46 @@ class UserTestCase(TestCase):
         self.assertEqual(user.get_absolute_url(), '/flickr/1234567890@N01/')
 
 
+class PhotosetTestCase(TestCase):
+
+    def test_str(self):
+        "Has the correct string representation"
+        photoset = PhotosetFactory(title='My test photoset')
+        self.assertEqual(photoset.__str__(), 'My test photoset')
+
+    def test_ordering(self):
+        "Latest photoset should come first by default."
+        photoset_1 = PhotosetFactory(title='Earliest',
+            flickr_created_time=datetime.datetime.strptime(
+                '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=pytz.utc))
+        photoset_2 = PhotosetFactory(title='Latest',
+            flickr_created_time=datetime.datetime.strptime(
+                '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=pytz.utc))
+        photosets = Photoset.objects.all()
+        self.assertEqual(photosets[0].title, 'Latest')
+        self.assertEqual(photosets[1].title, 'Earliest')
+
+    def test_unique_flickr_id(self):
+        "Ensures flickr_id is unique"
+        photoset_1 = PhotosetFactory(flickr_id=123456)
+        with self.assertRaises(IntegrityError):
+            photoset_2 = PhotosetFactory(flickr_id=123456)
+
+
 class PhotoTestCase(TestCase):
 
     def test_str(self):
-        "Has the correct string represntation"
+        "Has the correct string representation"
         photo = PhotoFactory(title='My test photo')
         self.assertEqual(photo.__str__(), 'My test photo')
+
+    def test_get_absolute_url(self):
+        photo = PhotoFactory(user=UserFactory(nsid='1234567890@N01'),
+                            flickr_id=123456)
+        self.assertEqual(photo.get_absolute_url(),
+                '/flickr/1234567890@N01/123456/')
 
     def test_ordering(self):
         "Latest photo (uploaded) should come first by default."
@@ -114,7 +149,8 @@ class PhotoTestCase(TestCase):
         "Summary should be made correctly on save."
         photo = PhotoFactory(
                 description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
-        self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
+        self.assertEqual(
+                    photo.summary, "Some test HTML. And another paragraph.")
 
     def test_account_exists(self):
         "If the photo is from an Account the account property should return it."

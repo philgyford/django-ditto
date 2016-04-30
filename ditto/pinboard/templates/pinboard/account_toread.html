@@ -16,12 +16,12 @@
         {% endblock %}
     </h1>
 
-	<div class="row">
-		<div class="col-md-3">
-			<div class="card">
-				<div class="card-block">
-					{{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to&nbsp;read”
-				</div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-block">
+                    {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to&nbsp;read”
+                </div>
                 {% if account.is_active %}
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
@@ -29,22 +29,15 @@
                         </li>
                     </ul>
                 {% endif %}
-			</div>
-		</div> <!-- .col -->
+            </div>
+        </div> <!-- .col -->
 
-		<div class="col-md-9">
-			<ul class="nav nav-tabs m-b-2">
-				<li class="nav-item">
-					<a class="nav-link" href="{% url 'pinboard:account_detail' username=account.username %}">All bookmarks</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="{% url 'pinboard:account_toread' username=account.username %}">To read</a>
-				</li>
-			</ul>
+        <div class="col-md-9">
+            {% include 'pinboard/includes/nav_tabs.html' with account=account active='toread' only %}
 
             {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=bookmark_list page_obj=page_obj perms=perms only %}
-		</div> <!-- .col -->
-	</div> <!-- .row -->
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 

@@ -93,7 +93,7 @@ class TagFactory(factory.DjangoModelFactory):
         model = taggit_models.Tag
 
     slug = factory.Sequence(lambda n: 'slug%d' % n)
-    name = slug 
+    name = slug
 
 
 class TaggedPhotoFactory(factory.DjangoModelFactory):
@@ -105,4 +105,17 @@ class TaggedPhotoFactory(factory.DjangoModelFactory):
     author = factory.SubFactory(UserFactory)
     machine_tag = False
     content_object = factory.SubFactory(PhotoFactory)
+
+
+class PhotosetFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.Photoset
+
+    user = factory.SubFactory(UserFactory,
+            username=factory.Sequence(lambda n: n),
+            realname=factory.Sequence(lambda n: 'User Name %d' % n)
+        )
+    flickr_id = factory.Sequence(lambda n: (n * 1000000))
+    title = factory.Sequence(lambda n: 'Photoset %d' % n)
+    flickr_created_time = datetime_now()
 

@@ -6,7 +6,7 @@ from django.views.generic.detail import SingleObjectMixin
 from taggit.models import Tag
 
 from ..core.views import PaginatedListView
-from .models import Account, Photo, TaggedPhoto, User
+from .models import Account, Photo, Photoset, TaggedPhoto, User
 
 
 class PhotosOrderMixin(object):
@@ -193,3 +193,40 @@ class UserTagDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
         queryset = super().get_queryset()
         return queryset.filter(user=self.object,
                                     tags__slug__in=[self.kwargs['tag_slug']])
+
+
+class UserPhotosetList(UserDetailMixin, ListView):
+    template_name = 'flickr/user_photoset_list.html'
+    model = Photoset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photoset_list'] = context['object_list']
+        return context
+
+
+class PhotosetDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+    template_name = 'flickr/photoset_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        self.photoset_object = self.get_photoset_object()
+        return super().get(request, *args, **kwargs)
+
+    def get_photoset_object(self):
+        """Custom method for fetching the Photoset."""
+        try:
+            obj = Photoset.objects.get(flickr_id=self.kwargs['flickr_id'])
+        except Photoset.DoesNotExist:
+            raise Http404(_("No Photosets found matching the query"))
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photoset'] = self.photoset_object
+        context['photo_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        """Show all the public Photos in this Photoset."""
+        return self.photoset_object.photo_set.all()
+

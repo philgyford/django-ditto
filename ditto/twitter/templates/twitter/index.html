@@ -19,14 +19,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            <ul class="nav nav-tabs m-b-2">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'twitter:index' %}">Tweets</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'twitter:favorites' %}">Likes</a>
-                </li>
-            </ul>
+            {% include 'twitter/includes/nav_tabs.html' with active='tweets' only %}
 
             {% include 'twitter/includes/tweet_list.html' with tweet_list=tweet_list page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->
