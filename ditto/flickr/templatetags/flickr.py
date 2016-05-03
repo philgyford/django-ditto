@@ -62,7 +62,7 @@ def photo_license(n):
                     'name': licenses[n],
                 })
         else:
-            returnlicenses[n]
+            return licenses[n]
     else:
         return '[missing]'
 
