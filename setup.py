@@ -12,11 +12,12 @@ setup(
     version='0.1',
     packages=['ditto'],
     install_requires=[
+        'django-sortedm2m>=1.2.2,<1.3',
         'django-taggit',
         'flickrapi',
         'pytz',
         'twitter-text-python',
-        'twython==3.3.0',
+        'twython>=3.3.0,<3.4',
     ],
     dependency_links=[
         # The v3.3.0 of twython on pypi isn't as up-to-date as the v3.3.0
@@ -24,7 +25,6 @@ setup(
         'git+ssh://github.com/ryanmcgrath/twython.git@3.3.0#egg=twython-3.3.0',
     ],
     tests_require=[
-        #'Django>=1.8',
         'factory-boy',
         'freezegun',
         'responses',

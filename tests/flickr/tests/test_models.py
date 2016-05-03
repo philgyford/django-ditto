@@ -80,7 +80,7 @@ class UserTestCase(TestCase):
                                 'https://www.flickr.com/images/buddyicon.gif')
 
     def test_get_absolute_url(self):
-        user=UserFactory(nsid='1234567890@N01')
+        user = UserFactory(nsid='1234567890@N01')
         self.assertEqual(user.get_absolute_url(), '/flickr/1234567890@N01/')
 
 
@@ -91,7 +91,7 @@ class PhotosetTestCase(TestCase):
         photoset = PhotosetFactory(title='My test photoset')
         self.assertEqual(photoset.__str__(), 'My test photoset')
 
-    def test_ordering(self):
+    def test_photoset_ordering(self):
         "Latest photoset should come first by default."
         photoset_1 = PhotosetFactory(title='Earliest',
             flickr_created_time=datetime.datetime.strptime(
@@ -110,6 +110,33 @@ class PhotosetTestCase(TestCase):
         photoset_1 = PhotosetFactory(flickr_id=123456)
         with self.assertRaises(IntegrityError):
             photoset_2 = PhotosetFactory(flickr_id=123456)
+
+    def test_get_absolute_url(self):
+        photoset = PhotosetFactory(user=UserFactory(nsid='1234567890@N01'),
+                                    flickr_id='123')
+        self.assertEqual(
+            photoset.get_absolute_url(), '/flickr/1234567890@N01/albums/123/')
+
+    def test_photo_ordering(self):
+        "Should return photos in the correct order."
+        photo_1 = PhotoFactory()
+        photo_2 = PhotoFactory()
+        photo_3 = PhotoFactory()
+        photoset = PhotosetFactory()
+        photoset.photos.add(photo_2, photo_1, photo_3)
+        photos = photoset.photos.all()
+        self.assertEqual(photos[0], photo_2)
+        self.assertEqual(photos[1], photo_1)
+        self.assertEqual(photos[2], photo_3)
+
+    def test_public_photos(self):
+        "public_photos() should only return public photos."
+        public_photo = PhotoFactory(is_private=False)
+        private_photo = PhotoFactory(is_private=True)
+        photoset = PhotosetFactory()
+        photoset.photos.add(public_photo, private_photo)
+        self.assertEqual(len(photoset.public_photos()), 1)
+        self.assertEqual(photoset.public_photos()[0], public_photo)
 
 
 class PhotoTestCase(TestCase):

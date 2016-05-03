@@ -2,6 +2,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
@@ -300,8 +301,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # TODO: NOTES
     # TODO: PEOPLE
 
-    photosets = models.ManyToManyField('Photoset')
-
     tags = TaggableManager(blank=True, manager=managers._PhotoTaggableManager,
                                                         through=TaggedPhoto)
 
@@ -441,7 +440,8 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
     user = models.ForeignKey('User')
     flickr_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    primary_photo = models.ForeignKey('Photo', null=True)
+    primary_photo = models.ForeignKey('Photo', null=True,
+                                            related_name='primary_photosets')
     title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=False, blank=True,
                                                 help_text="Can contain HTML")
@@ -463,6 +463,13 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
                         help_text="The time the item's data was last fetched.")
     raw = models.TextField(blank=True,
                                     help_text="The raw JSON from the API.")
+
+    # Returns ALL photos, public AND private.
+    photos = SortedManyToManyField('Photo', related_name='photosets')
+
+    def public_photos(self):
+        "Returns only public photos."
+        return self.photos.filter(is_private=False)
 
     def __str__(self):
         return self.title
@@ -539,3 +546,4 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     (self.iconfarm, self.iconserver, self.nsid)
         else:
             return 'https://www.flickr.com/images/buddyicon.gif'
+

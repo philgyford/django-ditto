@@ -56,7 +56,7 @@ class ViewTests(TestCase):
 
     def test_favorite_list_templates(self):
         "The Twitter favorites page uses the correct templates"
-        response = self.client.get(reverse('twitter:favorites'))
+        response = self.client.get(reverse('twitter:favorite_list'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'twitter/favorite_list.html')
         self.assertTemplateUsed(response, 'twitter/base.html')

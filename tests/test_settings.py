@@ -16,6 +16,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'taggit',
+    'sortedm2m',
     'ditto.core',
     'ditto.flickr',
     'ditto.pinboard',

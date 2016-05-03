@@ -3,13 +3,11 @@ from datetime import timedelta
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from ditto.flickr.factories import AccountFactory, PhotoFactory, TagFactory,\
-        TaggedPhotoFactory, UserFactory
+from ditto.flickr.factories import AccountFactory, PhotoFactory,\
+        PhotosetFactory, TagFactory, TaggedPhotoFactory, UserFactory
 from ditto.core.utils import datetime_now
 
-class ViewTests(TestCase):
-
-    # HOME
+class HomeViewTests(TestCase):
 
     def test_home_templates(self):
         "The Flickr home page uses the correct templates"
@@ -84,7 +82,8 @@ class ViewTests(TestCase):
         self.assertEqual(photos[0].pk, public_photo_1.pk)
         self.assertEqual(photos[1].pk, public_photo_2.pk)
 
-    # USER DETAIL
+
+class UserDetailViewTests(TestCase):
 
     def test_user_detail_templates(self):
         "Uses the correct templates"
@@ -190,7 +189,8 @@ class ViewTests(TestCase):
         self.assertEqual(len(response.context['photo_list']), 1)
         self.assertIn(public_photo, response.context['photo_list'])
 
-    # PHOTO DETAIL
+
+class PhotoDetailViewTests(TestCase):
 
     def test_photo_detail_templates(self):
         "Uses the correct templates"
@@ -240,6 +240,14 @@ class ViewTests(TestCase):
                                     kwargs={'nsid': user.nsid,
                                             'flickr_id': photo.flickr_id}))
         self.assertEqual(response.status_code, 404)
+
+    def test_photo_detail_404(self):
+        "Should 404 with mis-matched user and photo IDs"
+        response = self.client.get(reverse('flickr:photo_detail',
+            kwargs={'nsid': UserFactory().nsid,
+                    'flickr_id': PhotoFactory().flickr_id}))
+        self.assertEqual(response.status_code, 404)
+
 
 class TagViewTests(TestCase):
     """Have a bit more set up than the other tests, so may as well share it."""
@@ -463,4 +471,87 @@ class TagViewTests(TestCase):
         response = self.client.get(reverse('flickr:user_tag_detail',
             kwargs={'nsid': self.carp_photo.user.nsid, 'tag_slug': 'mammal'}))
         self.assertEquals(response.status_code, 404)
+
+
+class PhotosetViewTests(TestCase):
+
+    def setUp(self):
+
+        self.user_1 = UserFactory(nsid='1234567890@N01')
+        # Three photos, one of which is private.
+        self.photos_1 = PhotoFactory.create_batch(3, user=self.user_1)
+        self.photos_1[0].is_private = True
+        self.photos_1[0].save()
+
+        self.user_2 = UserFactory(nsid='9876543210@N01')
+        self.photos_2 = PhotoFactory.create_batch(3, user=self.user_2)
+
+        # Has three photos, one of them private:
+        self.photoset_1 = PhotosetFactory(user=self.user_1, flickr_id=123456)
+        self.photoset_1.photos.add(*self.photos_1)
+
+        # Should have two of user_2's three photos:
+        self.photoset_2a = PhotosetFactory(user=self.user_2, flickr_id=98765)
+        self.photoset_2a.photos.add(self.photos_2[0], self.photos_2[1])
+
+        # Has all three of user_2's photos:
+        self.photoset_2b = PhotosetFactory(user=self.user_2, flickr_id=55555)
+        self.photoset_2b.photos.add(*self.photos_2)
+
+    def test_user_photoset_list_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('flickr:user_photoset_list',
+            kwargs={'nsid': self.user_1.nsid}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'flickr/user_photoset_list.html')
+        self.assertTemplateUsed(response, 'flickr/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_user_photoset_list_context(self):
+        "Sends the correct data to templates"
+        response = self.client.get(reverse('flickr:user_photoset_list',
+            kwargs={'nsid': self.user_2.nsid}))
+        self.assertIn('photoset_list', response.context)
+        self.assertEqual(len(response.context['photoset_list']), 2)
+        self.assertIn('flickr_user', response.context)
+        self.assertEqual(response.context['flickr_user'], self.user_2)
+
+    def test_photoset_detail_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('flickr:photoset_detail',
+            kwargs={'nsid': self.user_1.nsid,
+                    'flickr_id': self.photoset_1.flickr_id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'flickr/photoset_detail.html')
+        self.assertTemplateUsed(response, 'flickr/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_photoset_detail_context(self):
+        "Sends the correct data to templates"
+        response = self.client.get(reverse('flickr:photoset_detail',
+            kwargs={'nsid': self.user_2.nsid,
+                    'flickr_id': self.photoset_2a.flickr_id}))
+        self.assertIn('photoset', response.context)
+        self.assertEqual(len(response.context['photoset'].photos.all()), 2)
+        self.assertIn('photo_list', response.context)
+        self.assertEqual(len(response.context['photo_list']), 2)
+        self.assertIn('flickr_user', response.context)
+        self.assertEqual(response.context['flickr_user'], self.user_2)
+
+    def test_photoset_detail_404(self):
+        "Should 404 with mis-matched user and photoset IDs"
+        response = self.client.get(reverse('flickr:photoset_detail',
+            kwargs={'nsid': self.user_2.nsid,
+                    'flickr_id': self.photoset_1.flickr_id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_photoset_detail_privacy(self):
+        "Should not show private photos that are in the photoset."
+        response = self.client.get(reverse('flickr:photoset_detail',
+            kwargs={'nsid': self.user_1.nsid,
+                    'flickr_id': self.photoset_1.flickr_id}))
+        photos = response.context['photo_list']
+        self.assertEqual(len(photos), 2)
+        self.assertEqual(photos[0], self.photos_1[1])
+        self.assertEqual(photos[1], self.photos_1[2])
 

@@ -114,9 +114,9 @@ class PhotoDetail(DetailView):
 
     def get_object(self, queryset=None):
         """Do standard DetailView.get_object(), but return 404 if the Photo is
-        private."""
+        private, OR if the URL's user NSID doesn't match the photo's."""
         obj = super().get_object(queryset)
-        if obj.is_private:
+        if obj.is_private or obj.user.nsid != self.kwargs['nsid']:
             raise Http404(_("No %(verbose_name)s found matching the query") %
                                       {'verbose_name': obj._meta.verbose_name})
         return obj
@@ -204,29 +204,34 @@ class UserPhotosetList(UserDetailMixin, ListView):
         context['photoset_list'] = context['object_list']
         return context
 
+    def get_queryset(self):
+        """Show all Photosets associated with this user."""
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.object)
+
 
 class PhotosetDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     template_name = 'flickr/photoset_detail.html'
 
-    def get(self, request, *args, **kwargs):
-        self.photoset_object = self.get_photoset_object()
-        return super().get(request, *args, **kwargs)
-
-    def get_photoset_object(self):
-        """Custom method for fetching the Photoset."""
-        try:
-            obj = Photoset.objects.get(flickr_id=self.kwargs['flickr_id'])
-        except Photoset.DoesNotExist:
-            raise Http404(_("No Photosets found matching the query"))
-        return obj
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # NOTE: photoset.objects.all() will return PRIVATE photos too.
+        # You probably don't want to do that.
         context['photoset'] = self.photoset_object
         context['photo_list'] = context['object_list']
         return context
 
     def get_queryset(self):
         """Show all the public Photos in this Photoset."""
-        return self.photoset_object.photo_set.all()
+        self.photoset_object = self.get_photoset_object()
+        return self.photoset_object.public_photos()
+
+    def get_photoset_object(self):
+        """Custom method for fetching the Photoset."""
+        try:
+            obj = Photoset.objects.get(user=self.object,
+                                        flickr_id=self.kwargs['flickr_id'])
+        except Photoset.DoesNotExist:
+            raise Http404(_("No Photosets found matching the query"))
+        return obj
 

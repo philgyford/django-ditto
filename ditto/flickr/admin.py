@@ -73,7 +73,7 @@ class PhotosetAdmin(admin.ModelAdmin):
             'fields': ('user', 'title', 'description', 'primary_photo',
                 'flickr_id',
                 'photo_count', 'video_count', 'view_count', 'comment_count',
-                'last_update_time', 'flickr_created_time',)
+                'last_update_time', 'flickr_created_time', 'photos',)
         }),
         ('Data', {
             'classes': ('collapse',),
@@ -82,7 +82,7 @@ class PhotosetAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
     search_fields = ('title', 'description',)
-    raw_id_fields = ('primary_photo',)
+    raw_id_fields = ('primary_photo', 'photos',)
 
 
 class TaggedPhotoInline(admin.TabularInline):
@@ -101,7 +101,7 @@ class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('show_image', 'user', 'title', 'description', 'summary',
-                'permalink', 'is_private', 'flickr_id', 'media', 'license', 'photosets', )
+                'permalink', 'is_private', 'flickr_id', 'media', 'license',)
         }),
         ('Times', {
             'classes': ('collapse',),
