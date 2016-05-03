@@ -2,6 +2,7 @@ import datetime
 import pytz
 
 from django import template
+from django.utils.html import format_html
 
 from ..models import Photo, User
 from ...core.templatetags.ditto import display_time
@@ -55,10 +56,13 @@ def photo_license(n):
 
     if n in licenses:
         if n in Photo.LICENSE_URLS and Photo.LICENSE_URLS[n] != '':
-            return '<a href="%s" title="More about permissions">%s</a>' % \
-                                        (Photo.LICENSE_URLS[n], licenses[n])
+            return format_html(
+                '<a href="%(url)s" title="More about permissions">%(name)s</a>' % {
+                    'url': Photo.LICENSE_URLS[n],
+                    'name': licenses[n],
+                })
         else:
-            return licenses[n]
+            returnlicenses[n]
     else:
         return '[missing]'
 
