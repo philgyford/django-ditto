@@ -36,15 +36,19 @@ class FlickrUtilsMixinTestCase(TestCase):
 class FlickrFetchTestCase(TestCase):
     """Useful things used by subsequent test cases."""
 
+    fixture_path = 'ditto/flickr/fixtures/api/'
+
     flickr_fixtures = {
-        'people.getPhotos': 'ditto/flickr/fixtures/api/people_getphotos.json',
-        'people.getInfo': 'ditto/flickr/fixtures/api/people_getinfo.json',
-        'photos.getInfo': 'ditto/flickr/fixtures/api/photos_getinfo.json',
-        'photos.getSizes': 'ditto/flickr/fixtures/api/photos_getsizes.json',
-        'photos.getExif': 'ditto/flickr/fixtures/api/photos_getexif.json',
-        'test.login': 'ditto/flickr/fixtures/api/test_login.json',
+        'people.getPhotos':         'people_getphotos.json',
+        'people.getInfo':           'people_getinfo.json',
+        'photos.getInfo':           'photos_getinfo.json',
+        'photos.getSizes':          'photos_getsizes.json',
+        'photos.getExif':           'photos_getexif.json',
+        'test.login':               'test_login.json',
         # Variation including video sizes:
-        'photos.getSizes_video': 'ditto/flickr/fixtures/api/photos_getsizes_video.json',
+        'photos.getSizes_video':    'photos_getsizes_video.json',
+        'photosets.getList':        'photosets_getlist.json',
+        'photosets.getPhotos':      'photosets_getphotos.json',
     }
 
     def load_raw_fixture(self, method):
@@ -52,7 +56,8 @@ class FlickrFetchTestCase(TestCase):
         method -- Method name used in self.flickr_fixtures.
         Returns the JSON text.
         """
-        json_file = open(self.flickr_fixtures[method])
+        json_file = open('%s%s' % (
+                            self.fixture_path, self.flickr_fixtures[method]))
         json_data = json_file.read()
         json_file.close()
         return json_data

@@ -8,7 +8,7 @@ import flickrapi
 from flickrapi.exceptions import FlickrError
 from taggit.models import Tag
 
-from .models import Account, Photo, User
+from .models import Account, Photo, Photoset, User
 from ..core.utils import datetime_now
 
 # Classes here:
@@ -18,6 +18,7 @@ from ..core.utils import datetime_now
 #
 # UserSaver
 # PhotoSaver
+# PhotosetSaver
 #
 # Fetcher
 #   UserIdFetcher
@@ -128,7 +129,7 @@ class PhotoSaver(FlickrUtilsMixin, object):
 
     def save_photo(self, photo):
         """Takes a dict of photo data from the API and creates or updates a
-        Photo object and its associated User object.
+        Photo object.
 
         Keyword arguments:
         photo -- The photo data, from several Flickr API calls.
@@ -336,6 +337,78 @@ class PhotoSaver(FlickrUtilsMixin, object):
         for tagged_photo in tagged_photos:
             if tagged_photo.flickr_id in flickr_ids_to_delete:
                 tagged_photo.delete()
+
+
+class PhotosetSaver(FlickrUtilsMixin, object):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save_photoset(self, photoset):
+        """Takes a dict of photoset data from the API and creates or updates a
+        Photoset object.
+
+        It accepts a list of photo data, but will only add each photo to the
+        photoset if we already have that photo's data in the DB.
+
+        Keyword arguments:
+        photoset -- Has keys:
+                    'fetch_time': A datetime.
+                    'photoset': The data about the photoset from the API.
+                    'photos': The data about the set's photos from the API.
+                    'user_obj': User object for this photoset's owner.
+
+        Returns:
+        The Photoset object that was created or updated.
+        """
+
+        ps = photoset['photoset']
+
+        defaults = {
+            'fetch_time':           photoset['fetch_time'],
+            'user':                 photoset['user_obj'],
+            'flickr_id':            ps['id'],
+            'title':                ps['title']['_content'],
+            'description':          ps['description']['_content'],
+            'photo_count':          ps['photos'],
+            'video_count':          ps['videos'],
+            'view_count':           ps['count_views'],
+            'comment_count':        ps['count_comments'],
+            'last_update_time':     self._unixtime_to_datetime(
+                                                            ps['date_update']),
+            'flickr_created_time':  self._unixtime_to_datetime(
+                                                            ps['date_create']),
+            'raw':                  json.dumps(ps),
+            'photos_raw':          json.dumps(photoset['photos']),
+        }
+
+        try:
+            defaults['primary_photo'] = \
+                                    Photo.objects.get(flickr_id=ps['primary'])
+        except Photo.DoesNotExist:
+            pass
+
+        photoset_obj, created = Photoset.objects.update_or_create(
+                flickr_id=ps['id'],
+                defaults=defaults
+            )
+
+        if photoset_obj:
+            # Add all the photoset's photos that we have in the DB to the
+            # photoset object.
+            photos = []
+            for photo in photoset['photos']:
+                try:
+                    photos.append( Photo.objects.get(flickr_id=photo['id']) )
+                except Photo.DoesNotExist:
+                    pass
+
+            # Sets/updates the SortedManyToMany field of the photoset's photos:
+            photoset_obj.photos = photos
+
+        return photoset_obj
+
+
 
 ###########################################################################
 

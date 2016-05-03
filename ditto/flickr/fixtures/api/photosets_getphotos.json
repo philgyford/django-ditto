@@ -1,0 +1,21 @@
+{ "photoset": {
+    "id": "72157665648859705",
+    "primary": "24990464004",
+    "owner": "35034346050@N01",
+    "ownername": "Phil Gyford", 
+    "photo": [
+      { "id": "24990464004", "secret": "751f8dc21b", "server": "1552", "farm": 2, "title": "East Terrace, Walton-on-the-Naze", "isprimary": 1, "ispublic": 1, "isfriend": 0, "isfamily": 0 },
+      { "id": "25253437489", "secret": "6d8c33de2d", "server": "1468", "farm": 2, "title": "A PRIVATE photo", "isprimary": 0, "ispublic": 0, "isfriend": 0, "isfamily": 0 },
+      { "id": "25253471989", "secret": "277b0d3cfb", "server": "1575", "farm": 2, "title": "Naze Park Avenue, Walton-on-the-Naze", "isprimary": 0, "ispublic": 1, "isfriend": 0, "isfamily": 0 },
+      { "id": "25502409002", "secret": "30de9d1592", "server": "1468", "farm": 2, "title": "Naze Beach, Walton-on-the-Naze", "isprimary": 0, "ispublic": 1, "isfriend": 0, "isfamily": 0 },
+      { "id": "25253527909", "secret": "edf4601674", "server": "1559", "farm": 2, "title": "East Beach, Walton-on-Naze", "isprimary": 0, "ispublic": 1, "isfriend": 0, "isfamily": 0 }
+    ],
+    "page": 1,
+    "per_page": "500",
+    "perpage": "500",
+    "pages": 1,
+    "total": 5,
+    "title": "Old Postcards of Walton-on-the-Naze"
+  },
+  "stat": "ok"
+}

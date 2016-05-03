@@ -439,16 +439,17 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
     user = models.ForeignKey('User')
-    flickr_id = models.BigIntegerField(null=False, blank=False, unique=True)
+    flickr_id = models.BigIntegerField(null=False, blank=False, unique=True,
+                                                                db_index=True)
     primary_photo = models.ForeignKey('Photo', null=True,
                                             related_name='primary_photosets')
     title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=False, blank=True,
                                                 help_text="Can contain HTML")
     photo_count = models.PositiveIntegerField(null=False, blank=False,
-                                                                    default=0)
+            default=0, help_text="The number of photos in the set on Flickr")
     video_count = models.PositiveIntegerField(null=False, blank=False,
-                                                                    default=0)
+            default=0, help_text="The number of videos in the set on Flickr")
     view_count = models.PositiveIntegerField(default=0,
                 help_text="How many times this had been viewed when fetched")
     comment_count = models.PositiveIntegerField(default=0,
@@ -463,6 +464,8 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
                         help_text="The time the item's data was last fetched.")
     raw = models.TextField(blank=True,
                                     help_text="The raw JSON from the API.")
+    photos_raw = models.TextField(blank=True,
+                    help_text="The raw JSON from the API listing the photos.")
 
     # Returns ALL photos, public AND private.
     photos = SortedManyToManyField('Photo', related_name='photosets')
@@ -483,7 +486,7 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
-    nsid = models.CharField(null=False, blank=False, unique=True,
+    nsid = models.CharField(null=False, blank=False, unique=True, db_index=True,
                                         max_length=50, verbose_name='NSID')
     is_pro = models.BooleanField(null=False, blank=False, default=False,
                                                     verbose_name='Is Pro?')

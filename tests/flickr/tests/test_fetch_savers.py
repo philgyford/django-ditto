@@ -9,8 +9,8 @@ from taggit.models import Tag
 
 from .test_fetch import FlickrFetchTestCase
 from ditto.flickr.factories import PhotoFactory, UserFactory
-from ditto.flickr.fetch import FetchError, UserSaver, PhotoSaver
-from ditto.flickr.models import Photo, TaggedPhoto, User
+from ditto.flickr.fetch import FetchError, UserSaver, PhotosetSaver, PhotoSaver
+from ditto.flickr.models import Photo, Photoset, TaggedPhoto, User
 
 
 class UserSaverTestCase(FlickrFetchTestCase):
@@ -332,4 +332,97 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(photo.latitude, None)
         self.assertEqual(photo.longitude, None)
 
+
+class PhotosetSaverTestCase(FlickrFetchTestCase):
+
+    def make_photoset_object(self, photoset_data):
+        """"Creates/updates a Photo from API data, then fetches that Photo from
+        the DB and returns it.
+        """
+        saved_photoset = PhotosetSaver().save_photoset(photoset_data)
+        return Photoset.objects.get(flickr_id=72157665648859705)
+
+    def make_photoset_data(self):
+        """Makes the dict of data that photo_save() expects, based on API data.
+        """
+        return {
+            'fetch_time': datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+            'user_obj': UserFactory(nsid='35034346050@N01'),
+            'photoset': self.load_fixture('photosets.getList')['photosets']['photoset'][0],
+            'photos': self.load_fixture('photosets.getPhotos')['photoset']['photo'],
+        }
+
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    def test_saves_correct_photoset_data(self):
+
+        photoset_data = self.make_photoset_data()
+        photoset = self.make_photoset_object( photoset_data )
+
+        self.assertEqual(photoset.fetch_time,
+                        datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+        self.assertEqual(photoset.user, photoset_data['user_obj'])
+
+        self.assertEqual(photoset.flickr_id, 72157665648859705)
+        self.assertEqual(photoset.title, 'Old Postcards of Walton-on-the-Naze')
+        self.assertEqual(photoset.description, '<b>Some text here</b>\n\nAnd new lines!')
+        self.assertEqual(photoset.photo_count, 5)
+        self.assertEqual(photoset.video_count, 1)
+        self.assertEqual(photoset.view_count, 7)
+        self.assertEqual(photoset.comment_count, 3)
+        self.assertEqual(photoset.last_update_time, datetime.datetime.strptime(
+                                    '2016-03-28 16:02:03', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        self.assertEqual(photoset.flickr_created_time, datetime.datetime.strptime(
+                                    '2016-03-08 19:37:04', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        self.assertEqual(photoset.raw, json.dumps(photoset_data['photoset']))
+        self.assertEqual(photoset.photos_raw,
+                                        json.dumps(photoset_data['photos']))
+
+        self.assertEqual(photoset.primary_photo, None)
+
+    def test_adds_primary_photo(self):
+        "If the primary photo is in the DB, it's set."
+
+        photo = PhotoFactory(flickr_id=24990464004)
+
+        photoset_data = self.make_photoset_data()
+        photoset = self.make_photoset_object( photoset_data )
+
+        self.assertEqual(photoset.primary_photo, photo)
+
+    def test_adds_photos(self):
+        "Will add all the photos to the photoset if they're in the DB."
+
+        # The photos' Flickr IDs from the fixture:
+        photo_ids = [
+            24990464004, 25253437489, 25253471989, 25502409002, 25253527909,
+        ]
+        for id in photo_ids:
+            PhotoFactory(flickr_id=id)
+
+        photoset_data = self.make_photoset_data()
+        photoset = self.make_photoset_object( photoset_data )
+
+        self.assertEqual(photoset.photos.count(), 5)
+        photos = photoset.photos.all()
+
+        self.assertEqual(photos[0].flickr_id, photo_ids[0])
+        self.assertEqual(photos[2].flickr_id, photo_ids[2])
+        self.assertEqual(photos[4].flickr_id, photo_ids[4])
+
+    def test_skips_photos_not_in_db(self):
+        "If we don't have a photo in the db, it's not added to photoset."
+
+        # Three of the five photos' Flickr IDs from the fixture:
+        photo_ids = [
+            24990464004, 25253437489, 25502409002,
+        ]
+        for id in photo_ids:
+            PhotoFactory(flickr_id=id)
+
+        photoset_data = self.make_photoset_data()
+        photoset = self.make_photoset_object( photoset_data )
+
+        self.assertEqual(photoset.photos.count(), 3)
 
