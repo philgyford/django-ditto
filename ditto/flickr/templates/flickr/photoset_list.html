@@ -1,21 +1,23 @@
 {% extends 'flickr/base.html' %}
+{% load l10n %}
 
 {% block breadcrumbs %}
     <li><a href="{% url 'ditto:index' %}">Home</a></li>
-    <li class="active">Flickr</li>
+    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li class="active">Albums</li>
 {% endblock %}
 
 {% block content %}
 
     <h1 class="m-y-2">
         {% block title %}
-            Flickr
+            Photo albums
         {% endblock %}
     </h1>
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'flickr/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='recent' only %}
+            {% include 'flickr/includes/account_list.html' with account_list=account_list count=photoset_list.count list_type='photosets' only %}
 
             <div class="card">
                 <div class="card-block">
@@ -27,13 +29,13 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'flickr/includes/nav_tabs.html' with active='photos' only %}
+            {% include 'flickr/includes/nav_tabs.html' with active='photosets' only %}
 
-            {% include 'flickr/includes/sorting.html' with request=request order=order only %}
-
-            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photoset_list.html' with photoset_list=photoset_list only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 
+
 {% endblock content %}
+
 

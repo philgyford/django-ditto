@@ -15,7 +15,7 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'twitter/includes/account_list.html' with account_list=account_list page_obj=page_obj list_type='recent' only %}
+            {% include 'twitter/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='recent' only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

@@ -36,7 +36,7 @@ Expects:
             {% if user %}
                 {% url 'flickr:user_photoset_list' nsid=user.nsid %}
             {% else %}
-            {% comment %}  {% url 'flickr:photoset_list' %} {% endcomment %}
+                {% url 'flickr:photoset_list' %}
             {% endif %}
         {% endspaceless %}">Albums</a>
         </li>

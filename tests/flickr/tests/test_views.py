@@ -478,12 +478,14 @@ class PhotosetViewTests(TestCase):
     def setUp(self):
 
         self.user_1 = UserFactory(nsid='1234567890@N01')
+        self.account_1 = AccountFactory(user=self.user_1)
         # Three photos, one of which is private.
         self.photos_1 = PhotoFactory.create_batch(3, user=self.user_1)
         self.photos_1[0].is_private = True
         self.photos_1[0].save()
 
         self.user_2 = UserFactory(nsid='9876543210@N01')
+        self.account_2 = AccountFactory(user=self.user_2)
         self.photos_2 = PhotoFactory.create_batch(3, user=self.user_2)
 
         # Has three photos, one of them private:
@@ -497,6 +499,25 @@ class PhotosetViewTests(TestCase):
         # Has all three of user_2's photos:
         self.photoset_2b = PhotosetFactory(user=self.user_2, flickr_id=55555)
         self.photoset_2b.photos.add(*self.photos_2)
+
+    # OVERALL PHOTOSETS
+    def test_photoset_list_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('flickr:photoset_list'))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'flickr/photoset_list.html')
+        self.assertTemplateUsed(response, 'flickr/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_photoset_list_context(self):
+        "Sends the correct data to templates"
+        response = self.client.get(reverse('flickr:photoset_list'))
+        self.assertIn('photoset_list', response.context)
+        self.assertEqual(len(response.context['photoset_list']), 3)
+        self.assertIn('account_list', response.context)
+        self.assertEqual(len(response.context['account_list']), 2)
+
+    # USER PHOTOSETS
 
     def test_user_photoset_list_templates(self):
         "Uses the correct templates"

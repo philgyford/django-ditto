@@ -64,6 +64,17 @@ class Home(PhotosOrderMixin, PaginatedListView):
         return context
 
 
+class PhotosetList(ListView):
+    template_name = 'flickr/photoset_list.html'
+    model = Photoset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photoset_list'] = context['object_list']
+        context['account_list'] = Account.objects.all()
+        return context
+
+
 class UserDetailMixin(SingleObjectMixin):
     """Used for views that need data about a User based on nsid in
     the URL, and its Account if it has one.

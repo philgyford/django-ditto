@@ -3,7 +3,7 @@ Display a list of the accounts we're showing bookmarks for.
 
 Expects:
 * account_list - All the accounts we're showing bookmarks for.
-* page_obj - Representing the list of bookmarks.
+* count - The number of bookmarks.
 * list_type - 'recent' (default) or 'toread'.
 {% endcomment %}
 
@@ -12,7 +12,7 @@ Expects:
 <div class="card">
     <div class="card-block">
         <p class="card-text">
-            {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+            {{ count|localize }} bookmark{{ count|pluralize }}
             {% if list_type == 'toread' %}
                 marked “to&nbsp;read”
             {% endif %}

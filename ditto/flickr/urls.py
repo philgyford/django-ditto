@@ -9,6 +9,11 @@ urlpatterns = [
         name='index'
     ),
     url(
+        regex=r"^albums/$",
+        view=views.PhotosetList.as_view(),
+        name='photoset_list'
+    ),
+    url(
         regex=r"^tags/$",
         view=views.TagList.as_view(),
         name='tag_list'

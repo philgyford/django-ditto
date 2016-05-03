@@ -3,7 +3,7 @@ Display a list of the accounts we're showing tweets for.
 
 Expects:
 * account_list - All the accounts we're showing tweets for.
-* page_obj - Representing the list of tweets.
+* count - The number of tweets.
 * list_type - 'recent' (default) or 'favorites'.
 {% endcomment %}
 
@@ -12,7 +12,7 @@ Expects:
 <div class="card">
     <div class="card-block">
         <p class="card-text">
-            {{ page_obj.paginator.count|localize }} Tweet{{ page_obj.paginator.count|pluralize }}
+            {{ count|localize }} Tweet{{ count|pluralize }}
             {% if list_type and list_type == 'favorites' %}
                 liked
             {% endif %}
