@@ -349,6 +349,26 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
         return has_exif
 
+    # Properties for always-the-same widths/heights, to maintain consistency:
+
+    @property
+    def square_width(self):
+        return 75
+
+    @property
+    def square_height(self):
+        return 75
+
+    @property
+    def large_square_height(self):
+        return 150
+
+    @property
+    def large_square_height(self):
+        return 150
+
+    # URLs for all image sizes:
+
     @property
     def square_url(self):
         return self._image_url('s')

@@ -18,7 +18,7 @@ Expects:
                     </h3>
                     {% if photoset.primary_photo %}
                         <p class="flickr-photoset-img m-b-0">
-                            <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}"><img src="{{ photoset.primary_photo.large_square_url }}" width="150" height="150" alt="" class="img-fluid"></a>
+                            <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}"><img src="{{ photoset.primary_photo.large_square_url }}" width="{{ photoset.primary_photo.large_square_width }}" height="{{ photoset.primary_photo.large_square_height }}" alt="" class="img-fluid"></a>
                         </p>
                     {% endif %}
                     <p class="flickr-photoset-meta m-b-0"><small class="text-muted">

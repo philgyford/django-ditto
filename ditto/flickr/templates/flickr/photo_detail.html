@@ -37,8 +37,11 @@
                     {% endif %}
                 </p>
             {% endif %}
+
             {% if photo.description %}
-                <p class="flickr-photo-description">{{ photo.description|safe }}</p>
+                <p class="flickr-photo-description m-b-3">
+                    {{ photo.description|safe }}
+                </p>
             {% endif %}
 
             {% load flickr %}
@@ -100,6 +103,26 @@
                 <dd class="col-sm-9">{% photo_safety_level photo.safety_level %}</dd>
             </dl>
 
+            {% if photo.photosets %}
+                <dl class="dl-horiztonal row photo-photosets">
+                    <dt class="col-sm-3">Albums</dt>
+                    <dd class="col-sm-9">
+                        <ul class="list-unstyled">
+                        {% for photoset in photo.photosets.all %}
+                            <li class="m-b-1">
+                                {% if photoset.primary_photo %}
+                                    <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}"><img src="{{ photoset.primary_photo.square_url }}" width="{{ photoset.primary_photo.square_width }}" height="{{ photoset.primary_photo.square_height }}" alt=""></a>
+                                {% endif %}
+                                <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">
+                                    {{ photoset.title }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                </dl>
+            {% endif %}
+
             {% if photo.has_exif %}
                 <dl class="dl-horizontal row photo-exif">
                     {% if photo.exif_camera %}
@@ -133,16 +156,30 @@
                 </dl>
             {% endif %}
 
-            <ul>
-                {% if perms.flickr.can_change_photo %}
-                    <li><a href="{% url 'admin:flickr_photo_change' photo.id %}" title="Edit this photo in the Django Admin">Edit</a></li>
-                {% endif %}
-                {% if photo.account and photo.account.is_active %}
-                    <li><a href="{{ photo.permalink }}">At Flickr.com</a></li>
-                {% endif %}
-                <li>Last updated on Flickr at {% display_time photo.last_update_time True %}</li>
-                <li>Data last fetched at {% display_time photo.fetch_time True %}</li>
-            </ul>
+            <div class="card photo-meta">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Last updated on Flickr at {% display_time photo.last_update_time True %}
+                    </li>
+                    {% if photo.account and photo.account.is_active %}
+                        <li class="list-group-item">
+                            <a href="{{ photo.permalink }}">At Flickr.com</a>
+                        </li>
+                    {% endif %}
+                    {% if perms.flickr.can_change_photo %}
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:flickr_photo_change' photo.id %}" title="Edit this photo in the Django Admin">Edit</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card flickr-user">
+                <div class="card-block">
+                    <p class="card-text text-muted">
+                        <small>As of {% display_time photo.fetch_time True %}</small>
+                    </p>
+                </div>
+            </div>
         </div> <!-- .col -->
 
         <div class="col-md-3">
