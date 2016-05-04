@@ -138,6 +138,13 @@ class PhotosetTestCase(TestCase):
         self.assertEqual(len(photoset.public_photos()), 1)
         self.assertEqual(photoset.public_photos()[0], public_photo)
 
+    def test_permalink(self):
+        "Should point to the correct Flickr.com page"
+        photoset = PhotosetFactory(user=UserFactory(nsid='1234567890@N01'),
+                                    flickr_id='12345')
+        self.assertEqual(photoset.permalink,
+                'https://www.flickr.com/photos/1234567890@N01/albums/12345')
+
 
 class PhotoTestCase(TestCase):
 

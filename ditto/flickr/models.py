@@ -484,6 +484,11 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return reverse('flickr:photoset_detail',
                 kwargs={'nsid': self.user.nsid, 'flickr_id': self.flickr_id})
 
+    @property
+    def permalink(self):
+        return 'https://www.flickr.com/photos/%s/albums/%s' % (
+                                            self.user.nsid, self.flickr_id)
+
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     nsid = models.CharField(null=False, blank=False, unique=True, db_index=True,

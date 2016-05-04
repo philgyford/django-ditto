@@ -34,6 +34,15 @@
                     <li class="list-group-item">
                         {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}
                     </li>
+                    <li class="list-group-item">
+                        {{ photoset.view_count }} view{{ photoset.view_count|pluralize }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ photoset.comment_count }} comment{{ photoset.comment_count|pluralize }}
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{{ photoset.permalink }}">At Flickr.com</a></li>
+                    </li>
                     <li class="list-group-item text-muted">
                         {% load ditto %}
                         <small>As of {% display_time photoset.fetch_time %}</small>

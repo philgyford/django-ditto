@@ -27,14 +27,6 @@ Expects:
                     <p class="flickr-photo-img m-b-0">
                         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}"><img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-fluid"></a>
                     </p>
-                    {% if photo.summary or photo.media == 'video' %}
-                        <p class="flickr-photo-summary m-b-0">
-                            {{ photo.summary|safe }}
-                            {% if photo.media == 'video' %}
-                                <span class="text-muted">(Video)</span>
-                            {% endif %}
-                        </p>
-                    {% endif %}
                     <p class="flickr-photo-meta"><small class="text-muted">
                         {% if order == 'taken' %}
                             Taken at
