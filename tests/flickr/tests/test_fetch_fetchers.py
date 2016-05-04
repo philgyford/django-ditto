@@ -7,9 +7,10 @@ from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
 from ditto.flickr.factories import AccountFactory, UserFactory
-from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher, PhotosFetcher,\
-        RecentPhotosFetcher, RecentPhotosMultiAccountFetcher, UserFetcher,\
-        UserIdFetcher
+from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher,\
+        UserFetcher, UserIdFetcher,\
+        PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
+        RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -174,7 +175,8 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_sizes')
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_exif')
     def test_fetches_extra_photo_data(self, fetch_photo_exif, fetch_photo_sizes, fetch_photo_info):
-        """For each photo in results, all the fetch_photo_* methods should be called."""
+        """For each photo in results, all the fetch_photo_* methods should be
+        called."""
         self.add_response('people.getInfo')
         # Set results, as if we'd used a subclasse's _call_api() method:
         self.fetcher.results = self.load_fixture('people.getPhotos')['photos']['photo']
@@ -310,8 +312,8 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
     @responses.activate
     def test_fetches_multiple_pages(self):
-        """If the response from the API says there's more than 1 page of results
-        _fetch_pages() should fetch them all."""
+        """If the response from the API says there's more than 1 page of
+        results _fetch_pages() should fetch them all."""
         # Alter our default response fixture to set the number of pages to 3:
         body = self.load_fixture('people.getPhotos')
         body['photos']['pages'] = 3
@@ -342,7 +344,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     @patch('ditto.flickr.fetch.PhotoSaver.save_photo')
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_extra')
     def test_fetches_recent_days(self, save_photo, fetch_extra):
-        """When calling fetch() with a number of days, we should only ask for photos since that number of days ago."""
+        """Should only ask for photos from recent days, if number of days is set."""
         # '1439294400' is 2015-08-11 12:00:00 (ie, 3 days ago)
         self.add_response('people.getPhotos',
                                 querystring={'min_upload_date': '1439294400'})
@@ -415,7 +417,93 @@ class MultiAccountFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(fetcher.accounts[0], self.account_1)
 
 
-class RecentPhotosMultiAccountFetcherTestCase(FlickrFetchTestCase):
+class PhotosetsFetcherTestCase(FlickrFetchTestCase):
+
+    def setUp(self):
+        account = AccountFactory(api_key='1234', api_secret='9876',
+                                    user=UserFactory(nsid='35034346050@N01'))
+        self.fetcher = PhotosetsFetcher(account=account)
+
+    def test_inherits_from_fetcher(self):
+        self.assertTrue( issubclass(PhotosetsFetcher, Fetcher) )
+
+    @responses.activate
+    def test_call_api_error(self):
+        "_call_api() should throw an error if there's an API error."
+        self.add_response('photosets.getList',
+            body='{"stat": "fail", "code": 1, "message": "User not found"}')
+
+        with self.assertRaises(FetchError):
+            self.fetcher._call_api()
+
+    @responses.activate
+    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_extra')
+    def test_fetches_multiple_pages(self, fetch_extra):
+        """If the response from the API says there's more than 1 page of
+        results _fetch_pages() should fetch them all."""
+        # Alter our default response fixture to set the number of pages to 3:
+        body = self.load_fixture('photosets.getList')
+        body['photosets']['pages'] = 3
+        body = json.dumps(body)
+
+        # Responses after the first should be for the subsequent pages:
+        self.add_response('photosets.getList', body=body)
+        self.add_response(
+                    'photosets.getList', body=body, querystring={'page': '2'})
+        self.add_response(
+                    'photosets.getList', body=body, querystring={'page': '3'})
+
+        with patch('time.sleep'):
+            self.fetcher._fetch_pages()
+
+            self.assertEqual(len(responses.calls), 3)
+            # Our fixture has 3 photosets, so we should now have 9:
+            self.assertEqual(len(self.fetcher.results), 9)
+
+    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_pages')
+    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_extra')
+    def test_calls_fetch_pages(self, fetch_extra, fetch_pages):
+        """Check that it uses the _fetch_pages() method we tested above,
+        rather than the singular _fetch_page()."""
+
+        self.fetcher.fetch()
+        fetch_pages.assert_called_once_with()
+
+    @responses.activate
+    @patch('ditto.flickr.fetch.PhotosetSaver.save_photoset')
+    def test_fetches_photos(self, save_photoset):
+        """Should fetch the list of photos in each photoset."""
+        self.add_response('photosets.getList',
+                    body=json.dumps( self.load_fixture('photosets.getList') ))
+
+        body = json.dumps(self.load_fixture('photosets.getPhotos'))
+        # Should be called for each of the photosets in the getList fixture.
+        self.add_response('photosets.getPhotos', body=body,
+                            querystring={'photoset_id':'72157665648859705'})
+        self.add_response('photosets.getPhotos', body=body,
+                            querystring={'photoset_id':'72157662491524213'})
+        self.add_response('photosets.getPhotos', body=body,
+                            querystring={'photoset_id':'72157645155015916'})
+
+        with patch('time.sleep'):
+            self.fetcher.fetch()
+            self.assertEqual(len(responses.calls), 4)
+
+    @responses.activate
+    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
+    @patch('ditto.flickr.fetch.PhotosetSaver.save_photoset')
+    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_photos_in_photoset')
+    def test_saves_photosets(self, fetch_photos, save_photoset):
+        """It should call save_photoset() for each photoset it fetches."""
+        self.add_response('photosets.getList')
+        with patch('time.sleep'):
+            results = self.fetcher.fetch()
+            self.assertEqual(save_photoset.call_count, 3)
+            self.assertTrue(results['success'])
+            self.assertEqual(results['fetched'], 3)
+
+
+class MultiAccountFetcherTestCase(FlickrFetchTestCase):
 
     def setUp(self):
         self.account_1 = AccountFactory(api_key='1234', api_secret='9876',
@@ -430,6 +518,9 @@ class RecentPhotosMultiAccountFetcherTestCase(FlickrFetchTestCase):
         self.assertTrue(
             issubclass(RecentPhotosMultiAccountFetcher, MultiAccountFetcher)
         )
+
+
+class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
 
     @patch('ditto.flickr.fetch.RecentPhotosFetcher.__init__')
     @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
@@ -456,4 +547,31 @@ class RecentPhotosMultiAccountFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(len(return_value), 2)
         self.assertEqual(return_value[0]['account'], 'bob')
 
+
+class PhotosetsMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
+
+    @patch('ditto.flickr.fetch.PhotosetsFetcher.__init__')
+    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    def test_inits_fetcher_with_active_accounts(self, fetch, init):
+        "PhotosetsFetcher should be called with 2 active accounts."
+        init.return_value = None
+        PhotosetsMultiAccountFetcher().fetch()
+        init.assert_has_calls([call(self.account_1), call(self.account_2)])
+
+    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    def test_calls_fetch_for_active_accounts(self, fetch):
+        "PhotosetsFetcher.fetch() should be called twice."
+        PhotosetsMultiAccountFetcher().fetch()
+        fetch.assert_has_calls([call(), call()])
+
+    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    def test_returns_list_of_return_values(self, fetch):
+        "Should return a list of the dicts that PhotosetsFetcher.fetch() returns"
+        ret = {'success': True, 'account': 'bob', 'fetched': 7}
+        fetch.side_effect = [ret, ret]
+
+        return_value = PhotosetsMultiAccountFetcher().fetch()
+
+        self.assertEqual(len(return_value), 2)
+        self.assertEqual(return_value[0]['account'], 'bob')
 

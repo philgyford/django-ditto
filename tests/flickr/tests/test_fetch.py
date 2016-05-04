@@ -108,15 +108,22 @@ class FlickrFetchTestCase(TestCase):
                         items will override the defaults for each method below.
         """
         querystrings = {
-            'people.getInfo':   {'user_id': '35034346050@N01', },
-            'people.getPhotos': {'user_id': '35034346050@N01',
-                                'min_upload_date': '946684800',
-                                'page': '1',
-                                'per_page': '500'},
-            'photos.getInfo':   {'photo_id': '26069027966', },
-            'photos.getSizes':  {'photo_id': '26069027966', },
-            'photos.getExif':   {'photo_id': '26069027966', },
-            'test.login':       {},
+            'people.getInfo':       {'user_id': '35034346050@N01', },
+            'people.getPhotos':     {'user_id': '35034346050@N01',
+                                    'min_upload_date': '946684800',
+                                    'page': '1',
+                                    'per_page': '500',},
+            'photos.getInfo':       {'photo_id': '26069027966', },
+            'photos.getSizes':      {'photo_id': '26069027966', },
+            'photos.getExif':       {'photo_id': '26069027966', },
+            'photosets.getList':    {'user_id': '35034346050@N01',
+                                    'page': '1',
+                                    'per_page': '500',},
+            'photosets.getPhotos':  {'user_id': '35034346050@N01',
+                                    'photoset_id': '72157665648859705',
+                                    'page': '1',
+                                    'per_page': '500',},
+            'test.login':           {},
         }
         if body is None:
             body = self.load_raw_fixture(method)

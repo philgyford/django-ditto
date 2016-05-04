@@ -25,9 +25,11 @@ from ..core.utils import datetime_now
 #   UserFetcher
 #   PhotosFetcher
 #       RecentPhotosFetcher
+#   PhotosetsFetcher
 #
 # MultiAccountFetcher
 #   RecentPhotosMultiAccountFetcher
+#   PhotosetsMultiAccountFetcher
 
 
 class FetchError(Exception):
@@ -780,51 +782,149 @@ class RecentPhotosFetcher(PhotosFetcher):
         self.results += results['photos']['photo']
 
 
-class FavoritePhotosFetcher(PhotosFetcher):
-    """Fetches and saves data about an Account's favorite Photos.
+#class FavoritePhotosFetcher(PhotosFetcher):
+    #"""Fetches and saves data about an Account's favorite Photos.
 
-    By default ALL favorite photos will be fetched.
+    #By default ALL favorite photos will be fetched.
 
-    Supply a number of days to fetch() to restrict to the photos favorited in
-    the most recent days.
-    """
+    #Supply a number of days to fetch() to restrict to the photos favorited in
+    #the most recent days.
+    #"""
 
-    def fetch(self, days=None):
-        """Fetch all of the Account's user's photos, by default.
-        days -- The number of days back to look, by upload date.
-        """
-        if days is not None:
-            self.min_date = datetime_now() - datetime.timedelta(days=days)
+    #def fetch(self, days=None):
+        #"""Fetch all of the Account's user's photos, by default.
+        #days -- The number of days back to look, by upload date.
+        #"""
+        #if days is not None:
+            #self.min_date = datetime_now() - datetime.timedelta(days=days)
 
-        return super().fetch()
+        #return super().fetch()
+
+    #def _call_api(self):
+        #"""Fetch one page of results, containing very basic info about the
+        #Photos."""
+
+        ## Turn our datetime object into a unix timestamp:
+        #min_unixtime = calendar.timegm(self.min_date.timetuple())
+
+        #try:
+            #results = self.api.people.getPhotos(
+                                            #user_id=self.account.user.nsid,
+                                            #min_upload_date=min_unixtime,
+                                            #per_page=self.items_per_page,
+                                            #page=self.page_number
+                                        #)
+        #except FlickrError as e:
+            #raise FetchError(
+                #"Error when fetching recent photos (page %s): %s" % \
+                                                        #(self.page_number, e))
+
+        #if self.page_number == 1 and 'photos' in results and 'pages' in results['photos']:
+            ## First time, set the total_pages there are to fetch.
+            #self.total_pages = int(results['photos']['pages'])
+
+
+        ## Add the list of photos' data from this page on to our total list:
+        #self.results += results['photos']['photo']
+
+
+class PhotosetsFetcher(Fetcher):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Photosets come in pages.
+        self.is_paged = True
 
     def _call_api(self):
-        """Fetch one page of results, containing very basic info about the
-        Photos."""
+        """Fetch one page of results.
 
-        # Turn our datetime object into a unix timestamp:
-        min_unixtime = calendar.timegm(self.min_date.timetuple())
+        https://www.flickr.com/services/api/flickr.photosets.getList.htm
+        """
 
         try:
-            results = self.api.people.getPhotos(
+            results = self.api.photosets.getList(
                                             user_id=self.account.user.nsid,
-                                            min_upload_date=min_unixtime,
                                             per_page=self.items_per_page,
                                             page=self.page_number
                                         )
         except FlickrError as e:
             raise FetchError(
-                "Error when fetching recent photos (page %s): %s" % \
+                "Error when fetching photosets (page %s): %s" % \
                                                         (self.page_number, e))
 
-        if self.page_number == 1 and 'photos' in results and 'pages' in results['photos']:
+        if self.page_number == 1 and 'photosets' in results and 'pages' in results['photosets']:
             # First time, set the total_pages there are to fetch.
-            self.total_pages = int(results['photos']['pages'])
+            self.total_pages = int(results['photosets']['pages'])
 
 
-        # Add the list of photos' data from this page on to our total list:
-        self.results += results['photos']['photo']
+        # Add the list of photosets' data from this page on to our total list:
+        self.results += results['photosets']['photoset']
 
+    def _fetch_extra(self):
+        """Before saving we need to get the list of photos in each photoset."""
+
+        extra_results = []
+
+        for i, photoset in enumerate(self.results):
+
+            photos = self._fetch_photos_in_photoset(photoset['id'])
+
+            extra_results.append({
+                'fetch_time': datetime_now(),
+                'photoset': photoset,
+                'photos': photos,
+                'user_obj': self.account.user,
+            })
+
+        # Replace self.results with our new array that contains more info.
+        self.results = extra_results
+
+    def _fetch_photos_in_photoset(self, photoset_id):
+        """Gets the info about all the photos in the photoset.
+        Might be in multiple pages.
+        The data is quite minimal, but that's all we need.
+
+        https://www.flickr.com/services/api/flickr.photosets.getPhotos.htm
+
+        Expects:
+            photoset_id -- eg 72157665648859705
+        Returns:
+            list of dicts, each dict containing photo data
+        """
+
+        photos = []
+        page_number = 1
+        total_pages = 1 # Will get set to its proper value below.
+
+        while page_number <= total_pages:
+            try:
+                results = self.api.photosets.getPhotos(
+                                                photoset_id=photoset_id,
+                                                user_id=self.account.user.nsid,
+                                                per_page=self.items_per_page,
+                                                page=page_number
+                                            )
+            except FlickrError as e:
+                raise FetchError(
+                    "Error when fetching photos in photoset %s (page %s): %s"%\
+                                                (photoset_id, page_number, e))
+
+            if 'photoset' in results and 'photo' in results['photoset']:
+                total_pages = results['photoset']['pages']
+                photos += results['photoset']['photo']
+
+            page_number += 1
+            time.sleep(1) # Being nice.
+
+        return photos
+
+    def _save_results(self):
+        """Save all the data we've fetched about photosets to the DB."""
+        saver = PhotosetSaver()
+        for photoset in self.results:
+            p = saver.save_photoset(photoset)
+        self.results_count = len(self.results)
 
 ###########################################################################
 
@@ -907,4 +1007,23 @@ class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
 
         return self.return_value
 
+
+class PhotosetsMultiAccountFetcher(MultiAccountFetcher):
+    """For fetching ALL photosets for ALL or ONE account(s).
+
+    Usage:
+
+        results = PhotosetsMultiAccountFetcher().fetch()
+
+    results will be a list of dicts containing info about what was fetched (or
+    went wrong) for each account.
+    """
+
+    def fetch(self):
+        for account in self.accounts:
+            self.return_value.append(
+                PhotosetsFetcher(account).fetch()
+            )
+
+        return self.return_value
 
