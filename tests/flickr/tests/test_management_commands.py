@@ -95,16 +95,23 @@ class FetchFlickrPhotos(TestCase):
             call_command('fetch_flickr_photos', days='foo')
 
     @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
-    def test_sends_args_to_fetcher_with_account(self, fetcher):
+    def test_sends_days_to_fetcher_with_account(self, fetcher):
         call_command('fetch_flickr_photos', account='35034346050@N01', days='4')
         fetcher.assert_called_with(nsid='35034346050@N01')
         fetcher.return_value.fetch.assert_called_with(days=4)
 
     @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
-    def test_sends_args_to_fetcher_no_account(self, fetcher):
+    def test_sends_days_to_fetcher_no_account(self, fetcher):
         call_command('fetch_flickr_photos', days='4')
         fetcher.assert_called_with(nsid=None)
         fetcher.return_value.fetch.assert_called_with(days=4)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_sends_all_to_fetcher_with_account(self, fetcher):
+        call_command(
+                'fetch_flickr_photos', account='35034346050@N01', days='all')
+        fetcher.assert_called_with(nsid='35034346050@N01')
+        fetcher.return_value.fetch.assert_called_with(days='all')
 
     @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
     def test_success_output(self, fetcher):

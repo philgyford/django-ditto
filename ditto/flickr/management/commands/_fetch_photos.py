@@ -37,8 +37,8 @@ class FetchPhotosCommand(BaseCommand):
             # Will be either 'all' or a number; make the number an int.
             if options['days'].isdigit():
                 options['days'] = int(options['days'])
-            else:
-                raise CommandError("--days should be an integer.")
+            elif options['days'] != 'all':
+                raise CommandError("--days should be an integer or 'all'.")
 
             results = self.fetch_photos(nsid, options['days'])
             self.output_results(results)
