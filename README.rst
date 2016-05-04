@@ -115,7 +115,7 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 
     $ ./manage.py fetch_flickr_account_user --id=1
 
-Now you can fetch data about your Photos (it doesn't currently fetch the photo files themselves). This will fetch ALL Photos for ALL Accounts (it might take a while)::
+Now you can fetch data about your Photos (it doesn't currently fetch the photo files themselves). This will fetch ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos)::
 
     $ ./manage.py fetch_flickr_photos --days=all
 

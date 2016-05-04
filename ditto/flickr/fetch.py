@@ -517,7 +517,7 @@ class Fetcher(object):
         while self.page_number <= self.total_pages and self._not_failed():
             self._fetch_page(**kwargs)
             self.page_number += 1
-            time.sleep(1) # Being nice.
+            time.sleep(0.5) # Being nice.
 
     def _fetch_page(self, **kwargs):
         try:
@@ -915,7 +915,7 @@ class PhotosetsFetcher(Fetcher):
                 photos += results['photoset']['photo']
 
             page_number += 1
-            time.sleep(1) # Being nice.
+            time.sleep(0.5) # Being nice.
 
         return photos
 

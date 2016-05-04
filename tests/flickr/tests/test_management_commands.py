@@ -8,7 +8,7 @@ from django.utils.six import StringIO
 from ditto.flickr.factories import AccountFactory, UserFactory
 
 
-class FetchFlickrAccountUser(TestCase):
+class FetchFlickrAccountUserTestCase(TestCase):
 
     def setUp(self):
         # What we'll use as return values from UserIdFetcher().fetch()...
@@ -21,7 +21,6 @@ class FetchFlickrAccountUser(TestCase):
         self.account = AccountFactory(id=32, user=None)
         self.out = StringIO()
         self.out_err = StringIO()
-
 
     def test_fail_with_no_args(self):
         with self.assertRaises(CommandError):
@@ -76,7 +75,7 @@ class FetchFlickrAccountUser(TestCase):
         self.assertEqual(self.account.user.nsid, '35034346050@N01')
 
 
-class FetchFlickrPhotos(TestCase):
+class FetchFlickrPhotosTestCase(TestCase):
 
     def setUp(self):
         self.out = StringIO()
@@ -127,5 +126,40 @@ class FetchFlickrPhotos(TestCase):
         call_command('fetch_flickr_photos', days='4', stdout=self.out,
                                                         stderr=self.out_err)
         self.assertIn('Phil Gyford: Failed to fetch Photos: Oops',
+                                                    self.out_err.getvalue())
+
+
+class FetchFlickrPhotosetsTestCase(TestCase):
+
+    def setUp(self):
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
+    def test_calls_fetcher_with_account(self, fetcher):
+        call_command('fetch_flickr_photosets', account='35034346050@N01')
+        fetcher.assert_called_with(nsid='35034346050@N01')
+        fetcher.return_value.fetch.assert_called_with()
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
+    def test_calls_fetcher_with_no_account(self, fetcher):
+        call_command('fetch_flickr_photosets')
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with()
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
+    def test_success_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': '40'}]
+        call_command('fetch_flickr_photosets', stdout=self.out)
+        self.assertIn('Phil Gyford: Fetched 40 Photosets', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
+    def test_error_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': False, 'message': 'Oops'}]
+        call_command('fetch_flickr_photosets', stdout=self.out,
+                                                        stderr=self.out_err)
+        self.assertIn('Phil Gyford: Failed to fetch Photosets: Oops',
                                                     self.out_err.getvalue())
 

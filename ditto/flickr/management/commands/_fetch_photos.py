@@ -29,10 +29,6 @@ class FetchPhotosCommand(BaseCommand):
         # We might be fetching for a specific account or all (None).
         nsid = options['account'] if options['account'] else None;
 
-        # Call different class for one vs all accounts.
-        # Fetch for `days` or ALL.
-        # Ability to fetch individual photo info?
-
         if options['days']:
             # Will be either 'all' or a number; make the number an int.
             if options['days'].isdigit():
@@ -77,7 +73,6 @@ class FetchPhotosCommand(BaseCommand):
                 noun = 'Photo' if result['fetched'] == 1 else 'Photos'
                 self.stdout.write('%s: Fetched %s %s' % (
                                 result['account'], result['fetched'], noun))
-
             else:
                 self.stderr.write('%s: Failed to fetch Photos: %s' % (
                                         result['account'], result['message']))
