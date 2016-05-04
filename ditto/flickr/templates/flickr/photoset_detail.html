@@ -21,19 +21,26 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-block">
+                    <h2 class="h6 card-title">
+                        An album by <a href="{% url 'flickr:user_detail' nsid=photoset.user.nsid %}">{{ photoset.user.name }}</a>
+                    </h2>
+                {% if photoset.description %}
                     <p class="card-text">
-                        {{ page_obj.paginator.count|localize }} photo{{ page_obj.paginator.count|pluralize }}
+                        {{ photoset.description|safe }}
                     </p>
                 </div>
+                {% endif %}
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <a href="{% url 'flickr:user_detail' nsid=user.nsid %}">All {{ user.name }}’s photos</a>
+                        {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}
                     </li>
-                    <li class="list-group-item">
-                        <a href="{% url 'flickr:user_photoset_list' nsid=user.nsid %}">All {{ user.name }}’s albums</a>
+                    <li class="list-group-item text-muted">
+                        {% load ditto %}
+                        <small>As of {% display_time photoset.fetch_time %}</small>
                     </li>
                 </ul>
             </div>
+
         </div> <!-- .col -->
 
         <div class="col-md-9">

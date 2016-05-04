@@ -1,0 +1,17 @@
+{% comment %}
+Displays something like "4 photos and 1 video" for a photoset.
+
+Expects:
+* photoset -- The photoset in question.
+{% endcomment %}
+
+{% if photoset.photo_count > 0 %}
+	{{ photoset.photo_count }} photo{{ photoset.photo_count|pluralize }}
+{% endif %}
+{% if photoset.photo_count > 0 and photoset.video_count > 0 %}
+	and
+{% endif %}
+{% if photoset.video_count > 0 %}
+	{{ photoset.video_count }} video{{ photoset.video_count|pluralize }}
+{% endif %}
+
