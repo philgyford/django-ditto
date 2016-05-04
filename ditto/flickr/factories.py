@@ -118,4 +118,5 @@ class PhotosetFactory(factory.DjangoModelFactory):
     flickr_id = factory.Sequence(lambda n: (n * 1000000))
     title = factory.Sequence(lambda n: 'Photoset %d' % n)
     flickr_created_time = datetime_now()
+    fetch_time = datetime_now()
 
