@@ -1,6 +1,6 @@
-=====
-Ditto
-=====
+=======
+ Ditto
+=======
 
 .. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
   :target: https://travis-ci.org/philgyford/django-ditto?branch=master
@@ -21,9 +21,9 @@ only visible in the Django admin.
 The docs below are hasty; I'm not expecting anyone else to use this yet.
 
 
-############
-Installation
-############
+##############
+ Installation
+##############
 
 *********************
 Add to INSTALLED_APPS
@@ -82,9 +82,9 @@ suit your project. See the ``urls.py`` in the ``demo/`` project for a full
 example.
 
 
-########
-Services
-########
+##########
+ Services
+##########
 
 As well as including the apps and URLs, you need to link each one with your
 account(s) on the related services. Each app has an ``Account`` model, which
@@ -115,6 +115,9 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 
     $ ./manage.py fetch_flickr_account_user --id=1
 
+Photos
+======
+
 Now you can fetch data about your Photos (it doesn't currently fetch the photo files themselves). This will fetch ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos)::
 
     $ ./manage.py fetch_flickr_photos --days=all
@@ -126,6 +129,24 @@ This will only fetch Photos uploaded in the past 3 days::
 Both options can be restricted to only fetch for a single Account by adding the NSID of the Account's Flickr User, eg::
 
     $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
+
+Photosets
+=========
+
+You can fetch data about your Photosets (also known as Albums) any time, but
+this won't fetch complete data for any Photos. So any Photos not already
+fetched will not be fetched by this process.
+
+So, for best results, ensure all Photos are downloaded before fetching Photoset
+data.
+
+To fetch Photosets for all Accounts::
+
+    $ ./manage.py fetch_flickr_photosets
+
+Or fetch for only one Account::
+
+    $ ./manage.py fetch_flickr_photosets --account=35034346050@N01
 
 
 ********
@@ -170,6 +191,9 @@ Then you *must* do::
 
 which will fetch the data for that Account's Twitter user.
 
+Tweets
+======
+
 If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at https://twitter.com/settings/account . When you've downloaded it, do::
 
     $ ./manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
@@ -182,39 +206,53 @@ This will fetch data for up to 6000 Tweets. You can run it every 15 minutes if y
 
 If there are newer Tweets, not in your downloaded archive, then run this::
 
-    $ ./manage.py fetch_twitter_tweets --recent=3200
+    $ ./manage.py fetch_twitter_tweets --account=philgyford --recent=3200
 
 The ``3200`` is the number of recent Tweets to fetch, with ``3200`` being the maximum allowed in one go.
 
 Run this version periodically to fetch the Tweets since you last fetched any::
 
-    $ ./manage.py fetch_twitter_tweets --recent=new
+    $ ./manage.py fetch_twitter_tweets --account=philgyford --recent=new
 
 You might also, or instead, want to fetch more than that, eg::
 
-    $ ./manage.py fetch_twitter_tweets --recent=200
+    $ ./manage.py fetch_twitter_tweets --account=philgyford --recent=200
 
 This would update data such as the Retweet and Like counts for all of the 200
 fetched Tweets, even if they're older than your last fetch.
 
-And one or both of these to fetch recent Tweets that your accounts have liked::
+If you have more than one Twitter Account in Ditto, the above commands can be
+run across all of them by omitting the ``--account`` option. eg::
+
+    $ ./manage.py fetch_twitter_tweets --recent=new
+
+Favorites/Likes
+===============
+
+And one or both of these to fetch recent Tweets that all your Accounts have liked::
 
     $ ./manage.py fetch_twitter_favorites --recent=new
     $ ./manage.py fetch_twitter_favorites --recent=200
 
-All of the above commands will fetch Tweets and favorites for all Accounts that have API credentials set. To restrict to a single Account add `--account` with the Twitter screen name. eg::
+Or restrict to a single Account::
 
-    $ ./manage.py fetch_twitter_tweets --recent=new --account=philgyford
+    $ ./manage.py fetch_twitter_favorites --account=philgyford --recent=new
+    $ ./manage.py fetch_twitter_favorites --account=philgyford --recent=200
 
-You may periodically want to update the stored data about all Twitter users
-(numbers of Tweets, descriptions, etc). This will fetch the latest data::
+Users
+=====
 
-    $ ./manage.py fetch_twitter_users --account=philgyford
+You may periodically want to update the stored data about all the Twitter users
+stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this::
+
+    $ ./manage.py update_twitter_users --account=philgyford
+
+This requires an ``account`` as the data is fetched from that Twitter user's point of view, when it comes to privacy etc.
 
 
-############
-Other things
-############
+##############
+ Other things
+##############
 
 
 *****************
