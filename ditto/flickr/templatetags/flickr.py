@@ -4,7 +4,7 @@ import pytz
 from django import template
 from django.utils.html import format_html
 
-from ..models import Photo, User
+from ..models import Photo, Photoset, User
 from ...core.templatetags.ditto import display_time
 
 
@@ -45,6 +45,20 @@ def day_photos(date, nsid=None):
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
     return photos
+
+@register.assignment_tag
+def photosets(nsid=None, limit=10):
+    """Returns a QuerySet of recent Photosets.
+
+    Keyword arguments:
+    nsid -- A Flickr user's NSID. If not supplied, we fetch
+                    Photosets for all Flickr users that have Accounts.
+    limit -- Maximum number to fetch. Default is 10.
+    """
+    photosets = Photoset.objects.all()
+    if nsid is not None:
+        photosets = photosets.filter(user__nsid=nsid)
+    return photosets.select_related()[:limit]
 
 
 @register.simple_tag

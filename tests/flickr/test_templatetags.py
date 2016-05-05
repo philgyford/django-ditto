@@ -8,7 +8,8 @@ from freezegun import freeze_time
 from ditto.core.templatetags.ditto import display_time
 from ditto.core.utils import datetime_now
 from ditto.flickr.templatetags import flickr
-from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
+from ditto.flickr.factories import AccountFactory, PhotoFactory,\
+        PhotosetFactory, UserFactory
 
 
 class TemplatetagsRecentPhotosTestCase(TestCase):
@@ -39,6 +40,31 @@ class TemplatetagsRecentPhotosTestCase(TestCase):
     def test_recent_photos_limit(self):
         photos = flickr.recent_photos(limit=4)
         self.assertEqual(4, len(photos))
+
+
+class TemplatetagsPhotosetsTestCase(TestCase):
+
+    def setUp(self):
+        user_1 = UserFactory(nsid='1234567890@N01')
+        user_2 = UserFactory(nsid='9876543210@N01')
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
+        self.photosets_1 = PhotosetFactory.create_batch(2, user=user_1)
+        self.photosets_2 = PhotosetFactory.create_batch(3, user=user_2)
+
+    def test_photosets(self):
+        "Returns photosets from all accounts"
+        photosets = flickr.photosets()
+        self.assertEqual(5, len(photosets))
+
+    def test_photosets_account(self):
+        "Returns photosets from one account"
+        photosets = flickr.photosets(nsid='1234567890@N01')
+        self.assertEqual(2, len(photosets))
+
+    def test_photosets_limit(self):
+        photosets = flickr.photosets(limit=4)
+        self.assertEqual(4, len(photosets))
 
 
 class TemplatetagsDayPhotosTestCase(TestCase):
