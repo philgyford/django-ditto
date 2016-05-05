@@ -9,18 +9,17 @@ Expects:
 
 <li class="m-b">
     {% load l10n %}
-    {% if media.media_type == 'video' %}
+    {% if media.media_type == 'video' or media.media_type == 'animated_gif' %}
         {% if view and view == 'detail' %}
             <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
         {% else %}
             <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
         {% endif %}
-            {% if media.mp4_url_3 %}
-                <source src="{{ media.mp4_url_3 }}" type="video/mp4">
-            {% elif media.mp4_url_2 %}
-                <source src="{{ media.mp4_url_2 }}" type="video/mp4">
-            {% elif media.mp4_url_1 %}
-                <source src="{{ media.mp4_url_1 }}" type="video/mp4">
+            {% if media.xmpeg_url %}
+                <source src="{{ media.xmpeg_url }}" type="application/x-mpegURL">
+            {% endif %}
+            {% if media.mp4_url %}
+                <source src="{{ media.mp4_url }}" type="video/mp4">
             {% endif %}
             {% if media.webm_url %}
                 <source src="{{ media.webm_url }}" type="video/webm">

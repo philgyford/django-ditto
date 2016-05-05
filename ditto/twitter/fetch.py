@@ -159,7 +159,7 @@ class TweetMixin(UserMixin):
             return media_count
 
         for item in media:
-            # Things common to photos and videos.
+            # Things common to photos, animated GIFs and videos.
 
             defaults = {
                 'tweet':        tweet,
@@ -169,6 +169,11 @@ class TweetMixin(UserMixin):
                 'is_private':   tweet.is_private,
             }
 
+            valid_types = [type for type,name in Media.MEDIA_TYPES]
+
+            if item['type'] in valid_types:
+                defaults['media_type'] = item['type']
+
             for size in ['large', 'medium', 'small', 'thumb']:
                 if size in item['sizes']:
                     defaults[size+'_w'] = item['sizes'][size]['w']
@@ -177,9 +182,8 @@ class TweetMixin(UserMixin):
                     defaults[size+'_w'] = None
                     defaults[size+'_h'] = None
 
-            # Adding things ony used for videos:
-            if 'type' in item and item['type'] == 'video' and 'video_info' in item:
-                defaults['media_type'] = 'video'
+            # Adding things ony used for videos and animated GIFs:
+            if 'video_info' in item:
 
                 info = item['video_info']
 
@@ -187,7 +191,8 @@ class TweetMixin(UserMixin):
                 defaults['aspect_ratio'] = '%s:%s' % (
                         info['aspect_ratio'][0], info['aspect_ratio'][1])
 
-                defaults['duration'] = info['duration_millis']
+                if 'duration_millis' in info:
+                    defaults['duration'] = info['duration_millis']
 
                 # Group the variants into a dict with keys like 'video/mp4'
                 # and values being a list of dicts. Each of those dicts
@@ -197,6 +202,8 @@ class TweetMixin(UserMixin):
                 #                  {'url':'...', 'bitrate':832000},]
                 #   },
                 # ]
+                # A bit less necessary now that mp4s are deprecated for videos.
+                # (But there's still a single(?) mp4 url for animated GIFs.)
 
                 # Sort the list of dicts by 'content_type'.
                 # Need to do this for the next grouping stage.
@@ -205,27 +212,17 @@ class TweetMixin(UserMixin):
                 grouped_variants = {}
 
                 for key, variants in itertools.groupby(sorted_variants, lambda k: k['content_type']):
-                    #grouped_variants[key] = sorted(
-                                    #list(items), key=lambda k: k['bitrate'])
                     grouped_variants[key] = list(variants)
 
                 if 'application/dash+xml' in grouped_variants:
                     defaults['dash_url'] = grouped_variants['application/dash+xml'][0]['url']
                 if 'application/x-mpegURL' in grouped_variants:
                     defaults['xmpeg_url'] = grouped_variants['application/x-mpegURL'][0]['url']
-                if 'video/webm' in grouped_variants:
-                    defaults['webm_url'] = grouped_variants['video/webm'][0]['url']
-                    defaults['webm_bitrate'] = grouped_variants['video/webm'][0]['bitrate']
 
-                if 'video/mp4' in grouped_variants:
-                    # Sort them by bitrate:
-                    mp4s = sorted(grouped_variants['video/mp4'],
-                                                    key=lambda k: k['bitrate'])
-
-                    for idx, mp4 in enumerate(mp4s):
-                        if idx < 3:
-                            defaults['mp4_url_%s' % (idx+1)] = mp4['url']
-                            defaults['mp4_bitrate_%s' % (idx+1)] = mp4['bitrate']
+                if defaults['media_type'] == 'animated_gif' and 'video/mp4' in grouped_variants:
+                    # Only Animated GIFs have mp4s now.
+                    # https://twittercommunity.com/t/retiring-mp4-video-output/66093
+                    defaults['mp4_url'] = grouped_variants['video/mp4'][0]['url']
 
             media_obj, created = Media.objects.update_or_create(
                     twitter_id=item['id'],

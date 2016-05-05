@@ -247,17 +247,37 @@ class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
         self.assertEqual(video.thumb_h, 150)
 
         self.assertEqual(video.aspect_ratio, '16:9')
-        self.assertEqual(video.duration, 20000)
-        self.assertEqual(video.mp4_url_1, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/320x180/UfbIvNT9mNTY-hTg.mp4')
-        self.assertEqual(video.mp4_bitrate_1, 320000)
-        self.assertEqual(video.mp4_url_2, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.mp4')
-        self.assertEqual(video.mp4_bitrate_2, 832000)
-        self.assertEqual(video.mp4_url_3, '')
-        self.assertEqual(video.mp4_bitrate_3, None)
-        self.assertEqual(video.webm_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.webm')
-        self.assertEqual(video.webm_bitrate, 832000)
         self.assertEqual(video.dash_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.mpd')
         self.assertEqual(video.xmpeg_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8')
+
+
+class TweetMixinAnimatedGifTestCase(TweetMixinMediaTestCase):
+    "Testing that animated GIFs are saved correctly."
+
+    api_fixture = 'tweet_with_animated_gif.json'
+
+    def test_saves_gifs(self):
+        self.assertEqual(self.tweet.media_count, 1)
+
+        media = Media.objects.filter(tweet=self.tweet)
+        self.assertEqual(len(media), 1)
+
+        gif = media[0]
+
+        self.assertEqual(gif.media_type, 'animated_gif')
+        self.assertEqual(gif.twitter_id, 726396540303073281)
+        self.assertEqual(gif.image_url, "https://pbs.twimg.com/tweet_video_thumb/ChStzgbWYAErHLi.jpg")
+        self.assertEqual(gif.is_private, self.tweet.is_private)
+        self.assertEqual(gif.large_w, 320)
+        self.assertEqual(gif.large_h, 232)
+        self.assertEqual(gif.medium_w, 320)
+        self.assertEqual(gif.medium_h, 232)
+        self.assertEqual(gif.small_w, 320)
+        self.assertEqual(gif.small_h, 232)
+        self.assertEqual(gif.thumb_w, 150)
+        self.assertEqual(gif.thumb_h, 150)
+        self.assertEqual(gif.aspect_ratio, '40:29')
+        self.assertEqual(gif.mp4_url, 'https://pbs.twimg.com/tweet_video/ChStzgbWYAErHLi.mp4')
 
 
 class UserMixinTestCase(FetchTwitterTestCase):

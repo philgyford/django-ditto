@@ -54,12 +54,7 @@ class MediaInline(admin.StackedInline):
         ('Video', {
             'classes': ('collapse',),
             'fields': ('aspect_ratio', 'duration',
-                        'mp4_url_1', 'mp4_bitrate_1',
-                        'mp4_url_2', 'mp4_bitrate_2',
-                        'mp4_url_3', 'mp4_bitrate_3',
-                        'webm_url', 'webm_bitrate',
-                        'dash_url',
-                        'xmpeg_url',)
+                        'mp4_url', 'dash_url', 'xmpeg_url',)
         }),
         ('Data', {
             'classes': ('collapse',),
