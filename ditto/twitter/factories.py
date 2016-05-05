@@ -100,13 +100,35 @@ class VideoFactory(factory.DjangoModelFactory):
     image_url = factory.Sequence(
         lambda n: 'http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg' % (n, n))
 
-    mp4_url_1 = factory.Sequence(lambda n: 'https://video.twimg.com/ext_tw_video/%d/pu/vid/320x180/%d.mp4' % (n, n))
-    mp4_url_2 = factory.Sequence(lambda n: 'https://video.twimg.com/ext_tw_video/%d/pu/vid/640x360/%d.mp4' % (n, n))
-    mp4_bitrate_1 = 320000
-    mp4_bitrate_2 = 832000
-
-    webm_url = factory.Sequence(lambda n: 'https://video.twimg.com/ext_tw_video/%d/pu/vid/640x360/%d.webm' % (n, n))
+    xmpeg_url = factory.Sequence(lambda n: 'https://video.twimg.com/ext_tw_video/%d/pu/pl/%d.m3u8' % (n, n))
+    dash_url = factory.Sequence(lambda n: 'https://video.twimg.com/ext_tw_video/%d/pu/pl/%d.mpd' % (n, n))
 
     aspect_ratio = '16:9'
     duration = 20000
+
+
+class AnimatedGifFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = models.Media
+
+    media_type = 'animated_gif'
+    tweet = factory.SubFactory(TweetFactory)
+    twitter_id = factory.Sequence(lambda n: (n * 10000000))
+
+    large_w = 640
+    large_h = 360
+    medium_w = 600
+    medium_h = 338
+    small_w = 340
+    small_h = 191
+    thumb_w = 150
+    thumb_h = 150
+
+    image_url = factory.Sequence(
+        lambda n: 'http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg' % (n, n))
+
+    mp4_url = factory.Sequence(lambda n: 'https://pbs.twimg.com/tweet_video/%d.mp4' % n)
+
+    aspect_ratio = '16:9'
 

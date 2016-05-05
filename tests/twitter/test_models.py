@@ -12,7 +12,7 @@ from django.test import TestCase
 
 from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, PhotoFactory, TweetFactory,\
-        UserFactory, VideoFactory
+        UserFactory, VideoFactory, AnimatedGifFactory
 from ditto.twitter.models import Account, Media, Tweet, User
 
 
@@ -241,6 +241,18 @@ class VideoTestCase(TestCase):
     def test_media_type(self):
         video = VideoFactory()
         self.assertEqual(video.media_type, 'video')
+
+
+class AnimatedGifTestCase(TestCase):
+    "Most things are the same for photos and videos, so not re-testing here."
+
+    def test_str(self):
+        gif = AnimatedGifFactory()
+        self.assertEqual(gif.__str__(), 'Animated GIF %d' % gif.id)
+
+    def test_media_type(self):
+        gif = AnimatedGifFactory()
+        self.assertEqual(gif.media_type, 'animated_gif')
 
 
 class TweetTestCase(TestCase):

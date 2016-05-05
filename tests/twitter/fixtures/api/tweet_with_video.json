@@ -67,16 +67,6 @@
             {  
               "content_type":"application/x-mpegURL",
               "url":"https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8"
-            },
-            {  
-              "content_type":"video/mp4",
-              "url":"https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/320x180/UfbIvNT9mNTY-hTg.mp4",
-              "bitrate":320000
-            },
-            {  
-              "content_type":"video/mp4",
-              "url":"https://video.twimg.com/ext_tw_video/661601811007188992/pu/vid/640x360/bKx7SCruMgrRitWy.mp4",
-              "bitrate":832000
             }
           ],
           "duration_millis":20000,
