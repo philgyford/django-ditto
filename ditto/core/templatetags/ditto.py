@@ -57,13 +57,15 @@ def width_height(w, h, max_w, max_h):
 
 
 @register.simple_tag
-def display_time(dt, link_to_day=False, granularity=0):
+def display_time(dt, link_to_day=False, granularity=0, case=None):
     """Return the HTML to display the time a Photo, Tweet, etc.
 
     dt -- The datetime.
     view -- Nothing or 'detail' or 'day', probably.
     granularity -- A number indicating how detailed the datetime is, based on
                     https://www.flickr.com/services/api/misc.dates.html
+    case -- How the visible text will be treated. By default will be lowercase
+                except for Month names. None, 'lower', or 'capfirst'. 
 
     For a 'day' view, just returns the date/time as text.
     For other views returns it including a link to the ditto:day_archive page
@@ -74,15 +76,15 @@ def display_time(dt, link_to_day=False, granularity=0):
     """
 
     if granularity == 8:
-        visible_time = 'Circa %s' % dt.strftime('%Y')
+        visible_time = 'circa %s' % dt.strftime('%Y')
         stamp = dt.strftime('%Y')
 
     elif granularity == 6:
-        visible_time = 'Sometime in %s' % dt.strftime('%Y')
+        visible_time = 'sometime in %s' % dt.strftime('%Y')
         stamp = dt.strftime('%Y')
 
     elif granularity == 4:
-        visible_time = 'Sometime in %s' % dt.strftime('%b&nbsp;%Y')
+        visible_time = 'sometime in %s' % dt.strftime('%b&nbsp;%Y')
         stamp = dt.strftime('%Y-%m')
 
     else:
@@ -109,6 +111,11 @@ def display_time(dt, link_to_day=False, granularity=0):
                 }
         else:
             visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
+
+    if case == 'lower':
+        visible_time = visible_time.lower()
+    elif case == 'capfirst':
+        visible_time = visible_time[0].upper() + visible_time[1:]
 
     return format_html('<time datetime="%(stamp)s">%(visible)s</time>' % {
                 'stamp': stamp,

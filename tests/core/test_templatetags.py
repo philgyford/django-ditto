@@ -107,21 +107,21 @@ class DisplayTimeTestCase(TestCase):
     def test_granularity_4_no_link(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=4),
-            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+            '<time datetime="2015-08">sometime in Aug&nbsp;2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
     def test_granularity_6_no_link(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=6),
-            '<time datetime="2015">Sometime in 2015</time>'
+            '<time datetime="2015">sometime in 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
     def test_granularity_8_no_link(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=8),
-            '<time datetime="2015">Circa 2015</time>'
+            '<time datetime="2015">circa 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -129,7 +129,7 @@ class DisplayTimeTestCase(TestCase):
         "Doesn't actually have a link as there's no exact day."
         self.assertEqual(
             display_time(datetime_now(), link_to_day=True, granularity=4),
-            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+            '<time datetime="2015-08">sometime in Aug&nbsp;2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -137,7 +137,7 @@ class DisplayTimeTestCase(TestCase):
         "Doesn't actually have a link as there's no exact day."
         self.assertEqual(
             display_time(datetime_now(), link_to_day=True, granularity=6),
-            '<time datetime="2015">Sometime in 2015</time>'
+            '<time datetime="2015">sometime in 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -145,9 +145,22 @@ class DisplayTimeTestCase(TestCase):
         "Doesn't actually have a link as there's no exact day."
         self.assertEqual(
             display_time(datetime_now(), link_to_day=True, granularity=8),
-            '<time datetime="2015">Circa 2015</time>'
+            '<time datetime="2015">circa 2015</time>'
         )
 
+    @freeze_time("2015-08-14 13:34:56")
+    def test_case_lower(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=4, case='lower'),
+            '<time datetime="2015-08">sometime in aug&nbsp;2015</time>'
+        )
+
+    @freeze_time("2015-08-14 13:34:56")
+    def test_case_capfirst(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=4, case='capfirst'),
+            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+        )
 
 class SplitByTestCase(TestCase):
 

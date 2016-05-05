@@ -29,14 +29,14 @@ Expects:
                     </p>
                     <p class="flickr-photo-meta"><small class="text-muted">
                         {% if order == 'taken' %}
-                            Taken at
+                            Taken
                             {% if view == 'day' %}
                                 {% display_time photo.taken_time link_to_day=False granularity=photo.taken_granularity %}
                             {% else %}
                                 {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
                             {% endif %}
                         {% else %}
-                            Uploaded at
+                            Uploaded
                             {% if view == 'day' %}
                                 {% display_time photo.post_time link_to_day=False granularity=photo.taken_granularity %}
                             {% else %}

@@ -51,7 +51,7 @@
                     {% if photo.taken_unknown %}
                         Unknown
                     {% else %}
-                        {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
+                        {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity case='capfirst' %}
                     {% endif %}
                 </dd>
 
