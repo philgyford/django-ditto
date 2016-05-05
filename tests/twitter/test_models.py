@@ -20,7 +20,7 @@ class AccountTestCase(TestCase):
 
     api_url = 'https://api.twitter.com/1.1'
 
-    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+    api_fixture = 'tests/twitter/fixtures/api/verify_credentials.json'
 
     def make_verify_credentials_body(self):
         "Makes the JSON response to a call to verify_credentials"

@@ -28,12 +28,13 @@ class FetchTwitterTestCase(TestCase):
     api_call = ''
 
     # Should be set in child classes to use self.make_response_body():
-    # eg, 'ditto/twitter/fixtures/api/tweets.json'
+    # eg, 'tweets.json'
     api_fixture = ''
 
     def make_response_body(self):
         "Makes the JSON response to a call to the API"
-        json_file = open(self.api_fixture)
+        json_file = open(
+                '%s%s' % ('tests/twitter/fixtures/api/', self.api_fixture))
         json_data = json_file.read()
         json_file.close()
         return json_data
@@ -73,7 +74,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
 
     # Note that we've changed the id and id_str of each Tweet in this
     # fixture to something much shorter, and easier to test with.
-    api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
+    api_fixture = 'tweets.json'
 
     def make_tweet(self, is_private=False):
         self.fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -143,7 +144,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
 
     def test_saves_quoted_tweets(self):
         "Saving a Tweet that quotes another Tweet should save the quoted Tweet."
-        self.api_fixture = 'ditto/twitter/fixtures/api/tweets_with_quoted_tweet.json'
+        self.api_fixture = 'tweets_with_quoted_tweet.json'
         tweet = self.make_tweet()
 
         self.assertEqual(tweet.text, 'Quoting a couple of tweets: https://t.co/HSaYtiWAbg and https://t.co/hpX1aGkWsv')
@@ -156,7 +157,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
     def test_saves_double_quoted_tweets(self):
         """Saving Tweet 1 that quotes Tweet 2 that quotes Tweet 3 should save
         Tweet 2, and cope with Tweet 3 not being savable."""
-        self.api_fixture = 'ditto/twitter/fixtures/api/tweets_with_double_quoted_tweet.json'
+        self.api_fixture = 'tweets_with_double_quoted_tweet.json'
         tweet1 = self.make_tweet()
 
         self.assertEqual(tweet1.text, 'Anyone fancy meeting sometime today/tomorrow to see @genmon\u2019s book vending machine at Google Campus, EC2? https://t.co/1ScaCLOUxb')
@@ -193,7 +194,7 @@ class TweetMixinMediaTestCase(FetchTwitterTestCase):
 class TweetMixinPhotosTestCase(TweetMixinMediaTestCase):
     "Testing that photos are saved correctly."
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_photos.json'
+    api_fixture = 'tweet_with_photos.json'
 
     def test_saves_photos(self):
         self.assertEqual(self.tweet.media_count, 3)
@@ -222,7 +223,7 @@ class TweetMixinPhotosTestCase(TweetMixinMediaTestCase):
 class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
     "Testing that videos are saved correctly."
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweet_with_video.json'
+    api_fixture = 'tweet_with_video.json'
 
     def test_saves_videos(self):
         self.assertEqual(self.tweet.media_count, 1)
@@ -261,7 +262,7 @@ class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
 
 class UserMixinTestCase(FetchTwitterTestCase):
 
-    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+    api_fixture = 'verify_credentials.json'
 
     def make_user_data(self, custom={}):
         """Get the JSON for a single user.
@@ -387,7 +388,7 @@ class TwitterFetcherInactiveAccountsTestCase(FetchTwitterTestCase):
 class TwitterFetcherTestCase(FetchTwitterTestCase):
     """Testing the parent TwitterFetcher class."""
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
+    api_fixture = 'tweets.json'
 
     def setUp(self):
         """We add the last_recent_id and last_favorite_id to prevent the
@@ -738,7 +739,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
 
 class UsersFetcherTestCase(TwitterFetcherTestCase):
 
-    api_fixture = 'ditto/twitter/fixtures/api/users_lookup.json'
+    api_fixture = 'users_lookup.json'
 
     api_call = 'users/lookup'
 
@@ -825,7 +826,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
 
 class TweetsFetcherTestCase(TwitterFetcherTestCase):
 
-    api_fixture = 'ditto/twitter/fixtures/api/tweets.json'
+    api_fixture = 'tweets.json'
 
     api_call = 'statuses/lookup'
 
@@ -929,7 +930,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
 
 class VerifyFetcherTestCase(TwitterFetcherTestCase):
 
-    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+    api_fixture = 'verify_credentials.json'
 
     api_call = 'account/verify_credentials'
 
@@ -996,7 +997,7 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
 
 class FetchVerifyTestCase(FetchTwitterTestCase):
 
-    api_fixture = 'ditto/twitter/fixtures/api/verify_credentials.json'
+    api_fixture = 'verify_credentials.json'
 
     api_call = 'account/verify_credentials'
 

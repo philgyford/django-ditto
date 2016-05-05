@@ -36,7 +36,7 @@ class FlickrUtilsMixinTestCase(TestCase):
 class FlickrFetchTestCase(TestCase):
     """Useful things used by subsequent test cases."""
 
-    fixture_path = 'ditto/flickr/fixtures/api/'
+    fixture_path = 'tests/flickr/fixtures/api/'
 
     flickr_fixtures = {
         'people.getPhotos':         'people_getphotos.json',

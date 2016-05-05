@@ -10,21 +10,28 @@ import responses
 
 from django.test import TestCase
 
-from ditto.pinboard import factories
+from ditto.pinboard.factories import AccountFactory, BookmarkFactory
 from ditto.pinboard.fetch import BookmarksFetcher, AllBookmarksFetcher,\
         DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher,\
         FetchError
 from ditto.pinboard.models import Account, Bookmark, BookmarkTag
 
 
-class FetchTypesTestRemoteCase(TestCase):
+class FetchTestCase(TestCase):
+
+    def setUp(self):
+        self.user_1 = AccountFactory(username='philgyford',
+                                    url='https://pinboard.in/u:philgyford',
+                                    api_token='philgyford:1234567890ABCDEFGHIJ')
+        self.user_2 = AccountFactory(username='testuser',
+                                    url='https://pinboard.in/u:testuser',
+                                    api_token='testuser:ABCDEFGHIJ1234567890')
+
+
+class FetchTypesTestRemoteCase(FetchTestCase):
     """Testing the various classes for fetching remote Bookmarks
     data: AllBookmarksFetcher, DateBookmarksFetcher, etc.
     """
-
-    # ./demo/manage.py dumpdata pinboard.Account --indent 4 > ditto/pinboard/fixtures/fetch_bookmarks_test.json
-    fixtures = ['fetch_bookmarks_test.json']
-
 
     def add_response(self, body, method='get', status=200):
         """If the URL given here is called, then the request is faked, and
@@ -177,31 +184,25 @@ class FetchInactiveAccountsTestCase(TestCase):
 
     def test_only_inactive_account(self):
         "Correctly reacts if only an inactive Account is tried"
-        account = factories.AccountFactory(
-                                        username='philgyford', is_active=False)
+        account = AccountFactory(username='philgyford', is_active=False)
         with self.assertRaises(FetchError):
             result = RecentBookmarksFetcher().fetch(username='philgyford')
 
     def test_inactive_accounts(self):
         "Correctly reacts fetching all accounts but all are inactive"
-        account_1 = factories.AccountFactory(
-                                        username='philgyford', is_active=False)
-        account_2 = factories.AccountFactory(
-                                        username='testuser', is_active=False)
+        account_1 = AccountFactory(username='philgyford', is_active=False)
+        account_2 = AccountFactory(username='testuser', is_active=False)
         with self.assertRaises(FetchError):
             result = RecentBookmarksFetcher().fetch()
 
 
-class FetchTypesSaveTestCase(TestCase):
+class FetchTypesSaveTestCase(FetchTestCase):
     """Ignoring the stuff for fetching remote data, given some successfully-
     fetched JSON, does parsing and saving work OK?
     """
 
-    # ./demo/manage.py dumpdata pinboard.Account --indent 4 > ditto/pinboard/fixtures/fetch_bookmarks_test.json
-    fixtures = ['fetch_bookmarks_test.json']
-
     # Path to the file we'll use as a mock response from Pinboard.
-    api_fixture = 'ditto/pinboard/fixtures/api/bookmarks_2015-06-24.json'
+    api_fixture = 'tests/pinboard/fixtures/api/bookmarks_2015-06-24.json'
 
 
     def get_bookmarks_from_json(self):
@@ -306,7 +307,7 @@ class FetchTypesSaveTestCase(TestCase):
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
-        bookmark = factories.BookmarkFactory(
+        bookmark = BookmarkFactory(
                         account=account,
                         title='My initial title',
                         is_private=True,
@@ -348,7 +349,7 @@ class FetchTypesSaveTestCase(TestCase):
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
-        bookmark = factories.BookmarkFactory(
+        bookmark = BookmarkFactory(
                         account=account,
                         title='Fontello - icon fonts generator',
                         is_private=False,

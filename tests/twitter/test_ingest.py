@@ -11,7 +11,7 @@ from ditto.twitter.models import Tweet
 class TweetIngesterTestCase(TestCase):
 
     # A sample file of the format we'd get in a Twitter archive.
-    ingest_fixture = 'ditto/twitter/fixtures/ingest/2015_08.js'
+    ingest_fixture = 'tests/twitter/fixtures/ingest/2015_08.js'
 
     def get_tweet_data(self):
         "Returns the JSON tweet data, as text, from the fixture."
