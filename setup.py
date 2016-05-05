@@ -17,12 +17,9 @@ setup(
         'flickrapi',
         'pytz',
         'twitter-text-python',
-        'twython>=3.3.0,<3.4',
+        'twython>=3.4.0,<3.5',
     ],
     dependency_links=[
-        # The v3.3.0 of twython on pypi isn't as up-to-date as the v3.3.0
-        # on GitHub, and we want the GitHub version.
-        'git+ssh://github.com/ryanmcgrath/twython.git@3.3.0#egg=twython-3.3.0',
     ],
     tests_require=[
         'factory-boy',
