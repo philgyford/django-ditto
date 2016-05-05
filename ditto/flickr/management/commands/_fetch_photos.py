@@ -71,7 +71,7 @@ class FetchPhotosCommand(BaseCommand):
         for result in results:
             if result['success']:
                 noun = 'Photo' if result['fetched'] == 1 else 'Photos'
-                self.stdout.write('%s: Fetched %s %s' % (
+                self.stdout.write('%s: Fetched %s %s                      ' % (
                                 result['account'], result['fetched'], noun))
             else:
                 self.stderr.write('%s: Failed to fetch Photos: %s' % (
