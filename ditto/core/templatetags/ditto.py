@@ -65,7 +65,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
     granularity -- A number indicating how detailed the datetime is, based on
                     https://www.flickr.com/services/api/misc.dates.html
     case -- How the visible text will be treated. By default will be lowercase
-                except for Month names. None, 'lower', or 'capfirst'. 
+                except for Month names. None, 'lower', or 'capfirst'.
 
     For a 'day' view, just returns the date/time as text.
     For other views returns it including a link to the ditto:day_archive page
