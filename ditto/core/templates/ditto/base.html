@@ -13,25 +13,25 @@
 
         <nav class="navbar navbar-dark bg-inverse m-b">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'ditto:index' %}">Ditto</a>
+                <a class="navbar-brand" href="{% url 'ditto:home' %}">Ditto</a>
                 {% if enabled_apps %}
                     <ul class="nav navbar-nav">
                         {% for app in enabled_apps %}
                             {% if app == 'pinboard' %}
                                 <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'pinboard:index' %}">
+                                    <a class="nav-link" href="{% url 'pinboard:home' %}">
                                         Pinboard
                                     </a>
                                 </li>
                             {% elif app == 'twitter' %}
                                 <li class="nav-item {% block twitter_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'twitter:index' %}">
+                                    <a class="nav-link" href="{% url 'twitter:home' %}">
                                         Twitter
                                     </a>
                                 </li>
                             {% elif app == 'flickr' %}
                                 <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'flickr:index' %}">
+                                    <a class="nav-link" href="{% url 'flickr:home' %}">
                                         Flickr
                                     </a>
                                 </li>

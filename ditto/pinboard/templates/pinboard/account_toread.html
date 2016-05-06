@@ -2,8 +2,8 @@
 {% load l10n %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:index' %}">Home</a></li>
-    <li><a href="{% url 'pinboard:index' %}">Pinboard</a></li>
+    <li><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li><a href="{% url 'pinboard:home' %}">Pinboard</a></li>
     <li><a href="{% url 'pinboard:account_detail' username=account.username %}">{{ account.username }}</a></li>
     <li class="active">To read</li>
 {% endblock %}

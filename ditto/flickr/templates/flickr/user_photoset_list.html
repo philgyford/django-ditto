@@ -2,8 +2,8 @@
 {% load l10n %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:index' %}">Home</a></li>
-    <li><a href="{% url 'flickr:index' %}">Flickr</a></li>
+    <li><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li><a href="{% url 'flickr:home' %}">Flickr</a></li>
     <li><a href="{% url 'flickr:user_detail' nsid=user.nsid %}">{{ user.name }}</a></li>
     <li class="active">Albums</li>
 {% endblock %}

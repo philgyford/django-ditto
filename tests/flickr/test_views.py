@@ -11,7 +11,7 @@ class HomeViewTests(TestCase):
 
     def test_home_templates(self):
         "The Flickr home page uses the correct templates"
-        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(reverse('flickr:home'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'flickr/index.html')
         self.assertTemplateUsed(response, 'flickr/base.html')
@@ -22,7 +22,7 @@ class HomeViewTests(TestCase):
         accounts = AccountFactory.create_batch(3)
         photos_1 = PhotoFactory.create_batch(2, user=accounts[0].user)
         photos_2 = PhotoFactory.create_batch(2, user=accounts[1].user)
-        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(reverse('flickr:home'))
         self.assertIn('account_list', response.context)
         self.assertIn('photo_list', response.context)
         self.assertEqual(len(response.context['photo_list']), 4)
@@ -41,7 +41,7 @@ class HomeViewTests(TestCase):
         photo_1 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=1))
         photo_3 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=3))
         photo_2 = PhotoFactory(user=ac.user, post_time=dt - timedelta(days=2))
-        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(reverse('flickr:home'))
         pl = response.context['photo_list']
         self.assertEqual(pl[0].pk, photo_1.pk)
         self.assertEqual(pl[1].pk, photo_2.pk)
@@ -56,7 +56,7 @@ class HomeViewTests(TestCase):
         photo_3 = PhotoFactory(user=ac.user, taken_time=dt - timedelta(days=3))
         photo_2 = PhotoFactory(user=ac.user, taken_time=dt - timedelta(days=2))
         photo_4 = PhotoFactory(user=ac.user, taken_unknown=True)
-        response = self.client.get(reverse('flickr:index')+'?order=taken')
+        response = self.client.get(reverse('flickr:home')+'?order=taken')
         pl = response.context['photo_list']
         self.assertEqual(len(pl), 3)
         self.assertEqual(pl[0].pk, photo_1.pk)
@@ -76,7 +76,7 @@ class HomeViewTests(TestCase):
         public_photo_2 = PhotoFactory(user=user_2)
         private_photo_2 = PhotoFactory(user=user_2, is_private=True)
 
-        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(reverse('flickr:home'))
         photos = response.context['photo_list']
         self.assertEqual(len(photos), 2)
         self.assertEqual(photos[0].pk, public_photo_1.pk)
@@ -167,7 +167,7 @@ class UserDetailViewTests(TestCase):
         photo_3 = PhotoFactory(user=user, taken_time=dt - timedelta(days=3))
         photo_2 = PhotoFactory(user=user, taken_time=dt - timedelta(days=2))
         photo_4 = PhotoFactory(user=user, taken_unknown=True)
-        response = self.client.get(reverse('flickr:index'))
+        response = self.client.get(reverse('flickr:home'))
         response = self.client.get(
             reverse('flickr:user_detail', kwargs={'nsid': user.nsid}) + \
                     '?order=taken')

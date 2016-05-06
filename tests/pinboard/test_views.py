@@ -8,7 +8,7 @@ class PinboardViewTests(TestCase):
 
     def test_home_templates(self):
         "The Pinboard home page uses the correct templates"
-        response = self.client.get(reverse('pinboard:index'))
+        response = self.client.get(reverse('pinboard:home'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'pinboard/index.html')
         self.assertTemplateUsed(response, 'pinboard/base.html')
@@ -21,7 +21,7 @@ class PinboardViewTests(TestCase):
         account_3 = AccountFactory(username='charlie')
         bookmarks_1 = BookmarkFactory.create_batch(5, account=account_1)
         bookmarks_2 = BookmarkFactory.create_batch(5, account=account_2)
-        response = self.client.get(reverse('pinboard:index'))
+        response = self.client.get(reverse('pinboard:home'))
         self.assertIn('account_list', response.context)
         self.assertIn('bookmark_list', response.context)
         # Three accounts, only two of which have bookmarks:
@@ -40,7 +40,7 @@ class PinboardViewTests(TestCase):
         public_bookmark_1 = BookmarkFactory(is_private=False)
         private_bookmark = BookmarkFactory(is_private=True)
         public_bookmark_2 = BookmarkFactory(is_private=False)
-        response = self.client.get(reverse('pinboard:index'))
+        response = self.client.get(reverse('pinboard:home'))
         bookmarks = response.context['bookmark_list']
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)

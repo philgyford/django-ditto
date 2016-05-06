@@ -15,7 +15,7 @@ class DittoViewTests(TestCase):
 
     def test_home_templates(self):
         "Overall home page uses the correct templates"
-        response = self.client.get(reverse('ditto:index'))
+        response = self.client.get(reverse('ditto:home'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
@@ -39,7 +39,7 @@ class DittoViewTests(TestCase):
         tweets_2 = twitterfactories.TweetFactory.create_batch(
                                             2, user=twitter_accounts[1].user)
 
-        response = self.client.get(reverse('ditto:index'))
+        response = self.client.get(reverse('ditto:home'))
         self.assertTrue('object_list' in response.context)
         # 4 photos, 4 bookmarks, 4 tweets:
         self.assertTrue(len(response.context), 12)
@@ -48,7 +48,7 @@ class DittoViewTests(TestCase):
         "Overall home page does not display private Photos"
         public_photo = flickrfactories.PhotoFactory(is_private=False)
         private_photo = flickrfactories.PhotoFactory(is_private=True)
-        response = self.client.get(reverse('ditto:index'))
+        response = self.client.get(reverse('ditto:home'))
 
         self.assertEqual(len(response.context['object_list']), 1)
         self.assertTrue(response.context['object_list'][0].pk,
@@ -58,7 +58,7 @@ class DittoViewTests(TestCase):
         "Overall home page does not display private Bookmarks"
         public_bookmark = pinboardfactories.BookmarkFactory(is_private=False)
         private_bookmark = pinboardfactories.BookmarkFactory(is_private=True)
-        response = self.client.get(reverse('ditto:index'))
+        response = self.client.get(reverse('ditto:home'))
 
         self.assertEqual(len(response.context['object_list']), 1)
         self.assertTrue(response.context['object_list'][0].pk,
@@ -76,7 +76,7 @@ class DittoViewTests(TestCase):
         private_tweet = twitterfactories.TweetFactory(user=private_user)
         public_tweet_2 = twitterfactories.TweetFactory(user=public_user)
 
-        response = self.client.get(reverse('ditto:index'))
+        response = self.client.get(reverse('ditto:home'))
 
         tweets = response.context['object_list']
         self.assertEqual(len(tweets), 2)
@@ -92,7 +92,7 @@ class DittoViewTests(TestCase):
                 'ditto.pinboard': True,
                 'ditto.twitter': True,
             }[x]
-            response = self.client.get(reverse('ditto:index'))
+            response = self.client.get(reverse('ditto:home'))
             self.assertFalse('flickr_photo_list' in response.context)
 
     def test_home_no_pinboard(self):
@@ -104,7 +104,7 @@ class DittoViewTests(TestCase):
                 'ditto.pinboard': False,
                 'ditto.twitter': True,
             }[x]
-            response = self.client.get(reverse('ditto:index'))
+            response = self.client.get(reverse('ditto:home'))
             self.assertFalse('pinboard_bookmark_list' in response.context)
 
     def test_home_no_twitter(self):
@@ -116,7 +116,7 @@ class DittoViewTests(TestCase):
                 'ditto.pinboard': True,
                 'ditto.twitter': False,
             }[x]
-            response = self.client.get(reverse('ditto:index'))
+            response = self.client.get(reverse('ditto:home'))
             self.assertFalse('twitter_tweet_list' in response.context)
 
     #def test_tag_list_templates(self):

@@ -6,7 +6,7 @@ urlpatterns = [
     url(
         regex=r"^$",
         view=views.Home.as_view(),
-        name='index'
+        name='home'
     ),
     #url(
         #regex=r"^tags$",
