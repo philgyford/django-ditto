@@ -210,6 +210,9 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     depending on which Account fetched this data. eg, `favorited` or
     `current_user_retweet`.
     """
+
+    ditto_item_name = 'twitter_tweet'
+
     user = models.ForeignKey('User')
 
     text = models.TextField(null=False, blank=False, max_length=140)

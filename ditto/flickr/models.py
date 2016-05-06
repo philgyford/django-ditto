@@ -88,6 +88,8 @@ class ExtraPhotoManagers(models.Model):
 
 class Photo(DittoItemModel, ExtraPhotoManagers):
 
+    ditto_item_name = 'flickr_photo'
+    
     # From
     # https://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
     LICENSES = (

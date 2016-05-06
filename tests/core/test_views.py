@@ -20,66 +20,29 @@ class DittoViewTests(TestCase):
         self.assertTemplateUsed(response, 'ditto/index.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_home_context_flickr(self):
-        "Overall home page sends correct Flickr data to templates"
-        accounts = flickrfactories.AccountFactory.create_batch(3)
-        photos_1 = flickrfactories.PhotoFactory.create_batch(3,
-                                                        user=accounts[0].user)
-        photos_2 = flickrfactories.PhotoFactory.create_batch(3,
-                                                        user=accounts[1].user)
+    def test_home_context(self):
+        flickr_accounts = flickrfactories.AccountFactory.create_batch(2)
+        photos_1 = flickrfactories.PhotoFactory.create_batch(2,
+                                                user=flickr_accounts[0].user)
+        photos_2 = flickrfactories.PhotoFactory.create_batch(2,
+                                                user=flickr_accounts[1].user)
 
-        response = self.client.get(reverse('ditto:index'))
-
-        self.assertTrue('flickr_photo_list' in response.context)
-        # It shows 4 of all the photos:
-        self.assertEqual(len(response.context['flickr_photo_list']), 3)
-
-    def test_home_context_pinboard(self):
-        "Overall home page sends correct Pinboard data to templates"
-        accounts = pinboardfactories.AccountFactory.create_batch(3)
+        pinboard_accounts = pinboardfactories.AccountFactory.create_batch(2)
         bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
-                                            2, account=accounts[0])
+                                            2, account=pinboard_accounts[0])
         bookmarks_2 = pinboardfactories.BookmarkFactory.create_batch(
-                                            2, account=accounts[1])
+                                            2, account=pinboard_accounts[1])
+
+        twitter_accounts = twitterfactories.AccountFactory.create_batch(2)
+        tweets_1 = twitterfactories.TweetFactory.create_batch(
+                                            2, user=twitter_accounts[0].user)
+        tweets_2 = twitterfactories.TweetFactory.create_batch(
+                                            2, user=twitter_accounts[1].user)
 
         response = self.client.get(reverse('ditto:index'))
-
-        self.assertTrue('pinboard_bookmark_list' in response.context)
-        # It shows 3 of all the bookmarks:
-        self.assertEqual(len(response.context['pinboard_bookmark_list']), 3)
-
-    def test_home_context_twitter(self):
-        "Overall home page sends correct Twitter data to templates"
-        accounts = twitterfactories.AccountFactory.create_batch(3)
-
-        # Should be before we generate favoritable_tweets, so we can check
-        # twitter_recent_tweet_list only includes these.
-        recent_tweets_1 = twitterfactories.TweetFactory.create_batch(
-                                                    3, user=accounts[0].user)
-        recent_tweets_2 = twitterfactories.TweetFactory.create_batch(
-                                                    3, user=accounts[1].user)
-
-        favoritable_tweets = twitterfactories.TweetFactory.create_batch(6)
-        for tweet in favoritable_tweets:
-            accounts[0].user.favorites.add(tweet)
-            accounts[2].user.favorites.add(tweet)
-
-        response = self.client.get(reverse('ditto:index'))
-
-        self.assertIn('twitter_tweet_list', response.context)
-        self.assertIn('twitter_favorite_list', response.context)
-
-        self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_tweet_list']],
-            [recent_tweets_2[2].pk, recent_tweets_2[1].pk,
-                recent_tweets_2[0].pk,]
-        )
-
-        self.assertEqual(
-            [tweet.pk for tweet in response.context['twitter_favorite_list']],
-            [favoritable_tweets[5].pk, favoritable_tweets[4].pk,
-                favoritable_tweets[3].pk,]
-        )
+        self.assertTrue('object_list' in response.context)
+        # 4 photos, 4 bookmarks, 4 tweets:
+        self.assertTrue(len(response.context), 12)
 
     def test_home_privacy_flickr(self):
         "Overall home page does not display private Photos"
@@ -87,8 +50,8 @@ class DittoViewTests(TestCase):
         private_photo = flickrfactories.PhotoFactory(is_private=True)
         response = self.client.get(reverse('ditto:index'))
 
-        self.assertEqual(len(response.context['flickr_photo_list']), 1)
-        self.assertTrue(response.context['flickr_photo_list'][0].pk,
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertTrue(response.context['object_list'][0].pk,
                                                             public_photo.pk)
 
     def test_home_privacy_pinboard(self):
@@ -97,8 +60,8 @@ class DittoViewTests(TestCase):
         private_bookmark = pinboardfactories.BookmarkFactory(is_private=True)
         response = self.client.get(reverse('ditto:index'))
 
-        self.assertEqual(len(response.context['pinboard_bookmark_list']), 1)
-        self.assertTrue(response.context['pinboard_bookmark_list'][0].pk,
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertTrue(response.context['object_list'][0].pk,
                                                             public_bookmark.pk)
 
     def test_home_privacy_twitter_recent(self):
@@ -115,30 +78,10 @@ class DittoViewTests(TestCase):
 
         response = self.client.get(reverse('ditto:index'))
 
-        tweets = response.context['twitter_tweet_list']
+        tweets = response.context['object_list']
         self.assertEqual(len(tweets), 2)
         self.assertEqual(tweets[0].pk, public_tweet_2.pk)
         self.assertEqual(tweets[1].pk, public_tweet_1.pk)
-
-    def test_home_privacy_twitter_favorites(self):
-        "Overall home page does not display private favorited Tweets"
-        private_user = twitterfactories.UserFactory(is_private=True)
-        public_users = twitterfactories.UserFactory.create_batch(2,
-                                                            is_private=False)
-
-        favoriting_account = twitterfactories.AccountFactory(
-                                                       user=public_users[0])
-        private_tweet = twitterfactories.TweetFactory(user=private_user)
-        public_tweet = twitterfactories.TweetFactory(user=public_users[1])
-
-        favoriting_account.user.favorites.add(private_tweet)
-        favoriting_account.user.favorites.add(public_tweet)
-
-        response = self.client.get(reverse('ditto:index'))
-
-        tweets = response.context['twitter_favorite_list']
-        self.assertEqual(len(tweets), 1)
-        self.assertEqual(tweets[0].pk, public_tweet.pk)
 
     def test_home_no_flickr(self):
         "Shouldn't try to get photos if flickr app isn't installed"

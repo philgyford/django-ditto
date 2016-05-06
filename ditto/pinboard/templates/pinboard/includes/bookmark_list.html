@@ -18,6 +18,7 @@ Expects:
         {% for bookmark in bookmark_list %}
             <li class="media m-t-0 pinboard-bookmark">
                 {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view=view|default:False perms=perms only %}
+                <hr>
             </li>
         {% endfor %}
     </ul>

@@ -120,6 +120,9 @@ class TaggedBookmark(TimeStampedModelMixin, GenericTaggedItemBase):
 
 
 class Bookmark(DittoItemModel, ExtraBookmarkManagers):
+
+    ditto_item_name = 'pinboard_bookmark'
+
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:

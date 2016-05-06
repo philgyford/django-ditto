@@ -10,3 +10,13 @@ urlpatterns = [
     url(r'^twitter/', include('ditto.twitter.urls', namespace='twitter')),
     url(r'', include('ditto.core.urls', namespace='ditto')),
 ]
+
+
+from django.conf import settings
+from django.conf.urls import include, patterns, url
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
