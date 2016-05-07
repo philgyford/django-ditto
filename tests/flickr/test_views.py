@@ -13,7 +13,7 @@ class HomeViewTests(TestCase):
         "The Flickr home page uses the correct templates"
         response = self.client.get(reverse('flickr:home'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'flickr/index.html')
+        self.assertTemplateUsed(response, 'flickr/home.html')
         self.assertTemplateUsed(response, 'flickr/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 

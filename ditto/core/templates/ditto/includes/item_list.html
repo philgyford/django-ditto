@@ -1,4 +1,12 @@
+{% comment %}
+For displaying an aggregated list of different kinds of Items - Photos,
+Bookmarks or Tweets.
 
+Expects:
+
+* object_list - A list containing individual Photo, Bookmark or Tweet objects.
+
+{% endcomment %}
 <hr>
 <ul class="media-list flickr-photos twitter-tweets pinboard-bookmarks">
     {% for item in object_list %}

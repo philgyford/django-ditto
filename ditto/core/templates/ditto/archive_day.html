@@ -30,7 +30,23 @@
 
 
             {% else %}
-                <p>There is nothing to display for this day.</p>
+                <p>
+                    There are no
+                    {% if ditto_app_name == 'flickr' %}
+                        Flickr photos
+                    {% elif ditto_app_name == 'pinboard' %}
+                        Pinboard bookmarks
+                    {% elif ditto_app_name == 'twitter' %}
+                        {% if ditto_variety_name == 'favorites' %}
+                            Twitter likes
+                        {% else %}
+                            Tweets
+                        {% endif %}
+                    {% else %}
+                        things
+                    {% endif %}
+                    to display for this day.
+                </p>
             {% endif %}
         </div> <!-- .col -->
     </div> <!-- .row -->

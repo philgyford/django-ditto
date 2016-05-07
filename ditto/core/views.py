@@ -337,7 +337,7 @@ class DittoAppsMixin:
 
 
 class Home(DittoAppsMixin, TemplateView):
-    template_name = 'ditto/index.html'
+    template_name = 'ditto/home.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

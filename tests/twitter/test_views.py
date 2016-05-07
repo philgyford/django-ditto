@@ -10,7 +10,7 @@ class ViewTests(TestCase):
         "The Twitter home page uses the correct templates"
         response = self.client.get(reverse('twitter:home'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'twitter/index.html')
+        self.assertTemplateUsed(response, 'twitter/home.html')
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 

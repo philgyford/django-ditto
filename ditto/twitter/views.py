@@ -8,7 +8,7 @@ from .models import Account, Tweet, User
 
 
 class Home(PaginatedListView):
-    template_name = 'twitter/index.html'
+    template_name = 'twitter/home.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

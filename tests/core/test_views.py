@@ -17,7 +17,7 @@ class DittoViewTests(TestCase):
         "Overall home page uses the correct templates"
         response = self.client.get(reverse('ditto:home'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'ditto/index.html')
+        self.assertTemplateUsed(response, 'ditto/home.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
     def test_home_context(self):
@@ -212,13 +212,32 @@ class DittoDayArchiveTestCase(TestCase):
         response = self.client.get(self.make_url())
         self.assertRedirects(response, '/2015/11/10/flickr/photos')
 
+    def test_success_flickr_photos(self):
+        response = self.client.get(self.make_url('flickr', 'photos'))
+        self.assertEquals(response.status_code, 200)
+
+    def test_success_pinboard(self):
+        response = self.client.get(self.make_url('pinboard', 'bookmarks'))
+        self.assertEquals(response.status_code, 200)
+
+    def test_success_twitter_tweets(self):
+        response = self.client.get(self.make_url('twitter', 'tweets'))
+        self.assertEquals(response.status_code, 200)
+
+    def test_success_twitter_favorites(self):
+        response = self.client.get(self.make_url('twitter', 'likes'))
+        self.assertEquals(response.status_code, 200)
+
     def test_day_templates(self):
         "Day archive page uses the correct templates"
         response = self.client.get(self.make_url('pinboard', 'bookmarks'))
-        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'ditto/archive_day.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
+        self.assertTemplateUsed(response, 'ditto/includes/item_lists.html')
 
+    def test_day_context(self):
+        "General items that are in context for all Day pages."
+        response = self.client.get(self.make_url('pinboard', 'bookmarks'))
         self.assertTrue('day' in response.context)
         self.assertEqual(response.context['day'], self.today.date())
         self.assertTrue('previous_day' in response.context)

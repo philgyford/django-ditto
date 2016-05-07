@@ -54,7 +54,7 @@ class PhotosOrderMixin(object):
 
 
 class Home(PhotosOrderMixin, PaginatedListView):
-    template_name = 'flickr/index.html'
+    template_name = 'flickr/home.html'
     paginate_by = 48
     queryset = Photo.public_photo_objects
 
