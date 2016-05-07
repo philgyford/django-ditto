@@ -26,7 +26,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options['id'] is False: 
+        if options['id'] is False:
             raise CommandError("Specify an Account ID like --id=1")
 
         # First we need the Account object we're fetching for.
