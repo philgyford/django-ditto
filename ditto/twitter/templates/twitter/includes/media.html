@@ -1,37 +1,76 @@
 {% comment %}
-A single Tweet Media item (ie, a photo or video).
+A list of a Tweet's Media objects (ie, photo, GIF or video).
 
 Expects:
- * tweet, a Tweet object (that hte Media belongs to).
- * media, a Media object.
+
+ * tweet, the Tweet object.
  * view, 'list' (a generic list), 'day' or 'detail'.
+
 {% endcomment %}
 
-<li class="m-b-1">
+{% if tweet.media_count > 0 %}
     {% load l10n %}
-    {% if media.media_type == 'video' or media.media_type == 'animated_gif' %}
-        {% if view == 'detail' %}
-            <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
-        {% else %}
-            <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
-        {% endif %}
-            {% if media.xmpeg_url %}
-                <source src="{{ media.xmpeg_url }}" type="application/x-mpegURL">
-            {% endif %}
-            {% if media.mp4_url %}
-                <source src="{{ media.mp4_url }}" type="video/mp4">
-            {% endif %}
-            {% if media.webm_url %}
-                <source src="{{ media.webm_url }}" type="video/webm">
-            {% endif %}
-        </video>
-    {% else %}
-        {# Photo #}
-        {% if view == 'detail' %}
-            <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
-        {% else %}
-            <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>
-        {% endif %}
-    {% endif %}
-</li>
 
+    {% with media_list=tweet.media_set.all %}
+
+        {% if media_list|length > 1 and view != 'detail' %}
+
+            {% comment %}
+                Multiple Photos, and not the Tweet's detail view.
+
+                This assumes that if there are multiple items then they're
+                photos, and there will be a maximum of 4.
+                This is true as of 2016-05-07...
+            {% endcomment %}
+
+            <ul class="list-unstyled row">
+                {% for media in media_list %}
+                    <li class="col-sm-3 m-b-1">
+                        <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" class="img-fluid" alt="Photo thumbnail"></a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        {% else %}
+
+            <ul class="list-unstyled m-b-0">
+                {% for media in media_list %}
+
+                    <li class="m-b-1">
+                        {% if media.media_type == 'photo' %}
+
+                            {% if view == 'detail' %}
+                                <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
+                            {% else %}
+                                <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>
+                            {% endif %}
+
+                        {% else %}
+
+                            {# Video or Animated GIF #}
+
+                            {% if view == 'detail' %}
+                                <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
+                            {% else %}
+                                <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
+                            {% endif %}
+                                {% if media.xmpeg_url %}
+                                    <source src="{{ media.xmpeg_url }}" type="application/x-mpegURL">
+                                {% endif %}
+                                {% if media.mp4_url %}
+                                    <source src="{{ media.mp4_url }}" type="video/mp4">
+                                {% endif %}
+                                {% if media.webm_url %}
+                                    <source src="{{ media.webm_url }}" type="video/webm">
+                                {% endif %}
+                            </video>
+
+                        {% endif %}
+                    </li>
+
+                {% endfor %}
+            </ul>
+
+        {% endif %}
+    {% endwith %}
+{% endif %}

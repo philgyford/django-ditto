@@ -60,11 +60,7 @@ Expects:
         {% endif %}
 
         {% if tweet.media_count > 0 %}
-            <ul class="m-b-0 list-unstyled">
-                {% for media in tweet.media_set.all %}
-                    {% include 'twitter/includes/media.html' with tweet=tweet media=media view=view %}
-                {% endfor %}
-            </ul>
+            {% include 'twitter/includes/media.html' with tweet=tweet view=view %}
         {% endif %}
 
         {% if tweet.place %}
