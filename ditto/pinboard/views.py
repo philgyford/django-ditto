@@ -24,7 +24,7 @@ class SingleAccountMixin(SingleObjectMixin):
 
 class Home(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
-    template_name = 'pinboard/index.html'
+    template_name = 'pinboard/home.html'
     queryset = Bookmark.public_objects.all()
 
     def get_context_data(self, **kwargs):

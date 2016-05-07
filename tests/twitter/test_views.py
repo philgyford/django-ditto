@@ -8,9 +8,9 @@ class ViewTests(TestCase):
 
     def test_home_templates(self):
         "The Twitter home page uses the correct templates"
-        response = self.client.get(reverse('twitter:index'))
+        response = self.client.get(reverse('twitter:home'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'twitter/index.html')
+        self.assertTemplateUsed(response, 'twitter/home.html')
         self.assertTemplateUsed(response, 'twitter/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
@@ -21,7 +21,7 @@ class ViewTests(TestCase):
                                                     5, user=accounts[0].user)
         tweets_2 = factories.TweetFactory.create_batch(
                                                     5, user=accounts[1].user)
-        response = self.client.get(reverse('twitter:index'))
+        response = self.client.get(reverse('twitter:home'))
         self.assertIn('account_list', response.context)
         self.assertIn('tweet_list', response.context)
         # Three accounts, only two of which have Tweets:
@@ -48,7 +48,7 @@ class ViewTests(TestCase):
         private_tweet = factories.TweetFactory(user=private_user)
         public_tweet_2 = factories.TweetFactory(user=public_user)
 
-        response = self.client.get(reverse('twitter:index'))
+        response = self.client.get(reverse('twitter:home'))
         tweets = response.context['tweet_list']
         self.assertEqual(len(tweets), 2)
         self.assertEqual(tweets[0].pk, public_tweet_2.pk)

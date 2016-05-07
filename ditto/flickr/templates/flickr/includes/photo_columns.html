@@ -1,5 +1,5 @@
 {% comment %}
-Displaying a list of Photos.
+Displaying a queryset of Photos in columns, with pagination.
 
 Expects:
  * request, the request object.
@@ -18,7 +18,7 @@ Expects:
     {% load ditto %}
 
     {% for row in photo_list|split_by:3 %}
-        <div class="row flickr-photos">
+        <div class="row flickr-photos flickr-photos-columns">
             {% for photo in row %}
                 <div class="col-md-4 flickr-photo">
                     <h3 class="h6">
@@ -56,5 +56,6 @@ Expects:
 
     <p>There are no Photos to show.</p>
 {% endif %}
+
 
 

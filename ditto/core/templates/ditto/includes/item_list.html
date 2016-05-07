@@ -1,0 +1,31 @@
+{% comment %}
+For displaying an aggregated list of different kinds of Items - Photos,
+Bookmarks or Tweets.
+
+Expects:
+
+* object_list - A list containing individual Photo, Bookmark or Tweet objects.
+
+{% endcomment %}
+<hr>
+<ul class="media-list flickr-photos twitter-tweets pinboard-bookmarks">
+    {% for item in object_list %}
+
+        {% if item.ditto_item_name == 'flickr_photo' %}
+            <li class="media m-t-0 flickr-photo">
+                {% include 'flickr/includes/photo.html' with photo=item only %}
+                <hr>
+        {% elif item.ditto_item_name == 'pinboard_bookmark' %}
+            <li class="media m-t-0 pinboard-bookmark">
+                {% include 'pinboard/includes/bookmark.html' with bookmark=item only %}
+                <hr>
+        {% elif item.ditto_item_name == 'twitter_tweet' %}
+            <li class="media m-t-0 twitter-tweet">
+                {% include 'twitter/includes/tweet.html' with tweet=item only %}
+                <hr>
+        {% endif %}
+            </li>
+
+    {% endfor %}
+</ul>
+

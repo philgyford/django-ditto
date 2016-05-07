@@ -77,6 +77,12 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     Should be inherited by a model in child apps.
     eg, Tweet, Photo, Bookmark, etc.
     """
+
+    # Should be overridden for child classes.
+    # eg, 'flickr_photo', 'twitter_tweet', etc.
+    # Used in templates.
+    ditto_item_name = 'ditto_item'
+
     title = models.CharField(blank=True, max_length=255)
     permalink = models.URLField(blank=True,
                     help_text="URL of the item on the service's website.")

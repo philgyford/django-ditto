@@ -15,7 +15,7 @@ Expects:
             {% if account %}
                 {% url 'pinboard:account_detail' username=account.username %}
             {% else %}
-                {% url 'pinboard:index' %}
+                {% url 'pinboard:home' %}
             {% endif %}
         {% endspaceless %}">All bookmarks</a>
         </li>

@@ -15,7 +15,7 @@ Expects:
                 {% if user %}
                     {% url 'twitter:user_detail' screen_name=user.screen_name %}
                 {% else %}
-                    {% url 'twitter:index' %}
+                    {% url 'twitter:home' %}
                 {% endif %}
         {% endspaceless %}">Tweets</a>
         </li>

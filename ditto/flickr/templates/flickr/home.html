@@ -1,7 +1,7 @@
 {% extends 'flickr/base.html' %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:index' %}">Home</a></li>
+    <li><a href="{% url 'ditto:home' %}">Home</a></li>
     <li class="active">Flickr</li>
 {% endblock %}
 
@@ -31,7 +31,7 @@
 
             {% include 'flickr/includes/sorting.html' with request=request order=order only %}
 
-            {% include 'flickr/includes/photo_list.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
+            {% include 'flickr/includes/photo_columns.html' with request=request photo_list=photo_list order=order page_obj=page_obj perms=perms only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

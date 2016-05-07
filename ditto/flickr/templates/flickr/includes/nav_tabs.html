@@ -16,7 +16,7 @@ Expects:
             {% if user %}
                 {% url 'flickr:user_detail' nsid=user.nsid %}
             {% else %}
-                {% url 'flickr:index' %}
+                {% url 'flickr:home' %}
             {% endif %}
         {% endspaceless %}">Photos</a>
         </li>

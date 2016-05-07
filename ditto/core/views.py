@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from itertools import chain
+from operator import attrgetter
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
@@ -335,16 +337,46 @@ class DittoAppsMixin:
 
 
 class Home(DittoAppsMixin, TemplateView):
-    template_name = 'ditto/index.html'
+    template_name = 'ditto/home.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        for app_name, variety_name in self.get_app_varieties():
-            queryset = self.get_queryset_for_app_variety(app_name, variety_name)
-            context_object_name = self.get_context_object_name_for_app_variety(
-                                                        app_name, variety_name)
-            context[context_object_name] = queryset[:3]
+        # How many items do we want to list?
+        items_to_list = 20
+
+        app_varieties = self.get_app_varieties()
+
+        # A bit hacky. Remove querysets we don't want.
+        try:
+            # Otherwise we'll get two sets of photos, sorted by upload or taken:
+            app_varieties.remove(('flickr', 'photo-taken'))
+            # No easy way to tell in the template whether a tweet is posted
+            # or favorited, so remove the favorites:
+            app_varieties.remove(('twitter', 'favorite'))
+        except ValueError:
+            pass
+
+        # Put all querysets for available apps in this list:
+        querysets = []
+
+        for app_name, variety_name in app_varieties:
+            qs = self.get_queryset_for_app_variety(app_name, variety_name)
+
+            # More hackiness.
+            # Don't want to include Tweets that are replies on the home page.
+            if app_name == 'twitter' and variety_name == 'tweet':
+                qs = qs.filter(in_reply_to_screen_name__exact='')
+
+            querysets.append( qs[:items_to_list] )
+
+        # Aggregate the individual items from all querysets into one list,
+        # sorted by post_time descending.
+        context['object_list'] = sorted(
+            chain(*querysets),
+            key=attrgetter('post_time'),
+            reverse=True
+        )[:items_to_list]
 
         return context
 
