@@ -260,7 +260,16 @@ class TweetTestCase(TestCase):
     def test_str(self):
         "Has the correct string represntation"
         tweet = TweetFactory(title='My tweet text')
-        self.assertEqual(tweet.__str__(), 'My tweet text')
+        self.assertEqual(str(tweet), 'My tweet text')
+
+    def test_ditto_item_name(self):
+        tweet = TweetFactory()
+        self.assertEqual(tweet.ditto_item_name, 'twitter_tweet')
+
+    def test_get_absolute_url(self):
+        tweet = TweetFactory(user=UserFactory(screen_name='bob'),
+                            twitter_id=1234567890)
+        self.assertEqual(tweet.get_absolute_url(), '/twitter/bob/1234567890/')
 
     def test_ordering(self):
         """Multiple tweets are sorted by post_time descending"""

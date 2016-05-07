@@ -155,6 +155,9 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         ordering = ['-post_time']
         unique_together = (('account', 'url'),)
 
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
         """Create a url_hash for this bookmark if it doesn't have one.
         This is not the best ever way to do this. For one, there's a very slim

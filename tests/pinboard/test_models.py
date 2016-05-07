@@ -10,7 +10,7 @@ from ditto.pinboard.factories import AccountFactory, BookmarkFactory
 from ditto.pinboard.models import Account, Bookmark, BookmarkTag
 
 
-class PinboardAccountTestCase(TestCase):
+class AccountTestCase(TestCase):
 
     def test_str(self):
         """The string representation of the Account is correct"""
@@ -50,7 +50,22 @@ class PinboardAccountTestCase(TestCase):
         self.assertEqual(account.public_bookmarks_count, 3)
 
 
-class PinboardBookmarkTestCase(TestCase):
+class BookmarkTestCase(TestCase):
+
+    def test_str(self):
+        "Has the correct string represntation"
+        bookmark = BookmarkFactory(title='My bookmark title')
+        self.assertEqual(str(bookmark), 'My bookmark title')
+
+    def test_ditto_item_name(self):
+        bookmark = BookmarkFactory()
+        self.assertEqual(bookmark.ditto_item_name, 'pinboard_bookmark')
+
+    def test_get_absolute_url(self):
+        bookmark = BookmarkFactory(accountAccountFactory(username='bob'),
+                            url_hash='12345678abc')
+        self.assertEqual(bookmark.get_absolute_url(),
+                                                '/pinboard/bob/12345678abc/')
 
     def test_save(self):
         """Calls the parent save() method when saving, so it actually saves"""

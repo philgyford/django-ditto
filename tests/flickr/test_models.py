@@ -151,7 +151,11 @@ class PhotoTestCase(TestCase):
     def test_str(self):
         "Has the correct string representation"
         photo = PhotoFactory(title='My test photo')
-        self.assertEqual(photo.__str__(), 'My test photo')
+        self.assertEqual(str(photo), 'My test photo')
+
+    def test_ditto_item_name(self):
+        photo = PhotoFactory()
+        self.assertEqual(photo.ditto_item_name, 'flickr_photo')
 
     def test_get_absolute_url(self):
         photo = PhotoFactory(user=UserFactory(nsid='1234567890@N01'),
