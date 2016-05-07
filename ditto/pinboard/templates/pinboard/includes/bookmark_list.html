@@ -4,7 +4,7 @@ Expects:
  * bookmark_list, a queryset of Bookmarks.
  * page_obj, optional, a DiggPaginator instance or False (default).
  * perms - The Django perms object.
- * view - optional, 'detail' or 'day'.
+ * view - 'list' (a generic list), 'detail' or 'day'.
 
 {% endcomment %}
 
@@ -17,7 +17,7 @@ Expects:
     <ul class="media-list pinboard-bookmarks">
         {% for bookmark in bookmark_list %}
             <li class="media m-t-0 pinboard-bookmark">
-                {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view=view|default:False perms=perms only %}
+                {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view=view perms=perms only %}
                 <hr>
             </li>
         {% endfor %}

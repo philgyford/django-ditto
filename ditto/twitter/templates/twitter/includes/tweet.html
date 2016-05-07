@@ -3,8 +3,7 @@ A single Tweet as the contents of a Bootstrap media object.
 
 Expects:
  * tweet, a Tweet object.
- * view, optional, 'detail' or 'day' - 'detail' is the Tweet's own page.
-    'day' is the page listing all things on that day.
+ * view, one of 'list' (a generic list), 'detail' (tweet's own page) or 'day'.
  * perms - The Django perms object.
 {% endcomment %}
 
@@ -31,11 +30,11 @@ Expects:
                     • <a href="{{ tweet.in_reply_to_url }}" title="See their Tweet">In reply to…</a>
                 {% endif %}
 
-                {% if not view or view != 'detail' %}
+                {% if view != 'detail' %}
                     • <a href="{{ tweet.get_absolute_url }}" title="See only this Tweet">#</a>
                 {% endif %}
 
-                {% if view and view == 'detail' %}
+                {% if view == 'detail' %}
                     {% if tweet.account and tweet.account.is_active %}
                         • <a href="{{ tweet.permalink }}" title="See on Twitter">At Twitter</a>
                     {% elif tweet.account == None %}
@@ -50,20 +49,20 @@ Expects:
             </small>
         </p>
 
-        <p class="{% if tweet.media_count == 0 %}m-b-0{% endif %}{% if view and view == 'detail' %} lead{% endif %} twitter-tweet-text">
+        <p class="{% if tweet.media_count == 0 %}m-b-0{% endif %}{% if view == 'detail' %} lead{% endif %} twitter-tweet-text">
             {{ tweet.text_html|safe }}
         </p>
 
         {% if tweet.get_quoted_tweet %}
             <div class="media text-muted twitter-tweet-quoted">
-                {% include 'twitter/includes/tweet.html' with tweet=tweet.get_quoted_tweet view=view|default:False perms=perms only %}
+                {% include 'twitter/includes/tweet.html' with tweet=tweet.get_quoted_tweet view=view perms=perms only %}
             </div>
         {% endif %}
 
         {% if tweet.media_count > 0 %}
             <ul class="m-b-0 list-unstyled">
                 {% for media in tweet.media_set.all %}
-                    {% include 'twitter/includes/media.html' with tweet=tweet media=media view=view|default:False %}
+                    {% include 'twitter/includes/media.html' with tweet=tweet media=media view=view %}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -80,7 +79,7 @@ Expects:
             </p>
         {% endif %}
 
-        {% if view and view == 'detail' %}
+        {% if view == 'detail' %}
             <p class="m-b-0 text-muted twitter-tweet-meta"><small>
                 {{ tweet.retweet_count }} Retweet{{ tweet.retweet_count|pluralize }}
                 • {{ tweet.favorite_count }} Like{{ tweet.favorite_count|pluralize }}

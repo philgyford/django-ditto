@@ -4,13 +4,13 @@ A single Tweet Media item (ie, a photo or video).
 Expects:
  * tweet, a Tweet object (that hte Media belongs to).
  * media, a Media object.
- * view, 'day' or 'detail' or maybe False.
+ * view, 'list' (a generic list), 'day' or 'detail'.
 {% endcomment %}
 
 <li class="m-b-1">
     {% load l10n %}
     {% if media.media_type == 'video' or media.media_type == 'animated_gif' %}
-        {% if view and view == 'detail' %}
+        {% if view == 'detail' %}
             <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
         {% else %}
             <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
@@ -27,7 +27,7 @@ Expects:
         </video>
     {% else %}
         {# Photo #}
-        {% if view and view == 'detail' %}
+        {% if view == 'detail' %}
             <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
         {% else %}
             <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>

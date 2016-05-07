@@ -5,27 +5,30 @@ Expects:
  * tweet_list, a queryset of Tweets.
  * perms - The Django perms object.
  * page_obj, optional, a DiggPaginator instance or False (default).
- * view - optional, 'detail' or 'day'.
+ * view - optional, 'list' (a generic list, the default), 'detail' or 'day'.
 {% endcomment %}
 
 {% if tweet_list|length > 0 %}
-    {% if page_obj and page_obj.number > 1 %}
-        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
-    {% endif %}
 
-    <hr>
-    <ul class="media-list twitter-tweets">
-        {% for tweet in tweet_list %}
-            <li class="media m-t-0 twitter-tweet">
-                {% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view|default:False only %}
-                <hr>
-            </li>
-        {% endfor %}
-    </ul>
+    {% with view=view|default_if_none:'list' %}
+        {% if page_obj and page_obj.number > 1 %}
+            {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+        {% endif %}
 
-    {% if page_obj|default:False %}
-        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
-    {% endif %}
+        <hr>
+        <ul class="media-list twitter-tweets">
+            {% for tweet in tweet_list %}
+                <li class="media m-t-0 twitter-tweet">
+                    {% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view only %}
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if page_obj|default:False %}
+            {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
+        {% endif %}
+    {% endwith %}
 {% else %}
 
     <p>There are no Tweets to show.</p>

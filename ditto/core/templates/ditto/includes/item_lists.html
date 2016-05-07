@@ -4,7 +4,7 @@ For displaying a series of separate lists of different items - Photos, Bookmarks
 Expects to be in context.
 
 May specifically have:
-* view - optional, 'day' or 'detail'
+* view - 'list' (a generic list), 'day' or 'detail'.
 
 {% endcomment %}
 
@@ -21,7 +21,7 @@ May specifically have:
         </a>
     </h2>
 
-    {% include 'flickr/includes/photo_columns.html' with order=order photo_list=flickr_photo_list view=view|default:False %}
+    {% include 'flickr/includes/photo_columns.html' with order=order photo_list=flickr_photo_list view=view %}
 
 {% endif %}
 
@@ -31,7 +31,7 @@ May specifically have:
         <a href="{% url 'pinboard:home' %}">Pinboard bookmarks</a>
     </h2>
 
-    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=pinboard_bookmark_list view=view|default:False %}
+    {% include 'pinboard/includes/bookmark_list.html' with bookmark_list=pinboard_bookmark_list view=view %}
 
 {% endif %}
 
@@ -41,7 +41,7 @@ May specifically have:
         <a href="{% url 'twitter:home' %}">Twitter tweets</a>
     </h2>
 
-    {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_tweet_list view=view|default:False %}
+    {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_tweet_list view=view %}
 
 {% endif %}
 
@@ -51,7 +51,7 @@ May specifically have:
         <a href="{% url 'twitter:favorite_list' %}">Liked tweets</a>
     </h2>
 
-    {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_favorite_list view=view|default:False %}
+    {% include 'twitter/includes/tweet_list.html' with tweet_list=twitter_favorite_list view=view %}
 
 {% endif %}
 

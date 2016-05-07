@@ -4,25 +4,25 @@ A single Bookmark as the contents of a Bootstrap media object.
 Expects:
  * bookmark, a Bookmark object.
  * perms - The Django perms object.
- * view - optional, 'day' or 'detail'.
+ * view - 'list' (a generic list) 'day' or 'detail'.
 
 {% endcomment %}
 
 
 <div class="media-body">
-    <h2 class="{% if not view or view != 'detail' %}h6{% endif %} media-heading pinboard-bookmark-title"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
+    <h2 class="{% if view != 'detail' %}h6{% endif %} media-heading pinboard-bookmark-title"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
     {% if bookmark.description %}
-        <p class="{% if view and view == 'detail' %}lead{% else %}m-b-0{% endif %} pinboard-bookmark-description">
+        <p class="{% if view == 'detail' %}lead{% else %}m-b-0{% endif %} pinboard-bookmark-description">
             {{ bookmark.description }}
         </p>
     {% endif %}
 
     {% if bookmark.tags.all|length %}
-        <ul class="{% if not view or view != 'detail' %}m-b-0 {% endif %}list-inline pinboard-bookmark-tags">
+        <ul class="{% if view != 'detail' %}m-b-0 {% endif %}list-inline pinboard-bookmark-tags">
             {% for tag in bookmark.tags.all %}
                 <li class="list-inline-item pinboard-bookmark-tag">
                     <a class="label label-pill label-primary" href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
-                        {% if not view or view != 'detail' %}
+                        {% if view != 'detail' %}
                             <small>{{ tag.name }}</small>
                         {% else %}
                             {{ tag.name }}
@@ -34,7 +34,7 @@ Expects:
     {% endif %}
 
     <p class="m-b-0 text-muted pinboard-bookmark-about">
-        {% if not view or view != 'detail' %}<small>{% endif %}
+        {% if view != 'detail' %}<small>{% endif %}
             By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
 
             {% load ditto %}
@@ -44,7 +44,7 @@ Expects:
                 {% display_time bookmark.post_time True %}
             {% endif %}
 
-            {% if not view or view != 'detail' %}
+            {% if view != 'detail' %}
                 • <a href="{{ bookmark.get_absolute_url }}" title="See only this bookmark">#</a>
             {% endif %}
             {% if perms.pinboard.can_change_bookmark %}
