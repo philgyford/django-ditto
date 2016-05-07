@@ -7,7 +7,7 @@ from ..core.views import PaginatedListView
 from .models import Account, Tweet, User
 
 
-class Home(PaginatedListView):
+class HomeView(PaginatedListView):
     template_name = 'twitter/home.html'
 
     def get_context_data(self, **kwargs):
@@ -21,7 +21,7 @@ class Home(PaginatedListView):
         return Tweet.public_tweet_objects.all().select_related()
 
 
-class FavoriteList(PaginatedListView):
+class FavoriteListView(PaginatedListView):
     template_name = 'twitter/favorite_list.html'
 
     def get_context_data(self, **kwargs):
@@ -56,7 +56,7 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetail(UserDetailMixin, PaginatedListView):
+class UserDetailView(UserDetailMixin, PaginatedListView):
     """A single Twitter User and its Tweets.
     The user might have an Account associated with it, or might not.
     """
@@ -72,7 +72,7 @@ class UserDetail(UserDetailMixin, PaginatedListView):
         return context
 
 
-class AccountFavoriteList(UserDetailMixin, PaginatedListView):
+class AccountFavoriteListView(UserDetailMixin, PaginatedListView):
     "A single Twitter User associated with an Account, and its Favorites."
     template_name = 'twitter/account_favorite_list.html'
 
@@ -87,7 +87,7 @@ class AccountFavoriteList(UserDetailMixin, PaginatedListView):
         return context
 
 
-class TweetDetail(DetailView):
+class TweetDetailView(DetailView):
     """Show a single tweet. It might be posted by one of the Accounts, or might
     be a tweet by someone else, favorited.
     """

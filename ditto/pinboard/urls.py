@@ -5,42 +5,42 @@ from . import views
 urlpatterns = [
     url(
         regex=r"^$",
-        view=views.Home.as_view(),
+        view=views.HomeView.as_view(),
         name='home'
     ),
     url(
         regex=r"^to-read/$",
-        view=views.ToreadList.as_view(),
+        view=views.ToreadListView.as_view(),
         name='toread'
     ),
     url(
         regex=r"^tags/$",
-        view=views.TagList.as_view(),
+        view=views.TagListView.as_view(),
         name='tag_list'
     ),
     url(
         regex=r"^tags/(?P<slug>[^/]+)/$",
-        view=views.TagDetail.as_view(),
+        view=views.TagDetailView.as_view(),
         name='tag_detail'
     ),
     url(
         regex=r"^(?P<username>\w+)/$",
-        view=views.AccountDetail.as_view(),
+        view=views.AccountDetailView.as_view(),
         name='account_detail'
     ),
     url(
         regex=r"^(?P<username>\w+)/to-read/$",
-        view=views.AccountToread.as_view(),
+        view=views.AccountToreadView.as_view(),
         name='account_toread'
     ),
     url(
         regex=r"^(?P<username>\w+)/tags/(?P<tag_slug>[^/]+)/$",
-        view=views.AccountTagDetail.as_view(),
+        view=views.AccountTagDetailView.as_view(),
         name='account_tag_detail'
     ),
     url(
         regex=r"^(?P<username>\w+)/(?P<hash>\w+)/$",
-        view=views.BookmarkDetail.as_view(),
+        view=views.BookmarkDetailView.as_view(),
         name='bookmark_detail'
     ),
 ]

@@ -22,7 +22,7 @@ class SingleAccountMixin(SingleObjectMixin):
         return context
 
 
-class Home(PaginatedListView):
+class HomeView(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
     template_name = 'pinboard/home.html'
     queryset = Bookmark.public_objects.all()
@@ -33,7 +33,7 @@ class Home(PaginatedListView):
         return context
 
 
-class ToreadList(PaginatedListView):
+class ToreadListView(PaginatedListView):
     template_name = 'pinboard/toread_list.html'
     queryset = Bookmark.public_toread_objects.all()
 
@@ -43,7 +43,7 @@ class ToreadList(PaginatedListView):
         return context
 
 
-class AccountDetail(SingleAccountMixin, PaginatedListView):
+class AccountDetailView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its Bookmarks."
     template_name = 'pinboard/account_detail.html'
 
@@ -57,7 +57,7 @@ class AccountDetail(SingleAccountMixin, PaginatedListView):
         return Bookmark.public_objects.filter(account=self.object)
 
 
-class AccountToread(SingleAccountMixin, PaginatedListView):
+class AccountToreadView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its 'to read' Bookmarks."
     template_name = 'pinboard/account_toread.html'
 
@@ -71,7 +71,7 @@ class AccountToread(SingleAccountMixin, PaginatedListView):
         return Bookmark.public_toread_objects.filter(account=self.object)
 
 
-class BookmarkDetail(DetailView):
+class BookmarkDetailView(DetailView):
     "A single Bookmark, from one Account"
     model = Bookmark
     # Only display public bookmarks; private ones will 404.
@@ -80,7 +80,7 @@ class BookmarkDetail(DetailView):
     slug_url_kwarg = 'hash'
 
 
-class TagList(ListView):
+class TagListView(ListView):
     template_name = 'pinboard/tag_list.html'
     context_object_name = 'tag_list'
 
@@ -88,7 +88,7 @@ class TagList(ListView):
         return Bookmark.tags.most_common()[:100]
 
 
-class TagDetail(SingleObjectMixin, PaginatedListView):
+class TagDetailView(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain tag from all Accounts"
     template_name = 'pinboard/tag_detail.html'
     allow_empty = False
@@ -108,7 +108,8 @@ class TagDetail(SingleObjectMixin, PaginatedListView):
         "Show all the public Bookmarks associated with this tag."
         return Bookmark.public_objects.filter(tags__slug__in=[self.object.slug])
 
-class AccountTagDetail(SingleAccountMixin, PaginatedListView):
+
+class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
     "All Bookmarks with a certain Tag from one Account"
     template_name = 'pinboard/account_tag_detail.html'
     allow_empty = False

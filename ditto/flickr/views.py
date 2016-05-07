@@ -53,7 +53,7 @@ class PhotosOrderMixin(object):
         return queryset
 
 
-class Home(PhotosOrderMixin, PaginatedListView):
+class HomeView(PhotosOrderMixin, PaginatedListView):
     template_name = 'flickr/home.html'
     paginate_by = 48
     queryset = Photo.public_photo_objects
@@ -64,7 +64,7 @@ class Home(PhotosOrderMixin, PaginatedListView):
         return context
 
 
-class PhotosetList(ListView):
+class PhotosetListView(ListView):
     template_name = 'flickr/photoset_list.html'
     model = Photoset
 
@@ -96,7 +96,7 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class UserDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     """A single Flickr User and its Photos.
     The user might have an Account associated with it, or might not.
     """
@@ -115,7 +115,7 @@ class UserDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
         return context
 
 
-class PhotoDetail(DetailView):
+class PhotoDetailView(DetailView):
     """Show a single Photo. It might be posted by one of the Accounts, or might
     be a Photo by someone else, favorited.
     """
@@ -144,7 +144,7 @@ class PhotoDetail(DetailView):
         return context
 
 
-class TagList(ListView):
+class TagListView(ListView):
     template_name = 'flickr/tag_list.html'
     context_object_name = 'tag_list'
 
@@ -152,7 +152,7 @@ class TagList(ListView):
         return Photo.tags.most_common()[:100]
 
 
-class TagDetail(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
+class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
     "All Photos with a certain tag from all Accounts"
     template_name = 'flickr/tag_detail.html'
     allow_empty = False
@@ -175,7 +175,7 @@ class TagDetail(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
         return queryset.filter(tags__slug__in=[self.object.slug])
 
 
-class UserTagDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class UserTagDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
     template_name = 'flickr/user_tag_detail.html'
     allow_empty = False
@@ -206,7 +206,7 @@ class UserTagDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
                                     tags__slug__in=[self.kwargs['tag_slug']])
 
 
-class UserPhotosetList(UserDetailMixin, ListView):
+class UserPhotosetListView(UserDetailMixin, ListView):
     template_name = 'flickr/user_photoset_list.html'
     model = Photoset
 
@@ -221,7 +221,7 @@ class UserPhotosetList(UserDetailMixin, ListView):
         return queryset.filter(user=self.object)
 
 
-class PhotosetDetail(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class PhotosetDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     template_name = 'flickr/photoset_detail.html'
 
     def get_context_data(self, **kwargs):

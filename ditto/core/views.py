@@ -12,7 +12,8 @@ from django.shortcuts import redirect
 from django.utils import six, timezone
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext as _
-from django.views.generic import DayArchiveView, DetailView, ListView, TemplateView, View
+from django.views.generic import DetailView, ListView, TemplateView, View
+from django.views.generic import DayArchiveView as DjangoDayArchiveView
 
 from .apps import ditto_apps
 from .paginator import DiggPaginator
@@ -336,7 +337,7 @@ class DittoAppsMixin:
             return 'post_time'
 
 
-class Home(DittoAppsMixin, TemplateView):
+class HomeView(DittoAppsMixin, TemplateView):
     template_name = 'ditto/home.html'
 
     def get_context_data(self, **kwargs):
@@ -381,7 +382,7 @@ class Home(DittoAppsMixin, TemplateView):
         return context
 
 
-class DayArchive(DittoAppsMixin, DayArchiveView):
+class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
     """A single app+variety for a single day.
     eg /2016/04/20/twitter/likes
     """
@@ -505,12 +506,12 @@ class DayArchive(DittoAppsMixin, DayArchiveView):
         return counts
 
 
-#class TagList(TemplateView):
+#class TagListView(TemplateView):
     #"Doesn't really do anything at the moment."
     #template_name = 'ditto/tag_list.html'
 
 
-#class TagDetail(TemplateView):
+#class TagDetailView(TemplateView):
     #"All items with a certain tag"
     #template_name = 'ditto/tag_detail.html'
 
