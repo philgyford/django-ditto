@@ -14,7 +14,7 @@ photo - A Photo object.
 </div>
 
 <div class="media-body">
-    <h3 class="media-heading h5 flickr-photo-title">
+    <h3 class="media-heading h6 flickr-photo-title">
         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
     </h3>
     <p class="m-b-0 flickr-photo-summary">{{ photo.summary }}</p>
