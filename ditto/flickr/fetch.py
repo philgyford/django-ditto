@@ -1,6 +1,7 @@
 import calendar
 import datetime
 import json
+import logging
 import pytz
 import time
 
@@ -31,6 +32,7 @@ from ..core.utils import datetime_now
 #   RecentPhotosMultiAccountFetcher
 #   PhotosetsMultiAccountFetcher
 
+logger = logging.getLogger('ditto.management_commands')
 
 class FetchError(Exception):
     pass
@@ -252,7 +254,6 @@ class PhotoSaver(FlickrUtilsMixin, object):
                 defaults[name+'_height'] = int(size['height'])
 
         try:
-            import logging
             for e in photo['exif']['exif']:
                 if e['tag'] == 'LensModel':
                     defaults['exif_lens_model'] = e['raw']['_content']
@@ -508,11 +509,6 @@ class Fetcher(object):
 
         return self.return_value
 
-    def _log(self, str):
-        """Dirty little thing for outputting info to the command line."""
-        # Add spaces on in case the previous line was longer than this one.
-        print(' ' + str + ' '*30, end='\r')
-
     def _fetch_pages(self, **kwargs):
         """Fetch all of the pages.
         This relies on something else setting self.total_pages to the correct
@@ -520,7 +516,7 @@ class Fetcher(object):
         as the results will contain the total number of pages available.
         """
         while self.page_number <= self.total_pages and self._not_failed():
-            self._log(
+            logger.info(
                 "Fetching page %d of %d" %(self.page_number, self.total_pages))
             self._fetch_page(**kwargs)
             self.page_number += 1
@@ -651,7 +647,7 @@ class PhotosFetcher(Fetcher):
         extra_results = []
 
         for i, photo in enumerate(self.results):
-            self._log(
+            logger.info(
                 "Fetching data about photo %d of %d" %(i+1, len(self.results)))
 
             self._fetch_user_if_missing(photo['owner'])
@@ -876,7 +872,7 @@ class PhotosetsFetcher(Fetcher):
         extra_results = []
 
         for i, photoset in enumerate(self.results):
-            self._log("Fetching list of photos in photoset %d of %d" %
+            logger.info("Fetching list of photos in photoset %d of %d" %
                                                     (i+1, len(self.results)))
 
             photos = self._fetch_photos_in_photoset(photoset['id'])
