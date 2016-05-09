@@ -91,7 +91,8 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     ditto_item_name = 'flickr_photo'
 
     # The 'label's are used in Flickr's API to identify sizes.
-    # The keys in this dict are what we use internally.
+    # The keys in this dict are what we use internally, for method names and
+    # for the sizes of PhotoDownloads.
     # See https://www.flickr.com/services/api/misc.urls.html
     PHOTO_SIZES = {
         'square': {
@@ -394,7 +395,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """Make the summary that's created when the Photo is saved."""
         return truncate_string(self.description,
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
-
     @property
     def account(self):
         "The Account whose photo this is, if any. Otherwise, None."
@@ -507,16 +507,30 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         raise AttributeError(msg.format(obj, attr))
 
 
-#class PhotoDownload(TimeStampedModelMixin, models.Model):
+class PhotoDownload(TimeStampedModelMixin, models.Model):
+    """
+    A photo/video file downloaded from Flickr, in one size for one Photo.
+    """
 
-    #def upload_path(self, filename):
-        #dirbase = getattr(settings, 'FLICKR_DOWNLOAD_DIRBASE', 'flickr')
-        #dirformat = getattr(settings, 'FLICKR_DOWNLOAD_DIRFORMAT', '%Y/%Y-%m')
-        #return '/'.join([dirbase, str(self.photo.date_posted.date().strftime(dirformat)), filename])
+    def upload_path(self, filename):
+        "Generate the path under MEDIA_ROOT where this Photo will be saved."
+        dirbase = getattr(settings, 'FLICKR_PHOTO_DIR_BASE', 'flickr')
+        dirformat = getattr(settings, 'FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
+        return '/'.join([
+            dirbase,
+            self.photo.user.nsid,
+            str(self.photo.post_time.date().strftime(dirformat)),
+            filename
+        ])
 
-    #photo = models.OneToOneField('Photo')
-    #image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
-    #size = models.CharField(max_length=11, choices=[(v['label'], k) for k, v in FLICKR_PHOTO_SIZES.iteritems()])
+    photo = models.OneToOneField('Photo')
+    image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
+    size = models.CharField(max_length=11,
+            choices=[(k, v['label']) for k, v in Photo.PHOTO_SIZES.items()])
+
+    def __str__(self):
+        return '%s download (%s) ' % (
+                            self.photo, Photo.PHOTO_SIZES[self.size]['label'])
 
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
