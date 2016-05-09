@@ -226,24 +226,12 @@ class PhotoSaver(FlickrUtilsMixin, object):
 
         # The size labels for all possible sizes an image might have, that we
         # also have width/height parameters for on Photo:
-        sizes = [
-            #'Square',
-            #'Large square',
-            'Thumbnail',
-            'Small',
-            'Small 320',
-            'Medium',
-            'Medium 640',
-            'Medium 800',
-            'Large',
-            'Large 1600',
-            'Large 2048',
-            'Original',
-            'Mobile MP4',
-            'Site MP4',
-            'HD MP4',
-            'Video Original',
-        ]
+        sizes = [v['label'] for k,v in Photo.PHOTO_SIZES.items()] + \
+                [v['label'] for k,v in Photo.VIDEO_SIZES.items()]
+        # We don't store width/height for these, so ignore them:
+        sizes.remove('Square')
+        sizes.remove('Large square')
+
         for size in photo['sizes']['size']:
             if size['label'] in sizes:
                 # eg, 'Small 320' becomes 'small_320':
