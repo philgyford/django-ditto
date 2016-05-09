@@ -1,7 +1,6 @@
 import calendar
 import datetime
 import json
-import logging
 import pytz
 import time
 
@@ -32,7 +31,6 @@ from ..core.utils import datetime_now
 #   RecentPhotosMultiAccountFetcher
 #   PhotosetsMultiAccountFetcher
 
-logger = logging.getLogger('ditto.management_commands')
 
 class FetchError(Exception):
     pass
@@ -516,8 +514,6 @@ class Fetcher(object):
         as the results will contain the total number of pages available.
         """
         while self.page_number <= self.total_pages and self._not_failed():
-            logger.info(
-                "Fetching page %d of %d" %(self.page_number, self.total_pages))
             self._fetch_page(**kwargs)
             self.page_number += 1
             time.sleep(0.5) # Being nice.
@@ -647,8 +643,6 @@ class PhotosFetcher(Fetcher):
         extra_results = []
 
         for i, photo in enumerate(self.results):
-            logger.info(
-                "Fetching data about photo %d of %d" %(i+1, len(self.results)))
 
             self._fetch_user_if_missing(photo['owner'])
 
@@ -872,8 +866,6 @@ class PhotosetsFetcher(Fetcher):
         extra_results = []
 
         for i, photoset in enumerate(self.results):
-            logger.info("Fetching list of photos in photoset %d of %d" %
-                                                    (i+1, len(self.results)))
 
             photos = self._fetch_photos_in_photoset(photoset['id'])
 
