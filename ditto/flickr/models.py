@@ -1,6 +1,7 @@
 # coding: utf-8
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
@@ -384,6 +385,26 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     tags = TaggableManager(blank=True, manager=managers._PhotoTaggableManager,
                                                         through=TaggedPhoto)
 
+    def upload_path(self, filename):
+        """Generate the path under MEDIA_ROOT where the original file will be
+        saved.
+        """
+        dirbase = getattr(settings, 'DITTO_FLICKR_PHOTO_DIR_BASE', 'flickr')
+        dirformat = getattr(
+                        settings, 'DITTO_FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
+        return '/'.join([
+            dirbase,
+            self.user.nsid,
+            str(self.post_time.date().strftime(dirformat)),
+            filename
+        ])
+
+    # Using a FileField rather than ImageField so we don't need to install
+    # Pillow just for this. And we're unlikely to display the original
+    # in a web page as an image.
+    original_file = models.FileField(
+                                upload_to=upload_path, null=True, blank=True)
+
     class Meta:
         ordering = ('-post_time',)
 
@@ -505,32 +526,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     def _raise_attr_error(self, obj, attr):
         msg = "'{0}' object has no attribute '{1}'"
         raise AttributeError(msg.format(obj, attr))
-
-
-class PhotoDownload(TimeStampedModelMixin, models.Model):
-    """
-    A photo/video file downloaded from Flickr, in one size for one Photo.
-    """
-
-    def upload_path(self, filename):
-        "Generate the path under MEDIA_ROOT where this Photo will be saved."
-        dirbase = getattr(settings, 'FLICKR_PHOTO_DIR_BASE', 'flickr')
-        dirformat = getattr(settings, 'FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
-        return '/'.join([
-            dirbase,
-            self.photo.user.nsid,
-            str(self.photo.post_time.date().strftime(dirformat)),
-            filename
-        ])
-
-    photo = models.OneToOneField('Photo')
-    image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
-    size = models.CharField(max_length=11,
-            choices=[(k, v['label']) for k, v in Photo.PHOTO_SIZES.items()])
-
-    def __str__(self):
-        return '%s download (%s) ' % (
-                            self.photo, Photo.PHOTO_SIZES[self.size]['label'])
 
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
