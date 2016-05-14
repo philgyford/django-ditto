@@ -1,4 +1,4 @@
-from ._fetch_photos import FetchPhotosCommand
+from . import FetchPhotosCommand
 from ...fetch import PhotosetsFetcher, PhotosetsMultiAccountFetcher
 
 
@@ -14,14 +14,6 @@ class Command(FetchPhotosCommand):
     """
 
     help = "Fetches all photosets for one or all Flickr Accounts (photo data must already be fetched)."
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--account',
-            action='store',
-            default=False,
-            help='The NSID of the Flickr User associated with the one Account to fetch for.',
-        )
 
     def handle(self, *args, **options):
         # We might be fetching for a specific account or all (None).

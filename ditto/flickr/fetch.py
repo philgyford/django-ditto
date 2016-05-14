@@ -1,12 +1,18 @@
 import calendar
 import datetime
 import json
+import os
 import pytz
+import re
+import shutil
 import time
 
 import flickrapi
 from flickrapi.exceptions import FlickrError
+import requests
 from taggit.models import Tag
+
+from django.core.files import File
 
 from .models import Account, Photo, Photoset, User
 from ..core.utils import datetime_now
@@ -913,6 +919,167 @@ class PhotosetsFetcher(Fetcher):
             p = saver.save_photoset(photoset)
         self.results_count = len(self.results)
 
+
+class OriginalFilesFetcher(object):
+    """
+    Fetch the original photo files for a single Account.
+
+    Not based off FlickrFetcher because we don't use the API so it's quite
+    different. But still has a similar external appearance.
+
+    Use something like:
+
+        results = OriginalFilesFetcher(account=account_object).fetch()
+
+    results is a dict that will have:
+        'success': Boolean.
+        'account': String. Indicating the Account (eg, its User's username).
+        'fetched': Integer. If success, the number of files fetched, if any.
+        'messages': List of strings. If no success, the failure message(s).
+    """
+
+    def __init__(self, account):
+        self.account = None
+
+        self.results = []
+
+        self.results_count = 0
+
+        self.return_value = {'fetched': 0}
+
+        if account.user:
+            self.return_value['account'] = account.user.username
+        else:
+            self.return_value['success'] = False
+            self.return_value['messages'] = ['This account has no Flickr User']
+
+        self.account = account
+
+    def fetch(self, fetch_all=False):
+        if self.account is None:
+            if 'success' not in self.return_value:
+                self.return_value['success'] = False
+                self.return_value['messages'] = ['No Account has been set']
+        else:
+            self._fetch_files(fetch_all)
+
+        self.return_value['fetched'] = self.results_count
+
+        return self.return_value
+
+    def _fetch_files(self, fetch_all):
+
+        photos = Photo.public_objects.filter(user=self.account.user)
+
+        if not fetch_all:
+            photos = photos.filter(original_file='')
+
+        # TODO: JUST FOR TESTING.
+        #photos = photos[:1]
+
+        error_messages = []
+
+        for photo in photos:
+            print(photo)
+            if photo.media == 'video':
+                url = photo.video_original_url
+                # Accepted video formats:
+                # https://help.yahoo.com/kb/flickr/sln15628.html
+                # BUT, they all seem to be sent as video/mp4.
+                acceptable_content_types = [ 'video/mp4', ]
+            else:
+                url = photo.original_url
+                acceptable_content_types = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+
+            filepath = False
+            try:
+                filepath = self._get_file(
+                                url, acceptable_content_types, photo)
+            except FetchError as e:
+                 error_messages.append(str(e))
+
+            if filepath:
+                # Reopen file and save to the photo:
+                reopened_file = open(filepath, 'rb')
+                django_file = File(reopened_file)
+                photo.original_file.save(
+                            os.path.basename(filepath), django_file, save=True)
+
+                self.results_count += 1
+
+        if len(error_messages) > 0:
+            self.return_value['success'] = False
+            self.return_value['messages'] = error_messages
+        else:
+            self.return_value['success'] = True
+
+
+    def _get_file(self, url, acceptable_content_types, photo):
+        """
+        http://stackoverflow.com/a/13137873/250962
+        """
+        try:
+            r = requests.get(url, stream=True)
+            if r.status_code == 200:
+                if r.headers['Content-Type'] in acceptable_content_types:
+                    # Where we'll temporarily save the file:
+                    filename = self._make_filename(url, r.headers, photo)
+                    filepath = '/tmp/%s' % filename
+                    # Save the file there:
+                    with open(filepath, 'wb') as f:
+                        r.raw.decode_content = True
+                        shutil.copyfileobj(r.raw, f)
+                    return filepath
+
+                else:
+                    raise FetchError(
+                        "Invalid content type (%s) when fetching %s"% \
+                                            (r.headers['content_type'], url))
+            else:
+                raise FetchError("Got status code %s when fetching %s" % \
+                                                        (r.status_code, url))
+        except Exception as e:
+            raise FetchError("Something when wrong when fetching %s: %s" % \
+                                                                    (url, e))
+        return False
+
+    def _make_filename(self, url, headers, photo):
+        """Find the filename of the downloaded file.
+        Returns a string.
+
+        url will probably end in like 'filename.jpg' for an image.
+        But videos end in like '/1234567890/'.
+
+        headers is a dict of response headers from requesting the URL.
+        Videos will hopefully have the filename in the Content-Disposition
+        header.
+        """
+        # Should work for photos:
+        filename = os.path.basename(url)
+
+        if filename == '':
+            # Probably a video, so we have to get the filename from headers:
+            try:
+                # Could be like 'attachment; filename=26897200312.avi'
+                disposition = headers['Content-Disposition']
+                m = re.search(
+                            'filename\=(.*?)$', headers['Content-Disposition'])
+                try:
+                    filename = m.group(1)
+                except (AttributeError, IndexError):
+                    pass
+            except KeyError:
+                pass
+
+        if filename == '':
+            # We shouldn't get here, but in case, make a filename.
+            filename = '%s_%s_o' % (photo.flickr_id, photo.original_secret)
+
+        return filename
+
+
+
 ###########################################################################
 
 
@@ -1010,6 +1177,26 @@ class PhotosetsMultiAccountFetcher(MultiAccountFetcher):
         for account in self.accounts:
             self.return_value.append(
                 PhotosetsFetcher(account).fetch()
+            )
+
+        return self.return_value
+
+
+class OriginalFilesMultiAccountFetcher(MultiAccountFetcher):
+    """For fetching original photo files for ALL or ONE account(s).
+
+    Usage:
+
+        results = OriginalFilesMultiAccountFetcher().fetch(fetch_all=True)
+
+    results will be a list of dicts containing info about what was fetched(or
+    went wrong) for each account.
+    """
+
+    def fetch(self, fetch_all=False):
+        for account in self.accounts:
+            self.return_value.append(
+                OriginalFilesFetcher(account).fetch(fetch_all=fetch_all)
             )
 
         return self.return_value

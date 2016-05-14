@@ -163,7 +163,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             'label': 'HD MP4',
             'url_size': 'hd',
         },
-        'original_video': {
+        'video_original': {
             'label': 'Video Original',
             'url_size': 'orig',
         },
@@ -403,7 +403,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # Pillow just for this. And we're unlikely to display the original
     # in a web page as an image.
     original_file = models.FileField(
-                                upload_to=upload_path, null=True, blank=True)
+                    upload_to=upload_path, null=False, blank=True, default='')
 
     class Meta:
         ordering = ('-post_time',)
@@ -498,8 +498,12 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         if self.media == 'photo':
             return None
         else:
+            if size == 'video_original':
+                secret = self.original_secret
+            else:
+                secret = self.secret
             url_size = self.VIDEO_SIZES[size]['url_size']
-            return '%splay/%s/%s/' % (self.permalink, url_size, self.secret)
+            return '%splay/%s/%s/' % (self.permalink, url_size, secret)
 
     def __getattr__(self, name):
         """
@@ -513,7 +517,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             self._raise_attr_error(type(self).__name__, name)
 
         if attr == 'url':
-            # eg original_video_url()
+            # eg video_original_url()
             if size in self.VIDEO_SIZES:
                 return self._video_url(size)
             elif size in self.PHOTO_SIZES:
