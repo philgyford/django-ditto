@@ -54,10 +54,10 @@ class Command(BaseCommand):
                 else:
                     self.stderr.write(
                         "Failed to fetch a user using Flickr ID '%s': %s" %\
-                                        (id_result['id'], result['message']))
+                                    (id_result['id'], result['messages'][0]))
             else:
                 self.stderr.write(
                     "Failed to fetch a Flickr ID for this Account: %s" %\
-                                                        id_result['message'])
+                                                    id_result['messages'][0])
 
 

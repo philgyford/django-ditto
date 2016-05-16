@@ -42,5 +42,12 @@ class DittoBaseCommand(BaseCommand):
                                 result['account'], result['fetched'], noun))
             else:
                 self.stderr.write('%s: Failed to fetch %s: %s' % (
-                     result['account'], self.plural_noun, result['message']))
+                                     result['account'],
+                                     self.plural_noun,
+                                     self.format_messages(result['messages'])
+                                ))
+
+    def format_messages(self, messages):
+        return "\n".join(messages)
+
 

@@ -419,7 +419,7 @@ class Fetcher(object):
         'success': Boolean.
         'account': String. Indicating the Account (eg, its User's username).
         'fetched': Integer. If success, the number of things fetched, if any.
-        'message': String. If no success, the failure message.
+        'messages': List. If no success, the failure message(s).
     """
 
     # How many photos (or whatever) do we fetch per page of retults?
@@ -468,13 +468,13 @@ class Fetcher(object):
                                 self.account.api_secret, format='parsed-json')
         else:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Account has no API credentials'
+            self.return_value['messages'] = ['Account has no API credentials']
 
     def fetch(self, **kwargs):
         if self.account is None:
             if 'success' not in self.return_value:
                 self.return_value['success'] = False
-                self.return_value['message'] = 'No Account has been set'
+                self.return_value['messages'] = ['No Account has been set']
         else:
             if self.is_paged:
                 self._fetch_pages(**kwargs)
@@ -487,7 +487,8 @@ class Fetcher(object):
                     self._fetch_extra()
                 except FetchError as e:
                     self.return_value['success'] = False
-                    self.return_value['message'] = 'Error when fetching extra data: %s' % e
+                    self.return_value['messages'] = [
+                                    'Error when fetching extra data: %s' % e]
 
             if self._not_failed():
                 # Still OK; save the data we've got.
@@ -497,7 +498,8 @@ class Fetcher(object):
                     self.return_value['fetched'] += self.results_count
                 except FetchError as e:
                     self.return_value['success'] = False
-                    self.return_value['message'] = 'Error when saving data: %s' % e
+                    self.return_value['messages'] = [
+                                            'Error when saving data: %s' % e]
 
         return self.return_value
 
@@ -517,7 +519,8 @@ class Fetcher(object):
             self._call_api(**kwargs)
         except FetchError as e:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Error when calling Flickr API: %s' % e
+            self.return_value['messages'] = [
+                                    'Error when calling Flickr API: %s' % e]
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""

@@ -91,16 +91,13 @@ class BookmarksFetcher(object):
         """Sends a request to the Pinboard API, returns the raw response.
 
         Returns a dict with a 'success' element: True or False.
-        If False, will have a 'message' element.
+        If False, will have a 'messages' element, a list.
         If True, will have a 'json' element with the fetched data in.
 
         Keyword arguments:
         fetch_type -- 'all', 'date', 'recent' or 'url'.
         params -- Any params needed for this type. eg 'dt':datetime.
         Account -- The account to fetch from.
-
-        Raises:
-        FetchError if there was an HTTP error.
         """
 
         url_parts = ['posts']
@@ -142,7 +139,8 @@ class BookmarksFetcher(object):
                 error_message = "Something unusual went wrong."
 
         if error_message:
-            raise FetchError(error_message)
+            return {'account': account.username, 'success': False,
+                                                'messages': [error_message,]}
         else:
             return {'account': account.username, 'success': True,
                                                         'json': response.text}

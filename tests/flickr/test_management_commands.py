@@ -44,10 +44,13 @@ class FetchFlickrAccountUserTestCase(TestCase):
     @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserFetcher')
     @patch('ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher')
     def test_invalid_nsid(self, id_fetcher, user_fetcher):
-        "Correct error message if we fail to find a user for the fetched Flickr ID (unlikely)."
+        """
+        Correct error message if we fail to find a user for the fetched
+        Flickr ID (unlikely).
+        """
         id_fetcher.return_value.fetch.return_value =  self.id_fetcher_success
         user_fetcher.return_value.fetch.return_value =\
-            {'success': False, 'message': 'Oops'}
+                                    {'success': False, 'messages': ['Oops']}
         call_command('fetch_flickr_account_user', id='32', stderr=self.out_err)
         self.assertIn(
             "Failed to fetch a user using Flickr ID '35034346050@N01': Oops",
@@ -57,7 +60,7 @@ class FetchFlickrAccountUserTestCase(TestCase):
     def test_no_matching_nsid(self, id_fetcher):
         "Correct error message if we can't find a Flickr ID for this Account."
         id_fetcher.return_value.fetch.return_value =\
-                                        {'success': False, 'message': 'Oops'}
+                                    {'success': False, 'messages': ['Oops']}
         call_command('fetch_flickr_account_user', id='32', stderr=self.out_err)
         self.assertIn(
             "Failed to fetch a Flickr ID for this Account: Oops",
@@ -122,7 +125,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value =\
-            [{'account': 'Phil Gyford', 'success': False, 'message': 'Oops'}]
+            [{'account': 'Phil Gyford', 'success': False, 'messages': ['Oops']}]
         call_command('fetch_flickr_photos', days='4', stdout=self.out,
                                                         stderr=self.out_err)
         self.assertIn('Phil Gyford: Failed to fetch Photos: Oops',
@@ -157,7 +160,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
     @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value =\
-            [{'account': 'Phil Gyford', 'success': False, 'message': 'Oops'}]
+            [{'account': 'Phil Gyford', 'success': False, 'messages': ['Oops']}]
         call_command('fetch_flickr_photosets', stdout=self.out,
                                                         stderr=self.out_err)
         self.assertIn('Phil Gyford: Failed to fetch Photosets: Oops',

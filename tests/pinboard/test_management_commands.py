@@ -100,7 +100,8 @@ class FetchPinboardOutput(TestCase):
         """Responds correctly when there was an error fetching all bookmarks"""
         # What the mocked method will return:
         fetch_method.side_effect = [
-            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke',]}]
         ]
         out = StringIO()
         out_err = StringIO()
@@ -116,7 +117,8 @@ class FetchPinboardOutput(TestCase):
         fetch_method.side_effect = [
             [
                 {'account': 'philgyford', 'success': True, 'fetched': 23},
-                {'account': 'wrongaccount', 'success': False, 'message': 'It broke'}
+                {'account': 'wrongaccount', 'success': False,
+                                                    'messages': ['It broke',]}
             ]
         ]
         out = StringIO()

@@ -10,7 +10,6 @@ class Command(FetchCommand):
 
     For one account:
         ./manage.py fetch_flickr_photosets --account=35034346050@N01
-
     """
 
     # What we're fetching:

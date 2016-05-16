@@ -55,7 +55,7 @@ class TweetIngester(TweetMixin, object):
             return {'success': False,
                     'tweets': 0,
                     'files': self.file_count,
-                    'message': "No tweets were found", }
+                    'messages': ["No tweets were found"], }
 
     def _load_data(self, directory):
         """Goes through all the *.js files in `directory` and puts the tweet

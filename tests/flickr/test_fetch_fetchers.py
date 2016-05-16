@@ -21,7 +21,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory(user=None)
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'Account: 1')
 
     def test_with_unsaved_account(self):
@@ -29,7 +29,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory.build(user=None)
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'Unsaved Account')
 
     def test_returns_false_with_no_creds(self):
@@ -37,7 +37,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory(user=UserFactory(username='bob'))
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'bob')
 
     @patch('ditto.flickr.fetch.Fetcher._call_api')
@@ -57,7 +57,7 @@ class FetcherTestCase(FlickrFetchTestCase):
                                             api_key='1234', api_secret='9876')
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @patch('ditto.flickr.fetch.Fetcher._call_api')
     def test_failure_with_no_child_save_results(self, call_api):
@@ -66,7 +66,7 @@ class FetcherTestCase(FlickrFetchTestCase):
                                             api_key='1234', api_secret='9876')
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
 
 class UserIdFetcherTestCase(FlickrFetchTestCase):
@@ -83,7 +83,7 @@ class UserIdFetcherTestCase(FlickrFetchTestCase):
             body='{"stat": "fail", "code": 99, "message": "Insufficient permissions. Method requires read privileges; none granted."}')
         result = UserIdFetcher(account=self.account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @responses.activate
     def test_returns_id(self):
@@ -116,7 +116,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
                                                         nsid='35034346050@N01')
 
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @responses.activate
     def test_makes_one_api_calls(self):
@@ -168,7 +168,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         with patch('time.sleep'):
             result = self.fetcher.fetch()
             self.assertFalse(result['success'])
-            self.assertIn('message', result)
+            self.assertIn('messages', result)
 
     @responses.activate
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_info')

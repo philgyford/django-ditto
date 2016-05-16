@@ -150,34 +150,37 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         for error, message in errors:
             exception = error(message)
             self.add_response(body=exception)
-            with self.assertRaises(FetchError):
-                result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
+            results = DateBookmarksFetcher().fetch(post_date='2015-06-18',
                                                     username='philgyford')
+            self.assertFalse(results[0]['success'])
             responses.reset()
 
     @responses.activate
     def test_it_handles_404s(self):
         """Correctly reacts to a 404 when fetching bookmarks"""
         self.add_response(body='<h1>Not found</h1>', status=404)
-        with self.assertRaises(FetchError):
-            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
-                                                username='philgyford')
+        results = DateBookmarksFetcher().fetch(post_date='2015-06-18',
+                                                        username='philgyford')
+        self.assertFalse(results[0]['success'])
+        self.assertEqual(results[0]['messages'][0], 'HTTP Error: 404')
 
     @responses.activate
     def test_it_handles_429s(self):
         """Correctly reacts to a 429 when fetching bookmarks"""
         self.add_response(body='<h1>Too Many Requests</h1>', status=429)
-        with self.assertRaises(FetchError):
-            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
-                                                username='philgyford')
+        results = DateBookmarksFetcher().fetch(post_date='2015-06-18',
+                                                        username='philgyford')
+        self.assertFalse(results[0]['success'])
+        self.assertEqual(results[0]['messages'][0], 'HTTP Error: 429')
 
     @responses.activate
     def test_it_handles_500s(self):
         """Correctly reacts to a 500 error when fetching bookmarks"""
         self.add_response(body='<h1>Error</h1>', status=500)
-        with self.assertRaises(FetchError):
-            result = DateBookmarksFetcher().fetch(post_date='2015-06-18',
-                                                username='philgyford')
+        results = DateBookmarksFetcher().fetch(post_date='2015-06-18',
+                                                        username='philgyford')
+        self.assertFalse(results[0]['success'])
+        self.assertEqual(results[0]['messages'][0], 'HTTP Error: 500')
 
 
 class FetchInactiveAccountsTestCase(TestCase):

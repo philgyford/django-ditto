@@ -125,7 +125,8 @@ class FetchTwitterTweetsOutput(FetchTwitterOutput):
     def test_error_output(self):
         "Responds correctly when there was an error fetching recent tweets"
         self.fetch_method.side_effect = [
-            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke']}]
         ]
         call_command('fetch_twitter_tweets', recent='new', stdout=self.out,
                                                         stderr=self.out_err)
@@ -148,7 +149,8 @@ class FetchTwitterFavoritesOutput(FetchTwitterOutput):
     def test_error_output(self):
         "Responds correctly when there was an error fetching recent tweets"
         self.fetch_method.side_effect = [
-            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke']}]
         ]
         call_command('fetch_twitter_favorites', recent='new', stdout=self.out,
                                                         stderr=self.out_err)
@@ -172,7 +174,7 @@ class FetchTwitterAccountsOutput(FetchTwitterOutput):
         "Responds correctly when there was an error fetching users"
         self.fetch_method.side_effect = [
                 [{'account': 'philgyford', 'success': False,
-                    'message': 'It broke'}]
+                                                    'messages': ['It broke']}]
         ]
         call_command('fetch_twitter_accounts', stdout=self.out, stderr=self.out_err)
         self.assertIn('Could not fetch @philgyford: It broke',
@@ -221,7 +223,7 @@ class ImportTweets(TestCase):
     def test_error_output(self):
         """Outputs the correct error if ingesting fails."""
         self.ingest_mock.return_value = {
-            'success': False, 'message': 'Something went wrong',
+            'success': False, 'messages': ['Something went wrong'],
         }
         with patch('os.path.isdir', return_value=True):
             call_command('import_twitter_tweets', path='/right/path',
@@ -292,7 +294,8 @@ class UpdateUsers(TestCase):
 
     def test_error_output(self):
         self.fetcher_class().fetch.side_effect = [
-            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke']}]
         ]
         call_command('update_twitter_users', account='bob', stdout=self.out,
                                                         stderr=self.out_err)
@@ -334,7 +337,8 @@ class UpdateTweets(TestCase):
 
     def test_error_output(self):
         self.fetcher_class().fetch.side_effect = [
-            [{'account': 'philgyford', 'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke']}]
         ]
         call_command('update_twitter_tweets', account='bob', stdout=self.out,
                                                         stderr=self.out_err)
