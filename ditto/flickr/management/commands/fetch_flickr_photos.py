@@ -19,7 +19,6 @@ class Command(FetchPhotosCommand):
 
     days_help = 'Fetches the most recent or all Photos, eg "3" or "all".'
 
-
     def fetch_photos(self, nsid, days):
         return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)
 

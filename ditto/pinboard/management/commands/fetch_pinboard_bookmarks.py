@@ -1,12 +1,13 @@
 # coding: utf-8
 import argparse
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 
+from ....core.management.commands import DittoBaseCommand
 from ...fetch import AllBookmarksFetcher, DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher
 
 
-class Command(BaseCommand):
+class Command(DittoBaseCommand):
     """Fetches bookmarks from Pinboard
 
     Fetch all bookmarks, from all accounts:
@@ -24,10 +25,15 @@ class Command(BaseCommand):
     Restrict any of the above to one account by adding the account's username:
     ./manage.py fetch_pinboardbookmarks --all --account=philgyford
     """
+
+    singular_noun = 'Bookmark'
+    plural_noun = 'Bookmarks'
+
     help = "Fetches bookmarks from Pinboard"
 
-
     def add_arguments(self, parser):
+        super().add_arguments(parser)
+
         parser.add_argument(
             '--all',
             action='store_true',
@@ -84,20 +90,5 @@ class Command(BaseCommand):
         else:
             raise CommandError("Specify --all, --recent, --date= or --url=")
 
-        # results should be a list of dicts.
-        # If a result dict is for one account it'll have an 'account' element.
-        # Each result dict will have:
-        #   'success': True or False.
-        #   'fetched': integer, the number of Bookmarks fetched.
-        # If it failed, we should also get 'message' (a string).
-        for result in results:
-            account = result['account'] if 'account' in result else 'all'
-            if result['success']:
-                noun = 'bookmark' if result['fetched'] == 1 else 'bookmarks'
-                self.stdout.write('%s: Fetched %s %s' % (
-                                            account, result['fetched'], noun))
-
-            else:
-                self.stderr.write('%s: Failed to fetch bookmarks: %s' %
-                                                (account, result['message']))
+        self.output_results(results)
 

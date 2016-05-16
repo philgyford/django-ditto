@@ -39,7 +39,7 @@ class BookmarksFetcher(object):
         username -- the username of the one Account to fetch (or None for all).
         """
         # Each element will be a dict, like:
-        # {'username':'philgyford', 'success':True, 'fetched':12}
+        # {'account':'philgyford', 'success':True, 'fetched':12}
         result = []
 
         accounts = self._get_accounts(username)
@@ -47,7 +47,7 @@ class BookmarksFetcher(object):
         for account in accounts:
             fetch_time = datetime_now()
 
-            response = self._send_request(fetch_type, params, account.api_token)
+            response = self._send_request(fetch_type, params, account)
 
             if response['success']:
                 # Tidy the raw data:
@@ -87,7 +87,7 @@ class BookmarksFetcher(object):
                 raise FetchError("The account %s is curently marked as inactive." % username)
         return accounts
 
-    def _send_request(self, fetch_type, params, api_token):
+    def _send_request(self, fetch_type, params, account):
         """Sends a request to the Pinboard API, returns the raw response.
 
         Returns a dict with a 'success' element: True or False.
@@ -97,7 +97,7 @@ class BookmarksFetcher(object):
         Keyword arguments:
         fetch_type -- 'all', 'date', 'recent' or 'url'.
         params -- Any params needed for this type. eg 'dt':datetime.
-        api_token -- Pinboard API token for the account to fetch from.
+        Account -- The account to fetch from.
 
         Raises:
         FetchError if there was an HTTP error.
@@ -114,7 +114,7 @@ class BookmarksFetcher(object):
         url = "{}{}".format(PINBOARD_API_ENDPOINT, "/".join(url_parts))
 
         params['format'] = "json"
-        params['auth_token'] = api_token
+        params['auth_token'] = account.api_token
         query_string = urllib.parse.urlencode(params)
 
         final_url = "{}?{}".format(url, query_string)
@@ -144,7 +144,8 @@ class BookmarksFetcher(object):
         if error_message:
             raise FetchError(error_message)
         else:
-            return {'success': True, 'json': response.text}
+            return {'account': account.username, 'success': True,
+                                                        'json': response.text}
 
 
     def _parse_response(self, fetch_type, json_text):

@@ -2,17 +2,20 @@ import argparse
 
 from django.core.management.base import BaseCommand, CommandError
 
+from ....core.management.commands import DittoBaseCommand
 from ...models import Account, User
 
 
-class FetchCommand(BaseCommand):
-
-    # What we're fetching:
-    singular_noun = 'Photo'
-    plural_noun = 'Photos'
+class FetchCommand(DittoBaseCommand):
+    """
+    Parent for all classes that fetch some things from Flickr. Photos,
+    Photosets, Files, etc.
+    """
 
     def add_arguments(self, parser):
         "All children will have the --account option."
+        super().add_arguments(parser)
+
         parser.add_argument(
             '--account',
             action='store',
@@ -20,35 +23,12 @@ class FetchCommand(BaseCommand):
             help='The NSID of the Flickr User associated with the one Account to fetch for.',
         )
 
-    def output_results(self, results):
-        """results should be a list of dicts.
-
-        Each dict is for one account.
-        Each dict will look like either:
-
-          { 'account': 'Phil Gyford',
-            'success': True,
-            'fetched': 200, # The number of things fetched
-          }
-
-        or:
-
-          { 'account': 'Phil Gyford',
-            'success': False,
-            'message': 'There was an error fetching data because blah',
-          }
-        """
-        for result in results:
-            if result['success']:
-                noun = self.singular_nound if result['fetched'] == 1 else self.plural_noun
-                self.stdout.write('%s: Fetched %s %s                      ' % (
-                                result['account'], result['fetched'], noun))
-            else:
-                self.stderr.write('%s: Failed to fetch %s: %s' % (
-                     result['account'], self.plural_noun, result['message']))
-
 
 class FetchPhotosCommand(FetchCommand):
+
+    # What we're fetching:
+    singular_noun = 'Photo'
+    plural_noun = 'Photos'
 
     # Child classes should supply some help text for the --days argument:
     days_help = ""

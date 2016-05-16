@@ -1,5 +1,5 @@
 from ...fetch import TweetsFetcher
-from ._update_twitter import UpdateTwitterCommand
+from . import UpdateTwitterCommand
 
 
 class Command(UpdateTwitterCommand):
@@ -11,7 +11,8 @@ class Command(UpdateTwitterCommand):
 
     help = "Fetches the latest data about each Twitter Tweet"
 
-    updated_noun = 'Tweet'
+    singular_noun = 'Tweet'
+    plural_noun = 'Tweets'
 
     def fetch(self, screen_name):
         return TweetsFetcher(screen_name=screen_name).fetch()

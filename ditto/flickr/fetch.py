@@ -999,16 +999,16 @@ class OriginalFilesFetcher(object):
         for photo in photos:
             try:
                 self._fetch_and_save_file(photo=photo, media_type='photo')
+                self.results_count += 1
             except FetchError as e:
                 error_messages.append(str(e))
 
             if photo.media == 'video':
                 try:
                     self._fetch_and_save_file(photo=photo, media_type='video')
+                    self.results_count += 1
                 except FetchError as e:
                     error_messages.append(str(e))
-
-            self.results_count += 1
 
         if len(error_messages) > 0:
             self.return_value['success'] = False

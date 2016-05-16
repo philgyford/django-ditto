@@ -13,6 +13,10 @@ class Command(FetchCommand):
 
     """
 
+    # What we're fetching:
+    singular_noun = 'Photoset'
+    plural_noun = 'Photosets'
+
     help = "Fetches all photosets for one or all Flickr Accounts (photo data must already be fetched)."
 
     def handle(self, *args, **options):
@@ -21,12 +25,4 @@ class Command(FetchCommand):
 
         results = PhotosetsMultiAccountFetcher(nsid=nsid).fetch()
 
-        for result in results:
-            if result['success']:
-                noun = 'Photoset' if result['fetched'] == 1 else 'Photosets'
-                self.stdout.write('%s: Fetched %s %s' % (
-                                result['account'], result['fetched'], noun))
-            else:
-                self.stderr.write('%s: Failed to fetch Photosets: %s' % (
-                                        result['account'], result['message']))
-
+        self.output_results(results)
