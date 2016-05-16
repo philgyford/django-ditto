@@ -102,7 +102,7 @@ class PhotoAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('show_image', 'user', 'title', 'description', 'summary',
                 'permalink', 'is_private', 'flickr_id', 'media', 'license',
-                'original_file', )
+                'original_file', 'video_original_file', )
         }),
         ('Times', {
             'classes': ('collapse',),

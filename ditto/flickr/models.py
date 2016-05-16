@@ -404,6 +404,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # in a web page as an image.
     original_file = models.FileField(
                     upload_to=upload_path, null=False, blank=True, default='')
+    video_original_file = models.FileField(
+                    upload_to=upload_path, null=False, blank=True, default='',
+                    help_text="Only present for Videos.")
 
     class Meta:
         ordering = ('-post_time',)

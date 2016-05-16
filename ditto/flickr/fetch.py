@@ -975,38 +975,23 @@ class OriginalFilesFetcher(object):
             photos = photos.filter(original_file='')
 
         # TODO: JUST FOR TESTING.
-        #photos = photos[:1]
+        #photos = photos[:3]
 
         error_messages = []
 
         for photo in photos:
-            print(photo)
-            if photo.media == 'video':
-                url = photo.video_original_url
-                # Accepted video formats:
-                # https://help.yahoo.com/kb/flickr/sln15628.html
-                # BUT, they all seem to be sent as video/mp4.
-                acceptable_content_types = [ 'video/mp4', ]
-            else:
-                url = photo.original_url
-                acceptable_content_types = [
-                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
-
-            filepath = False
             try:
-                filepath = self._get_file(
-                                url, acceptable_content_types, photo)
+                self._fetch_and_save_file(photo=photo, media_type='photo')
             except FetchError as e:
-                 error_messages.append(str(e))
+                error_messages.append(str(e))
 
-            if filepath:
-                # Reopen file and save to the photo:
-                reopened_file = open(filepath, 'rb')
-                django_file = File(reopened_file)
-                photo.original_file.save(
-                            os.path.basename(filepath), django_file, save=True)
+            if photo.media == 'video':
+                try:
+                    self._fetch_and_save_file(photo=photo, media_type='video')
+                except FetchError as e:
+                    error_messages.append(str(e))
 
-                self.results_count += 1
+            self.results_count += 1
 
         if len(error_messages) > 0:
             self.return_value['success'] = False
@@ -1014,12 +999,65 @@ class OriginalFilesFetcher(object):
         else:
             self.return_value['success'] = True
 
-
-    def _get_file(self, url, acceptable_content_types, photo):
+    def _fetch_and_save_file(self, photo, media_type):
         """
-        http://stackoverflow.com/a/13137873/250962
+        Downloads a video or photo file and saves it to the Photo object.
+
+        Expects:
+            photo -- A Photo object.
+            media_type -- String, either 'photo' or 'video'.
+
+        Raises FetchError if something goes wrong.
+        """
+
+        if media_type == 'video':
+            url = photo.video_original_url
+            # Accepted video formats:
+            # https://help.yahoo.com/kb/flickr/sln15628.html
+            # BUT, they all seem to be sent as video/mp4.
+            acceptable_content_types = ['video/mp4',]
+
+        else:
+            url = photo.original_url
+            acceptable_content_types = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+
+        filepath = False
+        try:
+            # Saves the file to /tmp/:
+            filepath = self._download_file(
+                                        url, acceptable_content_types, photo)
+        except FetchError as e:
+            raise FetchError(e)
+
+        if filepath:
+            # Reopen file and save to the Photo:
+            reopened_file = open(filepath, 'rb')
+            django_file = File(reopened_file)
+
+            if media_type == 'video':
+                photo.video_original_file.save(
+                            os.path.basename(filepath), django_file, save=True)
+            else:
+                photo.original_file.save(
+                            os.path.basename(filepath), django_file, save=True)
+
+
+    def _download_file(self, url, acceptable_content_types, photo):
+        """
+        Downloads a file from a URL and saves it into /tmp/.
+        Returns the filepath.
+
+        Expects:
+            url -- The URL of the file to fetch.
+            acceptable_content_types -- A list of MIME types the request must
+                                        match.
+            photo -- The Photo object we're fetching for.
+
+        Raises FetchError if something goes wrong.
         """
         try:
+            # From http://stackoverflow.com/a/13137873/250962
             r = requests.get(url, stream=True)
             if r.status_code == 200:
                 if r.headers['Content-Type'] in acceptable_content_types:
