@@ -12,7 +12,7 @@ class UserFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.User
 
-    nsid = factory.Sequence(lambda n: (n * 10000))
+    nsid = factory.Sequence(lambda n: '%s@N01' % (n * 10000))
     username = factory.Sequence(lambda n: 'user%d' % n)
     realname = factory.Sequence(lambda n: 'User Name %d' % n)
     iconserver = 1234
@@ -55,6 +55,7 @@ class PhotoFactory(factory.DjangoModelFactory):
     original_secret = factory.Sequence(lambda n: (n * 10001))
     server = '987'
     farm = 2
+    media = 'photo'
     post_time = datetime_now()
     taken_time = factory.LazyAttribute(lambda o:
                                 datetime_now() - datetime.timedelta(weeks=3)

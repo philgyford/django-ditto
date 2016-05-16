@@ -1,14 +1,19 @@
 import calendar
+import datetime
 import json
+import os
+import pytz
+import tempfile
 from unittest.mock import call, patch
 
 import responses
 from freezegun import freeze_time
+from django.test import override_settings, TestCase
 
 from ditto.core.utils import datetime_now
-from ditto.flickr.factories import AccountFactory, UserFactory
+from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
 from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher,\
-        UserFetcher, UserIdFetcher,\
+        UserFetcher, UserIdFetcher, OriginalFilesFetcher,\
         PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
         RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher
 from .test_fetch import FlickrFetchTestCase
@@ -150,6 +155,139 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertTrue(result['success'])
         self.assertIn('fetched', result)
         self.assertEqual(result['fetched'], 1)
+
+
+class FilesFetcherTestCase(TestCase):
+
+    def setUp(self):
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.fetcher = OriginalFilesFetcher(account=account)
+
+        self.photo_1 = PhotoFactory(original_file='p1.jpg', user=user)
+        # Needs a post_time for testing file save path:
+        self.photo_2 = PhotoFactory(original_file=None, user=user,
+                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
+        self.video_1 = PhotoFactory(media='video', original_file='v1.jpg',
+                                video_original_file='v1.mov', user=user)
+        self.video_2 = PhotoFactory(media='video', original_file=None,
+                                video_original_file=None, user=user)
+        # And one by someone else:
+        self.photo_3 = PhotoFactory(original_file=None, user=UserFactory())
+
+    def test_fails_with_no_account(self):
+        with self.assertRaises(TypeError):
+            fetcher = OriginalFilesFetcher()
+
+    def test_fails_with_no_flickr_user(self):
+        fetcher = OriginalFilesFetcher(account=AccountFactory(user=None))
+        results = fetcher.fetch()
+        self.assertFalse(results['success'])
+        self.assertIn(
+                    'This account has no Flickr User', results['messages'][0])
+
+    # This all feels too much like I'm testing internal behaviour, but not
+    # sure what else to do...
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_missing(self, fetch_and_save_file):
+        "Goes to fetch for photos without files already."
+        results = self.fetcher.fetch()
+        calls = [
+                    call(photo=self.video_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='video'),
+                    call(photo=self.photo_2, media_type='photo'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_all(self, fetch_and_save_file):
+        "Goes to fetch for ALL photos."
+        results = self.fetcher.fetch(fetch_all=True)
+        calls = [
+                    call(photo=self.photo_1, media_type='photo'),
+                    call(photo=self.video_1, media_type='photo'),
+                    call(photo=self.video_1, media_type='video'),
+                    call(photo=self.video_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='video'),
+                    call(photo=self.photo_2, media_type='photo'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_results_for_fetch_missing(self, fetch_and_save_file):
+        "Results values should be OK when fetching only missing photos/videos."
+        results = self.fetcher.fetch()
+        self.assertTrue(results['success'])
+        self.assertEqual(results['fetched'], 3)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_results_for_fetch_all(self, fetch_and_save_file):
+        "Results values should be OK when fetching ALL photos/videos."
+        results = self.fetcher.fetch(fetch_all=True)
+        self.assertTrue(results['success'])
+        self.assertEqual(results['fetched'], 6)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_error_results(self, fetch_and_save_file):
+        "Sets the correct error values if things go wrong."
+        fetch_and_save_file.side_effect = FetchError('Oh dear')
+        results = self.fetcher.fetch()
+        self.assertFalse(results['success'])
+        self.assertEqual(results['fetched'], 0)
+        self.assertEqual(len(results['messages']), 3)
+        self.assertEqual(results['messages'][0], 'Oh dear')
+
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_downloads_photo(self, download_file):
+        "Calls the download method correctly for photos."
+        download_file.return_value = False
+        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+        download_file.assert_has_calls( [ call(
+                    self.photo_2.original_url,
+                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',],
+                    self.photo_2
+                ) ] )
+
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_downloads_video(self, download_file):
+        "Calls the download method correctly for videos."
+        download_file.return_value = False
+        self.fetcher._fetch_and_save_file(self.video_2, 'video')
+        download_file.assert_has_calls( [ call(
+                    self.video_2.video_original_url,
+                    ['video/mp4',],
+                    self.video_2
+                ) ] )
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_saves_file(self, download_file):
+        # Make a temporary file, like _download_file() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download_file.return_value = temp_filepath
+
+        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+        self.assertEqual(
+            self.photo_2.original_file.name, 
+            'flickr/%s/2015/08/14/%s' % (
+                self.photo_2.user.nsid,
+                os.path.basename(temp_filepath)
+            )
+        )
+
+    # Test saves video file
+    # Test if _download_file throws exception
+
+    # Test _download_file makes request for url
+    # Test it checks content-types
+    # Test it saves temporary file
+
+    # Test make_filename works with normal photo url
+    # Test make_filename works with content-disposition
+    # Test make_filename fallback.
+
 
 
 class PhotosFetcherTestCase(FlickrFetchTestCase):

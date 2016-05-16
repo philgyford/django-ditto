@@ -968,15 +968,11 @@ class OriginalFilesFetcher(object):
         fetch_all -- Boolean. Fetch ALL photos/videos, even if we've already
                         got them?
         """
-
-        if self.account is None:
-            if 'success' not in self.return_value:
-                self.return_value['success'] = False
-                self.return_value['messages'] = ['No Account has been set']
-        else:
+        # Might already have success=False from __init__():
+        if 'success' not in self.return_value:
             self._fetch_files(fetch_all)
 
-        self.return_value['fetched'] = self.results_count
+            self.return_value['fetched'] = self.results_count
 
         return self.return_value
 

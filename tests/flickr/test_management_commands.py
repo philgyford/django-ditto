@@ -78,6 +78,48 @@ class FetchFlickrAccountUserTestCase(TestCase):
         self.assertEqual(self.account.user.nsid, '35034346050@N01')
 
 
+class FetchFlickrOriginalsTestCase(TestCase):
+
+    def setUp(self):
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_sends_all_true_to_fetcher_with_account(self, fetcher):
+        call_command(
+                'fetch_flickr_originals', '--all', account='35034346050@N01')
+        fetcher.assert_called_with(nsid='35034346050@N01')
+        fetcher.return_value.fetch.assert_called_with(fetch_all=True)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_sends_all_true_to_fetcher_no_account(self, fetcher):
+        call_command('fetch_flickr_originals', '--all')
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(fetch_all=True)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_sends_all_false_to_fetcher(self, fetcher):
+        call_command('fetch_flickr_originals')
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(fetch_all=False)
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_success_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': 33}]
+        call_command('fetch_flickr_originals', stdout=self.out)
+        self.assertIn('Phil Gyford: Fetched 33 Files', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_success_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': False, 'messages': ['Oops']}]
+        call_command('fetch_flickr_originals', stdout=self.out,
+                                                        stderr=self.out_err)
+        self.assertIn('Phil Gyford: Failed to fetch Files: Oops',
+                                                    self.out_err.getvalue())
+
+
 class FetchFlickrPhotosTestCase(TestCase):
 
     def setUp(self):

@@ -26,7 +26,7 @@ class Command(FetchCommand):
 
         parser.add_argument(
             '--all',
-            action='store',
+            action='store_true',
             default=False,
             help="Fetch ALL files, even if they've been downloaded before. Otherwise, only fetch files that haven't already been downloaded."
         )
