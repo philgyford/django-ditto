@@ -1,8 +1,8 @@
-from . import FetchPhotosCommand
+from . import FetchCommand
 from ...fetch import PhotosetsFetcher, PhotosetsMultiAccountFetcher
 
 
-class Command(FetchPhotosCommand):
+class Command(FetchCommand):
     """Fetches photosets from Flickr
 
     For all accounts:

@@ -51,7 +51,7 @@ class FetchCommand(BaseCommand):
 class FetchPhotosCommand(FetchCommand):
 
     # Child classes should supply some help text for the --days argument:
-    recent_help = ""
+    days_help = ""
 
     def add_arguments(self, parser):
         super().add_arguments(parser)

@@ -956,6 +956,16 @@ class OriginalFilesFetcher(object):
         self.account = account
 
     def fetch(self, fetch_all=False):
+        """
+        Download and save original photos and videos for all Photo objects
+        (or just those that don't already have them).
+
+        self.account must be an Account object first.
+
+        fetch_all -- Boolean. Fetch ALL photos/videos, even if we've already
+                        got them?
+        """
+
         if self.account is None:
             if 'success' not in self.return_value:
                 self.return_value['success'] = False
@@ -968,6 +978,13 @@ class OriginalFilesFetcher(object):
         return self.return_value
 
     def _fetch_files(self, fetch_all):
+        """
+        Download and save original photos and videos for all Photo objects
+        (or just those that don't already have them).
+
+        fetch_all -- Boolean. Fetch ALL photos/videos, even if we've already
+                        got them?
+        """
 
         photos = Photo.public_objects.filter(user=self.account.user)
 
