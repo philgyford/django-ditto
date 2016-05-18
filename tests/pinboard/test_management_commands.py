@@ -93,20 +93,21 @@ class FetchPinboardOutput(TestCase):
         ]
         out = StringIO()
         call_command('fetch_pinboard_bookmarks', all=True, stdout=out)
-        self.assertIn('philgyford: Fetched 23 bookmarks', out.getvalue())
+        self.assertIn('philgyford: Fetched 23 Bookmarks', out.getvalue())
 
     @patch('ditto.pinboard.fetch.AllBookmarksFetcher.fetch')
     def test_error_output(self, fetch_method):
         """Responds correctly when there was an error fetching all bookmarks"""
         # What the mocked method will return:
         fetch_method.side_effect = [
-            [{'success': False, 'message': 'It broke'}]
+            [{'account': 'philgyford', 'success': False,
+                                                    'messages': ['It broke',]}]
         ]
         out = StringIO()
         out_err = StringIO()
         call_command('fetch_pinboard_bookmarks', all=True, stdout=out,
                                                                 stderr=out_err)
-        self.assertIn('all: Failed to fetch bookmarks: It broke',
+        self.assertIn('philgyford: Failed to fetch Bookmarks: It broke',
                                                             out_err.getvalue())
 
     @patch('ditto.pinboard.fetch.AllBookmarksFetcher.fetch')
@@ -116,14 +117,15 @@ class FetchPinboardOutput(TestCase):
         fetch_method.side_effect = [
             [
                 {'account': 'philgyford', 'success': True, 'fetched': 23},
-                {'account': 'wrongaccount', 'success': False, 'message': 'It broke'}
+                {'account': 'wrongaccount', 'success': False,
+                                                    'messages': ['It broke',]}
             ]
         ]
         out = StringIO()
         out_err = StringIO()
         call_command('fetch_pinboard_bookmarks', all=True, stdout=out,
                                                                 stderr=out_err)
-        self.assertIn('philgyford: Fetched 23 bookmarks', out.getvalue())
-        self.assertIn('wrongaccount: Failed to fetch bookmarks: It broke',
+        self.assertIn('philgyford: Fetched 23 Bookmarks', out.getvalue())
+        self.assertIn('wrongaccount: Failed to fetch Bookmarks: It broke',
                                                             out_err.getvalue())
 

@@ -1,12 +1,18 @@
 import calendar
 import datetime
 import json
+import os
 import pytz
+import re
+import shutil
 import time
 
 import flickrapi
 from flickrapi.exceptions import FlickrError
+import requests
 from taggit.models import Tag
+
+from django.core.files import File
 
 from .models import Account, Photo, Photoset, User
 from ..core.utils import datetime_now
@@ -226,24 +232,12 @@ class PhotoSaver(FlickrUtilsMixin, object):
 
         # The size labels for all possible sizes an image might have, that we
         # also have width/height parameters for on Photo:
-        sizes = [
-            #'Square',
-            #'Large square',
-            'Thumbnail',
-            'Small',
-            'Small 320',
-            'Medium',
-            'Medium 640',
-            'Medium 800',
-            'Large',
-            'Large 1600',
-            'Large 2048',
-            'Original',
-            'Mobile MP4',
-            'Site MP4',
-            'HD MP4',
-            'Video Original',
-        ]
+        sizes = [v['label'] for k,v in Photo.PHOTO_SIZES.items()] + \
+                [v['label'] for k,v in Photo.VIDEO_SIZES.items()]
+        # We don't store width/height for these, so ignore them:
+        sizes.remove('Square')
+        sizes.remove('Large square')
+
         for size in photo['sizes']['size']:
             if size['label'] in sizes:
                 # eg, 'Small 320' becomes 'small_320':
@@ -425,7 +419,7 @@ class Fetcher(object):
         'success': Boolean.
         'account': String. Indicating the Account (eg, its User's username).
         'fetched': Integer. If success, the number of things fetched, if any.
-        'message': String. If no success, the failure message.
+        'messages': List. If no success, the failure message(s).
     """
 
     # How many photos (or whatever) do we fetch per page of retults?
@@ -461,12 +455,15 @@ class Fetcher(object):
         # What we'll return:
         self.return_value = {'fetched': 0}
 
-        if account.user:
-            self.return_value['account'] = account.user.username
-        elif account.pk:
-            self.return_value['account'] = 'Account: %s' % str(account)
+        if isinstance(account, Account):
+            if account.user:
+                self.return_value['account'] = account.user.username
+            elif account.pk:
+                self.return_value['account'] = 'Account: %s' % str(account)
+            else:
+                self.return_value['account'] = 'Unsaved Account'
         else:
-            self.return_value['account'] = 'Unsaved Account'
+            raise ValueError("An Account object is required")
 
         if account.has_credentials():
             self.account = account
@@ -474,36 +471,33 @@ class Fetcher(object):
                                 self.account.api_secret, format='parsed-json')
         else:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Account has no API credentials'
+            self.return_value['messages'] = ['Account has no API credentials']
 
     def fetch(self, **kwargs):
-        if self.account is None:
-            if 'success' not in self.return_value:
-                self.return_value['success'] = False
-                self.return_value['message'] = 'No Account has been set'
+        if self.is_paged:
+            self._fetch_pages(**kwargs)
         else:
-            if self.is_paged:
-                self._fetch_pages(**kwargs)
-            else:
-                self._fetch_page(**kwargs)
+            self._fetch_page(**kwargs)
 
-            if self._not_failed():
-                # OK so far; get extra data, if any, before saving.
-                try:
-                    self._fetch_extra()
-                except FetchError as e:
-                    self.return_value['success'] = False
-                    self.return_value['message'] = 'Error when fetching extra data: %s' % e
+        if self._not_failed():
+            # OK so far; get extra data, if any, before saving.
+            try:
+                self._fetch_extra()
+            except FetchError as e:
+                self.return_value['success'] = False
+                self.return_value['messages'] = [
+                                    'Error when fetching extra data: %s' % e]
 
-            if self._not_failed():
-                # Still OK; save the data we've got.
-                try:
-                    self._save_results()
-                    self.return_value['success'] = True
-                    self.return_value['fetched'] += self.results_count
-                except FetchError as e:
-                    self.return_value['success'] = False
-                    self.return_value['message'] = 'Error when saving data: %s' % e
+        if self._not_failed():
+            # Still OK; save the data we've got.
+            try:
+                self._save_results()
+                self.return_value['success'] = True
+                self.return_value['fetched'] += self.results_count
+            except FetchError as e:
+                self.return_value['success'] = False
+                self.return_value['messages'] = [
+                                            'Error when saving data: %s' % e]
 
         return self.return_value
 
@@ -523,7 +517,8 @@ class Fetcher(object):
             self._call_api(**kwargs)
         except FetchError as e:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Error when calling Flickr API: %s' % e
+            self.return_value['messages'] = [
+                                    'Error when calling Flickr API: %s' % e]
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""
@@ -673,7 +668,8 @@ class PhotosFetcher(Fetcher):
                     "Error when getting info about User with id '%s': %s" % \
                                                         (flickr_user_id, e))
 
-            user_obj = UserSaver().save_user(user_info['person'], datetime_now())
+            user_obj = UserSaver().save_user(
+                                        user_info['person'], datetime_now())
             self.fetched_users[flickr_user_id] = user_obj
 
     def _fetch_photo_info(self, photo_id):
@@ -925,6 +921,214 @@ class PhotosetsFetcher(Fetcher):
             p = saver.save_photoset(photoset)
         self.results_count = len(self.results)
 
+
+class OriginalFilesFetcher(object):
+    """
+    Fetch the original photo files for a single Account.
+
+    Not based off FlickrFetcher because we don't use the API so it's quite
+    different. But still has a similar external appearance.
+
+    Use something like:
+
+        results = OriginalFilesFetcher(account=account_object).fetch()
+
+    results is a dict that will have:
+        'success': Boolean.
+        'account': String. Indicating the Account (eg, its User's username).
+        'fetched': Integer. If success, the number of files fetched, if any.
+        'messages': List of strings. If no success, the failure message(s).
+    """
+
+    def __init__(self, account):
+        self.account = None
+
+        self.results = []
+
+        self.results_count = 0
+
+        self.return_value = {'fetched': 0}
+
+        if account.user:
+            self.return_value['account'] = account.user.username
+        else:
+            self.return_value['success'] = False
+            self.return_value['messages'] = ['This account has no Flickr User']
+
+        self.account = account
+
+    def fetch(self, fetch_all=False):
+        """
+        Download and save original photos and videos for all Photo objects
+        (or just those that don't already have them).
+
+        self.account must be an Account object first.
+
+        fetch_all -- Boolean. Fetch ALL photos/videos, even if we've already
+                        got them?
+        """
+        # Might already have success=False from __init__():
+        if 'success' not in self.return_value:
+            self._fetch_files(fetch_all)
+
+            self.return_value['fetched'] = self.results_count
+
+        return self.return_value
+
+    def _fetch_files(self, fetch_all):
+        """
+        Download and save original photos and videos for all Photo objects
+        (or just those that don't already have them).
+
+        fetch_all -- Boolean. Fetch ALL photos/videos, even if we've already
+                        got them?
+        """
+
+        photos = Photo.public_objects.filter(user=self.account.user)
+
+        if not fetch_all:
+            photos = photos.filter(original_file='')
+
+        error_messages = []
+
+        for photo in photos:
+            try:
+                self._fetch_and_save_file(photo=photo, media_type='photo')
+                self.results_count += 1
+            except FetchError as e:
+                error_messages.append(str(e))
+
+            if photo.media == 'video':
+                try:
+                    self._fetch_and_save_file(photo=photo, media_type='video')
+                    self.results_count += 1
+                except FetchError as e:
+                    error_messages.append(str(e))
+
+        if len(error_messages) > 0:
+            self.return_value['success'] = False
+            self.return_value['messages'] = error_messages
+        else:
+            self.return_value['success'] = True
+
+    def _fetch_and_save_file(self, photo, media_type):
+        """
+        Downloads a video or photo file and saves it to the Photo object.
+
+        Expects:
+            photo -- A Photo object.
+            media_type -- String, either 'photo' or 'video'.
+
+        Raises FetchError if something goes wrong.
+        """
+
+        if media_type == 'video':
+            url = photo.video_original_url
+            # Accepted video formats:
+            # https://help.yahoo.com/kb/flickr/sln15628.html
+            # BUT, they all seem to be sent as video/mp4.
+            acceptable_content_types = ['video/mp4',]
+
+        else:
+            url = photo.original_url
+            acceptable_content_types = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+
+        filepath = False
+        try:
+            # Saves the file to /tmp/:
+            filepath = self._download_file(
+                                        url, acceptable_content_types, photo)
+        except FetchError as e:
+            raise FetchError(e)
+
+        if filepath:
+            # Reopen file and save to the Photo:
+            reopened_file = open(filepath, 'rb')
+            django_file = File(reopened_file)
+
+            if media_type == 'video':
+                photo.video_original_file.save(
+                            os.path.basename(filepath), django_file, save=True)
+            else:
+                photo.original_file.save(
+                            os.path.basename(filepath), django_file, save=True)
+
+
+    def _download_file(self, url, acceptable_content_types, photo):
+        """
+        Downloads a file from a URL and saves it into /tmp/.
+        Returns the filepath.
+
+        Expects:
+            url -- The URL of the file to fetch.
+            acceptable_content_types -- A list of MIME types the request must
+                                        match.
+            photo -- The Photo object we're fetching for.
+
+        Raises FetchError if something goes wrong.
+        """
+        try:
+            # From http://stackoverflow.com/a/13137873/250962
+            r = requests.get(url, stream=True)
+            if r.status_code == 200:
+                if r.headers['Content-Type'] in acceptable_content_types:
+                    # Where we'll temporarily save the file:
+                    filename = self._make_filename(url, r.headers, photo)
+                    filepath = '/tmp/%s' % filename
+                    # Save the file there:
+                    with open(filepath, 'wb') as f:
+                        r.raw.decode_content = True
+                        shutil.copyfileobj(r.raw, f)
+                    return filepath
+
+                else:
+                    raise FetchError(
+                        "Invalid content type (%s) when fetching %s"% \
+                                            (r.headers['content_type'], url))
+            else:
+                raise FetchError("Got status code %s when fetching %s" % \
+                                                        (r.status_code, url))
+        except Exception as e:
+            raise FetchError("Something when wrong when fetching %s: %s" % \
+                                                                    (url, e))
+
+    def _make_filename(self, url, headers, photo):
+        """Find the filename of the downloaded file.
+        Returns a string.
+
+        url will probably end in like 'filename.jpg' for an image.
+        But videos end in like '/1234567890/'.
+
+        headers is a dict of response headers from requesting the URL.
+        Videos will hopefully have the filename in the Content-Disposition
+        header.
+        """
+        # Should work for photos:
+        filename = os.path.basename(url)
+
+        if filename == '':
+            # Probably a video, so we have to get the filename from headers:
+            try:
+                # Could be like 'attachment; filename=26897200312.avi'
+                disposition = headers['Content-Disposition']
+                m = re.search(
+                            'filename\=(.*?)$', headers['Content-Disposition'])
+                try:
+                    filename = m.group(1)
+                except (AttributeError, IndexError):
+                    pass
+            except KeyError:
+                pass
+
+        if filename == '':
+            # We shouldn't get here, but in case, make a filename.
+            filename = '%s_%s_o' % (photo.flickr_id, photo.original_secret)
+
+        return filename
+
+
+
 ###########################################################################
 
 
@@ -1022,6 +1226,26 @@ class PhotosetsMultiAccountFetcher(MultiAccountFetcher):
         for account in self.accounts:
             self.return_value.append(
                 PhotosetsFetcher(account).fetch()
+            )
+
+        return self.return_value
+
+
+class OriginalFilesMultiAccountFetcher(MultiAccountFetcher):
+    """For fetching original photo files for ALL or ONE account(s).
+
+    Usage:
+
+        results = OriginalFilesMultiAccountFetcher().fetch(fetch_all=True)
+
+    results will be a list of dicts containing info about what was fetched(or
+    went wrong) for each account.
+    """
+
+    def fetch(self, fetch_all=False):
+        for account in self.accounts:
+            self.return_value.append(
+                OriginalFilesFetcher(account).fetch(fetch_all=fetch_all)
             )
 
         return self.return_value

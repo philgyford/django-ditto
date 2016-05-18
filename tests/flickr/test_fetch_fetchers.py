@@ -1,16 +1,24 @@
 import calendar
+import datetime
 import json
+import os
+import pytz
+import tempfile
 from unittest.mock import call, patch
 
 import responses
+from requests.exceptions import HTTPError
+from flickrapi.exceptions import FlickrError
 from freezegun import freeze_time
+from django.test import override_settings, TestCase
 
 from ditto.core.utils import datetime_now
-from ditto.flickr.factories import AccountFactory, UserFactory
+from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
 from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher,\
-        UserFetcher, UserIdFetcher,\
+        UserFetcher, UserIdFetcher, OriginalFilesFetcher,\
         PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
-        RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher
+        RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher,\
+        OriginalFilesMultiAccountFetcher
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -21,7 +29,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory(user=None)
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'Account: 1')
 
     def test_with_unsaved_account(self):
@@ -29,7 +37,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory.build(user=None)
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'Unsaved Account')
 
     def test_returns_false_with_no_creds(self):
@@ -37,8 +45,26 @@ class FetcherTestCase(FlickrFetchTestCase):
         account = AccountFactory(user=UserFactory(username='bob'))
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
         self.assertEqual(result['account'], 'bob')
+
+    def test_requires_an_account_argument(self):
+        with self.assertRaises(TypeError):
+            result = Fetcher()
+
+    def test_requires_valid_account_object(self):
+        with self.assertRaises(ValueError):
+            result = Fetcher(account=None)
+
+    @patch.object(Fetcher, '_fetch_extra')
+    @patch.object(Fetcher, '_fetch_page')
+    def test_returns_false_when_extra_data_fetching_fails(self, fetch_page, fetch_extra):
+        fetch_extra.side_effect = FetchError('Oh dear')
+        account = AccountFactory(user=UserFactory(username='terry'),
+                                            api_key='1234', api_secret='9876')
+        result = Fetcher(account=account).fetch()
+        self.assertFalse(result['success'])
+        self.assertIn('Oh dear', result['messages'][0])
 
     @patch('ditto.flickr.fetch.Fetcher._call_api')
     @patch('ditto.flickr.fetch.Fetcher._save_results')
@@ -57,7 +83,7 @@ class FetcherTestCase(FlickrFetchTestCase):
                                             api_key='1234', api_secret='9876')
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @patch('ditto.flickr.fetch.Fetcher._call_api')
     def test_failure_with_no_child_save_results(self, call_api):
@@ -66,7 +92,7 @@ class FetcherTestCase(FlickrFetchTestCase):
                                             api_key='1234', api_secret='9876')
         result = Fetcher(account=account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
 
 class UserIdFetcherTestCase(FlickrFetchTestCase):
@@ -83,7 +109,7 @@ class UserIdFetcherTestCase(FlickrFetchTestCase):
             body='{"stat": "fail", "code": 99, "message": "Insufficient permissions. Method requires read privileges; none granted."}')
         result = UserIdFetcher(account=self.account).fetch()
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @responses.activate
     def test_returns_id(self):
@@ -116,7 +142,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
                                                         nsid='35034346050@N01')
 
         self.assertFalse(result['success'])
-        self.assertIn('message', result)
+        self.assertIn('messages', result)
 
     @responses.activate
     def test_makes_one_api_calls(self):
@@ -152,6 +178,252 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(result['fetched'], 1)
 
 
+class FilesFetcherTestCase(TestCase):
+
+    def setUp(self):
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.fetcher = OriginalFilesFetcher(account=account)
+
+        self.photo_1 = PhotoFactory(title='p1',
+                                            original_file='p1.jpg', user=user)
+        # Needs a post_time for testing file save path:
+        self.photo_2 = PhotoFactory(title='p2',
+                original_file=None, user=user,
+                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
+        self.video_1 = PhotoFactory(title='v1',
+                                media='video', original_file='v1.jpg',
+                                video_original_file='v1.mov', user=user)
+        self.video_2 = PhotoFactory(title='v2',
+                                media='video', original_file=None,
+                                video_original_file=None, user=user,
+                                flickr_id='1234567890', original_secret='7777',
+                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
+        # And one by someone else:
+        self.photo_3 = PhotoFactory(title='p3',
+                                        original_file=None, user=UserFactory())
+
+    def test_fails_with_no_account(self):
+        with self.assertRaises(TypeError):
+            fetcher = OriginalFilesFetcher()
+
+    def test_fails_with_no_flickr_user(self):
+        fetcher = OriginalFilesFetcher(account=AccountFactory(user=None))
+        results = fetcher.fetch()
+        self.assertFalse(results['success'])
+        self.assertIn(
+                    'This account has no Flickr User', results['messages'][0])
+
+    # This all feels too much like I'm testing internal behaviour, but not
+    # sure what else to do...
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_missing(self, fetch_and_save_file):
+        "Goes to fetch for photos without files already."
+        results = self.fetcher.fetch()
+        calls = [
+                    call(photo=self.photo_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='video'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_all(self, fetch_and_save_file):
+        "Goes to fetch for ALL photos."
+        results = self.fetcher.fetch(fetch_all=True)
+        calls = [
+                    call(photo=self.photo_1, media_type='photo'),
+                    call(photo=self.video_1, media_type='photo'),
+                    call(photo=self.video_1, media_type='video'),
+                    call(photo=self.photo_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='photo'),
+                    call(photo=self.video_2, media_type='video'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_results_for_fetch_missing(self, fetch_and_save_file):
+        "Results values should be OK when fetching only missing photos/videos."
+        results = self.fetcher.fetch()
+        self.assertTrue(results['success'])
+        self.assertEqual(results['fetched'], 3)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_results_for_fetch_all(self, fetch_and_save_file):
+        "Results values should be OK when fetching ALL photos/videos."
+        results = self.fetcher.fetch(fetch_all=True)
+        self.assertTrue(results['success'])
+        self.assertEqual(results['fetched'], 6)
+
+    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
+    def test_error_results(self, fetch_and_save_file):
+        "Sets the correct error values if things go wrong."
+        fetch_and_save_file.side_effect = FetchError('Oh dear')
+        results = self.fetcher.fetch()
+        self.assertFalse(results['success'])
+        self.assertEqual(results['fetched'], 0)
+        self.assertEqual(len(results['messages']), 3)
+        self.assertEqual(results['messages'][0], 'Oh dear')
+
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_downloads_photo(self, download_file):
+        "Calls the download method correctly for photos."
+        download_file.return_value = False
+        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+        download_file.assert_has_calls( [ call(
+                    self.photo_2.original_url,
+                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',],
+                    self.photo_2
+                ) ] )
+
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_downloads_video(self, download_file):
+        "Calls the download method correctly for videos."
+        download_file.return_value = False
+        self.fetcher._fetch_and_save_file(self.video_2, 'video')
+        download_file.assert_has_calls( [ call(
+                    self.video_2.video_original_url,
+                    ['video/mp4',],
+                    self.video_2
+                ) ] )
+
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_raises_error_if_download_fails(self, download_file):
+        "If _download_file() raises an error, so does _fetch_and_save_file()"
+        download_file.side_effect = FetchError("Ooops")
+        with self.assertRaises(FetchError):
+            self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_saves_downloaded_photo_file(self, download_file):
+        # Make a temporary file, like _download_file() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download_file.return_value = temp_filepath
+
+        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+        self.assertEqual(
+            self.photo_2.original_file.name,
+            'flickr/%s/2015/08/14/%s' % (
+                self.photo_2.user.nsid,
+                os.path.basename(temp_filepath)
+            )
+        )
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(OriginalFilesFetcher, '_download_file')
+    def test_saves_downloaded_video_file(self, download_file):
+        # Make a temporary file, like _download_file() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download_file.return_value = temp_filepath
+
+        self.fetcher._fetch_and_save_file(self.video_2, 'video')
+        self.assertEqual(
+            self.video_2.video_original_file.name,
+            'flickr/%s/2015/08/14/%s' % (
+                self.video_2.user.nsid,
+                os.path.basename(temp_filepath)
+            )
+        )
+
+    def test_make_filename_photo(self):
+        "Should use the original photo's filename."
+        filename = self.fetcher._make_filename(
+            'https://c2.staticflickr.com/8/7019/27006033235_caa438b3b8_o.jpg',
+            {},
+            self.photo_2
+        )
+        self.assertEqual(filename, '27006033235_caa438b3b8_o.jpg')
+
+    def test_make_filename_video(self):
+        "Should use the Content-Disposition filename."
+        filename = self.fetcher._make_filename(
+            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
+            {'Content-Disposition': 'attachment; filename=26348530105.mov'},
+            self.video_2
+        )
+        self.assertEqual(filename, '26348530105.mov')
+
+    def test_make_filename_fallback(self):
+        "It should make a filename based on Photo's id and secret"
+        filename = self.fetcher._make_filename(
+            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
+            {},
+            self.video_2
+        )
+        self.assertEqual(filename, '1234567890_7777_o')
+
+    def test_make_filename_fallback_2(self):
+        "It should make a filename if it can't match Content-Disposition name."
+        filename = self.fetcher._make_filename(
+            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
+            {'Content-Disposition': 'bibble; bobble'},
+            self.video_2
+        )
+        self.assertEqual(filename, '1234567890_7777_o')
+
+
+class FilesFetcherDownloadTestCase(TestCase):
+    "Testing the file downloading part of the FilesFetcher."
+
+    def setUp(self):
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.fetcher = OriginalFilesFetcher(account=account)
+        self.photo = PhotoFactory(original_file=None, user=user)
+
+    def do_download(self, status=200, content_type='image/jpg'):
+        "Mocks requests and calls _download_file()"
+        # Open the image we're going to pretend we're fetching from the URL:
+        with open('tests/flickr/fixtures/images/marmite.jpg', 'rb') as img1:
+
+            responses.add(responses.GET, self.photo.original_url,
+                            body=img1.read(),
+                            status=status,
+                            content_type=content_type,
+                            adding_headers={'Transfer-Encoding': 'chunked'})
+
+            return self.fetcher._download_file(
+                        self.photo.original_url, ['image/jpg'], self.photo )
+
+    @responses.activate
+    @patch.object(OriginalFilesFetcher, '_make_filename')
+    def test_downloads_file(self, make_filename):
+        "Streams a jpg, saves it to /tmp/, returns the path, calls _make_filename()."
+        make_filename.return_value = 'marmite.jpg'
+
+        filepath = self.do_download()
+
+        self.assertTrue(os.path.isfile(filepath))
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(filepath, '/tmp/marmite.jpg')
+        make_filename.assert_called_once_with(
+                self.photo.original_url, {'Content-Type': 'image/jpg', 'Transfer-Encoding': 'chunked'}, self.photo)
+
+    @responses.activate
+    def test_raises_error_on_get_failure(self):
+        "If the requests.get() call raises an error."
+        responses.add(responses.GET, self.photo.original_url,
+                        body=HTTPError('Something went wrong'))
+        with self.assertRaises(FetchError):
+            filepath = self.fetcher._download_file(
+                        self.photo.original_url, ['image/jpg'], self.photo )
+
+    @responses.activate
+    def test_raises_error_on_bad_status_code(self):
+        with self.assertRaises(FetchError):
+            filepath = self.do_download(status=500)
+
+    @responses.activate
+    def test_raises_error_with_invalid_content_type(self):
+        "If downloaded file has content type different to what we ask for."
+        with self.assertRaises(FetchError):
+            filepath = self.do_download(content_type='text/html')
+
+
 class PhotosFetcherTestCase(FlickrFetchTestCase):
     """Testing the parent class that's used for all kinds of fetching lists of
     photos."""
@@ -168,7 +440,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         with patch('time.sleep'):
             result = self.fetcher.fetch()
             self.assertFalse(result['success'])
-            self.assertIn('message', result)
+            self.assertIn('messages', result)
 
     @responses.activate
     @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_info')
@@ -178,8 +450,9 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         """For each photo in results, all the fetch_photo_* methods should be
         called."""
         self.add_response('people.getInfo')
-        # Set results, as if we'd used a subclasse's _call_api() method:
-        self.fetcher.results = self.load_fixture('people.getPhotos')['photos']['photo']
+        # Set results, as if we'd used a subclass's _call_api() method:
+        self.fetcher.results = self.load_fixture(
+                                        'people.getPhotos')['photos']['photo']
         self.fetcher._fetch_extra()
         # Each method is called once per photo_id:
         calls = [call('25822158530'), call('26069027966'), call('25822102530')]
@@ -208,6 +481,14 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         self.fetcher._fetch_user_if_missing('35034346050@N01')
         self.assertEqual(0, len(responses.calls))
         self.assertFalse(save_user.called)
+
+    @responses.activate
+    def test_fetch_user_if_missing_raises_error(self):
+        "If there was an error fetching the user's Info"
+        self.add_response('people.getInfo',
+                                    body=FlickrError('Something went wrong'))
+        with self.assertRaises(FetchError):
+            self.fetcher._fetch_user_if_missing('35034346050@N01')
 
     @responses.activate
     def test_fetches_photo_info(self):
@@ -369,52 +650,6 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             self.assertEqual(results['fetched'], 3)
 
 
-class MultiAccountFetcherTestCase(FlickrFetchTestCase):
-
-    def setUp(self):
-        self.account_1 = AccountFactory(api_key='1234', api_secret='9876',
-                                    user=UserFactory(nsid='35034346050@N01') )
-        self.inactive_account = AccountFactory(
-                            api_key='2345', api_secret='8765', is_active=False,
-                            user=UserFactory(nsid='12345678901@N01') )
-        self.account_2 = AccountFactory(api_key='3456', api_secret='7654',
-                                    user=UserFactory(nsid='98765432101@N01') )
-
-    def test_fetch_throws_exception(self):
-        "Throws an except if its own fetch() method is called."
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher().fetch()
-
-    def test_uses_all_accounts_by_default(self):
-        fetcher = MultiAccountFetcher()
-        self.assertEqual(len(fetcher.accounts), 2)
-
-    def test_throws_exception_with_no_active_accounts(self):
-        self.account_1.is_active = False
-        self.account_2.is_active = False
-        self.account_1.save()
-        self.account_2.save()
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher()
-
-    def test_throws_exception_with_invalid_nsid(self):
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='nope')
-
-    def test_throws_exception_with_no_account(self):
-        "If the NSID is not attached to an Account."
-        user = UserFactory(nsid='99999999999@N01')
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='99999999999@N01')
-
-    def test_throws_exception_with_inactive_account(self):
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='12345678901@N01')
-
-    def test_works_with_valid_nsid(self):
-        fetcher = MultiAccountFetcher(nsid='35034346050@N01')
-        self.assertEqual(len(fetcher.accounts), 1)
-        self.assertEqual(fetcher.accounts[0], self.account_1)
 
 
 class PhotosetsFetcherTestCase(FlickrFetchTestCase):
@@ -502,6 +737,13 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
             self.assertTrue(results['success'])
             self.assertEqual(results['fetched'], 3)
 
+    @responses.activate
+    def test_raises_error_if_fails_getting_photos(self):
+        self.add_response('photosets.getPhotos',
+                                    body=FlickrError('Something went wrong'))
+        with self.assertRaises(FetchError):
+            self.fetcher._fetch_photos_in_photoset(72157665648859705)
+
 
 class MultiAccountFetcherTestCase(FlickrFetchTestCase):
 
@@ -518,6 +760,42 @@ class MultiAccountFetcherTestCase(FlickrFetchTestCase):
         self.assertTrue(
             issubclass(RecentPhotosMultiAccountFetcher, MultiAccountFetcher)
         )
+
+    def test_fetch_throws_exception(self):
+        "Throws an exception if its own fetch() method is called."
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher().fetch()
+
+    def test_uses_all_accounts_by_default(self):
+        fetcher = MultiAccountFetcher()
+        self.assertEqual(len(fetcher.accounts), 2)
+
+    def test_throws_exception_with_no_active_accounts(self):
+        self.account_1.is_active = False
+        self.account_2.is_active = False
+        self.account_1.save()
+        self.account_2.save()
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher()
+
+    def test_throws_exception_with_invalid_nsid(self):
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='nope')
+
+    def test_throws_exception_with_no_account(self):
+        "If the NSID is not attached to an Account."
+        user = UserFactory(nsid='99999999999@N01')
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='99999999999@N01')
+
+    def test_throws_exception_with_inactive_account(self):
+        with self.assertRaises(FetchError):
+            MultiAccountFetcher(nsid='12345678901@N01')
+
+    def test_works_with_valid_nsid(self):
+        fetcher = MultiAccountFetcher(nsid='35034346050@N01')
+        self.assertEqual(len(fetcher.accounts), 1)
+        self.assertEqual(fetcher.accounts[0], self.account_1)
 
 
 class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
@@ -571,6 +849,40 @@ class PhotosetsMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
         fetch.side_effect = [ret, ret]
 
         return_value = PhotosetsMultiAccountFetcher().fetch()
+
+        self.assertEqual(len(return_value), 2)
+        self.assertEqual(return_value[0]['account'], 'bob')
+
+
+class OriginalFilesMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
+
+    @patch.object(OriginalFilesFetcher, '__init__')
+    @patch.object(OriginalFilesFetcher, 'fetch')
+    def test_inits_fetcher_with_active_accounts(self, fetch, init):
+        "OriginalFilesFetcher should be called with 2 active accounts."
+        init.return_value = None
+        OriginalFilesMultiAccountFetcher().fetch()
+        init.assert_has_calls([call(self.account_1), call(self.account_2)])
+
+    @patch.object(OriginalFilesFetcher, 'fetch')
+    def test_calls_fetch_for_active_accounts(self, fetch):
+        "OriginalFilesFetcher.fetch() should be called twice."
+        OriginalFilesMultiAccountFetcher().fetch()
+        fetch.assert_has_calls([call(fetch_all=False), call(fetch_all=False)])
+
+    @patch.object(OriginalFilesFetcher, 'fetch')
+    def test_calls_fetch_with_fetch_all_param(self, fetch):
+        "fetch() should pass on the fetch_all param"
+        OriginalFilesMultiAccountFetcher().fetch(fetch_all=True)
+        fetch.assert_has_calls([call(fetch_all=True), call(fetch_all=True)])
+
+    @patch.object(OriginalFilesFetcher, 'fetch')
+    def test_returns_list_of_return_values(self, fetch):
+        "Should return a list of the dicts that OriginalFilesFetcher.fetch() returns"
+        ret = {'success': True, 'account': 'bob', 'fetched': 7}
+        fetch.side_effect = [ret, ret]
+
+        return_value = OriginalFilesMultiAccountFetcher().fetch()
 
         self.assertEqual(len(return_value), 2)
         self.assertEqual(return_value[0]['account'], 'bob')

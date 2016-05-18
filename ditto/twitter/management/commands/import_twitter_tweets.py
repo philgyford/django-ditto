@@ -51,5 +51,5 @@ class Command(BaseCommand):
         else:
 
             self.stderr.write('Failed to import tweets: %s' % (
-                                                            result['message']))
+                                                        result['messages'][0]))
 

@@ -101,7 +101,8 @@ class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('show_image', 'user', 'title', 'description', 'summary',
-                'permalink', 'is_private', 'flickr_id', 'media', 'license',)
+                'permalink', 'is_private', 'flickr_id', 'media', 'license',
+                'original_file', 'video_original_file', )
         }),
         ('Times', {
             'classes': ('collapse',),

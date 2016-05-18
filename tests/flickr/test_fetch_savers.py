@@ -198,6 +198,15 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         save_tags.assert_called_once_with(photo, photo_data['info']['tags']['tag'])
 
     @patch('ditto.flickr.fetch.PhotoSaver._save_tags')
+    def test_saves_photo_with_no_exif(self, save_tags):
+        "If it has no EXIF data it doesn't complain."
+
+        photo_data = self.make_photo_data()
+        del(photo_data['exif']['exif'])
+        photo = self.make_photo_object( photo_data )
+        self.assertEqual(photo.flickr_id, int(photo_data['info']['id']))
+
+    @patch('ditto.flickr.fetch.PhotoSaver._save_tags')
     def test_saves_video_data(self, save_tags):
         photo_data = self.make_photo_data()
         # Change to use the getSizes fixture including video data:

@@ -1,5 +1,5 @@
 # coding: utf-8
-from ._fetch_twitter import FetchTwitterCommand
+from . import FetchTwitterCommand
 from ...fetch import RecentTweetsFetcher
 
 

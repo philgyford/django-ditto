@@ -391,7 +391,7 @@ class Fetch(object):
             self._post_fetch()
         else:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Account has no API credentials'
+            self.return_value['messages'] = ['Account has no API credentials']
 
         self.return_value['fetched'] = self.results_count
 
@@ -409,7 +409,7 @@ class Fetch(object):
             self._call_api()
         except TwythonError as e:
             self.return_value['success'] = False
-            self.return_value['message'] = 'Error when calling API: %s' % e
+            self.return_value['messages'] = ['Error when calling API: %s' % e]
         else:
             # If we've got to the last 'page' of tweet results, we'll receive
             # an empty list from the API.

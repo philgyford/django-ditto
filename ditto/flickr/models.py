@@ -1,6 +1,7 @@
 # coding: utf-8
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
@@ -89,7 +90,85 @@ class ExtraPhotoManagers(models.Model):
 class Photo(DittoItemModel, ExtraPhotoManagers):
 
     ditto_item_name = 'flickr_photo'
-    
+
+    # The 'label's are used in Flickr's API to identify sizes.
+    # The keys in this dict are what we use internally, for method names and
+    # for the sizes of PhotoDownloads.
+    # See https://www.flickr.com/services/api/misc.urls.html
+    PHOTO_SIZES = {
+        'square': {
+            'label':    'Square',
+            'suffix':   's',   # Used in this size's flickr.com URL.
+        },
+        'large_square': {
+            'label':    'Large square',
+            'suffix':   'q',
+        },
+        'thumbnail': {
+            'label':    'Thumbnail',
+            'suffix':   't',
+        },
+        'small':    {
+            'label':    'Small',
+            'suffix':   'm',
+        },
+        'small_320':    {
+            'label':    'Small 320',
+            'suffix':   'n',
+        },
+        'medium':    {
+            'label':    'Medium',
+            'suffix':   '',
+        },
+        'medium_640':    {
+            'label':    'Medium 640',
+            'suffix':   'z',
+        },
+        # Only exist after March 1st 2012.
+        'medium_800':    {
+            'label':    'Medium 800',
+            'suffix':   'c',
+        },
+        # Before May 25th 2010, large only exist for very large original images.
+        'large':    {
+            'label':    'Large',
+            'suffix':   'b',
+        },
+        # Only exist after March 1st 2012.
+        'large_1600':    {
+            'label':    'Large 1600',
+            'suffix':   'h',
+        },
+        # Only exist after March 1st 2012.
+        'large_2048':    {
+            'label':    'Large 2048',
+            'suffix':   'k',
+        },
+        'original':    {
+            'label':    'Original',
+            'suffix':   'o',
+        },
+    }
+
+    VIDEO_SIZES = {
+        'mobile_mp4': {
+            'label': 'Mobile MP4',
+            'url_size': 'mobile',   # Used in this size's flickr.com URL.
+        },
+        'site_mp4': {
+            'label': 'Site MP4',
+            'url_size': 'site',
+        },
+        'hd_mp4': {
+            'label': 'HD MP4',
+            'url_size': 'hd',
+        },
+        'video_original': {
+            'label': 'Video Original',
+            'url_size': 'orig',
+        },
+    }
+
     # From
     # https://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
     LICENSES = (
@@ -306,6 +385,29 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     tags = TaggableManager(blank=True, manager=managers._PhotoTaggableManager,
                                                         through=TaggedPhoto)
 
+    def upload_path(self, filename):
+        """Generate the path under MEDIA_ROOT where the original file will be
+        saved.
+        """
+        dirbase = getattr(settings, 'DITTO_FLICKR_PHOTO_DIR_BASE', 'flickr')
+        dirformat = getattr(
+                        settings, 'DITTO_FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
+        return '/'.join([
+            dirbase,
+            self.user.nsid,
+            str(self.post_time.date().strftime(dirformat)),
+            filename
+        ])
+
+    # Using a FileField rather than ImageField so we don't need to install
+    # Pillow just for this. And we're unlikely to display the original
+    # in a web page as an image.
+    original_file = models.FileField(
+                    upload_to=upload_path, null=False, blank=True, default='')
+    video_original_file = models.FileField(
+                    upload_to=upload_path, null=False, blank=True, default='',
+                    help_text="Only present for Videos.")
+
     class Meta:
         ordering = ('-post_time',)
 
@@ -317,7 +419,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """Make the summary that's created when the Photo is saved."""
         return truncate_string(self.description,
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
-
     @property
     def account(self):
         "The Account whose photo this is, if any. Otherwise, None."
@@ -369,94 +470,69 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     def large_square_height(self):
         return 150
 
-    # URLs for all image sizes:
-
-    @property
-    def square_url(self):
-        return self._image_url('s')
-
-    @property
-    def large_square_url(self):
-        return self._image_url('q')
-
-    @property
-    def thumbnail_url(self):
-        return self._image_url('t')
-
-    @property
-    def small_url(self):
-        return self._image_url('m')
-
-    @property
-    def small_320_url(self):
-        return self._image_url('n')
-
-    @property
-    def medium_url(self):
-        return self._image_url('-')
-
-    @property
-    def medium_640_url(self):
-        return self._image_url('z')
-
-    @property
-    def medium_800_url(self):
-        return self._image_url('c')
-
-    @property
-    def large_url(self):
-        return self._image_url('b')
-
-    @property
-    def large_1600_url(self):
-        return self._image_url('h')
-
-    @property
-    def large_2048_url(self):
-        return self._image_url('k')
-
-    @property
-    def original_url(self):
-        return 'https://farm%s.static.flickr.com/%s/%s_%s_o.%s' % (
+    def _image_url(self, size):
+        """
+        Helper for the photo url property methods.
+        See https://www.flickr.com/services/api/misc.urls.html
+        size -- One of the keys from self.PHOTO_SIZES.
+        """
+        if size == 'original':
+            return 'https://farm%s.static.flickr.com/%s/%s_%s_%s.%s' % (
                 self.farm, self.server, self.flickr_id, self.original_secret,
-                self.original_format)
-
-    @property
-    def mobile_mp4_url(self):
-        return self._video_url('mobile')
-
-    @property
-    def site_mp4_url(self):
-        return self._video_url('site')
-
-    @property
-    def hd_mp4_url(self):
-        return self._video_url('hd')
-
-    @property
-    def original_video_url(self):
-        return self._video_url('orig')
+                self.PHOTO_SIZES['original']['suffix'], self.original_format)
+        else:
+            size_ext = ''
+            try:
+                # Medium size doesn't have a letter suffix.
+                if self.PHOTO_SIZES[size]['suffix']:
+                    size_ext = '_%s' % self.PHOTO_SIZES[size]['suffix']
+            except KeyError:
+                return None
+            return 'https://farm%s.static.flickr.com/%s/%s_%s%s.jpg' % (
+                self.farm, self.server, self.flickr_id, self.secret, size_ext)
 
     def _video_url(self, size):
-        """Helper for the video URL property methods.
-        Returns None for photos, or a URL like
+        """
+        Helper for the video URL property methods.
+        Returns None for photos, or a URL for videos like:
         https://www.flickr.com/photos/philgyford/25743649964/play/site/a8bd5ddf59/
-        for videos.
-        size -- 'site', 'mobile', 'hd', or 'orig'
+        size -- One of the keys from self.VIDEO_SIZES.
         """
         if self.media == 'photo':
             return None
         else:
-            return '%splay/%s/%s/' % (self.permalink, size, self.secret)
+            if size == 'video_original':
+                secret = self.original_secret
+            else:
+                secret = self.secret
+            url_size = self.VIDEO_SIZES[size]['url_size']
+            return '%splay/%s/%s/' % (self.permalink, url_size, secret)
 
-    def _image_url(self, size):
-        "Helper for the photo url property methods."
-        size_ext = ''
-        if size != '-':
-            # All non-Medium-size images:
-            size_ext = '_%s' % size
-        return 'https://farm%s.static.flickr.com/%s/%s_%s%s.jpg' % (
-                self.farm, self.server, self.flickr_id, self.secret, size_ext)
+    def __getattr__(self, name):
+        """
+        Enables us to use properties like 'small_320_url' or 'site_mp4_url'.
+        Will call the correct internal helper method to return the URL.
+        """
+        try:
+            # Split 'small_240_url' into ['small_240', 'url']
+            size, attr = name.rsplit('_', 1)
+        except ValueError:
+            self._raise_attr_error(type(self).__name__, name)
+
+        if attr == 'url':
+            # eg video_original_url()
+            if size in self.VIDEO_SIZES:
+                return self._video_url(size)
+            elif size in self.PHOTO_SIZES:
+                return self._image_url(size)
+            else:
+                self._raise_attr_error(type(self).__name__, name)
+        else:
+            self._raise_attr_error(type(self).__name__, name)
+
+    def _raise_attr_error(self, obj, attr):
+        msg = "'{0}' object has no attribute '{1}'"
+        raise AttributeError(msg.format(obj, attr))
 
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):

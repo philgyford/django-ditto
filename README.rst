@@ -118,7 +118,7 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 Photos
 ======
 
-Now you can fetch data about your Photos (it doesn't currently fetch the photo files themselves). This will fetch ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos)::
+Now you can fetch data about your Photos. This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos)::
 
     $ ./manage.py fetch_flickr_photos --days=all
 
@@ -129,6 +129,31 @@ This will only fetch Photos uploaded in the past 3 days::
 Both options can be restricted to only fetch for a single Account by adding the NSID of the Account's Flickr User, eg::
 
     $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
+
+To download the original photo and video files, use the ``fetch_flickr_originals`` command, *after* fetching the photo's data::
+
+    $ ./manage.py fetch_flickr_originals
+
+By default this will fetch all the original files that haven't yet been downloaded (so the first time, it will fetch all of them). To force it to download *all* the files again (if you've deleted them locally, but they're still on Flickr) then::
+
+    $ ./manage.py fetch_flickr_originals --all
+
+Both variants can be restricted to fetching files for a single account::
+
+    $ ./manage.py fetch_flickr_originals --account=35034346050@N01
+
+Files will be saved within your project's ``MEDIA_ROOT`` directory, as defined in ``settings.py``. There are two optional settings to customise the directories in which the files are saved. Their default values are as shown here::
+
+   DITTO_FLICKR_PHOTO_DIR_BASE = 'flickr'
+   DITTO_FLICKR_PHOTO_DIR_FORMAT = '%Y/%m/%d'
+
+These values are used if you don't specify your own settings.
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the date the photo was taken::
+
+    /var/www/example.com/media/flickr/2016/08/31/1234567_987654_o.jpg
+
+Note that videos will have two "original" files downloaded: the video itself and a JPG image that Flickr created for it.
 
 Photosets
 =========

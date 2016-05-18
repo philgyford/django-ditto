@@ -137,7 +137,7 @@ class AccountTestCase(TestCase):
                 '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
                 responses.calls[0].request.url)
         self.assertFalse(result['success'])
-        self.assertIn('Could not authenticate you', result['message'])
+        self.assertIn('Could not authenticate you', result['messages'][0])
 
     def test_has_credentials_true(self):
         self.add_response(body=self.make_verify_credentials_body(),

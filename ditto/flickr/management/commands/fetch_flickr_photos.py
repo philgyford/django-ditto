@@ -1,9 +1,9 @@
-from ._fetch_photos import FetchPhotosCommand
+from . import FetchPhotosCommand
 from ...fetch import RecentPhotosFetcher, RecentPhotosMultiAccountFetcher
 
 
 class Command(FetchPhotosCommand):
-    """Fetches photos from Flickr
+    """Fetches photos from Flickr.
 
     For all accounts:
         ./manage.py fetch_flickr_photos --days=3
@@ -18,7 +18,6 @@ class Command(FetchPhotosCommand):
     help = "Fetches recent or all photos for one or all Flickr Accounts"
 
     days_help = 'Fetches the most recent or all Photos, eg "3" or "all".'
-
 
     def fetch_photos(self, nsid, days):
         return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)

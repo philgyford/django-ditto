@@ -3,7 +3,7 @@ import argparse
 
 from django.core.management.base import CommandError
 
-from ._fetch_twitter import FetchTwitterCommand
+from . import FetchTwitterCommand
 from ...fetch import FavoriteTweetsFetcher
 
 

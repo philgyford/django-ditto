@@ -39,12 +39,13 @@ class Command(BaseCommand):
         # or:
         # { 'account': 'thescreenname',
         #   'success': False,
-        #   'message': 'This screen_name doesn't exist"
+        #   'messages': ["This screen_name doesn't exist"]
         # }
         for result in results:
             if result['success']:
                 self.stdout.write('Fetched @%s' % result['account'])
             else:
                 self.stderr.write('Could not fetch @%s: %s' % (
-                                        result['account'], result['message']))
+                                    result['account'], result['messages'][0]
+                                ))
 

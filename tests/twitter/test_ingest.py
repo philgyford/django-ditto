@@ -113,5 +113,5 @@ class TweetIngesterTestCase(TestCase):
         self.assertFalse(result['success'])
         self.assertEqual(result['tweets'], 0)
         self.assertEqual(result['files'], 1)
-        self.assertEqual(result['message'], 'No tweets were found')
+        self.assertEqual(result['messages'][0], 'No tweets were found')
 
