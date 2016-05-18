@@ -7,6 +7,7 @@ import tempfile
 from unittest.mock import call, patch
 
 import responses
+from requests.exceptions import HTTPError
 from freezegun import freeze_time
 from django.test import override_settings, TestCase
 
@@ -171,7 +172,8 @@ class FilesFetcherTestCase(TestCase):
         self.video_1 = PhotoFactory(media='video', original_file='v1.jpg',
                                 video_original_file='v1.mov', user=user)
         self.video_2 = PhotoFactory(media='video', original_file=None,
-                                video_original_file=None, user=user)
+                                video_original_file=None, user=user,
+                                flickr_id='1234567890', original_secret='7777')
         # And one by someone else:
         self.photo_3 = PhotoFactory(original_file=None, user=UserFactory())
 
@@ -262,7 +264,7 @@ class FilesFetcherTestCase(TestCase):
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_saves_file(self, download_file):
+    def test_saves_downloaded_file(self, download_file):
         # Make a temporary file, like _download_file() would make:
         jpg = tempfile.NamedTemporaryFile()
         temp_filepath = jpg.name
@@ -270,24 +272,97 @@ class FilesFetcherTestCase(TestCase):
 
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
         self.assertEqual(
-            self.photo_2.original_file.name, 
+            self.photo_2.original_file.name,
             'flickr/%s/2015/08/14/%s' % (
                 self.photo_2.user.nsid,
                 os.path.basename(temp_filepath)
             )
         )
 
-    # Test saves video file
-    # Test if _download_file throws exception
+    def test_make_filename_photo(self):
+        "Should use the original photo's filename."
+        filename = self.fetcher._make_filename(
+            'https://c2.staticflickr.com/8/7019/27006033235_caa438b3b8_o.jpg',
+            {},
+            self.photo_2
+        )
+        self.assertEqual(filename, '27006033235_caa438b3b8_o.jpg')
 
-    # Test _download_file makes request for url
-    # Test it checks content-types
-    # Test it saves temporary file
+    def test_make_filename_video(self):
+        "Should use the Content-Disposition filename."
+        filename = self.fetcher._make_filename(
+            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
+            {'Content-Disposition': 'attachment; filename=26348530105.mov'},
+            self.video_2
+        )
+        self.assertEqual(filename, '26348530105.mov')
 
-    # Test make_filename works with normal photo url
-    # Test make_filename works with content-disposition
-    # Test make_filename fallback.
+    def test_make_filename_fallback(self):
+        "It should make a filename based on Photo's id and secret"
+        filename = self.fetcher._make_filename(
+            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
+            {},
+            self.video_2
+        )
+        self.assertEqual(filename, '1234567890_7777_o')
 
+
+class FilesFetcherDownloadTestCase(TestCase):
+    "Testing the file downloading part of the FilesFetcher."
+
+    def setUp(self):
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.fetcher = OriginalFilesFetcher(account=account)
+        self.photo = PhotoFactory(original_file=None, user=user)
+
+    def do_download(self, status=200, content_type='image/jpg'):
+        "Mocks requests and calls _download_file()"
+        # Open the image we're going to pretend we're fetching from the URL:
+        with open('tests/flickr/fixtures/images/marmite.jpg', 'rb') as img1:
+
+            responses.add(responses.GET, self.photo.original_url,
+                            body=img1.read(),
+                            status=status,
+                            content_type=content_type,
+                            adding_headers={'Transfer-Encoding': 'chunked'})
+
+            return self.fetcher._download_file(
+                        self.photo.original_url, ['image/jpg'], self.photo )
+
+    @responses.activate
+    @patch.object(OriginalFilesFetcher, '_make_filename')
+    def test_downloads_file(self, make_filename):
+        "Streams a jpg, saves it to /tmp/, returns the path, calls _make_filename()."
+        make_filename.return_value = 'marmite.jpg'
+
+        filepath = self.do_download()
+
+        self.assertTrue(os.path.isfile(filepath))
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(filepath, '/tmp/marmite.jpg')
+        make_filename.assert_called_once_with(
+                self.photo.original_url, {'Content-Type': 'image/jpg', 'Transfer-Encoding': 'chunked'}, self.photo)
+
+    @responses.activate
+    def test_raises_error_on_get_failure(self):
+        "If the requests.get() call raises an error."
+        responses.add(responses.GET, self.photo.original_url,
+                        body=HTTPError('Something went wrong'))
+        with self.assertRaises(FetchError):
+            filepath = self.fetcher._download_file(
+                        self.photo.original_url, ['image/jpg'], self.photo )
+
+    @responses.activate
+    def test_raises_error_on_bad_status_code(self):
+        with self.assertRaises(FetchError):
+            filepath = self.do_download(status=500)
+
+    @responses.activate
+    def test_raises_error_with_invalid_content_type(self):
+        "If downloaded file has content type different to what we ask for."
+        with self.assertRaises(FetchError):
+            filepath = self.do_download(content_type='text/html')
 
 
 class PhotosFetcherTestCase(FlickrFetchTestCase):

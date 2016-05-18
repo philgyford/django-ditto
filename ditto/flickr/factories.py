@@ -53,6 +53,7 @@ class PhotoFactory(factory.DjangoModelFactory):
     title = factory.Sequence(lambda n: 'Photo %d' % n)
     secret = factory.Sequence(lambda n: (n * 10000))
     original_secret = factory.Sequence(lambda n: (n * 10001))
+    original_format = 'jpg'
     server = '987'
     farm = 2
     media = 'photo'
