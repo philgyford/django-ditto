@@ -455,12 +455,15 @@ class Fetcher(object):
         # What we'll return:
         self.return_value = {'fetched': 0}
 
-        if account.user:
-            self.return_value['account'] = account.user.username
-        elif account.pk:
-            self.return_value['account'] = 'Account: %s' % str(account)
+        if isinstance(account, Account):
+            if account.user:
+                self.return_value['account'] = account.user.username
+            elif account.pk:
+                self.return_value['account'] = 'Account: %s' % str(account)
+            else:
+                self.return_value['account'] = 'Unsaved Account'
         else:
-            self.return_value['account'] = 'Unsaved Account'
+            raise ValueError("An Account object is required")
 
         if account.has_credentials():
             self.account = account
@@ -471,34 +474,29 @@ class Fetcher(object):
             self.return_value['messages'] = ['Account has no API credentials']
 
     def fetch(self, **kwargs):
-        if self.account is None:
-            if 'success' not in self.return_value:
-                self.return_value['success'] = False
-                self.return_value['messages'] = ['No Account has been set']
+        if self.is_paged:
+            self._fetch_pages(**kwargs)
         else:
-            if self.is_paged:
-                self._fetch_pages(**kwargs)
-            else:
-                self._fetch_page(**kwargs)
+            self._fetch_page(**kwargs)
 
-            if self._not_failed():
-                # OK so far; get extra data, if any, before saving.
-                try:
-                    self._fetch_extra()
-                except FetchError as e:
-                    self.return_value['success'] = False
-                    self.return_value['messages'] = [
+        if self._not_failed():
+            # OK so far; get extra data, if any, before saving.
+            try:
+                self._fetch_extra()
+            except FetchError as e:
+                self.return_value['success'] = False
+                self.return_value['messages'] = [
                                     'Error when fetching extra data: %s' % e]
 
-            if self._not_failed():
-                # Still OK; save the data we've got.
-                try:
-                    self._save_results()
-                    self.return_value['success'] = True
-                    self.return_value['fetched'] += self.results_count
-                except FetchError as e:
-                    self.return_value['success'] = False
-                    self.return_value['messages'] = [
+        if self._not_failed():
+            # Still OK; save the data we've got.
+            try:
+                self._save_results()
+                self.return_value['success'] = True
+                self.return_value['fetched'] += self.results_count
+            except FetchError as e:
+                self.return_value['success'] = False
+                self.return_value['messages'] = [
                                             'Error when saving data: %s' % e]
 
         return self.return_value
@@ -670,7 +668,8 @@ class PhotosFetcher(Fetcher):
                     "Error when getting info about User with id '%s': %s" % \
                                                         (flickr_user_id, e))
 
-            user_obj = UserSaver().save_user(user_info['person'], datetime_now())
+            user_obj = UserSaver().save_user(
+                                        user_info['person'], datetime_now())
             self.fetched_users[flickr_user_id] = user_obj
 
     def _fetch_photo_info(self, photo_id):
@@ -1096,7 +1095,6 @@ class OriginalFilesFetcher(object):
         except Exception as e:
             raise FetchError("Something when wrong when fetching %s: %s" % \
                                                                     (url, e))
-        return False
 
     def _make_filename(self, url, headers, photo):
         """Find the filename of the downloaded file.
