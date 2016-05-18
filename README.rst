@@ -12,7 +12,7 @@ A collection of Django apps for copying things from third-party sites and
 services. Very much in-progress. Requires Python 3.4 or 3.5, and Django 1.8 or
 1.9.
 
-Currently, it copies your Bookmarks from `Pinboard <https://pinboard.in/>`_, your Tweets and Favorites from `Twitter <https://twitter.com/>`_, and your Photos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
+Currently, it copies your Bookmarks from `Pinboard <https://pinboard.in/>`_, your Tweets and Favorites from `Twitter <https://twitter.com/>`_, and your Photos, Photosets and original images/videos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
 
 Public and private Tweets, Photos and Bookmarks are copied, but only public
 ones are displayed in the included views and templates; non-public ones are
@@ -33,14 +33,14 @@ To use Ditto in your own project (untested as yet), add the core ``ditto.core`` 
 
     INSTALLED_APPS = (
         # other apps listed here.
-        'taggit',
+        # ...
+        'sortedm2m',        # Required only for ditto.flickr
+        'taggit',           # Required only for ditto.flickr and ditto.pinboard
         'ditto.core',
         'ditto.flickr',
         'ditto.pinboard',
         'ditto.twitter',
     )
-
-Note that both ``ditto.flickr`` and ``ditto.pinboard`` also require ``taggit`` to be included, as shown.
 
 Add the project's context processor in your settings::
 
@@ -60,9 +60,7 @@ Add the project's context processor in your settings::
 Add to urls.py
 **************
 
-To use Ditto's views you can include each app's URLs in your project's own
-``urls.py``. Note that each app requires the correct namespace (``flickr``,
-``pinboard`` or ``twitter``), eg::
+To use Ditto's supplied views you can include each app's URLs in your project's own ``urls.py``. Note that each app requires the correct namespace (``flickr``, ``pinboard`` or ``twitter``), eg::
 
     from django.conf.urls import include, url
     from django.contrib import admin
@@ -70,8 +68,9 @@ To use Ditto's views you can include each app's URLs in your project's own
     urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
 
-        # If you're using the ditto.pinboard app:
-        url(r'^ditto/pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
+        url(r'^flickr/', include('ditto.flickr.urls', namespace='flickr')),
+        url(r'^pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
+        url(r'^twitter/', include('ditto.twitter.urls', namespace='twitter')),
 
         # To include the overall, aggregated views:
         url(r'ditto/', include('ditto.core.urls', namespace='ditto')),
@@ -86,9 +85,7 @@ example.
  Services
 ##########
 
-As well as including the apps and URLs, you need to link each one with your
-account(s) on the related services. Each app has an ``Account`` model, which
-parallels an account on the related service (eg, a Twitter account). The method of linking the two varies with each service.
+As well as including the apps and URLs, you need to link each one with your account(s) on the related services. Each app has an ``Account`` model, which parallels an account on the related service (eg, a Twitter account). The method of linking the two varies with each service.
 
 
 ******
