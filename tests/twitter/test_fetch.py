@@ -12,9 +12,13 @@ from django.http import QueryDict
 from django.test import TestCase
 
 from ditto.twitter import factories
-from ditto.twitter.fetch import FavoriteTweetsFetcher, FetchError,\
-        TweetMixin, TwitterFetcher, RecentTweetsFetcher, UserMixin,\
-        UsersFetcher, TweetsFetcher, VerifyFetcher, FetchVerify
+from ditto.twitter.fetch import \
+        FetchError, UserMixin, TweetMixin,\
+        FetchVerify,\
+        FetchUsers, FetchTweets,\
+        FetchTweetsRecent, FetchTweetsFavorite,\
+        TwitterFetcher, VerifyFetcher, UsersFetcher, TweetsFetcher,\
+        RecentTweetsFetcher, FavoriteTweetsFetcher
 from ditto.twitter.models import Account, Media, Tweet, User
 
 
@@ -477,7 +481,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         # number of 'Tweets' in the results:
         body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
-        with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
+        with patch.object(FetchTweetsRecent, '_save_results'):
             result = RecentTweetsFetcher(screen_name='jill').fetch(count=25)
             self.assertIn('count=25', responses.calls[0][0].url)
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
@@ -501,7 +505,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.account_1.save()
         body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
-        with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
+        with patch.object(FetchTweetsRecent, '_save_results'):
             result = RecentTweetsFetcher(screen_name='jill').fetch(count=25)
             self.account_1.refresh_from_db()
             self.assertEqual(self.account_1.last_recent_id, 999)
@@ -543,7 +547,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(User.objects.count(), 3)
 
     @responses.activate
-    @patch('ditto.twitter.fetch.TweetMixin.save_tweet')
+    @patch.object(TweetMixin, 'save_tweet')
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
@@ -584,7 +588,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         qs['count'] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch('ditto.twitter.fetch.FetchTweetsRecent._save_results'):
+        with patch.object(FetchTweetsRecent, '_save_results'):
             with patch('time.sleep'):
                 result = RecentTweetsFetcher(screen_name='jill').fetch(
                                                                     count=700)
@@ -636,7 +640,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         "If fetching a number of tweets, requests that number, not since_id"
         body = json.dumps([{'id':1} for x in range(25)])
         self.add_response(body=body)
-        with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
+        with patch.object(FetchTweetsFavorite, '_save_results'):
             result = FavoriteTweetsFetcher(screen_name='jill').fetch(count=25)
             self.assertIn('count=25', responses.calls[0][0].url)
             self.assertNotIn('since_id=100', responses.calls[0][0].url)
@@ -660,7 +664,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.account_1.save()
         body = json.dumps([{'id':999} for x in range(25)])
         self.add_response(body=body)
-        with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
+        with patch.object(FetchTweetsFavorite, '_save_results'):
             result = FavoriteTweetsFetcher(screen_name='jill').fetch(count=25)
             self.account_1.refresh_from_db()
             self.assertEqual(self.account_1.last_favorite_id, 999)
@@ -702,7 +706,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(User.objects.count(), 3)
 
     @responses.activate
-    @patch('ditto.twitter.fetch.TweetMixin.save_tweet')
+    @patch.object(TweetMixin, 'save_tweet')
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
@@ -752,7 +756,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         qs['count'] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch('ditto.twitter.fetch.FetchTweetsFavorite._save_results'):
+        with patch.object(FetchTweetsFavorite, '_save_results'):
             with patch('time.sleep'):
                 result = FavoriteTweetsFetcher(screen_name='jill').fetch(
                                                                     count=700)
@@ -840,7 +844,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
         qs['user_id'] = '%2C'.join(map(str, ids[-50:]))
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch('ditto.twitter.fetch.FetchUsers._save_results'):
+        with patch.object(FetchUsers, '_save_results'):
             with patch('time.sleep'):
                 result = UsersFetcher(screen_name='jill').fetch(ids)
                 self.assertEqual(4, len(responses.calls))
@@ -944,7 +948,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
         #qs['id'] = ','.join(map(str, ids[-50:]))
         self.add_response(body=body, method='POST')
 
-        with patch('ditto.twitter.fetch.FetchTweets._save_results'):
+        with patch.object(FetchTweets, '_save_results'):
             with patch('time.sleep'):
                 result = TweetsFetcher(screen_name='jill').fetch(ids)
                 self.assertEqual(4, len(responses.calls))

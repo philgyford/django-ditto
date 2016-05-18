@@ -14,7 +14,9 @@ from django.test import override_settings, TestCase
 
 from ditto.core.utils import datetime_now
 from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
-from ditto.flickr.fetch import FetchError, Fetcher, MultiAccountFetcher,\
+from ditto.flickr.fetch import FetchError,\
+        UserSaver, PhotoSaver, PhotosetSaver,\
+        Fetcher, MultiAccountFetcher,\
         UserFetcher, UserIdFetcher, OriginalFilesFetcher,\
         PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
         RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher,\
@@ -66,8 +68,8 @@ class FetcherTestCase(FlickrFetchTestCase):
         self.assertFalse(result['success'])
         self.assertIn('Oh dear', result['messages'][0])
 
-    @patch('ditto.flickr.fetch.Fetcher._call_api')
-    @patch('ditto.flickr.fetch.Fetcher._save_results')
+    @patch.object(Fetcher, '_call_api')
+    @patch.object(Fetcher, '_save_results')
     def test_returns_true_with_creds(self, save_results, call_api):
         """Success is true if Account has API credentials"""
         account = AccountFactory(user=UserFactory(username='terry'),
@@ -85,7 +87,7 @@ class FetcherTestCase(FlickrFetchTestCase):
         self.assertFalse(result['success'])
         self.assertIn('messages', result)
 
-    @patch('ditto.flickr.fetch.Fetcher._call_api')
+    @patch.object(Fetcher, '_call_api')
     def test_failure_with_no_child_save_results(self, call_api):
         """Requires a child class to set its own _call_api()."""
         account = AccountFactory(user=UserFactory(username='terry'),
@@ -153,7 +155,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
-    @patch('ditto.flickr.fetch.UserSaver.save_user')
+    @patch.object(UserSaver, 'save_user')
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_calls_save_user_correctly(self, save_user):
         "The correct data should be sent to UserSaver.save_user()"
@@ -443,9 +445,9 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
             self.assertIn('messages', result)
 
     @responses.activate
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_info')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_sizes')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_exif')
+    @patch.object(PhotosFetcher, '_fetch_photo_info')
+    @patch.object(PhotosFetcher, '_fetch_photo_sizes')
+    @patch.object(PhotosFetcher, '_fetch_photo_exif')
     def test_fetches_extra_photo_data(self, fetch_photo_exif, fetch_photo_sizes, fetch_photo_info):
         """For each photo in results, all the fetch_photo_* methods should be
         called."""
@@ -462,7 +464,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @responses.activate
-    @patch('ditto.flickr.fetch.UserSaver.save_user')
+    @patch.object(UserSaver, 'save_user')
     def test_fetch_user_if_missing_fetches(self, save_user):
         """If the user isn't in fetched_users, it is fetched and saved."""
         self.add_response('people.getInfo')
@@ -472,7 +474,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         save_user.assert_called_once_with(user_data, datetime_now())
 
     @responses.activate
-    @patch('ditto.flickr.fetch.UserSaver.save_user')
+    @patch.object(UserSaver, 'save_user')
     def test_fetch_user_if_missing_doesnt_fetch(self, save_user):
         """If the user is in fetched_users, it doesn't fetch the data again."""
         self.add_response('people.getInfo')
@@ -612,7 +614,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             # Our fixture has 3 photos, so we should now have 9:
             self.assertEqual(len(self.fetcher.results), 9)
 
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_pages')
+    @patch.object(PhotosFetcher, '_fetch_pages')
     def test_calls_fetch_pages(self, fetch_pages):
         """Check that it uses the _fetch_pages() method we tested above,
         rather than the singular _fetch_page()."""
@@ -622,8 +624,8 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
     @responses.activate
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    @patch('ditto.flickr.fetch.PhotoSaver.save_photo')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_extra')
+    @patch.object(PhotoSaver, 'save_photo')
+    @patch.object(PhotosFetcher, '_fetch_extra')
     def test_fetches_recent_days(self, save_photo, fetch_extra):
         """Should only ask for photos from recent days, if number of days is set."""
         # '1439294400' is 2015-08-11 12:00:00 (ie, 3 days ago)
@@ -635,10 +637,10 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
     @responses.activate
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    @patch('ditto.flickr.fetch.PhotoSaver.save_photo')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_info')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_sizes')
-    @patch('ditto.flickr.fetch.PhotosFetcher._fetch_photo_exif')
+    @patch.object(PhotoSaver, 'save_photo')
+    @patch.object(PhotosFetcher, '_fetch_photo_info')
+    @patch.object(PhotosFetcher, '_fetch_photo_sizes')
+    @patch.object(PhotosFetcher, '_fetch_photo_exif')
     def test_saves_photos(self, fetch_photo_info, fetch_photo_sizes, fetch_photo_exif, save_photo):
         """It should call save_photos() for each photo it fetches."""
         self.add_response('people.getPhotos')
@@ -672,7 +674,7 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
             self.fetcher._call_api()
 
     @responses.activate
-    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_extra')
+    @patch.object(PhotosetsFetcher, '_fetch_extra')
     def test_fetches_multiple_pages(self, fetch_extra):
         """If the response from the API says there's more than 1 page of
         results _fetch_pages() should fetch them all."""
@@ -695,8 +697,8 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
             # Our fixture has 3 photosets, so we should now have 9:
             self.assertEqual(len(self.fetcher.results), 9)
 
-    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_pages')
-    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_extra')
+    @patch.object(PhotosetsFetcher, '_fetch_pages')
+    @patch.object(PhotosetsFetcher, '_fetch_extra')
     def test_calls_fetch_pages(self, fetch_extra, fetch_pages):
         """Check that it uses the _fetch_pages() method we tested above,
         rather than the singular _fetch_page()."""
@@ -705,7 +707,7 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
         fetch_pages.assert_called_once_with()
 
     @responses.activate
-    @patch('ditto.flickr.fetch.PhotosetSaver.save_photoset')
+    @patch.object(PhotosetSaver, 'save_photoset')
     def test_fetches_photos(self, save_photoset):
         """Should fetch the list of photos in each photoset."""
         self.add_response('photosets.getList',
@@ -726,8 +728,8 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
 
     @responses.activate
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    @patch('ditto.flickr.fetch.PhotosetSaver.save_photoset')
-    @patch('ditto.flickr.fetch.PhotosetsFetcher._fetch_photos_in_photoset')
+    @patch.object(PhotosetSaver, 'save_photoset')
+    @patch.object(PhotosetsFetcher, '_fetch_photos_in_photoset')
     def test_saves_photosets(self, fetch_photos, save_photoset):
         """It should call save_photoset() for each photoset it fetches."""
         self.add_response('photosets.getList')
@@ -800,21 +802,21 @@ class MultiAccountFetcherTestCase(FlickrFetchTestCase):
 
 class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
 
-    @patch('ditto.flickr.fetch.RecentPhotosFetcher.__init__')
-    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    @patch.object(RecentPhotosFetcher, '__init__')
+    @patch.object(RecentPhotosFetcher, 'fetch')
     def test_inits_fetcher_with_active_accounts(self, fetch, init):
         "RecentPhotosFetcher should be called with 2 active accounts."
         init.return_value = None
         RecentPhotosMultiAccountFetcher().fetch()
         init.assert_has_calls([call(self.account_1), call(self.account_2)])
 
-    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    @patch.object(RecentPhotosFetcher, 'fetch')
     def test_calls_fetch_for_active_accounts(self, fetch):
         "RecentPhotosFetcher.fetch() should be called twice."
         RecentPhotosMultiAccountFetcher().fetch(days=3)
         fetch.assert_has_calls([call(days=3), call(days=3)])
 
-    @patch('ditto.flickr.fetch.RecentPhotosFetcher.fetch')
+    @patch.object(RecentPhotosFetcher, 'fetch')
     def test_returns_list_of_return_values(self, fetch):
         "Should return a list of the dicts that RecentPhotosFetcher.fetch() returns"
         ret = {'success': True, 'account': 'bob', 'fetched': 7}
@@ -828,21 +830,21 @@ class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
 
 class PhotosetsMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
 
-    @patch('ditto.flickr.fetch.PhotosetsFetcher.__init__')
-    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    @patch.object(PhotosetsFetcher, '__init__')
+    @patch.object(PhotosetsFetcher, 'fetch')
     def test_inits_fetcher_with_active_accounts(self, fetch, init):
         "PhotosetsFetcher should be called with 2 active accounts."
         init.return_value = None
         PhotosetsMultiAccountFetcher().fetch()
         init.assert_has_calls([call(self.account_1), call(self.account_2)])
 
-    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    @patch.object(PhotosetsFetcher, 'fetch')
     def test_calls_fetch_for_active_accounts(self, fetch):
         "PhotosetsFetcher.fetch() should be called twice."
         PhotosetsMultiAccountFetcher().fetch()
         fetch.assert_has_calls([call(), call()])
 
-    @patch('ditto.flickr.fetch.PhotosetsFetcher.fetch')
+    @patch.object(PhotosetsFetcher, 'fetch')
     def test_returns_list_of_return_values(self, fetch):
         "Should return a list of the dicts that PhotosetsFetcher.fetch() returns"
         ret = {'success': True, 'account': 'bob', 'fetched': 7}

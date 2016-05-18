@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.utils.six import StringIO
 
 from ditto.twitter import factories
+from ditto.twitter.models import Tweet
 
 
 class FetchTwitterArgs(TestCase):
@@ -242,13 +243,13 @@ class GenerateTweetHtml(TestCase):
         account_2 = factories.AccountFactory(user=user_2)
         self.out = StringIO()
 
-    @patch('ditto.twitter.models.Tweet.save')
+    @patch.object(Tweet, 'save')
     def test_with_all_accounts(self, save_method):
         call_command('generate_twitter_tweet_html', stdout=self.out)
         self.assertEqual(save_method.call_count, 5)
         self.assertIn('Generated HTML for 5 Tweets', self.out.getvalue())
 
-    @patch('ditto.twitter.models.Tweet.save')
+    @patch.object(Tweet, 'save')
     def test_with_one_account(self, save_method):
         call_command('generate_twitter_tweet_html', account='terry',
                                                             stdout=self.out)

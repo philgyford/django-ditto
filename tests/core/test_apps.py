@@ -4,7 +4,7 @@ from unittest.mock import call, patch
 from django.test import TestCase
 from django.apps import apps
 
-from ditto.core.apps import ditto_apps
+from ditto.core.apps import Apps, ditto_apps
 
 
 class DittoAppsTestCase(TestCase):
@@ -16,7 +16,7 @@ class DittoAppsTestCase(TestCase):
         self.assertEqual(all_apps[1], 'pinboard')
         self.assertEqual(all_apps[2], 'twitter')
 
-    @patch('ditto.core.apps.Apps.all')
+    @patch.object(Apps, 'all')
     def test_installed(self, patched_all):
         # all() will return an app that is not installed:
         patched_all.return_value = ['flickr', 'pinboard', 'twitter', 'NOPE',]
@@ -28,7 +28,7 @@ class DittoAppsTestCase(TestCase):
         self.assertEqual(installed_apps[1], 'pinboard')
         self.assertEqual(installed_apps[2], 'twitter')
 
-    @patch('ditto.core.apps.Apps.all')
+    @patch.object(Apps, 'all')
     def test_enabled(self, patched_all):
         # all() will return an app that is not installed:
         patched_all.return_value = ['flickr', 'pinboard', 'twitter', 'NOPE',]

@@ -108,7 +108,7 @@ class FetchTypesTestRemoteCase(FetchTestCase):
 
     # Check responses when bad data is supplied to interface methods.
 
-    @patch('ditto.pinboard.fetch.BookmarksFetcher._fetch')
+    @patch.object(BookmarksFetcher, '_fetch')
     def test_fetch_date_invalid(self, fetch_method):
         """Correctly reacts to an invalid date"""
         with self.assertRaises(FetchError):
