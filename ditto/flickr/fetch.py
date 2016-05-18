@@ -989,9 +989,6 @@ class OriginalFilesFetcher(object):
         if not fetch_all:
             photos = photos.filter(original_file='')
 
-        # TODO: JUST FOR TESTING.
-        #photos = photos[:3]
-
         error_messages = []
 
         for photo in photos:
