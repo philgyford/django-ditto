@@ -146,7 +146,24 @@
                 </div>
             </div>
 
-            {% if photo.photosets %}
+            {% with photo.get_previous as previous_photo %}
+                {% with photo.get_next as next_photo %}
+                    {% if previous_photo or next_photo %}
+                        <div class="card nextprev photo-nextprev ">
+                            <div class="card-block">
+                                {% if previous_photo %}
+                                    <a class="card-link nextprev-prev photo-nextprev-prev" href="{% url 'flickr:photo_detail' nsid=previous_photo.user.nsid flickr_id=previous_photo.flickr_id %}" title="{{ previous_photo.title }}">&larr; Previous</a>
+                                {% endif %}
+                                {% if next_photo %}
+                                    <a class="card-link nextprev-next photo-nextprev-next" href="{% url 'flickr:photo_detail' nsid=next_photo.user.nsid flickr_id=next_photo.flickr_id %}" title="{{ next_photo.title }}">Next &rarr;</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+
+            {% if photo.photosets|length > 0 %}
                 <div class="card photo-photosets">
                     <div class="card-block">
                         <h4 class="h6 card-title">Albums</h4>

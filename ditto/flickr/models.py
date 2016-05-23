@@ -419,6 +419,26 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """Make the summary that's created when the Photo is saved."""
         return truncate_string(self.description,
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
+
+    def get_next_public_by_post_time(self):
+        try:
+            return Photo.public_photo_objects.filter(post_time__gte=self.post_time).exclude(pk=self.pk).order_by('post_time')[:1].get()
+        except:
+            pass
+
+    def get_previous_public_by_post_time(self):
+        try:
+            return Photo.public_photo_objects.filter(post_time__lte=self.post_time).exclude(pk=self.pk).order_by('-post_time')[:1].get()
+        except:
+            pass
+
+    # Shortcuts:
+    def get_next(self):
+        return self.get_next_public_by_post_time()
+
+    def get_previous(self):
+        return self.get_previous_public_by_post_time()
+
     @property
     def account(self):
         "The Account whose photo this is, if any. Otherwise, None."

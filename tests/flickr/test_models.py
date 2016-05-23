@@ -198,7 +198,7 @@ class PhotoTestCase(TestCase):
         self.assertEqual(photo.account, account)
 
     def test_account_none(self):
-        "If the photo isn't from an Account its account property should be None."
+        "If photo isn't from an Account its account property should be None."
         photo = PhotoFactory(user=UserFactory())
         self.assertIsNone(photo.account)
 
@@ -334,4 +334,53 @@ class PhotoTestCase(TestCase):
     #def test_favorites_manager(self):
     #def test_public_favorites_photos_manager(self):
     #def test_public_favorites_accounts_manager(self):
+
+class PhotoNextPrevTestCase(TestCase):
+
+    def setUp(self):
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.photo_1 = PhotoFactory(user=user,
+                                post_time=datetime.datetime.strptime(
+                                    '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        self.private_photo = PhotoFactory(user=user, is_private=True,
+                                post_time=datetime.datetime.strptime(
+                                    '2016-04-09 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        # Photo by a different user:
+        self.other_photo = PhotoFactory(
+                                post_time=datetime.datetime.strptime(
+                                    '2016-04-10 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+        self.photo_2 = PhotoFactory(user=user,
+                                    post_time=datetime.datetime.strptime(
+                                    '2016-04-11 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc))
+
+    def test_next_public_by_post_time(self):
+        self.assertEqual(self.photo_1.get_next_public_by_post_time(),
+                        self.photo_2)
+
+    def test_next_public_by_post_time_none(self):
+        self.assertIsNone(self.photo_2.get_next_public_by_post_time())
+
+    def test_previous_public_by_post_time(self):
+        self.assertEqual(self.photo_2.get_previous_public_by_post_time(),
+                        self.photo_1)
+
+    def test_previous_public_by_post_time_none(self):
+        self.assertIsNone(self.photo_1.get_previous_public_by_post_time())
+
+    def test_next(self):
+        self.assertEqual(self.photo_1.get_next(),self.photo_2)
+
+    def test_next_none(self):
+        self.assertIsNone(self.photo_2.get_next())
+
+    def test_previous(self):
+        self.assertEqual(self.photo_2.get_previous(), self.photo_1)
+
+    def test_previous_none(self):
+        self.assertIsNone(self.photo_1.get_previous())
 
