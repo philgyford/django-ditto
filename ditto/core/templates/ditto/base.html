@@ -8,12 +8,20 @@
 
         {% load staticfiles %}
         <link rel="stylesheet" href="{% static "bootstrap.css" %}">
+
+        {% block head_extra %}
+            {# Use this if you need to more to the <head> of every page. #}
+        {% endblock %}
     </head>
     <body>
 
         <nav class="navbar navbar-dark bg-inverse m-b">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'ditto:home' %}">Ditto</a>
+                <a class="navbar-brand" href="{% url 'ditto:home' %}">
+                    {% block navbar_title %}
+                        Ditto
+                    {% endblock %}
+                </a>
                 {% if enabled_apps %}
                     <ul class="nav navbar-nav">
                         {% for app in enabled_apps %}
@@ -57,5 +65,12 @@
 
         </div>
 
+    {% block footer %}
+        {# Use this if you need to add a visible footer to every page. #}
+    {% endblock %}
+
+    {% block foot_extra %}
+        {# Use this if you need to add JS etc to the foot of the page. #}
+    {% endblock %}
     </body>
 </html>
