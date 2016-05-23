@@ -53,7 +53,7 @@ def width_height(w, h, max_w, max_h):
     width = int(round(w * ratio))
     height = int(round(h * ratio))
 
-    return 'width="%s" height="%s"' % (width, height)
+    return format_html('width="%s" height="%s"' % (width, height))
 
 
 @register.simple_tag
