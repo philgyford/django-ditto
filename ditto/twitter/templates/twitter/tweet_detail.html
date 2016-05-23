@@ -22,11 +22,32 @@
                 {# The `tweet` object will be None, too. #}
                 <p>This user is private.</p>
             {% else %}
+
+                {% with tweet.get_previous as previous_tweet %}
+                    {% with tweet.get_next as next_tweet %}
+                        {% if previous_tweet or next_tweet %}
+                            <div class="row nextprev twitter-tweet-nextprev ">
+                                {% if previous_tweet %}
+                                    <div class="col-xs-6">
+                                        <a class="card-link nextprev-prev twitter-tweet-nextprev-prev" href="{% url 'twitter:tweet_detail' screen_name=previous_tweet.user.screen_name twitter_id=previous_tweet.twitter_id %}" title="Previous Tweet">&larr; Previous</a>
+                                    </div>
+                                {% endif %}
+                                {% if next_tweet %}
+                                    <div class="col-xs-6 text-xs-right">
+                                        <a class="card-link nextprev-next twitter-tweet-nextprev-next" href="{% url 'twitter:tweet_detail' screen_name=next_tweet.user.screen_name twitter_id=next_tweet.twitter_id %}" title="Next Tweet">Next &rarr;</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}
+
                 <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
                     <hr>
                     {% include 'twitter/includes/tweet.html' with tweet=tweet view='detail' perms=perms only %}
                     <hr>
                 </div>
+
             {% endif %}
         </div> <!-- .col -->
 

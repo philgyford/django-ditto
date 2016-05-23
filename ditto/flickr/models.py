@@ -421,14 +421,16 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 strip_html=True, chars=255, truncate='…', at_word_boundary=True)
 
     def get_next_public_by_post_time(self):
+        "The next public Photo by this User, ordered by post_time."
         try:
-            return Photo.public_photo_objects.filter(post_time__gte=self.post_time).exclude(pk=self.pk).order_by('post_time')[:1].get()
+            return Photo.public_photo_objects.filter(post_time__gte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('post_time')[:1].get()
         except:
             pass
 
     def get_previous_public_by_post_time(self):
+        "The previous public Photo by this User, ordered by post_time."
         try:
-            return Photo.public_photo_objects.filter(post_time__lte=self.post_time).exclude(pk=self.pk).order_by('-post_time')[:1].get()
+            return Photo.public_photo_objects.filter(post_time__lte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('-post_time')[:1].get()
         except:
             pass
 

@@ -268,11 +268,32 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     def get_absolute_url(self):
         if self.user:
-            return reverse('twitter:tweet_detail',
-                        kwargs={'screen_name': self.user.screen_name,
-                                            'twitter_id': self.twitter_id})
+            return reverse('twitter:tweet_detail', kwargs={
+                                        'screen_name': self.user.screen_name,
+                                        'twitter_id': self.twitter_id})
         else:
             return ''
+
+    def get_next_public_by_post_time(self):
+        "Next Tweet by this User, if they're public."
+        try:
+            return Tweet.public_tweet_objects.filter(post_time__gte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('post_time')[:1].get()
+        except:
+            pass
+
+    def get_previous_public_by_post_time(self):
+        "Previous Tweet by this User, if they're public."
+        try:
+            return Tweet.public_tweet_objects.filter(post_time__lte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('-post_time')[:1].get()
+        except:
+            pass
+
+    # Shortcuts:
+    def get_next(self):
+        return self.get_next_public_by_post_time()
+
+    def get_previous(self):
+        return self.get_previous_public_by_post_time()
 
     @property
     def is_reply(self):
@@ -337,6 +358,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         # Save for later:
         self._quoted_tweet = tweet
         return tweet
+
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """A Twitter user.

@@ -349,7 +349,9 @@ class PhotoNextPrevTestCase(TestCase):
                                     '2016-04-09 12:00:00', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))
         # Photo by a different user:
-        self.other_photo = PhotoFactory(
+        user_2 = UserFactory()
+        account_2 = AccountFactory(user=user_2)
+        self.other_photo = PhotoFactory(user=user_2,
                                 post_time=datetime.datetime.strptime(
                                     '2016-04-10 12:00:00', '%Y-%m-%d %H:%M:%S'
                                 ).replace(tzinfo=pytz.utc))

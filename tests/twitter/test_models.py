@@ -414,6 +414,58 @@ class TweetTestCase(TestCase):
         self.assertEqual(get_method.call_count, 1)
 
 
+class TweetNextPrevTestCase(TestCase):
+
+    def setUp(self):
+        dt = datetime.datetime.strptime(
+                                    '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc)
+
+        user = UserFactory()
+        account = AccountFactory(user=user)
+        self.tweet_1 = TweetFactory(user=user, post_time=dt)
+
+        private_user = UserFactory(is_private=True)
+        private_account = AccountFactory(user=private_user)
+        self.private_tweeet = TweetFactory(user=private_user,
+                                post_time=dt + datetime.timedelta(days=1))
+
+        # Tweet by a different user:
+        user_2 = UserFactory()
+        account_2 = AccountFactory(user=user_2)
+        self.other_tweet = TweetFactory(user=user_2,
+                                post_time=dt + datetime.timedelta(days=2))
+
+        self.tweet_2 = TweetFactory(user=user,
+                                    post_time=dt + datetime.timedelta(days=3))
+
+    def test_next_public_by_post_time(self):
+        self.assertEqual(self.tweet_1.get_next_public_by_post_time(),
+                        self.tweet_2)
+
+    def test_next_public_by_post_time_none(self):
+        self.assertIsNone(self.tweet_2.get_next_public_by_post_time())
+
+    def test_previous_public_by_post_time(self):
+        self.assertEqual(self.tweet_2.get_previous_public_by_post_time(),
+                        self.tweet_1)
+
+    def test_previous_public_by_post_time_none(self):
+        self.assertIsNone(self.tweet_1.get_previous_public_by_post_time())
+
+    def test_next(self):
+        self.assertEqual(self.tweet_1.get_next(),self.tweet_2)
+
+    def test_next_none(self):
+        self.assertIsNone(self.tweet_2.get_next())
+
+    def test_previous(self):
+        self.assertEqual(self.tweet_2.get_previous(), self.tweet_1)
+
+    def test_previous_none(self):
+        self.assertIsNone(self.tweet_1.get_previous())
+
+
 class UserTestCase(TestCase):
 
     def test_str(self):
