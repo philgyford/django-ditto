@@ -173,6 +173,27 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         return reverse('pinboard:bookmark_detail',
             kwargs={'username': self.account.username, 'hash': self.url_hash})
 
+    def get_next_public_by_post_time(self):
+        "The next public Bookmark by this Account, ordered by post_time."
+        try:
+            return Bookmark.public_objects.filter(post_time__gte=self.post_time, account=self.account).exclude(pk=self.pk).order_by('post_time')[:1].get()
+        except:
+            pass
+
+    def get_previous_public_by_post_time(self):
+        "The previous public Bookmark by this Account, ordered by post_time."
+        try:
+            return Bookmark.public_objects.filter(post_time__lte=self.post_time, account=self.account).exclude(pk=self.pk).order_by('-post_time')[:1].get()
+        except:
+            pass
+
+    # Shortcuts:
+    def get_next(self):
+        return self.get_next_public_by_post_time()
+
+    def get_previous(self):
+        return self.get_previous_public_by_post_time()
+
     def summary_source(self):
         "The text that will be truncated to make a summary for this Bookmark"
         return self.description

@@ -188,6 +188,55 @@ class BookmarkTestCase(TestCase):
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
 
 
+class BookmarkNextPrevTestCase(TestCase):
+
+    def setUp(self):
+        dt = datetime.datetime.strptime(
+                                    '2016-04-08 12:00:00', '%Y-%m-%d %H:%M:%S'
+                                ).replace(tzinfo=pytz.utc)
+
+        account = AccountFactory()
+        self.bookmark_1 = BookmarkFactory(account=account, post_time=dt)
+
+        self.private_bookmark = BookmarkFactory(account=account,
+                                is_private=True,
+                                post_time=dt + datetime.timedelta(days=1))
+
+        # Bookmark by a different user:
+        account_2 = AccountFactory()
+        self.other_bookmark = BookmarkFactory(account=account_2,
+                                post_time=dt + datetime.timedelta(days=2))
+
+        self.bookmark_2 = BookmarkFactory(account=account,
+                                    post_time=dt + datetime.timedelta(days=3))
+
+    def test_next_public_by_post_time(self):
+        self.assertEqual(self.bookmark_1.get_next_public_by_post_time(),
+                        self.bookmark_2)
+
+    def test_next_public_by_post_time_none(self):
+        self.assertIsNone(self.bookmark_2.get_next_public_by_post_time())
+
+    def test_previous_public_by_post_time(self):
+        self.assertEqual(self.bookmark_2.get_previous_public_by_post_time(),
+                        self.bookmark_1)
+
+    def test_previous_public_by_post_time_none(self):
+        self.assertIsNone(self.bookmark_1.get_previous_public_by_post_time())
+
+    def test_next(self):
+        self.assertEqual(self.bookmark_1.get_next(),self.bookmark_2)
+
+    def test_next_none(self):
+        self.assertIsNone(self.bookmark_2.get_next())
+
+    def test_previous(self):
+        self.assertEqual(self.bookmark_2.get_previous(), self.bookmark_1)
+
+    def test_previous_none(self):
+        self.assertIsNone(self.bookmark_1.get_previous())
+
+
 class PinboardBookmarkTagSlugsTestCase(TestCase):
     """Ensuring slugs for tags matches what Pinboard does. ie, Not ASCII.
     https://pinboard.in/u:philgyford/t:testbookmark/

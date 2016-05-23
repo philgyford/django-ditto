@@ -12,25 +12,26 @@ Expects:
 
 <div class="card">
     <div class="card-block">
-        <p class="card-text">
+        <h4 class="card-title m-b-0 pinboard-user-name">
+            {{ account.username }}
+        </h4>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
             {% with count=account.public_bookmarks_count %}
                 {{ count|localize }} bookmark{{ count|pluralize }}
             {% endwith %}
-        </p>
-    </div>
-    {% if account.is_active %}
-        <ul class="list-group list-group-flush">
+        </li>
+        {% if account.is_active %}
             <li class="list-group-item">
                 <a class="card-link" href="{{ account.url }}">At Pinboard.in</a>
             </li>
-        </ul>
-    {% endif %}
+        {% endif %}
 
-    {% if perms and perms.pinboard.can_change_account %}
-        <ul class="list-group list-group-flush">
+        {% if perms and perms.pinboard.can_change_account %}
             <li class="list-group-item">
                 <a href="{% url 'admin:pinboard_account_change' account.id %}" title="Edit this account in the Django Admin">Edit</a>
             </li>
-        </ul>
-    {% endif %}
+        {% endif %}
+    </ul>
 </div>

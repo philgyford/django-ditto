@@ -4,13 +4,13 @@ A single Bookmark as the contents of a Bootstrap media object.
 Expects:
  * bookmark, a Bookmark object.
  * perms - The Django perms object.
- * view - 'list' (a generic list) 'day' or 'detail'.
+ * view - 'list' (a generic list), 'day' or 'detail'.
 
 {% endcomment %}
 
 
 <div class="media-body">
-    <h2 class="{% if view != 'detail' %}h6{% endif %} media-heading pinboard-bookmark-title"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
+    <h2 class="{% if view == 'detail' %}h4{% else %}h6{% endif %} media-heading pinboard-bookmark-title"><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></h2>
     {% if bookmark.description %}
         <p class="{% if view == 'detail' %}lead{% else %}m-b-0{% endif %} pinboard-bookmark-description">
             {{ bookmark.description }}
@@ -38,6 +38,7 @@ Expects:
             By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
 
             {% load ditto %}
+            Posted at
             {% if view == 'day' %}
                 {% display_time bookmark.post_time False %}
             {% else %}
