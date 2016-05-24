@@ -21,13 +21,17 @@
         <div class="col-md-9 flickr-photo">
             {% load l10n %}
             {% if photo.media == 'video' %}
-                <video {% width_height photo.site_mp4_width photo.site_mp4_height 867 600 %} poster="{{ photo.medium_640_url }}" controls preload="metadata" class="img-fluid m-b-1">
-                    {% if photo.site_mp4_url %}
-                        <source src="{{ photo.site_mp4_url }}" type="video/mp4">
-                    {% elif photo.mobile_mp4_url %}
-                        <source src="{{ photo.mobile_mp4_url }}" type="video/mp4">
-                    {% endif %}
-                </video>
+                {% if photo.site_mp4_width %}
+                    <video {% width_height photo.site_mp4_width photo.site_mp4_height 867 600 %} poster="{{ photo.medium_640_url }}" controls preload="metadata" class="img-fluid m-b-1">
+                        {% if photo.site_mp4_url %}
+                            <source src="{{ photo.site_mp4_url }}" type="video/mp4">
+                        {% elif photo.mobile_mp4_url %}
+                            <source src="{{ photo.mobile_mp4_url }}" type="video/mp4">
+                        {% endif %}
+                    </video>
+                {% else %}
+                    <p>[No video found.]</p>
+                {% endif %}
             {% else %}
                 <p class="flickr-photo-img">
                     {% if photo.medium_800_width %}
