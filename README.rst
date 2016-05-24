@@ -25,6 +25,13 @@ The docs below are hasty; I'm not expecting anyone else to use this yet.
  Installation
 ##############
 
+******
+Pillow
+******
+
+Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used `Homebrew <http://brew.sh>`_ to install libjpeg.)
+
+
 *********************
 Add to INSTALLED_APPS
 *********************

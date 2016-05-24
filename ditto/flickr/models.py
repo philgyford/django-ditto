@@ -386,7 +386,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                                                         through=TaggedPhoto)
 
     def upload_path(self, filename):
-        """Generate the path under MEDIA_ROOT where the original file will be
+        """Generate the path under MEDIA_ROOT where the original files will be
         saved.
         """
         dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
@@ -400,14 +400,11 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             filename
         ])
 
-    # Using a FileField rather than ImageField so we don't need to install
-    # Pillow just for this. And we're unlikely to display the original
-    # in a web page as an image.
-    original_file = models.FileField(
-                    upload_to=upload_path, null=False, blank=True, default='')
-    video_original_file = models.FileField(
-                    upload_to=upload_path, null=False, blank=True, default='',
-                    help_text="Only present for Videos.")
+    original_file = models.ImageField(upload_to=upload_path,
+                                            null=False, blank=True, default='')
+    video_original_file = models.FileField(upload_to=upload_path,
+                                        null=False, blank=True, default='',
+                                        help_text="Only present for Videos.")
 
     class Meta:
         ordering = ('-post_time',)
