@@ -389,12 +389,13 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """Generate the path under MEDIA_ROOT where the original file will be
         saved.
         """
-        dirbase = getattr(settings, 'DITTO_FLICKR_PHOTO_DIR_BASE', 'flickr')
+        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
         dirformat = getattr(
-                        settings, 'DITTO_FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
+                        settings, 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
         return '/'.join([
             dirbase,
             self.user.nsid,
+            'photos',
             str(self.post_time.date().strftime(dirformat)),
             filename
         ])

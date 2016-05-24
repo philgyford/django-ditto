@@ -308,7 +308,7 @@ class FilesFetcherTestCase(TestCase):
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
         self.assertEqual(
             self.photo_2.original_file.name,
-            'flickr/%s/2015/08/14/%s' % (
+            'flickr/%s/photos/2015/08/14/%s' % (
                 self.photo_2.user.nsid,
                 os.path.basename(temp_filepath)
             )
@@ -325,7 +325,7 @@ class FilesFetcherTestCase(TestCase):
         self.fetcher._fetch_and_save_file(self.video_2, 'video')
         self.assertEqual(
             self.video_2.video_original_file.name,
-            'flickr/%s/2015/08/14/%s' % (
+            'flickr/%s/photos/2015/08/14/%s' % (
                 self.video_2.user.nsid,
                 os.path.basename(temp_filepath)
             )

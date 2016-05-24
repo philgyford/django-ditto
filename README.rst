@@ -141,16 +141,16 @@ Both variants can be restricted to fetching files for a single account::
 
 Files will be saved within your project's ``MEDIA_ROOT`` directory, as defined in ``settings.py``. There are two optional settings to customise the directories in which the files are saved. Their default values are as shown here::
 
-   DITTO_FLICKR_PHOTO_DIR_BASE = 'flickr'
-   DITTO_FLICKR_PHOTO_DIR_FORMAT = '%Y/%m/%d'
+   DITTO_FLICKR_DIR_BASE = 'flickr'
+   DITTO_FLICKR_DIR_PHOTOS_FORMAT = '%Y/%m/%d'
 
 These values are used if you don't specify your own settings.
 
-If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the date the photo was taken::
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the Flickr user's NSID and the date the photo was taken::
 
-    /var/www/example.com/media/flickr/2016/08/31/1234567_987654_o.jpg
+    /var/www/example.com/media/flickr/35034346050@N01/photos/2016/08/31/1234567_987654_o.jpg
 
-Note that videos will have two "original" files downloaded: the video itself and a JPG image that Flickr created for it.
+Note that videos will have *two* "original" files downloaded: the video itself and a JPG image that Flickr created for it.
 
 Photosets
 =========
