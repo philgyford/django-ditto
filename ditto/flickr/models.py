@@ -677,8 +677,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return self.photos_url
 
     @property
-    def icon_url(self):
-        return self.original_icon_url
+    def avatar_url(self):
+        return self.avatar.url
 
     @property
     def original_icon_url(self):

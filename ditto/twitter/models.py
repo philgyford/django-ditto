@@ -470,6 +470,10 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return 'https://twitter.com/%s' % self.screen_name
 
     @property
+    def avatar_url(self):
+        return self.avatar.url
+
+    @property
     def profile_image_url(self):
         return self.profile_image_url_https
 

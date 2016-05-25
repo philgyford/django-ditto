@@ -69,14 +69,20 @@ class UserTestCase(TestCase):
         user = UserFactory()
         self.assertEqual(user.permalink, user.photos_url)
 
-    def test_icon_url(self):
+    def test_avatar_url(self):
+        user = UserFactory(
+                    avatar='flickr/12345678901N01/avatars/12345678901N01.jpg')
+        self.assertEqual(user.avatar_url,
+                            'flickr/12345678901N01/avatars/12345678901N01.jpg')
+
+    def test_original_icon_url(self):
         user = UserFactory(iconfarm=8, iconserver=7420, nsid='35034346050@N01')
-        self.assertEqual(user.icon_url,
+        self.assertEqual(user.original_icon_url,
         'https://farm8.staticflickr.com/7420/buddyicons/35034346050@N01.jpg')
 
-    def test_icon_url_default(self):
+    def test_original_icon_url_default(self):
         user = UserFactory(iconserver=0)
-        self.assertEqual(user.icon_url,
+        self.assertEqual(user.original_icon_url,
                                 'https://www.flickr.com/images/buddyicon.gif')
 
     def test_get_absolute_url(self):
