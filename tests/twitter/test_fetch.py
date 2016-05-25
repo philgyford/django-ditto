@@ -15,7 +15,8 @@ from django.test import override_settings, TestCase
 
 from ditto.core.utils import datetime_now
 from ditto.core.utils.downloader import DownloadException, filedownloader
-from ditto.twitter import factories
+from ditto.twitter.factories import AccountFactory,\
+        AccountWithCredentialsFactory, TweetFactory, UserFactory
 from ditto.twitter.fetch import \
         FetchError, UserMixin, TweetMixin,\
         FetchVerify,\
@@ -408,10 +409,10 @@ class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
     """
 
     def setUp(self):
-        user_1 = factories.UserFactory(screen_name='jill')
-        user_2 = factories.UserFactory(screen_name='debs')
-        account_1 = factories.AccountFactory(user=user_1)
-        account_2 = factories.AccountFactory(user=user_2)
+        user_1 = UserFactory(screen_name='jill')
+        user_2 = UserFactory(screen_name='debs')
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
         self.fetcher = TwitterFetcher()
 
     def test_set_accounts_gets_one(self):
@@ -441,10 +442,10 @@ class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
 class TwitterFetcherInactiveAccountsTestCase(FetchTwitterTestCase):
 
     def setUp(self):
-        user_1 = factories.UserFactory(screen_name='jill')
-        user_2 = factories.UserFactory(screen_name='debs')
-        account_1 = factories.AccountFactory(user=user_1, is_active=False)
-        account_2 = factories.AccountFactory(user=user_2, is_active=False)
+        user_1 = UserFactory(screen_name='jill')
+        user_2 = UserFactory(screen_name='debs')
+        account_1 = AccountFactory(user=user_1, is_active=False)
+        account_2 = AccountFactory(user=user_2, is_active=False)
 
     def test_set_account_inactive_account(self):
         "It raises FetchError if we try one inactive account."
@@ -466,16 +467,16 @@ class TwitterFetcherTestCase(FetchTwitterTestCase):
         """We add the last_recent_id and last_favorite_id to prevent the
         fetcher fetching multiple pages of tweets. Keeps things simpler.
         """
-        user_1 = factories.UserFactory(screen_name='jill', twitter_id=1)
-        user_2 = factories.UserFactory(screen_name='debs', twitter_id=2)
-        self.account_1 = factories.AccountWithCredentialsFactory(
+        user_1 = UserFactory(screen_name='jill', twitter_id=1)
+        user_2 = UserFactory(screen_name='debs', twitter_id=2)
+        self.account_1 = AccountWithCredentialsFactory(
                         user=user_1, last_recent_id=100, last_favorite_id=100)
-        self.account_2 = factories.AccountWithCredentialsFactory(
+        self.account_2 = AccountWithCredentialsFactory(
                         user=user_2, last_recent_id=100, last_favorite_id=100)
 
     def test_raises_error_with_invalid_screen_name(self):
-        user = factories.UserFactory(screen_name='goodname')
-        account = factories.AccountFactory(user=user)
+        user = UserFactory(screen_name='goodname')
+        account = AccountFactory(user=user)
         with self.assertRaises(FetchError):
             result = RecentTweetsFetcher(screen_name='badname')
 
@@ -504,9 +505,12 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
-    def test_ignores_account_with_no_creds(self):
-        user_3 = factories.UserFactory()
-        account_3 = factories.AccountFactory(user=user_3)
+    @patch.object(filedownloader, 'download')
+    def test_ignores_account_with_no_creds(self, download):
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
+        user_3 = UserFactory()
+        account_3 = AccountFactory(user=user_3)
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
@@ -584,8 +588,8 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_returns_error_if_no_creds(self):
         "If an account has no API credentials, the result is correct"
-        user = factories.UserFactory(screen_name='bobby')
-        account = factories.AccountFactory(user=user)
+        user = UserFactory(screen_name='bobby')
+        account = AccountFactory(user=user)
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
@@ -605,8 +609,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
-        save_tweet.side_effect = [factories.TweetFactory(),
-                        factories.TweetFactory(), factories.TweetFactory()]
+        save_tweet.side_effect = [TweetFactory(),TweetFactory(),TweetFactory()]
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(save_tweet.call_count, 3)
@@ -658,13 +661,19 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'favorites/list'
 
     @responses.activate
-    def test_api_request_for_one_account(self):
+    @patch.object(filedownloader, 'download')
+    def test_api_request_for_one_account(self, download):
+        # This will just stop us requesting avatars from Twitter:
+        download.side_effect = DownloadException('Ooops')
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(1, len(responses.calls))
 
     @responses.activate
-    def test_api_requests_for_all_accounts(self):
+    @patch.object(filedownloader, 'download')
+    def test_api_requests_for_all_accounts(self, download):
+        # This will just stop us requesting avatars from Twitter:
+        download.side_effect = DownloadException('Ooops')
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
@@ -675,7 +684,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         # This will just stop us requesting avatars from Twitter:
         download.side_effect = DownloadException('Ooops')
         # Add a third Account that has no API credentials:
-        account_3 = factories.AccountFactory(user=factories.UserFactory())
+        account_3 = AccountFactory(user=UserFactory())
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher().fetch()
         # Should only have fetched faves for the two accounts with API creds:
@@ -750,8 +759,8 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_returns_error_if_no_creds(self):
         "If an account has no API credentials, the result is correct"
-        user = factories.UserFactory(screen_name='bobby')
-        account = factories.AccountFactory(user=user)
+        user = UserFactory(screen_name='bobby')
+        account = AccountFactory(user=user)
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
@@ -771,8 +780,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
-        save_tweet.side_effect = [factories.TweetFactory(),
-                        factories.TweetFactory(), factories.TweetFactory()]
+        save_tweet.side_effect = [TweetFactory(),TweetFactory(),TweetFactory()]
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(save_tweet.call_count, 3)
@@ -837,7 +845,8 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     @patch.object(UserMixin, '_fetch_and_save_avatar')
     def test_makes_one_api_call(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
-        result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
+        result = UsersFetcher(screen_name='jill').fetch(
+                                                [460060168, 26727655, 6795192])
         self.assertEqual(1, len(responses.calls))
 
     @responses.activate
@@ -867,7 +876,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_requests_all_users(self):
         "If no ids supplied, uses all users in the DB"
-        users = factories.UserFactory.create_batch(5)
+        users = UserFactory.create_batch(5)
         result = UsersFetcher(screen_name='jill').fetch()
 
         ids = User.objects.values_list('twitter_id', flat=True).order_by('fetch_time')
@@ -884,7 +893,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
 
     @responses.activate
     def test_updates_users(self):
-        user = factories.UserFactory.create(
+        user = UserFactory.create(
                                     twitter_id=26727655, screen_name='bill')
         self.add_response(body=self.make_response_body())
         result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
@@ -922,7 +931,10 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'statuses/lookup'
 
     @responses.activate
-    def test_makes_one_api_call(self):
+    @patch.object(filedownloader, 'download')
+    def test_makes_one_api_call(self, download):
+        # This will just stop us requesting avatars from Twitter:
+        download.side_effect = DownloadException('Ooops')
         self.add_response(body=self.make_response_body(), method='POST')
         result = TweetsFetcher(screen_name='jill').fetch([300, 200, 100])
         self.assertEqual(1, len(responses.calls))
@@ -963,7 +975,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_requests_all_tweets(self):
         "If no ids supplied, uses all tweets in the DB"
-        tweets = factories.TweetFactory.create_batch(5)
+        tweets = TweetFactory.create_batch(5)
         result = TweetsFetcher(screen_name='jill').fetch()
 
         ids = Tweet.objects.values_list('twitter_id', flat=True).order_by('fetch_time')
@@ -982,8 +994,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
 
     @responses.activate
     def test_updates_tweets(self):
-        tweets = factories.TweetFactory.create(
-                                    twitter_id=200, text='Will change')
+        tweets = TweetFactory.create(twitter_id=200, text='Will change')
         self.add_response(body=self.make_response_body(), method='POST')
         result = TweetsFetcher(screen_name='jill').fetch([300,200,100])
         self.assertEqual(Tweet.objects.get(twitter_id=200).text,
@@ -1042,8 +1053,8 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     @patch.object(UserMixin, '_fetch_and_save_avatar')
     def test_ignores_account_with_no_creds(self, fetch_avatar):
-        user_3 = factories.UserFactory()
-        account_3 = factories.AccountFactory(user=user_3)
+        user_3 = UserFactory()
+        account_3 = AccountFactory(user=user_3)
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
@@ -1068,8 +1079,8 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_returns_error_if_no_creds(self):
         "If an account has no API credentials, the result is correct"
-        user = factories.UserFactory(screen_name='bobby')
-        account = factories.AccountFactory(user=user)
+        user = UserFactory(screen_name='bobby')
+        account = AccountFactory(user=user)
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher(screen_name='bobby').fetch()
         self.assertFalse(result[0]['success'])
@@ -1079,9 +1090,9 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_saves_users(self):
         "Updates the Account's user data in the DB with fetched data."
-        user = factories.UserFactory(twitter_id=12552,
+        user = UserFactory(twitter_id=12552,
                         screen_name='philgyford', name='This should change')
-        account = factories.AccountWithCredentialsFactory(id=4, user=user)
+        account = AccountWithCredentialsFactory(id=4, user=user)
 
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher(screen_name='philgyford').fetch()
@@ -1096,18 +1107,15 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
 
     api_call = 'account/verify_credentials'
 
-    def setUp(self):
-        # This will quietly stop the downloading of avatar files:
-        patcher = patch.object(filedownloader, 'download')
-        patcher.side_effect = DownloadException('Oops')
-        self.addCleanup(patcher.stop)
-        self.mock_foo = patcher.start()
-
     @responses.activate
-    def test_fetch_for_account_creates(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_fetch_for_account_creates(self, fetch_avatar):
         "Saves and returns new user after successful API call"
+        # Just make the mocked method return the User that's passed in:
+        fetch_avatar.side_effect = lambda value: value
+
         self.add_response(body=self.make_response_body())
-        account = factories.AccountWithCredentialsFactory.build(id=4, user=None)
+        account = AccountWithCredentialsFactory.build(id=4, user=None)
 
         result = FetchVerify(account=account).fetch()
         new_user = User.objects.get(twitter_id=12552)
@@ -1122,11 +1130,15 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
                 responses.calls[0].request.url)
 
     @responses.activate
-    def test_fetch_for_account_updates(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_fetch_for_account_updates(self, fetch_avatar):
         "Saves and returns updated existing user after successful API call"
+        # Just make the mocked method return the User that's passed in:
+        fetch_avatar.side_effect = lambda value: value
+
         self.add_response(body=self.make_response_body())
-        user = factories.UserFactory(twitter_id=12552, screen_name='bob')
-        account = factories.AccountWithCredentialsFactory(user=user)
+        user = UserFactory(twitter_id=12552, screen_name='bob')
+        account = AccountWithCredentialsFactory(user=user)
 
         result = FetchVerify(account=account).fetch()
         updated_user = User.objects.get(twitter_id=12552)
@@ -1147,7 +1159,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
             body='{"errors":[{"message":"Could not authenticate you","code":32}]}',
             status=401)
 
-        account = factories.AccountWithCredentialsFactory.build(user=None)
+        account = AccountWithCredentialsFactory.build(user=None)
         result = FetchVerify(account=account).fetch()
 
         self.assertEqual(result['account'], 'Unsaved Account')
