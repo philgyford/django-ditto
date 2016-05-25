@@ -13,6 +13,7 @@ class FileDownloader(object):
     For downloading a file from a URL and saving it into /tmp/.
 
     Use like:
+        from ditto.core.utils.downloader import filedownloader
         filepath = filedownloader.download(my_url, ['image/jpg'])
 
     filepath would be like '/tmp/image.jpg'
