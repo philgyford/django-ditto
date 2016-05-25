@@ -119,6 +119,15 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 
     $ ./manage.py fetch_flickr_account_user --id=1
 
+Profile photos of Flickr users are downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_FLICKR_DIR_BASE`` setting to change the location. The default is::
+
+   DITTO_FLICKR_DIR_BASE = 'flickr'
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with NSID ``35034346050@N01`` to something like this::
+
+    /var/www/example.com/media/flickr/35034346050N01/avatars/35034346050N01.jpg
+
+
 Photos
 ======
 
@@ -134,7 +143,7 @@ Both options can be restricted to only fetch for a single Account by adding the 
 
     $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
 
-To download the original photo and video files, use the ``fetch_flickr_originals`` command, *after* fetching the photo's data::
+The above only fetches data about the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the ``fetch_flickr_originals`` command, *after* fetching the photos' data::
 
     $ ./manage.py fetch_flickr_originals
 
@@ -155,7 +164,7 @@ These values are used if you don't specify your own settings.
 
 If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the Flickr user's NSID and the date the photo was taken::
 
-    /var/www/example.com/media/flickr/35034346050@N01/photos/2016/08/31/1234567_987654_o.jpg
+    /var/www/example.com/media/flickr/35034346050N01/photos/2016/08/31/1234567_987654_o.jpg
 
 Note that videos will have *two* "original" files downloaded: the video itself and a JPG image that Flickr created for it.
 
