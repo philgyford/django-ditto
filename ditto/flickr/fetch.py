@@ -3,19 +3,17 @@ import datetime
 import json
 import os
 import pytz
-import re
-import shutil
 import time
 
 import flickrapi
 from flickrapi.exceptions import FlickrError
-import requests
 from taggit.models import Tag
 
 from django.core.files import File
 
 from .models import Account, Photo, Photoset, User
 from ..core.utils import datetime_now
+from ..core.utils.downloader import DownloadException, filedownloader 
 
 # Classes here:
 #
@@ -604,8 +602,23 @@ class UserFetcher(Fetcher):
 
     def _save_results(self):
         user_obj = UserSaver().save_user(self.results[0], datetime_now())
+        self._fetch_and_save_avatar(user_obj)
         self.return_value['user'] = {'name': user_obj.name}
         self.results_count = 1
+
+    def _fetch_and_save_avatar(self, user):
+        """
+        Download and save the Avatar/profile pic for this user.
+        user -- User object.
+        """
+        try:
+            avatar_filepath = filedownloader.download(user.original_icon_url,
+                        ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+
+            user.avatar.save(os.path.basename(avatar_filepath),
+                                File(open(avatar_filepath, 'rb')) )
+        except DownloadException as e:
+            pass
 
 
 class PhotosFetcher(Fetcher):
@@ -661,16 +674,14 @@ class PhotosFetcher(Fetcher):
         flickr_user_id -- The user's ID on Flickr, eg '35034346050@N01'.
         """
         if self.fetched_users.get(flickr_user_id, None) is None:
-            try:
-                user_info = self.api.people.getInfo(user_id=flickr_user_id)
-            except FlickrError as e:
-                raise FetchError(
-                    "Error when getting info about User with id '%s': %s" % \
-                                                        (flickr_user_id, e))
+            results = UserFetcher(account=self.account).fetch(
+                                                        nsid=flickr_user_id)
+            if results['success'] == False:
+                raise FetchError(results['messages'][0])
 
-            user_obj = UserSaver().save_user(
-                                        user_info['person'], datetime_now())
-            self.fetched_users[flickr_user_id] = user_obj
+            # Get the user we just saved. A bit clunky!
+            self.fetched_users[flickr_user_id] = User.objects.get(
+                                                           nsid=flickr_user_id)
 
     def _fetch_photo_info(self, photo_id):
         """Calls the photos.getInfo() method of the Flickr API and returns the
@@ -1037,9 +1048,8 @@ class OriginalFilesFetcher(object):
         filepath = False
         try:
             # Saves the file to /tmp/:
-            filepath = self._download_file(
-                                        url, acceptable_content_types, photo)
-        except FetchError as e:
+            filepath = filedownloader.download(url, acceptable_content_types)
+        except DownloadException as e:
             raise FetchError(e)
 
         if filepath:
@@ -1049,84 +1059,10 @@ class OriginalFilesFetcher(object):
 
             if media_type == 'video':
                 photo.video_original_file.save(
-                            os.path.basename(filepath), django_file, save=True)
+                                    os.path.basename(filepath), django_file)
             else:
                 photo.original_file.save(
-                            os.path.basename(filepath), django_file, save=True)
-
-
-    def _download_file(self, url, acceptable_content_types, photo):
-        """
-        Downloads a file from a URL and saves it into /tmp/.
-        Returns the filepath.
-
-        Expects:
-            url -- The URL of the file to fetch.
-            acceptable_content_types -- A list of MIME types the request must
-                                        match.
-            photo -- The Photo object we're fetching for.
-
-        Raises FetchError if something goes wrong.
-        """
-        try:
-            # From http://stackoverflow.com/a/13137873/250962
-            r = requests.get(url, stream=True)
-            if r.status_code == 200:
-                if r.headers['Content-Type'] in acceptable_content_types:
-                    # Where we'll temporarily save the file:
-                    filename = self._make_filename(url, r.headers, photo)
-                    filepath = '/tmp/%s' % filename
-                    # Save the file there:
-                    with open(filepath, 'wb') as f:
-                        r.raw.decode_content = True
-                        shutil.copyfileobj(r.raw, f)
-                    return filepath
-
-                else:
-                    raise FetchError(
-                        "Invalid content type (%s) when fetching %s"% \
-                                            (r.headers['content_type'], url))
-            else:
-                raise FetchError("Got status code %s when fetching %s" % \
-                                                        (r.status_code, url))
-        except Exception as e:
-            raise FetchError("Something when wrong when fetching %s: %s" % \
-                                                                    (url, e))
-
-    def _make_filename(self, url, headers, photo):
-        """Find the filename of the downloaded file.
-        Returns a string.
-
-        url will probably end in like 'filename.jpg' for an image.
-        But videos end in like '/1234567890/'.
-
-        headers is a dict of response headers from requesting the URL.
-        Videos will hopefully have the filename in the Content-Disposition
-        header.
-        """
-        # Should work for photos:
-        filename = os.path.basename(url)
-
-        if filename == '':
-            # Probably a video, so we have to get the filename from headers:
-            try:
-                # Could be like 'attachment; filename=26897200312.avi'
-                disposition = headers['Content-Disposition']
-                m = re.search(
-                            'filename\=(.*?)$', headers['Content-Disposition'])
-                try:
-                    filename = m.group(1)
-                except (AttributeError, IndexError):
-                    pass
-            except KeyError:
-                pass
-
-        if filename == '':
-            # We shouldn't get here, but in case, make a filename.
-            filename = '%s_%s_o' % (photo.flickr_id, photo.original_secret)
-
-        return filename
-
+                                    os.path.basename(filepath), django_file)
 
 
 ###########################################################################

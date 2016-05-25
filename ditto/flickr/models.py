@@ -386,15 +386,13 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                                                         through=TaggedPhoto)
 
     def upload_path(self, filename):
-        """Generate the path under MEDIA_ROOT where the original files will be
-        saved.
-        """
+        "Make path under MEDIA_ROOT where original files will be saved."
         dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
         dirformat = getattr(
                         settings, 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
         return '/'.join([
             dirbase,
-            self.user.nsid,
+            self.user.nsid.replace('@',''),
             'photos',
             str(self.post_time.date().strftime(dirformat)),
             filename
@@ -625,9 +623,9 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                                 help_text="May contain HTML")
 
     photos_url = models.URLField(null=False, blank=False, max_length=255,
-                                                    verbose_name='Photos URL')
+                                            verbose_name='Photos URL at Flickr')
     profile_url = models.URLField(null=False, blank=False, max_length=255,
-                                                    verbose_name='Profile URL')
+                                        verbose_name='Avatar URL on Flickr')
 
     photos_count = models.PositiveIntegerField(null=False, blank=False,
                                                                       default=0)
@@ -643,6 +641,19 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     help_text="The raw JSON from the API.")
     timezone_id = models.CharField(null=False, blank=False, max_length=50,
                                             help_text="eg, 'Europe/London'.")
+
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
+        return '/'.join([
+            dirbase,
+            self.nsid.replace('@',''),
+            'avatars',
+            filename
+        ])
+
+    avatar = models.ImageField(upload_to=avatar_upload_path,
+                                            null=False, blank=True, default='')
 
     objects = models.Manager()
     # All Users that have Accounts:
@@ -667,6 +678,11 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     @property
     def icon_url(self):
+        return self.original_icon_url
+    
+    @property
+    def original_icon_url(self):
+        """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
             return 'https://farm%s.staticflickr.com/%s/buddyicons/%s.jpg' % \
                                     (self.iconfarm, self.iconserver, self.nsid)

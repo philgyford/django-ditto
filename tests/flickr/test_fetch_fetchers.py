@@ -7,12 +7,12 @@ import tempfile
 from unittest.mock import call, patch
 
 import responses
-from requests.exceptions import HTTPError
 from flickrapi.exceptions import FlickrError
 from freezegun import freeze_time
 from django.test import override_settings, TestCase
 
 from ditto.core.utils import datetime_now
+from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
 from ditto.flickr.fetch import FetchError,\
         UserSaver, PhotoSaver, PhotosetSaver,\
@@ -21,6 +21,7 @@ from ditto.flickr.fetch import FetchError,\
         PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
         RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher,\
         OriginalFilesMultiAccountFetcher
+from ditto.flickr.models import User
 from .test_fetch import FlickrFetchTestCase
 
 
@@ -147,7 +148,8 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertIn('messages', result)
 
     @responses.activate
-    def test_makes_one_api_calls(self):
+    @patch.object(UserFetcher, '_fetch_and_save_avatar')
+    def test_makes_one_api_calls(self, fetch_avatar):
         "Should call people.getInfo"
         self.add_response('people.getInfo')
         result = UserFetcher(account=self.account).fetch(
@@ -155,18 +157,40 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
-    @patch.object(UserSaver, 'save_user')
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
-    def test_calls_save_user_correctly(self, save_user):
+    @patch.object(UserFetcher, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, 'save_user')
+    def test_calls_save_user_correctly(self, save_user, fetch_avatar):
         "The correct data should be sent to UserSaver.save_user()"
         self.add_response('people.getInfo')
         result = UserFetcher(account=self.account).fetch(
                                                         nsid='35034346050@N01')
-
         user_response = self.load_fixture('people.getInfo')
 
         save_user.assert_called_once_with(
                                     user_response['person'], datetime_now())
+
+    @responses.activate
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(filedownloader, 'download')
+    def test_downloads_and_saves_avatar(self, download):
+        "Should call download() and save avatar when fetching user."
+        # Make a temporary file, like download() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download.return_value = temp_filepath
+
+        self.add_response('people.getInfo')
+        result = UserFetcher(account=self.account).fetch(
+                                                        nsid='35034346050@N01')
+
+        user = User.objects.get(nsid='35034346050@N01')
+
+        download.assert_called_once_with(user.original_icon_url,
+                        ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+
+        self.assertEqual(user.avatar, 'flickr/35034346050N01/avatars/%s' %
+                                            os.path.basename(temp_filepath))
 
     @responses.activate
     def test_returns_correct_success_result(self):
@@ -268,163 +292,66 @@ class FilesFetcherTestCase(TestCase):
         self.assertEqual(len(results['messages']), 3)
         self.assertEqual(results['messages'][0], 'Oh dear')
 
-    @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_downloads_photo(self, download_file):
+    @patch.object(filedownloader, 'download')
+    def test_downloads_photo(self, download):
         "Calls the download method correctly for photos."
-        download_file.return_value = False
+        download.return_value = False
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
-        download_file.assert_has_calls( [ call(
+        download.assert_has_calls( [ call(
                     self.photo_2.original_url,
-                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',],
-                    self.photo_2
+                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
                 ) ] )
 
-    @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_downloads_video(self, download_file):
+    @patch.object(filedownloader, 'download')
+    def test_downloads_video(self, download):
         "Calls the download method correctly for videos."
-        download_file.return_value = False
+        download.return_value = False
         self.fetcher._fetch_and_save_file(self.video_2, 'video')
-        download_file.assert_has_calls( [ call(
+        download.assert_has_calls( [ call(
                     self.video_2.video_original_url,
-                    ['video/mp4',],
-                    self.video_2
+                    ['video/mp4',]
                 ) ] )
 
-    @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_raises_error_if_download_fails(self, download_file):
-        "If _download_file() raises an error, so does _fetch_and_save_file()"
-        download_file.side_effect = FetchError("Ooops")
+    @patch.object(filedownloader, 'download')
+    def test_raises_error_if_download_fails(self, download):
+        "If download() raises an error, so does _fetch_and_save_file()"
+        download.side_effect = DownloadException("Ooops")
         with self.assertRaises(FetchError):
             self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_saves_downloaded_photo_file(self, download_file):
-        # Make a temporary file, like _download_file() would make:
+    @patch.object(filedownloader, 'download')
+    def test_saves_downloaded_photo_file(self, download):
+        # Make a temporary file, like download() would make:
         jpg = tempfile.NamedTemporaryFile()
         temp_filepath = jpg.name
-        download_file.return_value = temp_filepath
+        download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
         self.assertEqual(
             self.photo_2.original_file.name,
             'flickr/%s/photos/2015/08/14/%s' % (
-                self.photo_2.user.nsid,
+                self.photo_2.user.nsid.replace('@',''),
                 os.path.basename(temp_filepath)
             )
         )
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    @patch.object(OriginalFilesFetcher, '_download_file')
-    def test_saves_downloaded_video_file(self, download_file):
-        # Make a temporary file, like _download_file() would make:
+    @patch.object(filedownloader, 'download')
+    def test_saves_downloaded_video_file(self, download):
+        # Make a temporary file, like download() would make:
         jpg = tempfile.NamedTemporaryFile()
         temp_filepath = jpg.name
-        download_file.return_value = temp_filepath
+        download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.video_2, 'video')
         self.assertEqual(
             self.video_2.video_original_file.name,
             'flickr/%s/photos/2015/08/14/%s' % (
-                self.video_2.user.nsid,
+                self.video_2.user.nsid.replace('@',''),
                 os.path.basename(temp_filepath)
             )
         )
-
-    def test_make_filename_photo(self):
-        "Should use the original photo's filename."
-        filename = self.fetcher._make_filename(
-            'https://c2.staticflickr.com/8/7019/27006033235_caa438b3b8_o.jpg',
-            {},
-            self.photo_2
-        )
-        self.assertEqual(filename, '27006033235_caa438b3b8_o.jpg')
-
-    def test_make_filename_video(self):
-        "Should use the Content-Disposition filename."
-        filename = self.fetcher._make_filename(
-            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
-            {'Content-Disposition': 'attachment; filename=26348530105.mov'},
-            self.video_2
-        )
-        self.assertEqual(filename, '26348530105.mov')
-
-    def test_make_filename_fallback(self):
-        "It should make a filename based on Photo's id and secret"
-        filename = self.fetcher._make_filename(
-            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
-            {},
-            self.video_2
-        )
-        self.assertEqual(filename, '1234567890_7777_o')
-
-    def test_make_filename_fallback_2(self):
-        "It should make a filename if it can't match Content-Disposition name."
-        filename = self.fetcher._make_filename(
-            'https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/',
-            {'Content-Disposition': 'bibble; bobble'},
-            self.video_2
-        )
-        self.assertEqual(filename, '1234567890_7777_o')
-
-
-class FilesFetcherDownloadTestCase(TestCase):
-    "Testing the file downloading part of the FilesFetcher."
-
-    def setUp(self):
-        user = UserFactory()
-        account = AccountFactory(user=user)
-        self.fetcher = OriginalFilesFetcher(account=account)
-        self.photo = PhotoFactory(original_file=None, user=user)
-
-    def do_download(self, status=200, content_type='image/jpg'):
-        "Mocks requests and calls _download_file()"
-        # Open the image we're going to pretend we're fetching from the URL:
-        with open('tests/flickr/fixtures/images/marmite.jpg', 'rb') as img1:
-
-            responses.add(responses.GET, self.photo.original_url,
-                            body=img1.read(),
-                            status=status,
-                            content_type=content_type,
-                            adding_headers={'Transfer-Encoding': 'chunked'})
-
-            return self.fetcher._download_file(
-                        self.photo.original_url, ['image/jpg'], self.photo )
-
-    @responses.activate
-    @patch.object(OriginalFilesFetcher, '_make_filename')
-    def test_downloads_file(self, make_filename):
-        "Streams a jpg, saves it to /tmp/, returns the path, calls _make_filename()."
-        make_filename.return_value = 'marmite.jpg'
-
-        filepath = self.do_download()
-
-        self.assertTrue(os.path.isfile(filepath))
-        self.assertEqual(len(responses.calls), 1)
-        self.assertEqual(filepath, '/tmp/marmite.jpg')
-        make_filename.assert_called_once_with(
-                self.photo.original_url, {'Content-Type': 'image/jpg', 'Transfer-Encoding': 'chunked'}, self.photo)
-
-    @responses.activate
-    def test_raises_error_on_get_failure(self):
-        "If the requests.get() call raises an error."
-        responses.add(responses.GET, self.photo.original_url,
-                        body=HTTPError('Something went wrong'))
-        with self.assertRaises(FetchError):
-            filepath = self.fetcher._download_file(
-                        self.photo.original_url, ['image/jpg'], self.photo )
-
-    @responses.activate
-    def test_raises_error_on_bad_status_code(self):
-        with self.assertRaises(FetchError):
-            filepath = self.do_download(status=500)
-
-    @responses.activate
-    def test_raises_error_with_invalid_content_type(self):
-        "If downloaded file has content type different to what we ask for."
-        with self.assertRaises(FetchError):
-            filepath = self.do_download(content_type='text/html')
-
 
 class PhotosFetcherTestCase(FlickrFetchTestCase):
     """Testing the parent class that's used for all kinds of fetching lists of
@@ -464,14 +391,22 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @responses.activate
+    @patch.object(UserFetcher, '_fetch_and_save_avatar')
     @patch.object(UserSaver, 'save_user')
-    def test_fetch_user_if_missing_fetches(self, save_user):
+    def test_fetch_user_if_missing_fetches(self, save_user, fetch_avatar):
         """If the user isn't in fetched_users, it is fetched and saved."""
+
+        save_user.return_value = UserFactory.create(nsid='35034346050@N01')
+
         self.add_response('people.getInfo')
         user_data = self.load_fixture('people.getInfo')['person']
+
         self.fetcher._fetch_user_if_missing('35034346050@N01')
         self.assertEqual(1, len(responses.calls))
         save_user.assert_called_once_with(user_data, datetime_now())
+        self.assertEqual(1, len(self.fetcher.fetched_users))
+        self.assertEqual(self.fetcher.fetched_users['35034346050@N01'].nsid,
+                        '35034346050@N01')
 
     @responses.activate
     @patch.object(UserSaver, 'save_user')
@@ -506,7 +441,8 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(results, photo_data)
 
     @responses.activate
-    def test_fetches_photo_info_and_tag_user(self):
+    @patch.object(UserFetcher, '_fetch_and_save_avatar')
+    def test_fetches_photo_info_and_tag_user(self, fetch_avatar):
         """Fetches info for a photo and any tag authors who aren't in
         fetched_users."""
         self.add_response('photos.getInfo')

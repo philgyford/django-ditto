@@ -49,7 +49,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('realname', 'username', 'nsid',
                 'is_pro', 'location', 'description',
-                'photos_url', 'profile_url',
+                'photos_url', 'profile_url', 'avatar',
                 'photos_count', 'photos_views',
                 'photos_first_date', 'photos_first_date_taken', 'timezone_id',)
         }),
