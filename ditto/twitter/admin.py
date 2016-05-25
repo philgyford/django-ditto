@@ -128,7 +128,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('screen_name', 'name',
                 'is_private', 'is_verified',
-                'profile_image_url_https',
+                'profile_image_url_https', 'avatar',
                 'url', 'description', 'description_html', 'location',
                 'time_zone', 'twitter_id', 'created_at', )
         }),

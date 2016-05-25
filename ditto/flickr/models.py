@@ -679,7 +679,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     @property
     def icon_url(self):
         return self.original_icon_url
-    
+
     @property
     def original_icon_url(self):
         """URL of the avatar/profile pic at Flickr."""

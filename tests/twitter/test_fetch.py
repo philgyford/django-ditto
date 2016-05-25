@@ -2,15 +2,19 @@
 import datetime
 from decimal import Decimal
 import json
+import os
+import pytz
+import tempfile
 from unittest.mock import call, patch
 
-import pytz
 import responses
 from freezegun import freeze_time
 
 from django.http import QueryDict
-from django.test import TestCase
+from django.test import override_settings, TestCase
 
+from ditto.core.utils import datetime_now
+from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.twitter import factories
 from ditto.twitter.fetch import \
         FetchError, UserMixin, TweetMixin,\
@@ -175,6 +179,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         # ie, tweet3's ID:
         self.assertEqual(tweet2.quoted_status_id, 714527559946473474)
 
+
 class TweetMixinMediaTestCase(FetchTwitterTestCase):
     "Parent class for testing the save_media() method of the TweetMixin."
 
@@ -299,13 +304,14 @@ class UserMixinTestCase(FetchTwitterTestCase):
             user_data[key] = value
         return user_data
 
-    def make_user_object(self, user_data):
+    @patch.object(filedownloader, 'download')
+    def make_user_object(self, user_data, download):
         """"Creates/updates a User from API data, then fetches that User from
         the DB and returns it.
         """
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        user_mixin = UserMixin()
-        saved_user = user_mixin.save_user(user_data, fetch_time)
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
+        saved_user = UserMixin().save_user(user_data, datetime_now())
         return User.objects.get(twitter_id=12552)
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
@@ -352,6 +358,48 @@ class UserMixinTestCase(FetchTwitterTestCase):
         user_data = self.make_user_data({'entities': entities})
         user = self.make_user_object(user_data)
         self.assertEqual(user.url, 'http://t.co/UEs0CCkdrl')
+
+    @patch.object(filedownloader, 'download')
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_calls_fetch_and_save_avatar(self, fetch_avatar, download):
+        "_fetch_and_save_avatar should be called with the User object."
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
+        # Just make the mocked method return the User that's passed in:
+        fetch_avatar.side_effect = lambda value: value
+
+        user_data = self.make_user_data()
+        saved_user = UserMixin().save_user(user_data, datetime_now())
+        fetch_avatar.assert_called_once_with(saved_user)
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(filedownloader, 'download')
+    def test_downloads_and_saves_avatar(self, download):
+        "Should call download() and save avatar."
+        # Make a temporary file, like download() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download.return_value = temp_filepath
+
+        user_data = self.make_user_data()
+        saved_user = UserMixin().save_user(user_data, datetime_now())
+
+        download.assert_called_once_with(saved_user.profile_image_url_https,
+                        ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+
+        self.assertEqual(saved_user.avatar, 'twitter/12552/avatars/%s' %
+                                            os.path.basename(temp_filepath))
+
+    @patch.object(filedownloader, 'download')
+    @patch('ditto.twitter.fetch.os.path.exists')
+    def test_does_not_download_and_save_avatar(self, exists, download):
+        "If we already have the user's avatar, don't download it."
+        # Fake that the file we look for exists:
+        exists.return_value = True
+
+        user_data = self.make_user_data()
+        saved_user = UserMixin().save_user(user_data, datetime_now())
+        assert not download.called
 
 
 class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
@@ -438,13 +486,19 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'statuses/user_timeline'
 
     @responses.activate
-    def test_api_request_for_one_account(self):
+    @patch.object(filedownloader, 'download')
+    def test_api_request_for_one_account(self, download):
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher(screen_name='jill').fetch()
         self.assertEqual(1, len(responses.calls))
 
     @responses.activate
-    def test_api_requests_for_all_accounts(self):
+    @patch.object(filedownloader, 'download')
+    def test_api_requests_for_all_accounts(self, download):
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
         self.add_response(body=self.make_response_body())
         result = RecentTweetsFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
@@ -558,8 +612,11 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(save_tweet.call_count, 3)
 
     @responses.activate
-    def test_fetches_multiple_pages_for_new(self):
+    @patch.object(filedownloader, 'download')
+    def test_fetches_multiple_pages_for_new(self, download):
         "Fetches subsequent pages until no more recent results are returned."
+        # Quietly prevents avatar files being fetched:
+        download.side_effect = DownloadException('Oops')
         self.account_1.last_recent_id = 10
         self.account_1.save()
         qs = {'user_id': self.account_1.user.twitter_id,
@@ -613,11 +670,15 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
-    def test_ignores_account_with_no_creds(self):
-        user_3 = factories.UserFactory()
-        account_3 = factories.AccountFactory(user=user_3)
+    @patch.object(filedownloader, 'download')
+    def test_ignores_account_with_no_creds(self, download):
+        # This will just stop us requesting avatars from Twitter:
+        download.side_effect = DownloadException('Ooops')
+        # Add a third Account that has no API credentials:
+        account_3 = factories.AccountFactory(user=factories.UserFactory())
         self.add_response(body=self.make_response_body())
         result = FavoriteTweetsFetcher().fetch()
+        # Should only have fetched faves for the two accounts with API creds:
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
@@ -727,8 +788,11 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(jills_faves[0].twitter_id, 300)
 
     @responses.activate
-    def test_fetches_multiple_pages_for_new(self):
+    @patch.object(filedownloader, 'download')
+    def test_fetches_multiple_pages_for_new(self, download):
         """Fetches subsequent pages until no results are returned."""
+        # This will just stop us requesting avatars from Twitter:
+        download.side_effect = DownloadException('Ooops')
         self.account_1.last_favorite_id = 10
         self.account_1.save()
         qs = {'user_id': self.account_1.user.twitter_id,
@@ -770,7 +834,8 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'users/lookup'
 
     @responses.activate
-    def test_makes_one_api_call(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_makes_one_api_call(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = UsersFetcher(screen_name='jill').fetch([460060168, 26727655, 6795192])
         self.assertEqual(1, len(responses.calls))
@@ -961,19 +1026,22 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'account/verify_credentials'
 
     @responses.activate
-    def test_api_request_for_one_account(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_api_request_for_one_account(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher(screen_name='jill').fetch()
         self.assertEqual(1, len(responses.calls))
 
     @responses.activate
-    def test_api_requests_for_all_accounts(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_api_requests_for_all_accounts(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
-    def test_ignores_account_with_no_creds(self):
+    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    def test_ignores_account_with_no_creds(self, fetch_avatar):
         user_3 = factories.UserFactory()
         account_3 = factories.AccountFactory(user=user_3)
         self.add_response(body=self.make_response_body())
@@ -1027,6 +1095,13 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
     api_fixture = 'verify_credentials.json'
 
     api_call = 'account/verify_credentials'
+
+    def setUp(self):
+        # This will quietly stop the downloading of avatar files:
+        patcher = patch.object(filedownloader, 'download')
+        patcher.side_effect = DownloadException('Oops')
+        self.addCleanup(patcher.stop)
+        self.mock_foo = patcher.start()
 
     @responses.activate
     def test_fetch_for_account_creates(self):

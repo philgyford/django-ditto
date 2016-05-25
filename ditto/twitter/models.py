@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -413,6 +414,19 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                             help_text="The time the data was last fetched.")
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
+
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        dirbase = getattr(settings, 'DITTO_TWITTER_DIR_BASE', 'twitter')
+        return '/'.join([
+            dirbase,
+            str(self.twitter_id),
+            'avatars',
+            str(filename)
+        ])
+
+    avatar = models.ImageField(upload_to=avatar_upload_path,
+                                            null=False, blank=True, default='')
 
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
 

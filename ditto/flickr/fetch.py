@@ -13,7 +13,7 @@ from django.core.files import File
 
 from .models import Account, Photo, Photoset, User
 from ..core.utils import datetime_now
-from ..core.utils.downloader import DownloadException, filedownloader 
+from ..core.utils.downloader import DownloadException, filedownloader
 
 # Classes here:
 #
