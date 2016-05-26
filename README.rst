@@ -1,6 +1,6 @@
-=======
- Ditto
-=======
+==============
+ Django Ditto
+==============
 
 .. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
   :target: https://travis-ci.org/philgyford/django-ditto?branch=master
@@ -8,17 +8,13 @@
 .. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
   :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
 
-A collection of Django apps for copying things from third-party sites and
-services. Very much in-progress. Requires Python 3.4 or 3.5, and Django 1.8 or
-1.9.
+A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
 
-Currently, it copies your Bookmarks from `Pinboard <https://pinboard.in/>`_, your Tweets and Favorites from `Twitter <https://twitter.com/>`_, and your Photos, Photosets and original images/videos from `Flickr <https://flickr.com/>`_. See possible future services in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_. These work well, but there may be changes as this is still in development.
+Currently, Ditto copies Photos, Photosets and original images/videos from `Flickr <https://flickr.com/>`_, Bookmarks from `Pinboard <https://pinboard.in/>`_, and Tweets and Favorites from `Twitter <https://twitter.com/>`_. It can save these things for one or more account on each service. See possible future services, and overall progress, in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_.
 
-Public and private Tweets, Photos and Bookmarks are copied, but only public
-ones are displayed in the included views and templates; non-public ones are
-only visible in the Django admin.
+Public and private Tweets, Photos and Bookmarks are copied, but only public ones are displayed in the included Django views and templates; non-public ones are only visible in the Django admin.
 
-The docs below are hasty; I'm not expecting anyone else to use this yet.
+The docs below are a bit hasty; I'm not expecting anyone else to use this yet.
 
 
 ##############
@@ -36,7 +32,7 @@ Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some pr
 Add to INSTALLED_APPS
 *********************
 
-To use Ditto in your own project (untested as yet), add the core ``ditto.core`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This includes Flickr, Pinboard and Twitter::
+To use Ditto in your own project (untested as yet), add the core ``ditto.core`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This example includes Flickr, Pinboard and Twitter::
 
     INSTALLED_APPS = (
         # other apps listed here.
