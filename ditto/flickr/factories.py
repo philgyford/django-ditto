@@ -29,6 +29,8 @@ class UserFactory(factory.DjangoModelFactory):
                             )
     fetch_time = datetime_now()
 
+    avatar = factory.django.ImageField(filename='my_avatar.jpg')
+
 
 class AccountFactory(factory.DjangoModelFactory):
     class Meta:

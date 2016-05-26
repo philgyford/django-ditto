@@ -494,6 +494,14 @@ class UserTestCase(TestCase):
         user = UserFactory(screen_name='bill')
         self.assertEqual(user.permalink, 'https://twitter.com/bill')
 
+    def test_avatar_url(self):
+        user = UserFactory(twitter_id=1234, avatar__filename='my_face.jpg')
+        self.assertEqual(user.avatar_url, 'twitter/1234/avatars/my_face.jpg')
+
+    def test_avatar_url_missing(self):
+        user = UserFactory(avatar=None)
+        self.assertEqual(user.avatar_url, '/static/img/default_avatar.png')
+
     def test_profile_image_url(self):
         url = 'https://twitter.com/tester.jpg'
         user = UserFactory(profile_image_url_https=url)

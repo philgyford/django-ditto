@@ -63,3 +63,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# So that ImageField/FileField fields on models don't have FactoryBoy
+# create test files in the project's file structure:
+import tempfile
+MEDIA_ROOT = tempfile.mkdtemp()
+

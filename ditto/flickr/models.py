@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.templatetags.static import static
 
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
@@ -678,7 +679,10 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     @property
     def avatar_url(self):
-        return self.avatar.url
+        try:
+            return self.avatar.url
+        except ValueError:
+            return static('img/default_avatar.png')
 
     @property
     def original_icon_url(self):
