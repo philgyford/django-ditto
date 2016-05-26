@@ -10,9 +10,32 @@
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
 
-Currently, Ditto copies Photos, Photosets and original images/videos from `Flickr <https://flickr.com/>`_, Bookmarks from `Pinboard <https://pinboard.in/>`_, and Tweets and Favorites from `Twitter <https://twitter.com/>`_. It can save these things for one or more account on each service. See possible future services, and overall progress, in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_.
+Currently, Ditto can copy these things from these services:
 
-Public and private Tweets, Photos and Bookmarks are copied, but only public ones are displayed in the included Django views and templates; non-public ones are only visible in the Django admin.
+- `Flickr <https://flickr.com/>`_
+    - Photos
+    - Photosets
+    - Original image and video files
+    - Users
+- `Pinboard <https://pinboard.in/>`_
+    - Bookmarks
+- `Twitter <https://twitter.com/>`_
+    - Tweets
+    - Favorites/Likes
+    - Users
+
+It can save these things for one or more account on each service. See possible future services, and overall progress, in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_.
+
+Public and private Photos, Bookmarks and Tweets are saved, but only public ones are displayed in the included Django views and templates; non-public ones are only visible in the Django admin.
+
+The Ditto app provides:
+
+- Models
+- Admin
+- Management commands to fetch the data/files
+- Views and URLs
+- Templates (that use `Bootstrap 4 <http://v4-alpha.getbootstrap.com>`_)
+- Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
 
 The docs below are a bit hasty; I'm not expecting anyone else to use this yet.
 
