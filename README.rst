@@ -77,7 +77,7 @@ To use Ditto's supplied views you can include each app's URLs in your project's 
     ]
 
 Change the URL include paths (eg, ``r'^ditto/pinboard/'`` as appropriate) to
-suit your project. See the ``urls.py`` in the ``demo/`` project for a full
+suit your project. See the ``urls.py`` in the ``devproject/`` project for a full
 example.
 
 
