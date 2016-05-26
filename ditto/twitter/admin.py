@@ -120,15 +120,16 @@ class TweetAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('screen_name', 'name', 'is_private', 'fetch_time',)
-    list_display_links = ('screen_name', )
+    list_display = ('show_avatar', 'screen_name', 'name', 'is_private',
+                    'fetch_time',)
+    list_display_links = ('show_avatar', 'screen_name', )
     search_fields = ('screen_name', 'name',)
 
     fieldsets = (
         (None, {
             'fields': ('screen_name', 'name',
                 'is_private', 'is_verified',
-                'profile_image_url_https',
+                'profile_image_url_https', 'avatar',
                 'url', 'description', 'description_html', 'location',
                 'time_zone', 'twitter_id', 'created_at', )
         }),
@@ -148,3 +149,7 @@ class UserAdmin(admin.ModelAdmin):
 
     readonly_fields = ('description_html' ,'raw', 'fetch_time', 'time_created', 'time_modified',)
 
+    def show_avatar(self, instance):
+        return '<img src="%s" width="24" height="24" />' % (instance.avatar_url)
+    show_avatar.allow_tags = True
+    show_avatar.short_description = ''

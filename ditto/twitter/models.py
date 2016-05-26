@@ -1,6 +1,8 @@
 # coding: utf-8
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.templatetags.static import static
 
 from . import managers
 from .utils import htmlify_description, htmlify_tweet
@@ -92,7 +94,7 @@ class Media(TimeStampedModelMixin, models.Model):
     """Photos and Videos.
 
     They have a bunch of common fields, and then some extra for Videos.
-    A Tweet could have zero, one or more Medias.
+    A Tweet could have zero, one or more Medias. Yes that's the plural shut up.
     """
     MEDIA_TYPES = (
         ('animated_gif', 'Animated GIF'),
@@ -128,7 +130,7 @@ class Media(TimeStampedModelMixin, models.Model):
     thumb_h = models.PositiveSmallIntegerField(null=True, blank=True,
                                                 verbose_name="Thumbnail height")
 
-    # VIDEO-ONLY PROPERTIES.
+    # START VIDEO-ONLY PROPERTIES.
 
     # These will be in order from lowest bitrate to highest.
     mp4_url = models.URLField(null=False, blank=True,
@@ -414,6 +416,19 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     raw = models.TextField(null=False, blank=True,
                                     help_text="eg, the raw JSON from the API.")
 
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        dirbase = getattr(settings, 'DITTO_TWITTER_DIR_BASE', 'twitter')
+        return '/'.join([
+            dirbase,
+            str(self.twitter_id),
+            'avatars',
+            str(filename)
+        ])
+
+    avatar = models.ImageField(upload_to=avatar_upload_path,
+                                            null=False, blank=True, default='')
+
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
 
     objects = models.Manager()
@@ -454,6 +469,13 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     @property
     def permalink(self):
         return 'https://twitter.com/%s' % self.screen_name
+
+    @property
+    def avatar_url(self):
+        try:
+            return self.avatar.url
+        except ValueError:
+            return static('img/default_avatar.png')
 
     @property
     def profile_image_url(self):

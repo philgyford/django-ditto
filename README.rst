@@ -25,6 +25,13 @@ The docs below are hasty; I'm not expecting anyone else to use this yet.
  Installation
 ##############
 
+******
+Pillow
+******
+
+Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used `Homebrew <http://brew.sh>`_ to install libjpeg.)
+
+
 *********************
 Add to INSTALLED_APPS
 *********************
@@ -112,6 +119,7 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 
     $ ./manage.py fetch_flickr_account_user --id=1
 
+
 Photos
 ======
 
@@ -127,7 +135,7 @@ Both options can be restricted to only fetch for a single Account by adding the 
 
     $ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
 
-To download the original photo and video files, use the ``fetch_flickr_originals`` command, *after* fetching the photo's data::
+The above only fetches data about the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the ``fetch_flickr_originals`` command, *after* fetching the photos' data::
 
     $ ./manage.py fetch_flickr_originals
 
@@ -141,16 +149,16 @@ Both variants can be restricted to fetching files for a single account::
 
 Files will be saved within your project's ``MEDIA_ROOT`` directory, as defined in ``settings.py``. There are two optional settings to customise the directories in which the files are saved. Their default values are as shown here::
 
-   DITTO_FLICKR_PHOTO_DIR_BASE = 'flickr'
-   DITTO_FLICKR_PHOTO_DIR_FORMAT = '%Y/%m/%d'
+   DITTO_FLICKR_DIR_BASE = 'flickr'
+   DITTO_FLICKR_DIR_PHOTOS_FORMAT = '%Y/%m/%d'
 
 These values are used if you don't specify your own settings.
 
-If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the date the photo was taken::
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the Flickr user's NSID and the date the photo was taken::
 
-    /var/www/example.com/media/flickr/2016/08/31/1234567_987654_o.jpg
+    /var/www/example.com/media/flickr/35034346050N01/photos/2016/08/31/1234567_987654_o.jpg
 
-Note that videos will have two "original" files downloaded: the video itself and a JPG image that Flickr created for it.
+Note that videos will have *two* "original" files downloaded: the video itself and a JPG image that Flickr created for it.
 
 Photosets
 =========
@@ -169,6 +177,17 @@ To fetch Photosets for all Accounts::
 Or fetch for only one Account::
 
     $ ./manage.py fetch_flickr_photosets --account=35034346050@N01
+
+Users
+=====
+
+Profile photos of Flickr Users are downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_FLICKR_DIR_BASE`` setting to change the location. The default is::
+
+   DITTO_FLICKR_DIR_BASE = 'flickr'
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with NSID ``35034346050@N01`` to something like this::
+
+    /var/www/example.com/media/flickr/35034346050N01/avatars/35034346050N01.jpg
 
 
 ********
@@ -263,6 +282,14 @@ Or restrict to a single Account::
 
 Users
 =====
+
+When a Tweet of any kind is fetched, its User data is also stored, and the User's profile photo (avatar) is downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_TWITTER_DIR_BASE`` setting to change the location. The default is::
+
+   DITTO_TWITTER_DIR_BASE = 'twitter'
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with a Twitter ID ``12345678`` to something like this::
+
+    /var/www/example.com/media/twitter/12345678/avatars/my_avatar.jpg
 
 You may periodically want to update the stored data about all the Twitter users
 stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this::

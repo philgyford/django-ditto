@@ -1,13 +1,18 @@
 # coding: utf-8
 import datetime
 import json
+import os
 import pytz
 import time
 
 from twython import Twython, TwythonError
 
+from django.conf import settings
+from django.core.files import File
+
 from .models import Account, Media, Tweet, User
 from ..core.utils import datetime_now
+from ..core.utils.downloader import DownloadException, filedownloader
 
 
 # CLASSES HERE:
@@ -63,13 +68,14 @@ class UserMixin(TwitterItemMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def save_user(self, user, fetch_time, extra={}):
+    def save_user(self, user, fetch_time, download_avatar=True):
         """With Twitter user data from the API, it creates or updates the User
         and returns the User object.
 
         Keyword arguments:
         user -- A dict of the data about a user from the API's JSON.
         fetch_time -- A datetime.
+        download_avatar -- Boolean. Should user's profile pic be downloaded?
 
         Returns the User object.
         """
@@ -121,7 +127,40 @@ class UserMixin(TwitterItemMixin):
             twitter_id=user['id'], defaults=defaults
         )
 
+        if download_avatar:
+            user_obj = self._fetch_and_save_avatar(user_obj)
+
         return user_obj
+
+    def _fetch_and_save_avatar(self, user):
+        """
+        Download and save the Avatar/profile pic for this user.
+        If the user's profile_image_url_https property doesn't match an image
+        we've already downloaded for them, we fetch and save it.
+
+        user -- User object.
+        """
+        filename = os.path.basename(user.profile_image_url_https)
+        # Where we'd save the user's avatar image to:
+        avatar_upload_path = os.path.join(
+                                settings.MEDIA_ROOT,
+                                user.avatar_upload_path(filename)
+                            )
+        if os.path.exists(avatar_upload_path):
+            return user
+
+        # We don't have this image yet, so fetch and save it.
+        try:
+            avatar_filepath = filedownloader.download(
+                        user.profile_image_url_https,
+                        ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+
+            user.avatar.save(os.path.basename(avatar_filepath),
+                                File(open(avatar_filepath, 'rb')) )
+        except DownloadException as e:
+            pass
+
+        return user
 
 
 class TweetMixin(UserMixin):
@@ -473,6 +512,10 @@ class FetchVerify(UserMixin, Fetch):
 
 
 class FetchLookup(Fetch):
+    """
+    Parent class for classes that call lookup* queries on the Twitter API.
+    eg, lookup_user or lookup_status.
+    """
 
     # Maximum number of users/tweets to ask for per query, allowed by the API:
     fetch_per_query = 100

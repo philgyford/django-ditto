@@ -42,14 +42,14 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('realname', 'username', 'fetch_time',)
-    list_display_links = ('realname', )
+    list_display = ('show_avatar', 'realname', 'username', 'fetch_time',)
+    list_display_links = ('show_avatar', 'realname', )
 
     fieldsets = (
         (None, {
             'fields': ('realname', 'username', 'nsid',
                 'is_pro', 'location', 'description',
-                'photos_url', 'profile_url',
+                'photos_url', 'profile_url', 'avatar',
                 'photos_count', 'photos_views',
                 'photos_first_date', 'photos_first_date_taken', 'timezone_id',)
         }),
@@ -61,6 +61,11 @@ class UserAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
     search_fields = ('realname', 'username',)
+
+    def show_avatar(self, instance):
+        return '<img src="%s" width="24" height="24" />' % (instance.avatar_url)
+    show_avatar.allow_tags = True
+    show_avatar.short_description = ''
 
 
 @admin.register(Photoset)

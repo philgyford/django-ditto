@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.templatetags.static import static
 
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
@@ -386,27 +387,23 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                                                         through=TaggedPhoto)
 
     def upload_path(self, filename):
-        """Generate the path under MEDIA_ROOT where the original file will be
-        saved.
-        """
-        dirbase = getattr(settings, 'DITTO_FLICKR_PHOTO_DIR_BASE', 'flickr')
+        "Make path under MEDIA_ROOT where original files will be saved."
+        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
         dirformat = getattr(
-                        settings, 'DITTO_FLICKR_PHOTO_DIR_FORMAT', '%Y/%m/%d')
+                        settings, 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
         return '/'.join([
             dirbase,
-            self.user.nsid,
+            self.user.nsid.replace('@',''),
+            'photos',
             str(self.post_time.date().strftime(dirformat)),
             filename
         ])
 
-    # Using a FileField rather than ImageField so we don't need to install
-    # Pillow just for this. And we're unlikely to display the original
-    # in a web page as an image.
-    original_file = models.FileField(
-                    upload_to=upload_path, null=False, blank=True, default='')
-    video_original_file = models.FileField(
-                    upload_to=upload_path, null=False, blank=True, default='',
-                    help_text="Only present for Videos.")
+    original_file = models.ImageField(upload_to=upload_path,
+                                            null=False, blank=True, default='')
+    video_original_file = models.FileField(upload_to=upload_path,
+                                        null=False, blank=True, default='',
+                                        help_text="Only present for Videos.")
 
     class Meta:
         ordering = ('-post_time',)
@@ -627,9 +624,9 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                                 help_text="May contain HTML")
 
     photos_url = models.URLField(null=False, blank=False, max_length=255,
-                                                    verbose_name='Photos URL')
+                                            verbose_name='Photos URL at Flickr')
     profile_url = models.URLField(null=False, blank=False, max_length=255,
-                                                    verbose_name='Profile URL')
+                                        verbose_name='Avatar URL on Flickr')
 
     photos_count = models.PositiveIntegerField(null=False, blank=False,
                                                                       default=0)
@@ -645,6 +642,19 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     help_text="The raw JSON from the API.")
     timezone_id = models.CharField(null=False, blank=False, max_length=50,
                                             help_text="eg, 'Europe/London'.")
+
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
+        return '/'.join([
+            dirbase,
+            self.nsid.replace('@',''),
+            'avatars',
+            filename
+        ])
+
+    avatar = models.ImageField(upload_to=avatar_upload_path,
+                                            null=False, blank=True, default='')
 
     objects = models.Manager()
     # All Users that have Accounts:
@@ -668,7 +678,15 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return self.photos_url
 
     @property
-    def icon_url(self):
+    def avatar_url(self):
+        try:
+            return self.avatar.url
+        except ValueError:
+            return static('img/default_avatar.png')
+
+    @property
+    def original_icon_url(self):
+        """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
             return 'https://farm%s.staticflickr.com/%s/buddyicons/%s.jpg' % \
                                     (self.iconfarm, self.iconserver, self.nsid)

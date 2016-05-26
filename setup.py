@@ -15,6 +15,7 @@ setup(
         'django-sortedm2m>=1.2.2,<1.3',
         'django-taggit',
         'flickrapi',
+        'pillow>=3.2.0,<3.3',
         'pytz',
         'twitter-text-python',
         'twython>=3.4.0,<3.5',
