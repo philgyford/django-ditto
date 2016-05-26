@@ -119,14 +119,6 @@ Finally, for each of those Accounts, note its ID from the Django admin, and do t
 
     $ ./manage.py fetch_flickr_account_user --id=1
 
-Profile photos of Flickr users are downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_FLICKR_DIR_BASE`` setting to change the location. The default is::
-
-   DITTO_FLICKR_DIR_BASE = 'flickr'
-
-If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with NSID ``35034346050@N01`` to something like this::
-
-    /var/www/example.com/media/flickr/35034346050N01/avatars/35034346050N01.jpg
-
 
 Photos
 ======
@@ -185,6 +177,17 @@ To fetch Photosets for all Accounts::
 Or fetch for only one Account::
 
     $ ./manage.py fetch_flickr_photosets --account=35034346050@N01
+
+Users
+=====
+
+Profile photos of Flickr Users are downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_FLICKR_DIR_BASE`` setting to change the location. The default is::
+
+   DITTO_FLICKR_DIR_BASE = 'flickr'
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with NSID ``35034346050@N01`` to something like this::
+
+    /var/www/example.com/media/flickr/35034346050N01/avatars/35034346050N01.jpg
 
 
 ********
@@ -279,6 +282,14 @@ Or restrict to a single Account::
 
 Users
 =====
+
+When a Tweet of any kind is fetched, its User data is also stored, and the User's profile photo (avatar) is downloaded and stored in your project's ``MEDIA_ROOT`` directory. You can optionally set the ``DITTO_TWITTER_DIR_BASE`` setting to change the location. The default is::
+
+   DITTO_TWITTER_DIR_BASE = 'twitter'
+
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above setting would save the profile image for the user with a Twitter ID ``12345678`` to something like this::
+
+    /var/www/example.com/media/twitter/12345678/avatars/my_avatar.jpg
 
 You may periodically want to update the stored data about all the Twitter users
 stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this::

@@ -94,7 +94,7 @@ class Media(TimeStampedModelMixin, models.Model):
     """Photos and Videos.
 
     They have a bunch of common fields, and then some extra for Videos.
-    A Tweet could have zero, one or more Medias.
+    A Tweet could have zero, one or more Medias. Yes that's the plural shut up.
     """
     MEDIA_TYPES = (
         ('animated_gif', 'Animated GIF'),
@@ -130,7 +130,7 @@ class Media(TimeStampedModelMixin, models.Model):
     thumb_h = models.PositiveSmallIntegerField(null=True, blank=True,
                                                 verbose_name="Thumbnail height")
 
-    # VIDEO-ONLY PROPERTIES.
+    # START VIDEO-ONLY PROPERTIES.
 
     # These will be in order from lowest bitrate to highest.
     mp4_url = models.URLField(null=False, blank=True,
