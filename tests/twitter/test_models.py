@@ -14,7 +14,7 @@ from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, PhotoFactory, TweetFactory,\
         UserFactory, VideoFactory, AnimatedGifFactory
 from ditto.twitter.models import Account, Media, Tweet, User
-from ditto.twitter.fetch.fetch import FetchVerify
+from ditto.twitter.fetch.savers import UserSaver
 
 
 class AccountTestCase(TestCase):
@@ -69,7 +69,7 @@ class AccountTestCase(TestCase):
         self.assertEqual(accounts[0].pk, account_2.pk)
 
     @responses.activate
-    @patch.object(FetchVerify, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_creates_user(self, fetch_avatar):
         "Should fetch user from API on save if it has no user"
         # Just make the mocked method return the User that's passed in:
@@ -109,7 +109,7 @@ class AccountTestCase(TestCase):
         self.assertEqual(0, len(responses.calls))
 
     @responses.activate
-    @patch.object(FetchVerify, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_update_user_updates_user(self, fetch_avatar):
         "Sets the Account's user and returns it if all is well."
         # Just make the mocked method return the User that's passed in:

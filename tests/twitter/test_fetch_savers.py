@@ -13,12 +13,12 @@ from ditto.core.utils.downloader import DownloadException, filedownloader
 from django.test import override_settings
 
 from .test_fetch import FetchTwitterTestCase
-from ditto.twitter.fetch.mixins import TweetMixin, UserMixin
+from ditto.twitter.fetch.savers import TweetSaver, UserSaver
 from ditto.twitter.models import Media, Tweet, User
 
 
-class TweetMixinTestCase(FetchTwitterTestCase):
-    """Testing the TweetMixin"""
+class TweetSaverTestCase(FetchTwitterTestCase):
+    """Testing the TweetSaver class"""
 
     # Note that we've changed the id and id_str of each Tweet in this
     # fixture to something much shorter, and easier to test with.
@@ -35,8 +35,7 @@ class TweetMixinTestCase(FetchTwitterTestCase):
             tweet_data['user']['protected'] = True
 
         # Send the JSON, and our new User object, to try and save the tweet:
-        mixin = TweetMixin()
-        saved_tweet = mixin.save_tweet(tweet_data, self.fetch_time)
+        saved_tweet = TweetSaver().save_tweet(tweet_data, self.fetch_time)
 
         # Load that saved tweet from the DB:
         return Tweet.objects.get(twitter_id=300)
@@ -120,8 +119,8 @@ class TweetMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet2.quoted_status_id, 714527559946473474)
 
 
-class TweetMixinMediaTestCase(FetchTwitterTestCase):
-    "Parent class for testing the save_media() method of the TweetMixin."
+class TweetSaverMediaTestCase(FetchTwitterTestCase):
+    "Parent class for testing the save_media() method of the TweetSaver class."
 
     # Child classes should have an api_fixture property.
 
@@ -133,14 +132,13 @@ class TweetMixinMediaTestCase(FetchTwitterTestCase):
         tweet_data = json.loads(self.make_response_body())
 
         # Send the JSON, and our new User object, to try and save the tweet:
-        mixin = TweetMixin()
-        saved_tweet = mixin.save_tweet(tweet_data, fetch_time)
+        saved_tweet = TweetSaver().save_tweet(tweet_data, fetch_time)
 
         # Load that saved tweet from the DB:
         self.tweet = Tweet.objects.get(twitter_id=9876543210)
 
 
-class TweetMixinPhotosTestCase(TweetMixinMediaTestCase):
+class TweetSaverPhotosTestCase(TweetSaverMediaTestCase):
     "Testing that photos are saved correctly."
 
     api_fixture = 'tweet_with_photos.json'
@@ -169,7 +167,7 @@ class TweetMixinPhotosTestCase(TweetMixinMediaTestCase):
         self.assertEqual(photo.thumb_h, 150)
 
 
-class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
+class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
     "Testing that videos are saved correctly."
 
     api_fixture = 'tweet_with_video.json'
@@ -200,7 +198,7 @@ class TweetMixinVideosTestCase(TweetMixinMediaTestCase):
         self.assertEqual(video.xmpeg_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8')
 
 
-class TweetMixinAnimatedGifTestCase(TweetMixinMediaTestCase):
+class TweetSaverAnimatedGifTestCase(TweetSaverMediaTestCase):
     "Testing that animated GIFs are saved correctly."
 
     api_fixture = 'tweet_with_animated_gif.json'
@@ -229,7 +227,7 @@ class TweetMixinAnimatedGifTestCase(TweetMixinMediaTestCase):
         self.assertEqual(gif.mp4_url, 'https://pbs.twimg.com/tweet_video/ChStzgbWYAErHLi.mp4')
 
 
-class UserMixinTestCase(FetchTwitterTestCase):
+class UserSaverTestCase(FetchTwitterTestCase):
 
     api_fixture = 'verify_credentials.json'
 
@@ -251,7 +249,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
         """
         # Quietly prevents avatar files being fetched:
         download.side_effect = DownloadException('Oops')
-        saved_user = UserMixin().save_user(user_data, datetime_now())
+        saved_user = UserSaver().save_user(user_data, datetime_now())
         return User.objects.get(twitter_id=12552)
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
@@ -299,7 +297,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
         self.assertEqual(user.url, 'http://t.co/UEs0CCkdrl')
 
     @patch.object(filedownloader, 'download')
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_calls_fetch_and_save_avatar(self, fetch_avatar, download):
         "_fetch_and_save_avatar should be called with the User object."
         # Quietly prevents avatar files being fetched:
@@ -308,7 +306,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
         fetch_avatar.side_effect = lambda value: value
 
         user_data = self.make_user_data()
-        saved_user = UserMixin().save_user(user_data, datetime_now())
+        saved_user = UserSaver().save_user(user_data, datetime_now())
         fetch_avatar.assert_called_once_with(saved_user)
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
@@ -321,7 +319,7 @@ class UserMixinTestCase(FetchTwitterTestCase):
         download.return_value = temp_filepath
 
         user_data = self.make_user_data()
-        saved_user = UserMixin().save_user(user_data, datetime_now())
+        saved_user = UserSaver().save_user(user_data, datetime_now())
 
         download.assert_called_once_with(saved_user.profile_image_url_https,
                         ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
@@ -337,6 +335,6 @@ class UserMixinTestCase(FetchTwitterTestCase):
         exists.return_value = True
 
         user_data = self.make_user_data()
-        saved_user = UserMixin().save_user(user_data, datetime_now())
+        saved_user = UserSaver().save_user(user_data, datetime_now())
         assert not download.called
 

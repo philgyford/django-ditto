@@ -10,7 +10,7 @@ from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, TweetFactory, UserFactory
 from ditto.twitter.fetch import FetchError
-from ditto.twitter.fetch.mixins import UserMixin, TweetMixin
+from ditto.twitter.fetch.savers import UserSaver, TweetSaver
 from ditto.twitter.fetch.fetch import FetchVerify, FetchUsers, FetchTweets,\
         FetchTweetsRecent, FetchTweetsFavorite
 from ditto.twitter.fetch.fetchers import TwitterFetcher, VerifyFetcher,\
@@ -220,7 +220,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(User.objects.count(), 3)
 
     @responses.activate
-    @patch.object(TweetMixin, 'save_tweet')
+    @patch.object(TweetSaver, 'save_tweet')
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
@@ -391,7 +391,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.assertEqual(User.objects.count(), 3)
 
     @responses.activate
-    @patch.object(TweetMixin, 'save_tweet')
+    @patch.object(TweetSaver, 'save_tweet')
     def test_saves_correct_tweet_data(self, save_tweet):
         """Assert save_tweet is called once per tweet.
         Not actually checking what's passed in."""
@@ -457,7 +457,7 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'users/lookup'
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_makes_one_api_call(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = UsersFetcher(screen_name='jill').fetch(
@@ -652,21 +652,21 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
     api_call = 'account/verify_credentials'
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_api_request_for_one_account(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher(screen_name='jill').fetch()
         self.assertEqual(1, len(responses.calls))
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_api_requests_for_all_accounts(self, fetch_avatar):
         self.add_response(body=self.make_response_body())
         result = VerifyFetcher().fetch()
         self.assertEqual(2, len(responses.calls))
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_ignores_account_with_no_creds(self, fetch_avatar):
         user_3 = UserFactory()
         account_3 = AccountFactory(user=user_3)
@@ -723,7 +723,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
     api_call = 'account/verify_credentials'
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_fetch_for_account_creates(self, fetch_avatar):
         "Saves and returns new user after successful API call"
         # Just make the mocked method return the User that's passed in:
@@ -745,7 +745,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
                 responses.calls[0].request.url)
 
     @responses.activate
-    @patch.object(UserMixin, '_fetch_and_save_avatar')
+    @patch.object(UserSaver, '_fetch_and_save_avatar')
     def test_fetch_for_account_updates(self, fetch_avatar):
         "Saves and returns updated existing user after successful API call"
         # Just make the mocked method return the User that's passed in:

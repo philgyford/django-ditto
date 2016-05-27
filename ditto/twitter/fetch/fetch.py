@@ -3,7 +3,7 @@ import time
 from twython import Twython, TwythonError
 
 from . import FetchError
-from .mixins import TweetMixin, UserMixin
+from .savers import TweetSaver, UserSaver
 from ..models import Tweet, User
 from ...core.utils import datetime_now
 
@@ -126,7 +126,7 @@ class Fetch(object):
     def _save_results(self):
         """Define in child classes.
         Should go through self._results() and, probably, call
-        self.save_tweet() or self.save_user() for each one.
+        TweetSaver().save_tweet() or UserSaver().save_user() for each one.
         """
         self.objects = []
 
@@ -143,7 +143,7 @@ class Fetch(object):
         pass
 
 
-class FetchVerify(UserMixin, Fetch):
+class FetchVerify(Fetch):
     """For verifying an Account's API credentials, but ALSO fetches the user
     data for that single Account.
     """
@@ -161,7 +161,7 @@ class FetchVerify(UserMixin, Fetch):
         In other sibling classes this would loop through results and save each
         in turn, but here we only have a single result.
         """
-        user = self.save_user(self.results, self.fetch_time)
+        user = UserSaver().save_user(self.results, self.fetch_time)
         self.objects = [user]
 
 
@@ -229,7 +229,7 @@ class FetchLookup(Fetch):
         return self.ids_remaining_to_fetch[:self.fetch_per_query]
 
 
-class FetchUsers(UserMixin, FetchLookup):
+class FetchUsers(FetchLookup):
     """For fetching users.
 
     Supply fetch() with a list of Twitter user IDs, and corresponding Users
@@ -250,11 +250,11 @@ class FetchUsers(UserMixin, FetchLookup):
 
     def _save_results(self):
         for user in self.results:
-            user_obj = self.save_user(user, self.fetch_time)
+            user_obj = UserSaver().save_user(user, self.fetch_time)
             self.objects.append(user_obj)
 
 
-class FetchTweets(TweetMixin, FetchLookup):
+class FetchTweets(FetchLookup):
     """For fetching specific Tweets.
 
     Supply fetch() with a list of Twitter Tweet IDs, and coresponding Tweets
@@ -275,11 +275,11 @@ class FetchTweets(TweetMixin, FetchLookup):
 
     def _save_results(self):
         for tweet in self.results:
-            tweet_obj = self.save_tweet(tweet, self.fetch_time)
+            tweet_obj = TweetSaver().save_tweet(tweet, self.fetch_time)
             self.objects.append(tweet_obj)
 
 
-class FetchNewTweets(TweetMixin, Fetch):
+class FetchNewTweets(Fetch):
     """A parent class for those which fetch "new" Tweets. ie, fetching a
     quantity of the most recent Tweets/favorited Tweets. As opposed to fetching
     a specified selection of Tweets, regardless of when they were.
@@ -388,7 +388,7 @@ class FetchTweetsRecent(FetchNewTweets):
         Adds each new Tweet object to self.objects.
         """
         for tweet in self.results:
-            tw = self.save_tweet(tweet, self.fetch_time)
+            tw = TweetSaver().save_tweet(tweet, self.fetch_time)
             self.objects.append(tw)
 
 
@@ -429,7 +429,7 @@ class FetchTweetsFavorite(FetchNewTweets):
         Adds each new Tweet object to self.objects.
         """
         for tweet in self.results:
-            tw = self.save_tweet(tweet, self.fetch_time)
+            tw = TweetSaver().save_tweet(tweet, self.fetch_time)
             # Associate this tweet with the Account's user:
             self.account.user.favorites.add(tw)
             self.objects.append(tw)

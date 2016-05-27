@@ -4,7 +4,7 @@ import json
 import os
 import pytz
 
-from .fetch.mixins import TweetMixin
+from .fetch.savers import TweetSaver
 from .models import User
 from ..core.utils import datetime_now
 
@@ -13,7 +13,7 @@ class IngestError(Exception):
     pass
 
 
-class TweetIngester(TweetMixin, object):
+class TweetIngester(object):
     """For importing a downloaded archive of tweets.
     Request yours from https://twitter.com/settings/account
 
@@ -110,6 +110,6 @@ class TweetIngester(TweetMixin, object):
             return
 
         for tweet in self.tweets_data:
-            self.save_tweet(tweet, self.fetch_time)
+            TweetSaver().save_tweet(tweet, self.fetch_time)
             self.tweet_count += 1
 

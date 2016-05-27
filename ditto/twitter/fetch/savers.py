@@ -12,16 +12,16 @@ from ...core.utils.downloader import DownloadException, filedownloader
 # Classes that take JSON data from the Twitter API and create or update
 # objects.
 #
-# They don't call the API at all. But UserMixin fetches avatar images.
+# They don't call the API at all. But UserSaver fetches avatar images.
 
 # CLASSES HERE:
 #
-# TwitterItemMixin
-#   UserMixin
-#     TweetMixin
+# SaveUtilsMixin
+# UserSaver
+# TweetSaver
 
 
-class TwitterItemMixin(object):
+class SaveUtilsMixin(object):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,7 +34,7 @@ class TwitterItemMixin(object):
                                                             tzinfo=pytz.utc)
 
 
-class UserMixin(TwitterItemMixin):
+class UserSaver(SaveUtilsMixin, object):
     "Provides a method for creating/updating a User using data from the API."
 
     def __init__(self, *args, **kwargs):
@@ -136,7 +136,7 @@ class UserMixin(TwitterItemMixin):
         return user
 
 
-class TweetMixin(UserMixin):
+class TweetSaver(SaveUtilsMixin, object):
     """Provides a method for creating/updating a Tweet (and its User) using
     data from the API. Also used by ingest.TweetIngester()
     """
@@ -263,7 +263,7 @@ class TweetMixin(UserMixin):
             # different format for created_at. Of course. Why not?!
             created_at = self._api_time_to_datetime(tweet['created_at'], time_format='%Y-%m-%d %H:%M:%S +0000')
 
-        user = self.save_user(tweet['user'], fetch_time)
+        user = UserSaver().save_user(tweet['user'], fetch_time)
 
         defaults = {
             'fetch_time':       fetch_time,
@@ -326,7 +326,7 @@ class TweetMixin(UserMixin):
                 # tweet 2 will have 'quoted_status_id' but not 'quoted_status'.
                 # But the tweet does have quoted_status, we'll create/update
                 # the quoted User object, and quoted Tweet.
-                quoted_user = self.save_user(
+                quoted_user = UserSaver().save_user(
                                     tweet['quoted_status']['user'], fetch_time)
                 quoted_tweet_obj = self.save_tweet(
                                             tweet['quoted_status'], fetch_time)
