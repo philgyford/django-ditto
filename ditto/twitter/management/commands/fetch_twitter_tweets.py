@@ -1,6 +1,6 @@
 # coding: utf-8
-from . import FetchTwitterCommand
-from ...fetch import RecentTweetsFetcher
+from .import FetchTwitterCommand
+from ...fetch.fetchers import RecentTweetsFetcher
 
 
 class Command(FetchTwitterCommand):

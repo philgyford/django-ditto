@@ -4,7 +4,7 @@ import json
 import os
 import pytz
 
-from .fetch import TweetMixin
+from .fetch.mixins import TweetMixin
 from .models import User
 from ..core.utils import datetime_now
 

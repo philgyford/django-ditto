@@ -14,7 +14,7 @@ from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, PhotoFactory, TweetFactory,\
         UserFactory, VideoFactory, AnimatedGifFactory
 from ditto.twitter.models import Account, Media, Tweet, User
-from ditto.twitter.fetch import FetchVerify
+from ditto.twitter.fetch.fetch import FetchVerify
 
 
 class AccountTestCase(TestCase):

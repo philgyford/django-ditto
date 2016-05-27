@@ -4,7 +4,7 @@ import argparse
 from django.core.management.base import CommandError
 
 from . import FetchTwitterCommand
-from ...fetch import FavoriteTweetsFetcher
+from ...fetch.fetchers import FavoriteTweetsFetcher
 
 
 class Command(FetchTwitterCommand):

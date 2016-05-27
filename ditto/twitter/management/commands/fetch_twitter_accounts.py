@@ -3,7 +3,7 @@ import argparse
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch import VerifyFetcher
+from ...fetch.fetchers import VerifyFetcher
 
 
 class Command(BaseCommand):
