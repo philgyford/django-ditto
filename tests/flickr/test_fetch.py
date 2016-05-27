@@ -6,28 +6,28 @@ import urllib
 
 from django.test import TestCase
 
-from ditto.flickr.fetch import FlickrUtilsMixin
+from ditto.flickr.fetch import FetchUtilsMixin
 
 
-class FlickrUtilsMixinTestCase(TestCase):
+class FetchUtilsMixinTestCase(TestCase):
     """Not sure these tests are that useful, but still."""
 
     def test_api_datetime_to_datetime_default_tz(self):
         api_time = '1998-07-22 13:15:23'
-        time1 = FlickrUtilsMixin()._api_datetime_to_datetime(api_time)
+        time1 = FetchUtilsMixin()._api_datetime_to_datetime(api_time)
         time2 = datetime.datetime.strptime(api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.timezone('Etc/UTC'))
         self.assertEqual(time1, time2)
 
     def test_api_datetime_to_datetime_custom_tz(self):
         api_time = '1998-07-22 13:15:23'
-        time1 = FlickrUtilsMixin()._api_datetime_to_datetime(
+        time1 = FetchUtilsMixin()._api_datetime_to_datetime(
                                             api_time, 'America/Los_Angeles')
         time2 = datetime.datetime.strptime(api_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.timezone('America/Los_Angeles'))
         self.assertEqual(time1, time2)
 
     def test_unixtime_to_datetime(self):
         api_time = '1093459273'
-        time1 = FlickrUtilsMixin()._unixtime_to_datetime(api_time)
+        time1 = FetchUtilsMixin()._unixtime_to_datetime(api_time)
         time2 = datetime.datetime.utcfromtimestamp(int(api_time))\
                                                     .replace(tzinfo=pytz.utc)
         self.assertEqual(time1, time2)

@@ -11,18 +11,15 @@ from flickrapi.exceptions import FlickrError
 from freezegun import freeze_time
 from django.test import override_settings, TestCase
 
-from ditto.core.utils import datetime_now
-from ditto.core.utils.downloader import DownloadException, filedownloader
-from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
-from ditto.flickr.fetch import FetchError,\
-        UserSaver, PhotoSaver, PhotosetSaver,\
-        Fetcher, MultiAccountFetcher,\
-        UserFetcher, UserIdFetcher, OriginalFilesFetcher,\
-        PhotosFetcher, RecentPhotosFetcher, PhotosetsFetcher,\
-        RecentPhotosMultiAccountFetcher, PhotosetsMultiAccountFetcher,\
-        OriginalFilesMultiAccountFetcher
-from ditto.flickr.models import User
 from .test_fetch import FlickrFetchTestCase
+from ditto.core.utils import datetime_now
+from ditto.core.utils.downloader import filedownloader
+from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
+from ditto.flickr.fetch import FetchError
+from ditto.flickr.fetch.fetchers import Fetcher, PhotosFetcher,\
+    PhotosetsFetcher, RecentPhotosFetcher, UserFetcher, UserIdFetcher
+from ditto.flickr.fetch.savers import UserSaver, PhotoSaver, PhotosetSaver
+from ditto.flickr.models import User
 
 
 class FetcherTestCase(FlickrFetchTestCase):
@@ -203,155 +200,6 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertIn('fetched', result)
         self.assertEqual(result['fetched'], 1)
 
-
-class FilesFetcherTestCase(TestCase):
-
-    def setUp(self):
-        user = UserFactory()
-        account = AccountFactory(user=user)
-        self.fetcher = OriginalFilesFetcher(account=account)
-
-        self.photo_1 = PhotoFactory(title='p1',
-                                            original_file='p1.jpg', user=user)
-        # Needs a post_time for testing file save path:
-        self.photo_2 = PhotoFactory(title='p2',
-                original_file=None, user=user,
-                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
-        self.video_1 = PhotoFactory(title='v1',
-                                media='video', original_file='v1.jpg',
-                                video_original_file='v1.mov', user=user)
-        self.video_2 = PhotoFactory(title='v2',
-                                media='video', original_file=None,
-                                video_original_file=None, user=user,
-                                flickr_id='1234567890', original_secret='7777',
-                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
-        # And one by someone else:
-        self.photo_3 = PhotoFactory(title='p3',
-                                        original_file=None, user=UserFactory())
-
-    def test_fails_with_no_account(self):
-        with self.assertRaises(TypeError):
-            fetcher = OriginalFilesFetcher()
-
-    def test_fails_with_no_flickr_user(self):
-        fetcher = OriginalFilesFetcher(account=AccountFactory(user=None))
-        results = fetcher.fetch()
-        self.assertFalse(results['success'])
-        self.assertIn(
-                    'This account has no Flickr User', results['messages'][0])
-
-    # This all feels too much like I'm testing internal behaviour, but not
-    # sure what else to do...
-
-    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
-    def test_calls_fetch_and_save_missing(self, fetch_and_save_file):
-        "Goes to fetch for photos without files already."
-        results = self.fetcher.fetch()
-        calls = [
-                    call(photo=self.photo_2, media_type='photo'),
-                    call(photo=self.video_2, media_type='photo'),
-                    call(photo=self.video_2, media_type='video'),
-                ]
-        fetch_and_save_file.assert_has_calls(calls)
-
-    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
-    def test_calls_fetch_and_save_all(self, fetch_and_save_file):
-        "Goes to fetch for ALL photos."
-        results = self.fetcher.fetch(fetch_all=True)
-        calls = [
-                    call(photo=self.photo_1, media_type='photo'),
-                    call(photo=self.video_1, media_type='photo'),
-                    call(photo=self.video_1, media_type='video'),
-                    call(photo=self.photo_2, media_type='photo'),
-                    call(photo=self.video_2, media_type='photo'),
-                    call(photo=self.video_2, media_type='video'),
-                ]
-        fetch_and_save_file.assert_has_calls(calls)
-
-    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
-    def test_results_for_fetch_missing(self, fetch_and_save_file):
-        "Results values should be OK when fetching only missing photos/videos."
-        results = self.fetcher.fetch()
-        self.assertTrue(results['success'])
-        self.assertEqual(results['fetched'], 3)
-
-    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
-    def test_results_for_fetch_all(self, fetch_and_save_file):
-        "Results values should be OK when fetching ALL photos/videos."
-        results = self.fetcher.fetch(fetch_all=True)
-        self.assertTrue(results['success'])
-        self.assertEqual(results['fetched'], 6)
-
-    @patch.object(OriginalFilesFetcher, '_fetch_and_save_file')
-    def test_error_results(self, fetch_and_save_file):
-        "Sets the correct error values if things go wrong."
-        fetch_and_save_file.side_effect = FetchError('Oh dear')
-        results = self.fetcher.fetch()
-        self.assertFalse(results['success'])
-        self.assertEqual(results['fetched'], 0)
-        self.assertEqual(len(results['messages']), 3)
-        self.assertEqual(results['messages'][0], 'Oh dear')
-
-    @patch.object(filedownloader, 'download')
-    def test_downloads_photo(self, download):
-        "Calls the download method correctly for photos."
-        download.return_value = False
-        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
-        download.assert_has_calls( [ call(
-                    self.photo_2.original_url,
-                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
-                ) ] )
-
-    @patch.object(filedownloader, 'download')
-    def test_downloads_video(self, download):
-        "Calls the download method correctly for videos."
-        download.return_value = False
-        self.fetcher._fetch_and_save_file(self.video_2, 'video')
-        download.assert_has_calls( [ call(
-                    self.video_2.video_original_url,
-                    ['video/mp4',]
-                ) ] )
-
-    @patch.object(filedownloader, 'download')
-    def test_raises_error_if_download_fails(self, download):
-        "If download() raises an error, so does _fetch_and_save_file()"
-        download.side_effect = DownloadException("Ooops")
-        with self.assertRaises(FetchError):
-            self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
-
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    @patch.object(filedownloader, 'download')
-    def test_saves_downloaded_photo_file(self, download):
-        # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
-
-        self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
-        self.assertEqual(
-            self.photo_2.original_file.name,
-            'flickr/%s/photos/2015/08/14/%s' % (
-                self.photo_2.user.nsid.replace('@',''),
-                os.path.basename(temp_filepath)
-            )
-        )
-
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    @patch.object(filedownloader, 'download')
-    def test_saves_downloaded_video_file(self, download):
-        # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
-
-        self.fetcher._fetch_and_save_file(self.video_2, 'video')
-        self.assertEqual(
-            self.video_2.video_original_file.name,
-            'flickr/%s/photos/2015/08/14/%s' % (
-                self.video_2.user.nsid.replace('@',''),
-                os.path.basename(temp_filepath)
-            )
-        )
 
 class PhotosFetcherTestCase(FlickrFetchTestCase):
     """Testing the parent class that's used for all kinds of fetching lists of
@@ -588,8 +436,6 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             self.assertEqual(results['fetched'], 3)
 
 
-
-
 class PhotosetsFetcherTestCase(FlickrFetchTestCase):
 
     def setUp(self):
@@ -682,146 +528,4 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
         with self.assertRaises(FetchError):
             self.fetcher._fetch_photos_in_photoset(72157665648859705)
 
-
-class MultiAccountFetcherTestCase(FlickrFetchTestCase):
-
-    def setUp(self):
-        self.account_1 = AccountFactory(api_key='1234', api_secret='9876',
-                                    user=UserFactory(nsid='35034346050@N01') )
-        self.inactive_account = AccountFactory(
-                            api_key='2345', api_secret='8765', is_active=False,
-                            user=UserFactory(nsid='12345678901@N01') )
-        self.account_2 = AccountFactory(api_key='3456', api_secret='7654',
-                                    user=UserFactory(nsid='98765432101@N01') )
-
-    def test_inherits_from_multi_account_fetcher(self):
-        self.assertTrue(
-            issubclass(RecentPhotosMultiAccountFetcher, MultiAccountFetcher)
-        )
-
-    def test_fetch_throws_exception(self):
-        "Throws an exception if its own fetch() method is called."
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher().fetch()
-
-    def test_uses_all_accounts_by_default(self):
-        fetcher = MultiAccountFetcher()
-        self.assertEqual(len(fetcher.accounts), 2)
-
-    def test_throws_exception_with_no_active_accounts(self):
-        self.account_1.is_active = False
-        self.account_2.is_active = False
-        self.account_1.save()
-        self.account_2.save()
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher()
-
-    def test_throws_exception_with_invalid_nsid(self):
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='nope')
-
-    def test_throws_exception_with_no_account(self):
-        "If the NSID is not attached to an Account."
-        user = UserFactory(nsid='99999999999@N01')
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='99999999999@N01')
-
-    def test_throws_exception_with_inactive_account(self):
-        with self.assertRaises(FetchError):
-            MultiAccountFetcher(nsid='12345678901@N01')
-
-    def test_works_with_valid_nsid(self):
-        fetcher = MultiAccountFetcher(nsid='35034346050@N01')
-        self.assertEqual(len(fetcher.accounts), 1)
-        self.assertEqual(fetcher.accounts[0], self.account_1)
-
-
-class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
-
-    @patch.object(RecentPhotosFetcher, '__init__')
-    @patch.object(RecentPhotosFetcher, 'fetch')
-    def test_inits_fetcher_with_active_accounts(self, fetch, init):
-        "RecentPhotosFetcher should be called with 2 active accounts."
-        init.return_value = None
-        RecentPhotosMultiAccountFetcher().fetch()
-        init.assert_has_calls([call(self.account_1), call(self.account_2)])
-
-    @patch.object(RecentPhotosFetcher, 'fetch')
-    def test_calls_fetch_for_active_accounts(self, fetch):
-        "RecentPhotosFetcher.fetch() should be called twice."
-        RecentPhotosMultiAccountFetcher().fetch(days=3)
-        fetch.assert_has_calls([call(days=3), call(days=3)])
-
-    @patch.object(RecentPhotosFetcher, 'fetch')
-    def test_returns_list_of_return_values(self, fetch):
-        "Should return a list of the dicts that RecentPhotosFetcher.fetch() returns"
-        ret = {'success': True, 'account': 'bob', 'fetched': 7}
-        fetch.side_effect = [ret, ret]
-
-        return_value = RecentPhotosMultiAccountFetcher().fetch(days=3)
-
-        self.assertEqual(len(return_value), 2)
-        self.assertEqual(return_value[0]['account'], 'bob')
-
-
-class PhotosetsMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
-
-    @patch.object(PhotosetsFetcher, '__init__')
-    @patch.object(PhotosetsFetcher, 'fetch')
-    def test_inits_fetcher_with_active_accounts(self, fetch, init):
-        "PhotosetsFetcher should be called with 2 active accounts."
-        init.return_value = None
-        PhotosetsMultiAccountFetcher().fetch()
-        init.assert_has_calls([call(self.account_1), call(self.account_2)])
-
-    @patch.object(PhotosetsFetcher, 'fetch')
-    def test_calls_fetch_for_active_accounts(self, fetch):
-        "PhotosetsFetcher.fetch() should be called twice."
-        PhotosetsMultiAccountFetcher().fetch()
-        fetch.assert_has_calls([call(), call()])
-
-    @patch.object(PhotosetsFetcher, 'fetch')
-    def test_returns_list_of_return_values(self, fetch):
-        "Should return a list of the dicts that PhotosetsFetcher.fetch() returns"
-        ret = {'success': True, 'account': 'bob', 'fetched': 7}
-        fetch.side_effect = [ret, ret]
-
-        return_value = PhotosetsMultiAccountFetcher().fetch()
-
-        self.assertEqual(len(return_value), 2)
-        self.assertEqual(return_value[0]['account'], 'bob')
-
-
-class OriginalFilesMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
-
-    @patch.object(OriginalFilesFetcher, '__init__')
-    @patch.object(OriginalFilesFetcher, 'fetch')
-    def test_inits_fetcher_with_active_accounts(self, fetch, init):
-        "OriginalFilesFetcher should be called with 2 active accounts."
-        init.return_value = None
-        OriginalFilesMultiAccountFetcher().fetch()
-        init.assert_has_calls([call(self.account_1), call(self.account_2)])
-
-    @patch.object(OriginalFilesFetcher, 'fetch')
-    def test_calls_fetch_for_active_accounts(self, fetch):
-        "OriginalFilesFetcher.fetch() should be called twice."
-        OriginalFilesMultiAccountFetcher().fetch()
-        fetch.assert_has_calls([call(fetch_all=False), call(fetch_all=False)])
-
-    @patch.object(OriginalFilesFetcher, 'fetch')
-    def test_calls_fetch_with_fetch_all_param(self, fetch):
-        "fetch() should pass on the fetch_all param"
-        OriginalFilesMultiAccountFetcher().fetch(fetch_all=True)
-        fetch.assert_has_calls([call(fetch_all=True), call(fetch_all=True)])
-
-    @patch.object(OriginalFilesFetcher, 'fetch')
-    def test_returns_list_of_return_values(self, fetch):
-        "Should return a list of the dicts that OriginalFilesFetcher.fetch() returns"
-        ret = {'success': True, 'account': 'bob', 'fetched': 7}
-        fetch.side_effect = [ret, ret]
-
-        return_value = OriginalFilesMultiAccountFetcher().fetch()
-
-        self.assertEqual(len(return_value), 2)
-        self.assertEqual(return_value[0]['account'], 'bob')
 

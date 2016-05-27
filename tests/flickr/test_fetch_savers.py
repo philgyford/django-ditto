@@ -9,7 +9,8 @@ from taggit.models import Tag
 
 from .test_fetch import FlickrFetchTestCase
 from ditto.flickr.factories import PhotoFactory, UserFactory
-from ditto.flickr.fetch import FetchError, UserSaver, PhotosetSaver, PhotoSaver
+from ditto.flickr.fetch import FetchError
+from ditto.flickr.fetch.savers import UserSaver, PhotosetSaver, PhotoSaver
 from ditto.flickr.models import Photo, Photoset, TaggedPhoto, User
 
 

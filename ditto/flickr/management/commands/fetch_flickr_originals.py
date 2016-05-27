@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from . import FetchCommand
-from ...fetch import OriginalFilesMultiAccountFetcher
+from ...fetch.multifetchers import OriginalFilesMultiAccountFetcher
 
 
 class Command(FetchCommand):

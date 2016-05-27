@@ -2,7 +2,7 @@ import argparse
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch import UserIdFetcher, UserFetcher
+from ...fetch.fetchers import UserIdFetcher, UserFetcher
 from ...models import Account, User
 
 
