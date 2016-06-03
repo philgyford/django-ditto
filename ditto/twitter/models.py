@@ -91,7 +91,7 @@ class Account(TimeStampedModelMixin, models.Model):
 
 
 class Media(TimeStampedModelMixin, models.Model):
-    """Photos and Videos.
+    """A photo, video or animated GIF attached to a Tweet.
 
     They have a bunch of common fields, and then some extra for Videos.
     A Tweet could have zero, one or more Medias. Yes that's the plural shut up.
@@ -105,13 +105,15 @@ class Media(TimeStampedModelMixin, models.Model):
     media_type = models.CharField(null=False, blank=False, max_length=8,
                                                         choices=MEDIA_TYPES)
 
-    tweet = models.ForeignKey('Tweet')
+    # A media item can belong to more than one tweet. Why?
+    # Because if tweet 1 retweets tweet 2, which has a photo, then we save
+    # that photo as attached to both tweets 1 and 2.
+    # Because that's how the API does it too.
+    tweets = models.ManyToManyField('Tweet', related_name='media')
+
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
     image_url = models.URLField(null=False, blank=False,
                                         help_text="URL of the image itself")
-
-    is_private = models.BooleanField(default=False, null=False, blank=False,
-        help_text="If true, this item will not be shown on public-facing pages.")
 
     large_w = models.PositiveSmallIntegerField(null=True, blank=True,
                                                 verbose_name="Large width")
@@ -150,8 +152,8 @@ class Media(TimeStampedModelMixin, models.Model):
     # All Items (eg, used in Admin):
     objects = models.Manager()
 
-    # All Items which aren't private. Should ALWAYS be used for public pages:
-    public_objects = PublicItemManager()
+    # There is no Public manager for media, as we don't have the concept of
+    # private/public Media items.
 
     def __str__(self):
         return '%s %d' % (self.get_media_type_display(), self.id)
@@ -160,13 +162,6 @@ class Media(TimeStampedModelMixin, models.Model):
         ordering = ['time_created']
         verbose_name = 'Media item'
         verbose_name_plural = 'Media items'
-
-    def save(self, *args, **kwargs):
-        """Privacy depends on the tweet (which depends on its user), so ensure
-        it's set correctly.
-        """
-        self.is_private = self.tweet.is_private
-        super().save(*args, **kwargs)
 
     @property
     def large_url(self):
@@ -250,6 +245,9 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     quoted_status_id = models.BigIntegerField(null=True, blank=True,
         help_text="The ID of the Tweet quoted, if any")
+
+    retweeted_status_id = models.BigIntegerField(null=True, blank=True,
+        help_text="The ID of the retweeted Tweet, if any")
 
     source = models.CharField(null=False, blank=True, max_length=255,
                                 help_text="Utility used to post the Tweet")
@@ -359,6 +357,23 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
         # Save for later:
         self._quoted_tweet = tweet
+        return tweet
+
+    def get_retweeted_tweet(self):
+        # There's one we saved earlier, so use that.
+        if hasattr(self, '_retweeted_tweet'):
+            return self._retweeted_tweet
+
+        tweet = None
+        if self.retweeted_status_id:
+            try:
+                tweet = Tweet.public_objects.get(
+                                        twitter_id=self.retweeted_status_id)
+            except Tweet.DoesNotExist:
+                pass
+
+        # Save for later:
+        self._retweeted_tweet = tweet
         return tweet
 
 

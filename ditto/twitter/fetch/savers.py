@@ -174,11 +174,9 @@ class TweetSaver(SaveUtilsMixin, object):
             # Things common to photos, animated GIFs and videos.
 
             defaults = {
-                'tweet':        tweet,
                 'media_type':   'photo',
                 'twitter_id':   item['id'],
                 'image_url':    item['media_url_https'],
-                'is_private':   tweet.is_private,
             }
 
             valid_types = [type for type,name in Media.MEDIA_TYPES]
@@ -241,6 +239,9 @@ class TweetSaver(SaveUtilsMixin, object):
                     defaults=defaults
                 )
             media_count += 1
+
+            if tweet not in media_obj.tweets.all():
+                media_obj.tweets.add(tweet)
 
         return media_count
 
@@ -330,6 +331,14 @@ class TweetSaver(SaveUtilsMixin, object):
                                     tweet['quoted_status']['user'], fetch_time)
                 quoted_tweet_obj = self.save_tweet(
                                             tweet['quoted_status'], fetch_time)
+
+        if 'retweeted_status' in tweet:
+            defaults['retweeted_status_id'] = tweet['retweeted_status']['id']
+
+            retweeted_user = UserSaver().save_user(
+                                tweet['retweeted_status']['user'], fetch_time)
+            retweeted_tweet_obj = self.save_tweet(
+                                        tweet['retweeted_status'], fetch_time)
 
         tweet_obj, created = Tweet.objects.update_or_create(
                 twitter_id=tweet['id'],

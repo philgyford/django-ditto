@@ -11,7 +11,7 @@ Expects:
 {% if tweet.media_count > 0 %}
     {% load l10n %}
 
-    {% with media_list=tweet.media_set.all %}
+    {% with media_list=tweet.media.all %}
 
         {% if media_list|length > 1 and view != 'detail' %}
 

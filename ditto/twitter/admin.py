@@ -39,13 +39,23 @@ class AccountAdmin(admin.ModelAdmin):
     has_credentials.boolean = True
 
 
-class MediaInline(admin.StackedInline):
-    model = Media
+class TweetsMediaInline(admin.TabularInline):
+    model = Media.tweets.through
     extra = 0
+    raw_id_fields = ('media', 'tweet',)
+
+
+@admin.register(Media)
+class MediaAdmin(admin.ModelAdmin):
+
+    list_display = ('show_thumb', 'media_type', 'time_created', )
+    list_display_links = ('show_thumb', )
+    list_filter = ('time_created', )
+    date_hierarchy = 'time_created'
 
     fieldsets = (
         (None, {
-            'fields': ('media_type', 'twitter_id', 'image_url', 'is_private', )
+            'fields': ('show_image', 'media_type', 'twitter_id', 'image_url', ),
         }),
         ('Sizes', {
             'classes': ('collapse',),
@@ -62,7 +72,22 @@ class MediaInline(admin.StackedInline):
         }),
     )
 
-    readonly_fields = ('time_created', 'time_modified',)
+    inlines = [
+        TweetsMediaInline,
+    ]
+
+    readonly_fields = ('show_image', 'time_created', 'time_modified',)
+    exclude = ('tweets',)
+
+    def show_thumb(self, instance):
+        return '<img src="%s" width="%s" height="%s" />' % (instance.thumb_url, instance.thumb_w, instance.thumb_h)
+    show_thumb.allow_tags = True
+    show_thumb.short_description = ''
+
+    def show_image(self, instance):
+        return '<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_w, instance.small_h)
+    show_image.allow_tags = True
+    show_image.short_description = 'Image'
 
 
 @admin.register(Tweet)
@@ -71,10 +96,6 @@ class TweetAdmin(admin.ModelAdmin):
     list_display_links = ('title', )
     list_filter = ('post_time', 'fetch_time', )
     search_fields = ('text', )
-
-    inlines = [
-        MediaInline,
-    ]
 
     fieldsets = (
         (None, {
@@ -85,20 +106,27 @@ class TweetAdmin(admin.ModelAdmin):
             'fields': ('favorite_count', 'retweet_count', 'media_count',
                 'language', 'source',
                 'in_reply_to_screen_name', 'in_reply_to_status_id',
-                'in_reply_to_user_id', 'quoted_status_id', )
+                'in_reply_to_user_id',
+                'quoted_status_id', 'retweeted_status_id',)
         }),
         ('Location', {
+            'classes': ('collapse',),
             'fields': ('latitude', 'longitude',
                 'place_attribute_street_address', 'place_full_name',
-                'place_country')
+                'place_country',)
         }),
         ('Data', {
+            'classes': ('collapse',),
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
         }),
     )
 
     readonly_fields = ('text_html', 'raw',
                         'fetch_time', 'time_created', 'time_modified',)
+
+    inlines = [
+        TweetsMediaInline,
+    ]
 
     formfield_overrides = {
         # Make the inputs full-width.

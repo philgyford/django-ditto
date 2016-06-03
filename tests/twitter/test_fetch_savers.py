@@ -118,6 +118,19 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         # ie, tweet3's ID:
         self.assertEqual(tweet2.quoted_status_id, 714527559946473474)
 
+    def test_saves_retweeted_tweets(self):
+        "Saving a Tweet that is a retweet should save the retweeted Tweet."
+        self.api_fixture = 'tweets_with_retweeted_tweet.json'
+        tweet = self.make_tweet()
+
+        self.assertEqual(tweet.text, 'RT @stefiorazi: Twitter help: Looking for early Barbican Estate residents to interview. mail@modernistestates RTs appreciated https://t.co/\u2026')
+        self.assertEqual(tweet.retweeted_status_id, 735555565724827649)
+
+        retweeted_tweet = Tweet.objects.get(twitter_id=735555565724827649)
+        self.assertEqual(retweeted_tweet.text,
+            'Twitter help: Looking for early Barbican Estate residents to interview. mail@modernistestates RTs appreciated https://t.co/IFSZIh9DHm')
+        self.assertEqual(retweeted_tweet.user.screen_name, 'stefiorazi')
+
 
 class TweetSaverMediaTestCase(FetchTwitterTestCase):
     "Parent class for testing the save_media() method of the TweetSaver class."
@@ -146,7 +159,7 @@ class TweetSaverPhotosTestCase(TweetSaverMediaTestCase):
     def test_saves_photos(self):
         self.assertEqual(self.tweet.media_count, 3)
 
-        photos = Media.objects.filter(tweet=self.tweet)
+        photos = Media.objects.filter(tweets__pk=self.tweet.pk)
 
         self.assertEqual(len(photos), 3)
 
@@ -156,7 +169,6 @@ class TweetSaverPhotosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(photo.twitter_id, 1234567890)
         self.assertEqual(photo.image_url,
                             "https://pbs.twimg.com/media/CSaWsSkWsAA-yXb.jpg")
-        self.assertEqual(photo.is_private, self.tweet.is_private)
         self.assertEqual(photo.large_w, 935)
         self.assertEqual(photo.large_h, 397)
         self.assertEqual(photo.medium_w, 600)
@@ -165,6 +177,7 @@ class TweetSaverPhotosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(photo.small_h, 144)
         self.assertEqual(photo.thumb_w, 150)
         self.assertEqual(photo.thumb_h, 150)
+        self.assertIn(self.tweet, photo.tweets.all())
 
 
 class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
@@ -175,7 +188,7 @@ class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
     def test_saves_videos(self):
         self.assertEqual(self.tweet.media_count, 1)
 
-        videos = Media.objects.filter(tweet=self.tweet)
+        videos = Media.objects.filter(tweets__pk=self.tweet.pk)
         self.assertEqual(len(videos), 1)
 
         video = videos[0]
@@ -183,7 +196,6 @@ class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(video.media_type, 'video')
         self.assertEqual(video.twitter_id, 1234567890)
         self.assertEqual(video.image_url, "https://pbs.twimg.com/ext_tw_video_thumb/661601811007188992/pu/img/gcxHGl7EA08a-Gps.jpg")
-        self.assertEqual(video.is_private, self.tweet.is_private)
         self.assertEqual(video.large_w, 640)
         self.assertEqual(video.large_h, 360)
         self.assertEqual(video.medium_w, 600)
@@ -192,6 +204,7 @@ class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(video.small_h, 191)
         self.assertEqual(video.thumb_w, 150)
         self.assertEqual(video.thumb_h, 150)
+        self.assertIn(self.tweet, video.tweets.all())
 
         self.assertEqual(video.aspect_ratio, '16:9')
         self.assertEqual(video.dash_url, 'https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.mpd')
@@ -206,7 +219,7 @@ class TweetSaverAnimatedGifTestCase(TweetSaverMediaTestCase):
     def test_saves_gifs(self):
         self.assertEqual(self.tweet.media_count, 1)
 
-        media = Media.objects.filter(tweet=self.tweet)
+        media = Media.objects.filter(tweets__pk=self.tweet.pk)
         self.assertEqual(len(media), 1)
 
         gif = media[0]
@@ -214,7 +227,6 @@ class TweetSaverAnimatedGifTestCase(TweetSaverMediaTestCase):
         self.assertEqual(gif.media_type, 'animated_gif')
         self.assertEqual(gif.twitter_id, 726396540303073281)
         self.assertEqual(gif.image_url, "https://pbs.twimg.com/tweet_video_thumb/ChStzgbWYAErHLi.jpg")
-        self.assertEqual(gif.is_private, self.tweet.is_private)
         self.assertEqual(gif.large_w, 320)
         self.assertEqual(gif.large_h, 232)
         self.assertEqual(gif.medium_w, 320)
@@ -223,6 +235,7 @@ class TweetSaverAnimatedGifTestCase(TweetSaverMediaTestCase):
         self.assertEqual(gif.small_h, 232)
         self.assertEqual(gif.thumb_w, 150)
         self.assertEqual(gif.thumb_h, 150)
+        self.assertIn(self.tweet, gif.tweets.all())
         self.assertEqual(gif.aspect_ratio, '40:29')
         self.assertEqual(gif.mp4_url, 'https://pbs.twimg.com/tweet_video/ChStzgbWYAErHLi.mp4')
 

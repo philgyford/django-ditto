@@ -201,36 +201,9 @@ class PhotoTestCase(TestCase):
         private_user = UserFactory(is_private=True)
         public_tweet = TweetFactory(user=public_user)
         private_tweet = TweetFactory(user=private_user)
-        public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
-        private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
+        public_photos = PhotoFactory.create_batch(2, tweets=(public_tweet,))
+        private_photos = PhotoFactory.create_batch(1, tweets=(private_tweet,))
         self.assertEqual(len(Media.objects.all()), 3)
-
-    def test_public_manager(self):
-        "Public Manager shows only public photos"
-        public_user = UserFactory(is_private=False)
-        private_user = UserFactory(is_private=True)
-        public_tweet = TweetFactory(user=public_user)
-        private_tweet = TweetFactory(user=private_user)
-        public_photos = PhotoFactory.create_batch(2, tweet=public_tweet)
-        private_photos = PhotoFactory.create_batch(1, tweet=private_tweet)
-        photos = Media.public_objects.all()
-        self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0].pk, public_photos[0].pk)
-        self.assertEqual(photos[1].pk, public_photos[1].pk)
-
-    def test_is_public(self):
-        "Photo should be public if photo's tweet is public"
-        user = UserFactory(is_private=False)
-        tweet = TweetFactory(user=user)
-        photo = PhotoFactory(tweet=tweet)
-        self.assertFalse(tweet.is_private)
-
-    def test_is_private(self):
-        "Photo should be private if photo's tweet is private"
-        user = UserFactory(is_private=True)
-        tweet = TweetFactory(user=user)
-        photo = PhotoFactory(tweet=tweet)
-        self.assertTrue(tweet.is_private)
 
     def test_size_urls(self):
         url = 'http://www.example.org/image.jpg'
@@ -239,6 +212,16 @@ class PhotoTestCase(TestCase):
         self.assertEqual(photo.medium_url, '%s:medium' % url)
         self.assertEqual(photo.small_url,  '%s:small' % url)
         self.assertEqual(photo.thumb_url,  '%s:thumb' % url)
+
+    def test_tweets(self):
+        "It should be possible to belong to more than one tweet."
+        tweet_1 = TweetFactory(text='1')
+        tweet_2 = TweetFactory(text='2')
+        photo = PhotoFactory(tweets=(tweet_1, tweet_2,))
+        self.assertEqual(2, photo.tweets.count())
+        self.assertEqual(photo.tweets.all()[0], tweet_2)
+        self.assertEqual(photo.tweets.all()[1], tweet_1)
+
 
 class VideoTestCase(TestCase):
     "Most things are the same for photos and videos, so not re-testing here."
@@ -421,6 +404,32 @@ class TweetTestCase(TestCase):
         tweet.get_quoted_tweet()
         tweet.get_quoted_tweet()
         self.assertEqual(get_method.call_count, 1)
+
+    def test_get_retweeted_tweet(self):
+        retweeted_tweet = TweetFactory(text='Retweeted tweet!', twitter_id=123)
+        tweet = TweetFactory(retweeted_status_id=123)
+        self.assertEqual(tweet.get_retweeted_tweet().text, 'Retweeted tweet!')
+
+    def test_get_retweeted_tweet_none(self):
+        tweet = TweetFactory(retweeted_status_id=None)
+        self.assertIsNone(tweet.get_retweeted_tweet())
+
+    @patch('ditto.twitter.models.Tweet.public_objects.get')
+    def test_get_retweeted_tweet_caches(self, get_method):
+        "Should only fetch retweeted Tweet from DB once."
+        retweeted_tweet = TweetFactory(text='Retweeted tweet!', twitter_id=123)
+        tweet = TweetFactory(retweeted_status_id=123)
+        tweet.get_retweeted_tweet()
+        tweet.get_retweeted_tweet()
+        self.assertEqual(get_method.call_count, 1)
+
+    def test_media(self):
+        tweet = TweetFactory()
+        photo_1 = PhotoFactory()
+        photo_2 = PhotoFactory()
+        photo_1.tweets.add(tweet)
+        photo_2.tweets.add(tweet)
+        self.assertEqual(2, tweet.media.count())
 
 
 class TweetNextPrevTestCase(TestCase):

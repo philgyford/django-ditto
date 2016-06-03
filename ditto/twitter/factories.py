@@ -60,14 +60,37 @@ class TweetFactory(factory.DjangoModelFactory):
     source = 'web'
 
 
-class PhotoFactory(factory.DjangoModelFactory):
+class MediaFactory(factory.DjangoModelFactory):
+    "Parent class for the photo, video and gif factories."
 
     class Meta:
         model = models.Media
 
-    media_type = 'photo'
-    tweet = factory.SubFactory(TweetFactory)
     twitter_id = factory.Sequence(lambda n: (n * 10000000))
+    large_w = 640
+    large_h = 360
+    medium_w = 600
+    medium_h = 338
+    small_w = 340
+    small_h = 191
+    thumb_w = 150
+    thumb_h = 150
+
+
+    @factory.post_generation
+    def tweets(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for tweet in extracted:
+                self.tweets.add(tweet)
+
+
+class PhotoFactory(MediaFactory):
+
+    media_type = 'photo'
+
     large_w = 938
     large_h = 397
     medium_w = 600
@@ -81,23 +104,9 @@ class PhotoFactory(factory.DjangoModelFactory):
                             lambda n: 'http://pbs.twimg.com/media/%d.jpg' % n)
 
 
-class VideoFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = models.Media
+class VideoFactory(MediaFactory):
 
     media_type = 'video'
-    tweet = factory.SubFactory(TweetFactory)
-    twitter_id = factory.Sequence(lambda n: (n * 10000000))
-
-    large_w = 640
-    large_h = 360
-    medium_w = 600
-    medium_h = 338
-    small_w = 340
-    small_h = 191
-    thumb_w = 150
-    thumb_h = 150
 
     image_url = factory.Sequence(
         lambda n: 'http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg' % (n, n))
@@ -109,23 +118,9 @@ class VideoFactory(factory.DjangoModelFactory):
     duration = 20000
 
 
-class AnimatedGifFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = models.Media
+class AnimatedGifFactory(MediaFactory):
 
     media_type = 'animated_gif'
-    tweet = factory.SubFactory(TweetFactory)
-    twitter_id = factory.Sequence(lambda n: (n * 10000000))
-
-    large_w = 640
-    large_h = 360
-    medium_w = 600
-    medium_h = 338
-    small_w = 340
-    small_h = 191
-    thumb_w = 150
-    thumb_h = 150
 
     image_url = factory.Sequence(
         lambda n: 'http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg' % (n, n))
