@@ -5,7 +5,7 @@ from django import template
 from django.utils.html import format_html
 
 from ..models import Photo, Photoset, User
-from ...core.templatetags.ditto import display_time
+from ...core.templatetags.ditto_core import display_time
 
 
 register = template.Library()

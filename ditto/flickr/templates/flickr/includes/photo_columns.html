@@ -15,7 +15,7 @@ Expects:
         {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
     {% endif %}
 
-    {% load ditto %}
+    {% load ditto_core %}
 
     {% for row in photo_list|split_by:3 %}
         <div class="row flickr-photos flickr-photos-columns">

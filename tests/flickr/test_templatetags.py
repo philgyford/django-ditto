@@ -5,9 +5,9 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.core.templatetags.ditto import display_time
+from ditto.core.templatetags.ditto_core import display_time
 from ditto.core.utils import datetime_now
-from ditto.flickr.templatetags import flickr
+from ditto.flickr.templatetags import ditto_flickr
 from ditto.flickr.factories import AccountFactory, PhotoFactory,\
         PhotosetFactory, UserFactory
 
@@ -28,17 +28,17 @@ class TemplatetagsRecentPhotosTestCase(TestCase):
 
     def test_recent_photos(self):
         "Returns recent photos from all public accounts"
-        photos = flickr.recent_photos()
+        photos = ditto_flickr.recent_photos()
         self.assertEqual(5, len(photos))
         self.assertNotIn(self.private_photo.pk, self.public_pks)
 
     def test_recent_photos_account(self):
         "Returns recent photos from one account"
-        photos = flickr.recent_photos(nsid='1234567890@N01')
+        photos = ditto_flickr.recent_photos(nsid='1234567890@N01')
         self.assertEqual(2, len(photos))
 
     def test_recent_photos_limit(self):
-        photos = flickr.recent_photos(limit=4)
+        photos = ditto_flickr.recent_photos(limit=4)
         self.assertEqual(4, len(photos))
 
 
@@ -54,16 +54,16 @@ class TemplatetagsPhotosetsTestCase(TestCase):
 
     def test_photosets(self):
         "Returns photosets from all accounts"
-        photosets = flickr.photosets()
+        photosets = ditto_flickr.photosets()
         self.assertEqual(5, len(photosets))
 
     def test_photosets_account(self):
         "Returns photosets from one account"
-        photosets = flickr.photosets(nsid='1234567890@N01')
+        photosets = ditto_flickr.photosets(nsid='1234567890@N01')
         self.assertEqual(2, len(photosets))
 
     def test_photosets_limit(self):
-        photosets = flickr.photosets(limit=4)
+        photosets = ditto_flickr.photosets(limit=4)
         self.assertEqual(4, len(photosets))
 
 
@@ -89,14 +89,14 @@ class TemplatetagsDayPhotosTestCase(TestCase):
 
     def test_day_photos(self):
         "Returns only public Photos from the date"
-        photos = flickr.day_photos(datetime.date(2015, 3, 18))
+        photos = ditto_flickr.day_photos(datetime.date(2015, 3, 18))
         self.assertEqual(2, len(photos))
         self.assertEqual(photos[0].pk, self.photos_2[1].pk)
         self.assertEqual(photos[1].pk, self.photos_1[0].pk)
 
     def test_day_photos_one_account(self):
         "Returns only Photos from the day if it's the chosen account"
-        photos = flickr.day_photos(
+        photos = ditto_flickr.day_photos(
                             datetime.date(2015, 3, 18), nsid='1234567890@N01')
         self.assertEqual(1, len(photos))
         self.assertEqual(photos[0].pk, self.photos_1[0].pk)
@@ -105,25 +105,26 @@ class TemplatetagsDayPhotosTestCase(TestCase):
 class PhotoLicenseTestCase(TestCase):
 
     def test_license_0(self):
-        self.assertEqual(flickr.photo_license('0'), 'All Rights Reserved')
+        self.assertEqual(
+                        ditto_flickr.photo_license('0'), 'All Rights Reserved')
 
     def test_license_1(self):
-        self.assertEqual(flickr.photo_license('1'),
+        self.assertEqual(ditto_flickr.photo_license('1'),
             '<a href="https://creativecommons.org/licenses/by-nc-sa/2.0/" title="More about permissions">Attribution-NonCommercial-ShareAlike License</a>'
         )
 
     def test_license_99(self):
-        self.assertEqual(flickr.photo_license('99'), '[missing]')
+        self.assertEqual(ditto_flickr.photo_license('99'), '[missing]')
 
 
 class PhotoSafetyLevelTestCase(TestCase):
 
     def test_safety_level_0(self):
-        self.assertEqual(flickr.photo_safety_level(0), 'none')
+        self.assertEqual(ditto_flickr.photo_safety_level(0), 'none')
 
     def test_safety_level_1(self):
-        self.assertEqual(flickr.photo_safety_level(1), 'Safe')
+        self.assertEqual(ditto_flickr.photo_safety_level(1), 'Safe')
 
     def test_safety_level_4(self):
-        self.assertEqual(flickr.photo_safety_level(4), '[missing]')
+        self.assertEqual(ditto_flickr.photo_safety_level(4), '[missing]')
 

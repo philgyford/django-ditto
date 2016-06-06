@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    {% load ditto %}
+    {% load ditto_core %}
 
     <h1 class="m-y-2">
         {% block title %}
@@ -48,7 +48,7 @@
                 </p>
             {% endif %}
 
-            {% load flickr %}
+            {% load ditto_flickr %}
             <dl class="dl-horizontal row photo-times">
                 <dt class="col-sm-3">Taken time</dt>
                 <dd class="col-sm-9">

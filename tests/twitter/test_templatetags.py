@@ -4,7 +4,7 @@ import pytz
 from django.test import TestCase
 
 from ditto.twitter.factories import AccountFactory, TweetFactory, UserFactory
-from ditto.twitter.templatetags import twitter
+from ditto.twitter.templatetags import ditto_twitter
 
 
 class TemplatetagsRecentTweetsTestCase(TestCase):
@@ -22,24 +22,24 @@ class TemplatetagsRecentTweetsTestCase(TestCase):
 
     def test_recent_tweets(self):
         "Returns recent tweets from all public accounts"
-        tweets = twitter.recent_tweets()
+        tweets = ditto_twitter.recent_tweets()
         self.assertEqual(6, len(tweets))
         # tweets[4] would be self.tweets_2[2] if user_2 wasn't private.
         self.assertEqual(tweets[4].pk, self.tweets_1[1].pk)
 
     def test_recent_tweets_account(self):
         "Returns recent tweets from one public account"
-        tweets = twitter.recent_tweets(screen_name='terry')
+        tweets = ditto_twitter.recent_tweets(screen_name='terry')
         self.assertEqual(2, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets_1[1].pk)
 
     def test_recent_tweets_private_account(self):
         "Returns no tweets from a private account"
-        tweets = twitter.recent_tweets(screen_name='bob')
+        tweets = ditto_twitter.recent_tweets(screen_name='bob')
         self.assertEqual(0, len(tweets))
 
     def test_recent_tweets_limit(self):
-        tweets = twitter.recent_tweets(limit=5)
+        tweets = ditto_twitter.recent_tweets(limit=5)
         self.assertEqual(5, len(tweets))
         self.assertEqual(tweets[4].pk, self.tweets_1[1].pk)
 
@@ -68,21 +68,21 @@ class TemplatetagsRecentFavoritesTestCase(TestCase):
 
     def test_recent_favorites(self):
         "Returns recent public tweets favorited by any account."
-        tweets = twitter.recent_favorites()
+        tweets = ditto_twitter.recent_favorites()
         self.assertEqual(len(tweets), 3)
 
     def test_recent_favorites_account(self):
         "Returns recent public tweets favorited by one account"
-        tweets = twitter.recent_favorites(screen_name='terry')
+        tweets = ditto_twitter.recent_favorites(screen_name='terry')
         self.assertEqual(len(tweets), 2)
 
     def test_recent_favorites_limit(self):
-        tweets = twitter.recent_favorites(limit=2)
+        tweets = ditto_twitter.recent_favorites(limit=2)
         self.assertEqual(len(tweets), 2)
 
     def test_recent_favorites_private_account(self):
         "Doesn't return favorites by a private account"
-        tweets = twitter.recent_favorites(screen_name='thelma')
+        tweets = ditto_twitter.recent_favorites(screen_name='thelma')
         self.assertEqual(len(tweets), 0)
 
 
@@ -110,21 +110,21 @@ class TemplatetagsDayTweetsTestCase(TestCase):
 
     def test_day_tweets(self):
         "Returns only public Tweets from the date"
-        tweets = twitter.day_tweets(datetime.date(2015, 3, 18))
+        tweets = ditto_twitter.day_tweets(datetime.date(2015, 3, 18))
         self.assertEqual(2, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets_2[1].pk)
         self.assertEqual(tweets[1].pk, self.tweets_1[0].pk)
 
     def test_day_tweets_public_account(self):
         "Returns only Tweets from the day if it's a public account"
-        tweets = twitter.day_tweets(
+        tweets = ditto_twitter.day_tweets(
                             datetime.date(2015, 3, 18), screen_name='terry')
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets_1[0].pk)
 
     def test_day_tweets_private_account(self):
         "Doesn't return Tweets from the day if it's a private account"
-        tweets = twitter.day_tweets(
+        tweets = ditto_twitter.day_tweets(
                             datetime.date(2015, 3, 18), screen_name='thelma')
         self.assertEqual(0, len(tweets))
 
@@ -162,20 +162,20 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
 
     def test_day_favorites(self):
         "Returns only favorited Tweets from the date, favorited by public Accounts"
-        tweets = twitter.day_favorites(datetime.date(2015, 3, 18))
+        tweets = ditto_twitter.day_favorites(datetime.date(2015, 3, 18))
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_public_account(self):
         "Returns only favorited Tweets from the date, favorited by a public Account"
-        tweets = twitter.day_favorites(
+        tweets = ditto_twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='terry')
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_private_account(self):
         "Doesn't return Tweets favorited by a public Account"
-        tweets = twitter.day_favorites(
+        tweets = ditto_twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='thelma')
         self.assertEqual(0, len(tweets))
 

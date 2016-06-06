@@ -5,7 +5,7 @@ import pytz
 from django.test import TestCase
 
 from ditto.pinboard.factories import AccountFactory, BookmarkFactory
-from ditto.pinboard.templatetags import pinboard
+from ditto.pinboard.templatetags import ditto_pinboard
 
 
 class TemplatetagsRecentBookmarksTestCase(TestCase):
@@ -20,19 +20,19 @@ class TemplatetagsRecentBookmarksTestCase(TestCase):
 
     def test_recent_bookmarks(self):
         "Returns recent public bookmarks from all accounts."
-        bookmarks = pinboard.recent_bookmarks()
+        bookmarks = ditto_pinboard.recent_bookmarks()
         self.assertEqual(10, len(bookmarks))
         # bookmarks[6] would be self.bookmarks_1[5] if [5] wasn't private.
         self.assertEqual(bookmarks[6].pk, self.bookmarks_1[4].pk)
 
     def test_recent_bookmarks_account(self):
         "Only fetches recent public bookmarks from the named account."
-        bookmarks = pinboard.recent_bookmarks(account='terry')
+        bookmarks = ditto_pinboard.recent_bookmarks(account='terry')
         self.assertEqual(5, len(bookmarks))
         self.assertEqual(bookmarks[0].pk, self.bookmarks_1[4].pk)
 
     def test_recent_bookmarks_limit(self):
-        bookmarks = pinboard.recent_bookmarks(limit=8)
+        bookmarks = ditto_pinboard.recent_bookmarks(limit=8)
         self.assertEqual(8, len(bookmarks))
         self.assertEqual(bookmarks[6].pk, self.bookmarks_1[4].pk)
 
@@ -57,19 +57,19 @@ class TemplatetagsDayBookmarksTestCase(TestCase):
 
     def test_day_bookmarks(self):
         "Returns public bookmarks from all accounts."
-        bookmarks = pinboard.day_bookmarks(datetime.date(2015, 3, 18))
+        bookmarks = ditto_pinboard.day_bookmarks(datetime.date(2015, 3, 18))
         self.assertEqual(2, len(bookmarks))
         self.assertEqual(bookmarks[1].pk, self.bookmarks_1[3].pk)
 
     def test_day_bookmarks_account(self):
         "Only fetches public bookmarks from the named account."
-        bookmarks = pinboard.day_bookmarks(datetime.date(2015, 3, 18),
+        bookmarks = ditto_pinboard.day_bookmarks(datetime.date(2015, 3, 18),
                                                             account='terry')
         self.assertEqual(1, len(bookmarks))
         self.assertEqual(bookmarks[0].pk, self.bookmarks_1[3].pk)
 
     def test_day_bookmarks_none(self):
         "Fetches no bookmarks when there aren't any on supplied date."
-        bookmarks = pinboard.recent_bookmarks(datetime.date(2015, 3, 19))
+        bookmarks = ditto_pinboard.recent_bookmarks(datetime.date(2015, 3, 19))
         self.assertEqual(0, len(bookmarks))
 

@@ -7,7 +7,7 @@ Expects:
 
 {% if photoset_list|length > 0 %}
 
-    {% load ditto %}
+    {% load ditto_core %}
 
     {% for row in photoset_list|split_by:3 %}
         <div class="row m-b-1 flickr-photosets">

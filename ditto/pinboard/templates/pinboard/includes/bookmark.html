@@ -37,7 +37,7 @@ Expects:
         {% if view != 'detail' %}<small>{% endif %}
             By <a href="{{ bookmark.account.get_absolute_url }}">{{ bookmark.account.username }}</a> •
 
-            {% load ditto %}
+            {% load ditto_core %}
             Posted at
             {% if view == 'day' %}
                 {% display_time bookmark.post_time False %}
