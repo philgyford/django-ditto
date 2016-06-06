@@ -1,10 +1,10 @@
 # coding: utf-8
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.templatetags.static import static
 
 from . import managers
+from . import settings
 from .utils import htmlify_description, htmlify_tweet
 from ..core.managers import PublicItemManager
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
@@ -433,9 +433,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
-        dirbase = getattr(settings, 'DITTO_TWITTER_DIR_BASE', 'twitter')
         return '/'.join([
-            dirbase,
+            settings.DITTO_TWITTER_DIR_BASE,
             str(self.twitter_id),
             'avatars',
             str(filename)

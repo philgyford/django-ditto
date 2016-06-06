@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.db import models
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.templatetags.static import static
 
 from sortedm2m.fields import SortedManyToManyField
@@ -9,6 +8,7 @@ from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
 from . import managers
+from . import settings
 from ..core.utils import truncate_string
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
@@ -388,14 +388,12 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     def upload_path(self, filename):
         "Make path under MEDIA_ROOT where original files will be saved."
-        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
-        dirformat = getattr(
-                        settings, 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
         return '/'.join([
-            dirbase,
+            settings.DITTO_FLICKR_DIR_BASE,
             self.user.nsid.replace('@',''),
             'photos',
-            str(self.post_time.date().strftime(dirformat)),
+            str(self.post_time.date().strftime(
+                                    settings.DITTO_FLICKR_DIR_PHOTOS_FORMAT)),
             filename
         ])
 
@@ -645,9 +643,8 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
-        dirbase = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
         return '/'.join([
-            dirbase,
+            settings.DITTO_FLICKR_DIR_BASE,
             self.nsid.replace('@',''),
             'avatars',
             filename
