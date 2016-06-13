@@ -47,7 +47,7 @@ class TweetSaverTestCase(FetchTwitterTestCase):
 
         #And check it's all there:
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
-        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
+        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.latitude, Decimal('40.057016'))
         self.assertEqual(tweet.longitude, Decimal('-75.143103'))
@@ -130,6 +130,17 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(retweeted_tweet.text,
             'Twitter help: Looking for early Barbican Estate residents to interview. mail@modernistestates RTs appreciated https://t.co/IFSZIh9DHm')
         self.assertEqual(retweeted_tweet.user.screen_name, 'stefiorazi')
+
+    def test_extended_2016_tweets(self):
+        """Saves correctly from the new (2016) tweet format.
+        https://dev.twitter.com/overview/api/upcoming-changes-to-tweets
+        """
+        self.api_fixture = 'tweets_extended_format_2016.json'
+        tweet = self.make_tweet()
+
+        self.assertEqual(tweet.text, '@philgyford Here\u2019s a test tweet that goes on as much as possible and includes an image. Hi to my fans in testland! https://t.co/tzhyk2QWSr')
+        self.assertEqual(tweet.summary, 'Here\u2019s a test tweet that goes on as much as possible and includes an image. Hi to my fans in testland!')
+        self.assertEqual(tweet.title, 'Here\u2019s a test tweet that goes on as much as possible and includes an image. Hi to my fans in testland!')
 
 
 class TweetSaverMediaTestCase(FetchTwitterTestCase):

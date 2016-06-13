@@ -61,6 +61,9 @@ def htmlify_tweet(json_data):
     * Replaces t.co URLs with clickable, full links.
     """
 
+    if 'full_text' in json_data:
+        json_data['text'] = json_data['full_text']
+
     # This does most of the work for us:
     # https://twython.readthedocs.org/en/latest/usage/special_functions.html#html-for-tweet
     html = Twython.html_for_tweet(

@@ -278,11 +278,6 @@ class TweetTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             tweet_2 = TweetFactory(twitter_id=123)
 
-    def test_summary_creation(self):
-        "Creates the Tweet's summary correctly on save"
-        tweet = TweetFactory(text='This is my tweet text')
-        self.assertEqual(tweet.summary, 'This is my tweet text')
-
     def test_account_exists(self):
         "If the tweet is from an Account the account property should return it."
         user = UserFactory()

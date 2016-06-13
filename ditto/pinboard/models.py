@@ -194,10 +194,6 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     def get_previous(self):
         return self.get_previous_public_by_post_time()
 
-    def summary_source(self):
-        "The text that will be truncated to make a summary for this Bookmark"
-        return self.description
-
     def slugs_match_tags(self, slugs):
         """Does a list of slugs equal the slugs of all this Bookmark's tags?
         Keyword arguments:

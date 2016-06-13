@@ -2,7 +2,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
 
-from .utils import truncate_string
 from .managers import PublicItemManager
 
 
@@ -118,16 +117,4 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def __str__(self):
         return self.title
-
-    def save(self, *args, **kwargs):
-        self.summary = truncate_string(self.summary_source(), strip_html=True,
-                chars=255, truncate=u'…', at_word_boundary=True)
-        super().save(*args, **kwargs)
-
-    def summary_source(self):
-        """In child classes, this should return the text to be used, in
-        truncated form, for the summary. Eg, an entire blog post or photo
-        description.
-        """
-        return 'This child class should define its own summary_source() method!'
 

@@ -212,7 +212,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     user = models.ForeignKey('User')
 
-    text = models.TextField(null=False, blank=False, max_length=140)
+    text = models.TextField(null=False, blank=False)
     text_html = models.TextField(null=False, blank=True,
         help_text="An HTMLified version of the Tweet's text")
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True,
@@ -326,10 +326,6 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
             return self.user.account_set.all()[0]
         except IndexError:
             return None
-
-    def summary_source(self):
-        "The text that will be truncated to make a summary for this Tweet"
-        return self.text
 
     def make_text_html(self):
         """Uses the raw JSON for the tweet to set self.text_html to a nice

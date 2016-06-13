@@ -268,6 +268,7 @@ class FetchTweets(FetchLookup):
         ids = [str(id) for id in self._ids_to_fetch_in_query()]
         self.results = self.api.lookup_status(
                             id=ids,
+                            tweet_mode='extended',
                             include_entities=True,
                             trim_user=False,
                             map=False

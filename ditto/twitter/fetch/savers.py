@@ -266,6 +266,18 @@ class TweetSaver(SaveUtilsMixin, object):
 
         user = UserSaver().save_user(tweet['user'], fetch_time)
 
+        if 'full_text' in tweet:
+            # For new (2016) 'extended' format tweet data.
+            # https://dev.twitter.com/overview/api/upcoming-changes-to-tweets
+            text = tweet['full_text']
+            frm = tweet['display_text_range'][0]
+            to = tweet['display_text_range'][1]
+            summary = text[frm:to]
+        else:
+            # Older 'classic' format tweet data.
+            text = tweet['text']
+            summary = text
+
         defaults = {
             'fetch_time':       fetch_time,
             'raw':              raw_json,
@@ -274,9 +286,9 @@ class TweetSaver(SaveUtilsMixin, object):
             'post_time':        created_at,
             'permalink':        'https://twitter.com/%s/status/%s' % (
                                                 user.screen_name, tweet['id']),
-            'title':            tweet['text'].replace('\n', ' ').replace('\r', ' '),
-            'summary':          tweet['text'],
-            'text':             tweet['text'],
+            'title':            summary.replace('\n', ' ').replace('\r', ' '),
+            'summary':          summary,
+            'text':             text,
             'twitter_id':       tweet['id'],
             'source':           tweet['source']
         }

@@ -196,13 +196,6 @@ class PhotoTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             photo_2 = PhotoFactory(flickr_id=123456)
 
-    def test_summary_creation(self):
-        "Summary should be made correctly on save."
-        photo = PhotoFactory(
-                description="Some <b>test HTML</b>.\n\nAnd another paragraph.")
-        self.assertEqual(
-                    photo.summary, "Some test HTML. And another paragraph.")
-
     def test_account_exists(self):
         "If the photo is from an Account the account property should return it."
         user = UserFactory()

@@ -102,16 +102,6 @@ class BookmarkTestCase(TestCase):
         except IntegrityError:
             self.fail("It looks like there's a Unique constraint on Bookmark.url, which there shouldn't be.")
 
-    def test_summary_creation(self):
-        "Creates the Bookmark's summary correctly"
-
-        self.maxDiff = None
-        bookmark = BookmarkFactory(description="""<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus.</p>
-
-        <p>Fusce ullamcorper nunc vitae tincidunt sodales. Vestibulum sit amet lacus at sem porta porta. Donec fringilla laoreet orci eu porta. Aenean non lacus hendrerit, semper odio a, feugiat orci. Suspendisse potenti.</p>""")
-
-        self.assertEqual(bookmark.summary, u'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales.…')
-
     def test_get_absolute_url(self):
         "Has the correct URL on this site"
         account = AccountFactory(username='billy')
