@@ -7,8 +7,7 @@ from .models import Account, Media, Tweet, User
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('user', 'has_credentials', 'is_active',
-                    'time_created', 'time_modified',)
+    list_display = ('user', 'is_active', 'time_created', 'time_modified',)
 
     fieldsets = (
         (None, {
@@ -33,10 +32,6 @@ class AccountAdmin(admin.ModelAdmin):
     }
 
     readonly_fields = ('time_created', 'time_modified',)
-
-    def has_credentials(self, obj):
-        return obj.hasCredentials()
-    has_credentials.boolean = True
 
 
 class TweetsMediaInline(admin.TabularInline):
