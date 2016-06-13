@@ -12,6 +12,7 @@ setup(
     version='0.1',
     packages=['ditto'],
     install_requires=[
+        'django-imagekit>=3.3,<3.4',
         'django-sortedm2m>=1.2.2,<1.3',
         'django-taggit',
         'flickrapi',

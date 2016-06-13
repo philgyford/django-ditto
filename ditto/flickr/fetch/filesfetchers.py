@@ -73,7 +73,7 @@ class OriginalFilesFetcher(object):
                         got them?
         """
 
-        photos = Photo.public_objects.filter(user=self.account.user)
+        photos = Photo.objects.filter(user=self.account.user)
 
         if not fetch_all:
             photos = photos.filter(original_file='')
@@ -112,14 +112,14 @@ class OriginalFilesFetcher(object):
         """
 
         if media_type == 'video':
-            url = photo.video_original_url
+            url = photo.remote_video_original_url
             # Accepted video formats:
             # https://help.yahoo.com/kb/flickr/sln15628.html
             # BUT, they all seem to be sent as video/mp4.
             acceptable_content_types = ['video/mp4',]
 
         else:
-            url = photo.original_url
+            url = photo.remote_original_url
             acceptable_content_types = [
                         'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
 

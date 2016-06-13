@@ -163,10 +163,10 @@ class PhotoAdmin(admin.ModelAdmin):
     def show_thumb(self, instance):
         return '<img src="%s" width="%s" height="%s" />' % (instance.thumbnail_url, instance.thumbnail_width, instance.thumbnail_height)
     show_thumb.allow_tags = True
-    show_thumb.short_description = ''
+    show_thumb.short_description = 'Thumbnail'
 
     def show_image(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.medium_url, instance.width, instance.height)
+        return '<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_width, instance.small_height)
     show_image.allow_tags = True
-    show_image.short_description = 'Image'
+    show_image.short_description = 'Small image'
 

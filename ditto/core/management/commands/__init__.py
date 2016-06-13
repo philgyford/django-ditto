@@ -36,11 +36,12 @@ class DittoBaseCommand(BaseCommand):
           }
         """
         for result in results:
-            if result['success']:
+            if 'fetched' in result:
                 noun = self.singular_noun if result['fetched'] == 1 else self.plural_noun
-                self.stdout.write('%s: Fetched %s %s                      ' % (
+                self.stdout.write('%s: Fetched %s %s' % (
                                 result['account'], result['fetched'], noun))
-            else:
+
+            if result['success'] == False:
                 self.stderr.write('%s: Failed to fetch %s: %s' % (
                                      result['account'],
                                      self.plural_noun,
@@ -48,6 +49,10 @@ class DittoBaseCommand(BaseCommand):
                                 ))
 
     def format_messages(self, messages):
-        return "\n".join(messages)
+        if len(messages) == 1:
+            return messages[0]
+        else:
+            # On separate lines, and start a newline first.
+            return "%s%s" % ("\n", "\n".join(messages))
 
 

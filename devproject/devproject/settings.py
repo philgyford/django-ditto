@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    #'imagekit',
     'sortedm2m',
     'taggit',
     'ditto.core',
@@ -144,6 +145,7 @@ USE_THOUSAND_SEPARATOR = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -152,4 +154,9 @@ MEDIA_URL = '/media/'
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ['127.0.0.1', '::1',]
+
+
+# DITTO-SPECIFIC SETTINGS.
+
+DITTO_FLICKR_USE_LOCAL_PHOTOS = True
 

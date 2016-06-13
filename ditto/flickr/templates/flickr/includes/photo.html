@@ -10,7 +10,9 @@ photo - A Photo object.
 {% load ditto_core %}
 
 <div class="media-left">
-    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}" class="flickr-photo-img"><img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt=""></a>
+    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}" class="flickr-photo-img">
+        <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="">
+    </a>
 </div>
 
 <div class="media-body">

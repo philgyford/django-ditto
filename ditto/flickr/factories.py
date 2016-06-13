@@ -69,6 +69,10 @@ class PhotoFactory(factory.DjangoModelFactory):
     fetch_time = factory.LazyAttribute(lambda o:
                                 datetime_now() - datetime.timedelta(weeks=1)
                             )
+
+    original_file = factory.django.ImageField(filename='example.jpg')
+    video_original_file = factory.django.FileField(filename='example.mov')
+
     thumbnail_width = 100
     thumbnail_height = 67
     small_width = 240

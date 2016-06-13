@@ -3,6 +3,7 @@ import json
 import pytz
 from decimal import Decimal
 from unittest.mock import patch
+
 from freezegun import freeze_time
 
 from taggit.models import Tag

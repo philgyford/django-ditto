@@ -106,7 +106,7 @@ class FilesFetcherTestCase(TestCase):
         download.return_value = False
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
         download.assert_has_calls( [ call(
-                    self.photo_2.original_url,
+                    self.photo_2.remote_original_url,
                     ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
                 ) ] )
 

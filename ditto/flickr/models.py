@@ -3,12 +3,14 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 
+from imagekit.cachefiles import ImageCacheFile
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
 from . import managers
-from . import settings
+from . import app_settings
+from . import imagegenerators
 from ..core.utils import truncate_string
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
@@ -92,58 +94,71 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     ditto_item_name = 'flickr_photo'
 
-    # The 'label's are used in Flickr's API to identify sizes.
     # The keys in this dict are what we use internally, for method names and
     # for the sizes of PhotoDownloads.
+    # The 'label's are used in Flickr's API to identify sizes.
+    # The 'generator's are used to create an image of that size from original
+    # files.
     # See https://www.flickr.com/services/api/misc.urls.html
     PHOTO_SIZES = {
         'square': {
             'label':    'Square',
             'suffix':   's',   # Used in this size's flickr.com URL.
+            'generator': imagegenerators.Square,
         },
         'large_square': {
             'label':    'Large square',
             'suffix':   'q',
+            'generator': imagegenerators.LargeSquare,
         },
         'thumbnail': {
             'label':    'Thumbnail',
             'suffix':   't',
+            'generator': imagegenerators.Thumbnail,
         },
         'small':    {
             'label':    'Small',
             'suffix':   'm',
+            'generator': imagegenerators.Small,
         },
         'small_320':    {
             'label':    'Small 320',
             'suffix':   'n',
+            'generator': imagegenerators.Small320,
         },
         'medium':    {
             'label':    'Medium',
             'suffix':   '',
+            'generator': imagegenerators.Medium,
         },
         'medium_640':    {
             'label':    'Medium 640',
             'suffix':   'z',
+            'generator': imagegenerators.Medium640,
         },
         # Only exist after March 1st 2012.
         'medium_800':    {
             'label':    'Medium 800',
             'suffix':   'c',
+            'generator': imagegenerators.Medium800,
         },
         # Before May 25th 2010, large only exist for very large original images.
         'large':    {
             'label':    'Large',
             'suffix':   'b',
+            'generator': imagegenerators.Large,
         },
         # Only exist after March 1st 2012.
         'large_1600':    {
             'label':    'Large 1600',
             'suffix':   'h',
+            'generator': imagegenerators.Large1600,
         },
         # Only exist after March 1st 2012.
         'large_2048':    {
             'label':    'Large 2048',
             'suffix':   'k',
+            'generator': imagegenerators.Large2048,
         },
         'original':    {
             'label':    'Original',
@@ -389,11 +404,11 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     def upload_path(self, filename):
         "Make path under MEDIA_ROOT where original files will be saved."
         return '/'.join([
-            settings.DITTO_FLICKR_DIR_BASE,
+            app_settings.DITTO_FLICKR_DIR_BASE,
             self.user.nsid.replace('@',''),
             'photos',
             str(self.post_time.date().strftime(
-                                    settings.DITTO_FLICKR_DIR_PHOTOS_FORMAT)),
+                                app_settings.DITTO_FLICKR_DIR_PHOTOS_FORMAT)),
             filename
         ])
 
@@ -480,17 +495,67 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         return 75
 
     @property
-    def large_square_height(self):
+    def large_square_width(self):
         return 150
 
     @property
     def large_square_height(self):
         return 150
 
+    @property
+    def remote_original_url(self):
+        """
+        URL of the original image file on Flickr.com.
+        Usually we'd use self.original_url but if we have
+        DITTO_FLICKR_USE_LOCAL_PHOTOS as True, then we still need to be able
+        to get the remote original file URL somehow. So use this.
+        """
+        return self._remote_image_url('original')
+
+    @property
+    def remote_video_original_url(self):
+        """
+        Same as remote_original_url but for video.
+        EXCEPT currently we can ONLY get the remote video URLs anyway.
+        """
+        return self._remote_video_url('video_original')
+
     def _image_url(self, size):
         """
         Helper for the photo url property methods.
         See https://www.flickr.com/services/api/misc.urls.html
+        size -- One of the keys from self.PHOTO_SIZES.
+        """
+        if app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS:
+            return self._local_image_url(size)
+        else:
+            return self._remote_image_url(size)
+
+    def _local_image_url(self, size):
+        """
+        Generate the URL of an image of a particular size, hosted locally,
+        based on the original file (which must already be downloaded).
+        """
+        if self.original_file:
+            if size == 'original':
+                return self.original_file.url
+            else:
+                generator = self.PHOTO_SIZES[size]['generator']
+                try:
+                    image_generator = generator(source=self.original_file)
+                    result = ImageCacheFile(image_generator)
+                    return result.url
+                except:
+                    # We have an original file but something's wrong with it.
+                    # Might be 0 bytes or something.
+                    return static('img/original_error.jpg')
+        else:
+            # We haven't downloaded an original file for this Photo.
+            return static('img/original_missing.jpg')
+
+    def _remote_image_url(self, size):
+        """
+        Generate the URL of an image of a particular size, on flickr.com.
         size -- One of the keys from self.PHOTO_SIZES.
         """
         if size == 'original':
@@ -499,18 +564,26 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 self.PHOTO_SIZES['original']['suffix'], self.original_format)
         else:
             size_ext = ''
-            try:
-                # Medium size doesn't have a letter suffix.
-                if self.PHOTO_SIZES[size]['suffix']:
-                    size_ext = '_%s' % self.PHOTO_SIZES[size]['suffix']
-            except KeyError:
-                return None
+            # Medium size doesn't have a letter suffix.
+            if self.PHOTO_SIZES[size]['suffix']:
+                size_ext = '_%s' % self.PHOTO_SIZES[size]['suffix']
             return 'https://farm%s.static.flickr.com/%s/%s_%s%s.jpg' % (
                 self.farm, self.server, self.flickr_id, self.secret, size_ext)
 
     def _video_url(self, size):
+        return self._remote_video_url(size)
+
+    #def _local_video_url(self, size):
+        #"""One day, if we work out how to translate our downloaded original
+        #video files into something usable on the web in different sizes, then
+        #we can have _video_url() call this if
+        #app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS is False.
+        #"""
+        #pass
+
+    def _remote_video_url(self, size):
         """
-        Helper for the video URL property methods.
+        Helper for the video URL property methods, on Flickr.com.
         Returns None for photos, or a URL for videos like:
         https://www.flickr.com/photos/philgyford/25743649964/play/site/a8bd5ddf59/
         size -- One of the keys from self.VIDEO_SIZES.
@@ -644,7 +717,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
         return '/'.join([
-            settings.DITTO_FLICKR_DIR_BASE,
+            app_settings.DITTO_FLICKR_DIR_BASE,
             self.nsid.replace('@',''),
             'avatars',
             filename

@@ -1,5 +1,6 @@
 .coverage
 devproject/db.sqlite3
 devproject/media
+devproject/static
 django_ditto.egg-info
 htmlcov
