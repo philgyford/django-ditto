@@ -123,6 +123,16 @@ class FetchTwitterTweetsOutput(FetchTwitterOutput):
         call_command('fetch_twitter_tweets', recent='new', stdout=self.out)
         self.assertIn('philgyford: Fetched 23 Tweets', self.out.getvalue())
 
+    def test_success_output_verbosity_0(self):
+        "Outputs nothing when recent tweets were successfully fetched"
+        # What the mocked method will return:
+        self.fetch_method.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 23}]
+        ]
+        call_command(
+            'fetch_twitter_tweets', recent='new', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
     def test_error_output(self):
         "Responds correctly when there was an error fetching recent tweets"
         self.fetch_method.side_effect = [
@@ -147,6 +157,15 @@ class FetchTwitterFavoritesOutput(FetchTwitterOutput):
         call_command('fetch_twitter_favorites', recent='new', stdout=self.out)
         self.assertIn('philgyford: Fetched 23 Tweets', self.out.getvalue())
 
+    def test_success_output_verbosity_0(self):
+        "Outputs nothing when recent tweets were successfully fetched"
+        self.fetch_method.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 23}]
+        ]
+        call_command('fetch_twitter_favorites',
+                                    recent='new', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
     def test_error_output(self):
         "Responds correctly when there was an error fetching recent tweets"
         self.fetch_method.side_effect = [
@@ -170,6 +189,14 @@ class FetchTwitterAccountsOutput(FetchTwitterOutput):
         ]
         call_command('fetch_twitter_accounts', stdout=self.out)
         self.assertIn('Fetched @philgyford', self.out.getvalue())
+
+    def test_success_output_verbosity_0(self):
+        "Outputs nothing when users were successfully fetched"
+        self.fetch_method.side_effect = [
+            [{'account': 'philgyford', 'success': True}]
+        ]
+        call_command('fetch_twitter_accounts', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
 
     def test_error_output(self):
         "Responds correctly when there was an error fetching users"
@@ -220,6 +247,16 @@ class ImportTweets(TestCase):
                                                             stdout=self.out)
             self.assertIn('Imported 12345 tweets from 21 files',
                                                             self.out.getvalue())
+
+    def test_success_output_verbosity_0(self):
+        """Outputs nothing if ingesting succeeds."""
+        self.ingest_mock.return_value = {
+            'success': True, 'tweets': 12345, 'files': 21
+        }
+        with patch('os.path.isdir', return_value=True):
+            call_command('import_twitter_tweets',
+                            path='/right/path', verbosity=0, stdout=self.out)
+            self.assertEqual('', self.out.getvalue())
 
     def test_error_output(self):
         """Outputs the correct error if ingesting fails."""
@@ -293,6 +330,14 @@ class UpdateUsers(TestCase):
         call_command('update_twitter_users', account='bob', stdout=self.out)
         self.assertIn('philgyford: Fetched 612 Users', self.out.getvalue())
 
+    def test_success_output_verbosity_0(self):
+        self.fetcher_class().fetch.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 612}]
+        ]
+        call_command('update_twitter_users',
+                                account='bob', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
     def test_error_output(self):
         self.fetcher_class().fetch.side_effect = [
             [{'account': 'philgyford', 'success': False,
@@ -335,6 +380,14 @@ class UpdateTweets(TestCase):
         ]
         call_command('update_twitter_tweets', account='bob', stdout=self.out)
         self.assertIn('philgyford: Fetched 612 Tweets', self.out.getvalue())
+
+    def test_success_output_verbosity_0(self):
+        self.fetcher_class().fetch.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 612}]
+        ]
+        call_command('update_twitter_tweets',
+                                account='bob', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
 
     def test_error_output(self):
         self.fetcher_class().fetch.side_effect = [

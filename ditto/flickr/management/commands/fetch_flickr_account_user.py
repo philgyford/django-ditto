@@ -49,14 +49,17 @@ class Command(BaseCommand):
                     user = User.objects.get(nsid='35034346050@N01')
                     account.user = user
                     account.save()
-                    self.stdout.write(
-                        "Fetched and saved user '%s'" % result['user']['name'])
+                    if options.get('verbosity', 1) > 0:
+                        self.stdout.write("Fetched and saved user '%s'" %\
+                                                        result['user']['name'])
                 else:
-                    self.stderr.write(
+                    if options.get('verbosity', 1) > 0:
+                        self.stderr.write(
                         "Failed to fetch a user using Flickr ID '%s': %s" %\
                                     (id_result['id'], result['messages'][0]))
             else:
-                self.stderr.write(
+                if options.get('verbosity', 1) > 0:
+                    self.stderr.write(
                     "Failed to fetch a Flickr ID for this Account: %s" %\
                                                     id_result['messages'][0])
 

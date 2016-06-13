@@ -111,7 +111,14 @@ class FetchFlickrOriginalsTestCase(TestCase):
         self.assertIn('Phil Gyford: Fetched 33 Files', self.out.getvalue())
 
     @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
-    def test_success_output(self, fetcher):
+    def test_success_output_verbosity_0(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': 33}]
+        call_command('fetch_flickr_originals', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher')
+    def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value =\
             [{'account': 'Phil Gyford', 'success': False, 'messages': ['Oops']}]
         call_command('fetch_flickr_originals', stdout=self.out,
@@ -165,6 +172,14 @@ class FetchFlickrPhotosTestCase(TestCase):
         self.assertIn('Phil Gyford: Fetched 40 Photos', self.out.getvalue())
 
     @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
+    def test_success_output_verbosity_0(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': '40'}]
+        call_command('fetch_flickr_photos',
+                                        days='4', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher')
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value =\
             [{'account': 'Phil Gyford', 'success': False, 'messages': ['Oops']}]
@@ -198,6 +213,13 @@ class FetchFlickrPhotosetsTestCase(TestCase):
             [{'account': 'Phil Gyford', 'success': True, 'fetched': '40'}]
         call_command('fetch_flickr_photosets', stdout=self.out)
         self.assertIn('Phil Gyford: Fetched 40 Photosets', self.out.getvalue())
+
+    @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
+    def test_success_output_verbosity_0(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+            [{'account': 'Phil Gyford', 'success': True, 'fetched': '40'}]
+        call_command('fetch_flickr_photosets', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
 
     @patch('ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher')
     def test_error_output(self, fetcher):

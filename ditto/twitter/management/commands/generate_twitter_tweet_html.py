@@ -42,5 +42,6 @@ class Command(BaseCommand):
         for tweet in tweets:
             tweet.save()
 
-        self.stdout.write('Generated HTML for %d Tweets' % tweets.count())
+        if options.get('verbosity', 1) > 0:
+            self.stdout.write('Generated HTML for %d Tweets' % tweets.count())
 

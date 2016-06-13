@@ -131,3 +131,15 @@ class FetchPinboardOutput(TestCase):
         self.assertIn('wrongaccount: Failed to fetch Bookmarks: It broke',
                                                             out_err.getvalue())
 
+    @patch.object(AllBookmarksFetcher, 'fetch')
+    def test_success_output_verbosity_0(self, fetch_method):
+        """Outputs nothing when all bookmarks were successfully fetched"""
+        # What the mocked method will return:
+        fetch_method.side_effect = [
+            [{'account': 'philgyford', 'success': True, 'fetched': 23}]
+        ]
+        out = StringIO()
+        call_command('fetch_pinboard_bookmarks', all=True, verbosity=0, stdout=out)
+        self.assertEqual('', out.getvalue())
+
+

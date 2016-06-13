@@ -17,7 +17,7 @@ class DittoBaseCommand(BaseCommand):
         "We may add stuff for handling verbosity here."
         pass
 
-    def output_results(self, results):
+    def output_results(self, results, verbosity=1):
         """results should be a list of dicts.
 
         Each dict is for one account.
@@ -35,6 +35,9 @@ class DittoBaseCommand(BaseCommand):
             'messages': ['There was an error fetching data because blah'],
           }
         """
+        if verbosity == 0:
+            return
+
         for result in results:
             if 'fetched' in result:
                 noun = self.singular_noun if result['fetched'] == 1 else self.plural_noun

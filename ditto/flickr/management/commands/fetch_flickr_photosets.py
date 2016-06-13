@@ -24,4 +24,4 @@ class Command(FetchCommand):
 
         results = PhotosetsMultiAccountFetcher(nsid=nsid).fetch()
 
-        self.output_results(results)
+        self.output_results(results, options.get('verbosity', 1))

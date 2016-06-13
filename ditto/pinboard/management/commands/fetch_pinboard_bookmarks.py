@@ -90,5 +90,5 @@ class Command(DittoBaseCommand):
         else:
             raise CommandError("Specify --all, --recent, --date= or --url=")
 
-        self.output_results(results)
+        self.output_results(results, options.get('verbosity', 1))
 

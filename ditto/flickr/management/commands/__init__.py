@@ -56,7 +56,7 @@ class FetchPhotosCommand(FetchCommand):
                 raise CommandError("--days should be an integer or 'all'.")
 
             results = self.fetch_photos(nsid, options['days'])
-            self.output_results(results)
+            self.output_results(results, options.get('verbosity', 1))
         elif options['account']:
             raise CommandError("Specify --days as well as --account.")
         else:

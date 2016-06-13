@@ -41,11 +41,12 @@ class Command(BaseCommand):
         #   'success': False,
         #   'messages': ["This screen_name doesn't exist"]
         # }
-        for result in results:
-            if result['success']:
-                self.stdout.write('Fetched @%s' % result['account'])
-            else:
-                self.stderr.write('Could not fetch @%s: %s' % (
+        if options.get('verbosity', 1) > 0:
+            for result in results:
+                if result['success']:
+                    self.stdout.write('Fetched @%s' % result['account'])
+                else:
+                    self.stderr.write('Could not fetch @%s: %s' % (
                                     result['account'], result['messages'][0]
                                 ))
 

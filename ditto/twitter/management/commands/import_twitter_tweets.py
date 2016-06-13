@@ -42,14 +42,16 @@ class Command(BaseCommand):
         else:
             raise CommandError("Specify the location of the archive, eg --path=/Path/To/1234567890_abcdefg12345")
 
-        if result['success']:
-            tweetnoun = 'tweet' if result['tweets'] == 1 else 'tweets'
-            filenoun = 'file' if result['files'] == 1 else 'files'
+        if options.get('verbosity', 1) > 0:
+            if result['success']:
+                tweetnoun = 'tweet' if result['tweets'] == 1 else 'tweets'
+                filenoun = 'file' if result['files'] == 1 else 'files'
 
-            self.stdout.write('Imported %s %s from %s %s' % (
-                        result['tweets'], tweetnoun, result['files'], filenoun))
-        else:
+                self.stdout.write(
+                    'Imported %s %s from %s %s' % (
+                    result['tweets'], tweetnoun, result['files'], filenoun))
+            else:
 
-            self.stderr.write('Failed to import tweets: %s' % (
+                self.stderr.write('Failed to import tweets: %s' % (
                                                         result['messages'][0]))
 

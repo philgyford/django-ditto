@@ -43,7 +43,7 @@ class FetchTwitterCommand(DittoBaseCommand):
                 options['recent'] = int(options['recent'])
 
             results = self.fetch_tweets(account, options['recent'])
-            self.output_results(results)
+            self.output_results(results, options.get('verbosity', 1))
         elif options['account']:
             raise CommandError("Specify --recent as well as --account.")
         else:
@@ -85,7 +85,7 @@ class UpdateTwitterCommand(DittoBaseCommand):
             raise CommandError("Specify --account, eg --account=philgyford.")
 
         results = self.fetch(screen_name)
-        self.output_results(results)
+        self.output_results(results, options.get('verbosity', 1))
 
     def fetch(self, screen_name):
         """Child classes should override this method to call a method that
