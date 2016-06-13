@@ -175,7 +175,7 @@ Files will be saved within your project's ``MEDIA_ROOT`` directory, as defined i
 
 These values are used if you don't specify your own settings.
 
-If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the Flickr user's NSID and the date the photo was taken::
+If your ``MEDIA_ROOT`` was set to ``/var/www/example.com/media/`` then the above settings would save the Flickr photo ``1234567_987654_o.jpg`` to something like this, depending on the Flickr user's NSID and the date the photo was taken (not uploaded)::
 
     /var/www/example.com/media/flickr/35034346050N01/photos/2016/08/31/1234567_987654_o.jpg
 

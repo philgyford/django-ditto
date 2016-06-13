@@ -388,7 +388,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
 
         self.photo = PhotoFactory(
                             user=UserFactory(nsid='123456@N01'),
-                            post_time=datetime.datetime.strptime(
+                            taken_time=datetime.datetime.strptime(
                                 '2015-08-14 12:00:00', '%Y-%m-%d %H:%M:%S'
                             ).replace(tzinfo=pytz.utc))
 

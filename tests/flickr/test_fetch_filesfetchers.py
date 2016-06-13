@@ -21,10 +21,16 @@ class FilesFetcherTestCase(TestCase):
 
         self.photo_1 = PhotoFactory(title='p1',
                                             original_file='p1.jpg', user=user)
-        # Needs a post_time for testing file save path:
+
+        the_time = datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc)
+
+        # Needs a taken_time for testing file save path:
+        # post_time will put them in order.
         self.photo_2 = PhotoFactory(title='p2',
-                original_file=None, user=user,
-                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
+                                    original_file=None,
+                                    user=user,
+                                    post_time=the_time,
+                                    taken_time=the_time)
         self.video_1 = PhotoFactory(title='v1',
                                 media='video', original_file='v1.jpg',
                                 video_original_file='v1.mov', user=user)
@@ -32,7 +38,8 @@ class FilesFetcherTestCase(TestCase):
                                 media='video', original_file=None,
                                 video_original_file=None, user=user,
                                 flickr_id='1234567890', original_secret='7777',
-                post_time=datetime.datetime.strptime('2015-08-14', '%Y-%m-%d').replace(tzinfo=pytz.utc))
+                                post_time=the_time,
+                                taken_time=the_time)
         # And one by someone else:
         self.photo_3 = PhotoFactory(title='p3',
                                         original_file=None, user=UserFactory())

@@ -407,7 +407,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             app_settings.DITTO_FLICKR_DIR_BASE,
             self.user.nsid.replace('@',''),
             'photos',
-            str(self.post_time.date().strftime(
+            str(self.taken_time.date().strftime(
                                 app_settings.DITTO_FLICKR_DIR_PHOTOS_FORMAT)),
             filename
         ])
