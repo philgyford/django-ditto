@@ -155,8 +155,8 @@ class FilesFetcherTestCase(TestCase):
     @patch.object(filedownloader, 'download')
     def test_saves_downloaded_video_file(self, download):
         # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
+        video = tempfile.NamedTemporaryFile()
+        temp_filepath = video.name
         download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.video_2, 'video')

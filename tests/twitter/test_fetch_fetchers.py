@@ -1,20 +1,27 @@
 import json
-from unittest.mock import patch
+import os
+import tempfile
+from unittest.mock import call, patch
 
 import responses
 
 from django.http import QueryDict
+from django.test import override_settings, TestCase
 
 from .test_fetch import FetchTwitterTestCase
 from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.twitter.factories import AccountFactory,\
-        AccountWithCredentialsFactory, TweetFactory, UserFactory
+        AccountWithCredentialsFactory, AnimatedGifFactory, PhotoFactory,\
+        TweetFactory, UserFactory, VideoFactory
 from ditto.twitter.fetch import FetchError
 from ditto.twitter.fetch.savers import UserSaver, TweetSaver
-from ditto.twitter.fetch.fetch import FetchVerify, FetchUsers, FetchTweets,\
-        FetchTweetsRecent, FetchTweetsFavorite
-from ditto.twitter.fetch.fetchers import TwitterFetcher, VerifyFetcher,\
-        UsersFetcher, TweetsFetcher, RecentTweetsFetcher, FavoriteTweetsFetcher
+from ditto.twitter.fetch.fetch import FetchFiles,\
+        FetchVerify, FetchUsers,\
+        FetchTweets, FetchTweetsRecent, FetchTweetsFavorite
+from ditto.twitter.fetch.fetchers import FilesFetcher,\
+        TwitterFetcher,\
+        VerifyFetcher, UsersFetcher,\
+        TweetsFetcher, RecentTweetsFetcher, FavoriteTweetsFetcher
 from ditto.twitter.models import Account, Tweet, User
 
 
@@ -783,4 +790,152 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
                 '%s/%s.json' % (self.api_url, 'account/verify_credentials'),
                 responses.calls[0].request.url)
         self.assertTrue('Could not authenticate you' in result['messages'][0])
+
+
+class FilesFetcherTestCase(TestCase):
+
+    def setUp(self):
+        self.fetched_image = PhotoFactory(twitter_id=99999999,
+                                                image_file='downloaded.jpg')
+        self.image = PhotoFactory(twitter_id=88888888, image_file='',
+            image_url='https://pbs.twimg.com/media/abcdefghijklmno.png')
+
+        self.animated_gif = AnimatedGifFactory(
+            twitter_id=77777777,
+            image_url='https://pbs.twimg.com/tweet_video_thumb/1234567890abcde.png',
+            mp4_url='https://pbs.twimg.com/tweet_video/abcde1234567890.mp4',
+            image_file='', mp4_file='')
+
+        self.video = VideoFactory(twitter_id=66666666,
+            image_url='https://pbs.twimg.com/ext_tw_video_thumb/740282905369444352/pu/img/zyxwvutsrqponml.jpg',
+            image_file='', mp4_file='')
+
+    @patch.object(FetchFiles, 'fetch')
+    def test_calls_fetch_files(self, fetch):
+        results = FilesFetcher().fetch()
+        fetch.assert_has_calls([ call(fetch_all=False) ])
+
+    @patch.object(FetchFiles, 'fetch')
+    def test_calls_fetch_files_with_all(self, fetch):
+        results = FilesFetcher().fetch(fetch_all=True)
+        fetch.assert_has_calls([ call(fetch_all=True) ])
+
+    @patch.object(FetchFiles, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_missing(self, fetch_and_save_file):
+        "Goes to fetch for media without files already."
+        results = FilesFetcher().fetch()
+        calls = [
+                    call(media_obj=self.image, media_type='image'),
+                    call(media_obj=self.animated_gif, media_type='image'),
+                    call(media_obj=self.animated_gif, media_type='mp4'),
+                    call(media_obj=self.video, media_type='image'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(FetchFiles, '_fetch_and_save_file')
+    def test_calls_fetch_and_save_all(self, fetch_and_save_file):
+        "Goes to fetch for ALL media."
+        results = FilesFetcher().fetch(fetch_all=True)
+        calls = [
+                    call(media_obj=self.fetched_image, media_type='image'),
+                    call(media_obj=self.image, media_type='image'),
+                    call(media_obj=self.animated_gif, media_type='image'),
+                    call(media_obj=self.animated_gif, media_type='mp4'),
+                    call(media_obj=self.video, media_type='image'),
+                ]
+        fetch_and_save_file.assert_has_calls(calls)
+
+    @patch.object(FetchFiles, '_fetch_and_save_file')
+    def test_results_for_fetch_missing(self, fetch_and_save_file):
+        results = FilesFetcher().fetch()
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0]['success'])
+        # Three images and one MP4 file:
+        self.assertEqual(results[0]['fetched'], 4)
+
+    @patch.object(FetchFiles, '_fetch_and_save_file')
+    def test_results_for_fetch_all(self, fetch_and_save_file):
+        results = FilesFetcher().fetch(fetch_all=True)
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0]['success'])
+        self.assertEqual(results[0]['fetched'], 5)
+
+    @patch.object(FetchFiles, '_fetch_and_save_file')
+    def test_error_results(self, fetch_and_save_file):
+        "Sets the correct error values if things go wrong."
+        fetch_and_save_file.side_effect = FetchError('Oh dear')
+        results = FilesFetcher().fetch()
+        self.assertFalse(results[0]['success'])
+        self.assertEqual(results[0]['fetched'], 0)
+        self.assertEqual(len(results[0]['messages']), 4)
+        self.assertEqual(results[0]['messages'][0], 'Oh dear')
+
+    @patch.object(filedownloader, 'download')
+    def test_downloads_image(self, download):
+        "Calls the download method correctly for images."
+        download.return_value = False
+        FetchFiles()._fetch_and_save_file(
+                                    media_obj=self.image, media_type='image')
+        download.assert_has_calls( [ call(
+                    self.image.image_url,
+                    ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+                ) ] )
+
+    @patch.object(filedownloader, 'download')
+    def test_downloads_video(self, download):
+        "Calls the download method correctly for GIFs' videos."
+        download.return_value = False
+        FetchFiles()._fetch_and_save_file(
+                            media_obj=self.animated_gif, media_type='mp4')
+        download.assert_has_calls( [ call(
+                    self.animated_gif.mp4_url,
+                    ['video/mp4',]
+                ) ] )
+
+    def test_raises_error_with_invalid_media_type(self):
+        with self.assertRaises(FetchError):
+            FetchFiles()._fetch_and_save_file(self.image, 'bibbly boo')
+
+    @patch.object(filedownloader, 'download')
+    def test_raises_error_if_download_fails(self, download):
+        "If download() raises an error, so does _fetch_and_save_file()"
+        download.side_effect = DownloadException("Ooops")
+        with self.assertRaises(FetchError):
+            FetchFiles()._fetch_and_save_file(self.image, 'image')
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(filedownloader, 'download')
+    def test_saves_downloaded_image_file(self, download):
+        # Make a temporary file, like download() would make:
+        jpg = tempfile.NamedTemporaryFile()
+        temp_filepath = jpg.name
+        download.return_value = temp_filepath
+
+        FetchFiles()._fetch_and_save_file(self.image, 'image')
+        self.assertEqual(
+            self.image.image_file.name,
+            'twitter/media/%s/%s/%s' % (
+                temp_filepath[-4:-2],
+                temp_filepath[-2:],
+                os.path.basename(temp_filepath)
+            )
+        )
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch.object(filedownloader, 'download')
+    def test_saves_downloaded_mp4_file(self, download):
+        # Make a temporary file, like download() would make:
+        mp4 = tempfile.NamedTemporaryFile()
+        temp_filepath = mp4.name
+        download.return_value = temp_filepath
+
+        FetchFiles()._fetch_and_save_file(self.animated_gif, 'mp4')
+        self.assertEqual(
+            self.animated_gif.mp4_file.name,
+            'twitter/media/%s/%s/%s' % (
+                temp_filepath[-4:-2],
+                temp_filepath[-2:],
+                os.path.basename(temp_filepath)
+            )
+        )
 

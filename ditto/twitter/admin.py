@@ -14,7 +14,8 @@ class AccountAdmin(admin.ModelAdmin):
             'fields': ('user', 'is_active', )
         }),
         ('API', {
-            'fields': ('consumer_key', 'consumer_secret', 'access_token', 'access_token_secret',),
+            'fields': ('consumer_key', 'consumer_secret', 'access_token',
+                        'access_token_secret',),
             'description': 'Keys and secrets require creation of an app at <a href="https://apps.twitter.com/">apps.twitter.com</a>',
         }),
         ('Data', {
@@ -50,7 +51,8 @@ class MediaAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('show_image', 'media_type', 'twitter_id', 'image_url', ),
+            'fields': ('show_image', 'media_type', 'twitter_id', 'image_url',
+                        'image_file', 'mp4_file', ),
         }),
         ('Sizes', {
             'classes': ('collapse',),

@@ -346,6 +346,42 @@ stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this::
 
 This requires an ``account`` as the data is fetched from that Twitter user's point of view, when it comes to privacy etc.
 
+Images
+======
+
+Fetching Tweets (whether your own or your Likes) fetches all the data about
+them, but does not fetch any media files uploaded with them. It's not possible
+to fetch video files (as far as I can tell) but there's a separate command for
+fetching images and the MP4 video files for animated GIFs. (There's no way to
+fetch the original GIF files).
+
+You must first download the Tweet data, and then fetch the files for all those
+Tweets::
+
+    $ ./manage.py fetch_twitter_files
+
+This will fetch the files for all Tweets whose files haven't already been
+fetched (so, the first time, it's all the Tweets).
+
+If you want to force a re-fetching of all files, whether they've already been
+downloaded or not::
+
+    $ ./manage.py fetch_twitter_files --all
+
+Each image/MP4 is associated with the relevant Tweet(s) and saved within your project's ``MEDIA_ROOT`` directory, as defined in ``settings.py``. There's one optional setting to customise the directory in which the files are saved. Its default value is as shown here::
+
+   DITTO_TWITTER_DIR_BASE = 'twitter'
+
+Files are organised into separate directories according to the final characters
+of their file names (so as not to have too many in one directory). eg, an image
+might be saved in::
+
+    /var/www/example.com/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.png
+
+Every uploaded image, animated GIF and video should have a single image.
+Animated GIFs will also have an MP4 file.
+
+
 
 ##############
  Other things

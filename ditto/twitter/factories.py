@@ -76,6 +76,8 @@ class MediaFactory(factory.DjangoModelFactory):
     thumb_w = 150
     thumb_h = 150
 
+    image_file = factory.django.ImageField()
+    mp4_file = factory.django.FileField()
 
     @factory.post_generation
     def tweets(self, create, extracted, **kwargs):
@@ -102,6 +104,7 @@ class PhotoFactory(MediaFactory):
 
     image_url = factory.Sequence(
                             lambda n: 'http://pbs.twimg.com/media/%d.jpg' % n)
+    image_file = factory.django.ImageField(filename='example.jpg')
 
 
 class VideoFactory(MediaFactory):
@@ -117,6 +120,8 @@ class VideoFactory(MediaFactory):
     aspect_ratio = '16:9'
     duration = 20000
 
+    image_file = factory.django.ImageField(filename='example.jpg')
+
 
 class AnimatedGifFactory(MediaFactory):
 
@@ -128,4 +133,7 @@ class AnimatedGifFactory(MediaFactory):
     mp4_url = factory.Sequence(lambda n: 'https://pbs.twimg.com/tweet_video/%d.mp4' % n)
 
     aspect_ratio = '16:9'
+
+    image_file = factory.django.ImageField(filename='example.jpg')
+    mp4_file = factory.django.FileField(filename='example.mp4')
 

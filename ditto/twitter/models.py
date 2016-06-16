@@ -1,10 +1,12 @@
 # coding: utf-8
+import os
+
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.templatetags.static import static
 
+from . import app_settings
 from . import managers
-from . import settings
 from .utils import htmlify_description, htmlify_tweet
 from ..core.managers import PublicItemManager
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
@@ -113,7 +115,7 @@ class Media(TimeStampedModelMixin, models.Model):
 
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
     image_url = models.URLField(null=False, blank=False,
-                                        help_text="URL of the image itself")
+                            help_text="URL of the image itself on Twitter.com")
 
     large_w = models.PositiveSmallIntegerField(null=True, blank=True,
                                                 verbose_name="Large width")
@@ -148,6 +150,27 @@ class Media(TimeStampedModelMixin, models.Model):
                                                 help_text="In milliseconds")
     # END VIDEO-ONLY PROPERTIES
 
+    def upload_path(self, filename):
+        "Make path under MEDIA_ROOT where original files will be saved."
+
+        # eg get '12345678' from '12345678.jpg':
+        name = os.path.splitext(filename)[0]
+
+        # If filename is '12345678.jpg':
+        # 'twitter/media/56/78/12345678.jpg'
+        return '/'.join([
+            app_settings.DITTO_TWITTER_DIR_BASE,
+            'media',
+            name[-4:-2],
+            name[-2:],
+            filename
+        ])
+
+    image_file = models.ImageField(upload_to=upload_path,
+                                            null=False, blank=True, default='')
+    mp4_file = models.FileField(upload_to=upload_path,
+                                null=False, blank=True, default='',
+                                help_text="Only used for Animated GIFs")
 
     # All Items (eg, used in Admin):
     objects = models.Manager()
@@ -430,7 +453,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
         return '/'.join([
-            settings.DITTO_TWITTER_DIR_BASE,
+            app_settings.DITTO_TWITTER_DIR_BASE,
             str(self.twitter_id),
             'avatars',
             str(filename)

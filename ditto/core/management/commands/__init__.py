@@ -34,21 +34,24 @@ class DittoBaseCommand(BaseCommand):
             'success': False,
             'messages': ['There was an error fetching data because blah'],
           }
+
+        Or, it might not have an 'account'.
         """
         if verbosity == 0:
             return
 
         for result in results:
+            prefix = '%s: ' % result['account'] if 'account' in result else ''
             if 'fetched' in result:
                 noun = self.singular_noun if result['fetched'] == 1 else self.plural_noun
-                self.stdout.write('%s: Fetched %s %s' % (
-                                result['account'], result['fetched'], noun))
+                self.stdout.write('%sFetched %s %s' % (
+                                            prefix, result['fetched'], noun))
 
             if result['success'] == False:
-                self.stderr.write('%s: Failed to fetch %s: %s' % (
-                                     result['account'],
-                                     self.plural_noun,
-                                     self.format_messages(result['messages'])
+                self.stderr.write('%sFailed to fetch %s: %s' % (
+                                    prefix,
+                                    self.plural_noun,
+                                    self.format_messages(result['messages'])
                                 ))
 
     def format_messages(self, messages):

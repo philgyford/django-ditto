@@ -1,6 +1,6 @@
 from . import FetchError
-from .fetch import Fetch, FetchTweetsRecent, FetchTweetsFavorite, FetchTweets,\
-        FetchUsers, FetchVerify
+from .fetch import Fetch, FetchFiles, FetchTweetsRecent, FetchTweetsFavorite,\
+        FetchTweets, FetchUsers, FetchVerify
 from ..models import Account
 
 
@@ -9,7 +9,7 @@ from ..models import Account
 #
 # They call the classes in fetch.fetch.* to do the actual API calling.
 #
-# In general, use them like this:
+# In general (FilesFetcher excepted), use them something like this:
 #
 #   fetcher = RecentTweetsFetcher(screen_name='philgyford')
 #   results = fetcher.fetch(count=20)
@@ -22,6 +22,7 @@ from ..models import Account
 #   TweetsFetcher
 #   RecentTweetsFetcher
 #   FavoriteTweetsFetcher
+# FilesFetcher
 
 
 class TwitterFetcher(object):
@@ -30,11 +31,11 @@ class TwitterFetcher(object):
 
     Use like:
         fetcher = ChildTwitterFetcher(screen_name='philgyford')
-        fetcher.fetch()
+        results = fetcher.fetch()
 
     Or, for all accounts:
         fetcher = ChildTwitterFetcher()
-        fetcher.fetch()
+        results = fetcher.fetch()
 
     Child classes should at least override:
         _get_account_fetcher()
@@ -216,4 +217,28 @@ class FavoriteTweetsFetcher(TwitterFetcher):
 
     def _get_account_fetcher(self, account):
         return FetchTweetsFavorite(account)
+
+
+class FilesFetcher(object):
+    """
+    Use like:
+        fetcher = FilesFetcher()
+        results = fetcher.fetch()
+    or:
+        results = fetcher.fetch(fetch_all=True)
+
+    Doesn't do much - simply to preserve a similar interface to the other
+    *Fetcher() classes that use the API and Accounts.
+    """
+
+    def __init__(self):
+        self.return_values = []
+
+    def fetch(self, fetch_all=False):
+        results = FetchFiles().fetch(fetch_all=fetch_all)
+
+        # Return a list to behave similar to the other *Fetcher() classes that
+        # can deal with multiple Accounts.
+        return [ results ]
+
 

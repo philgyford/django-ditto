@@ -400,5 +400,43 @@ class UpdateTweets(TestCase):
                                                     self.out_err.getvalue())
 
 
+class FetchFiles(TestCase):
 
+    def setUp(self):
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    @patch('ditto.twitter.management.commands.fetch_twitter_files.FilesFetcher')
+    def test_sends_all_true_to_fetcher(self, fetcher):
+        call_command('fetch_twitter_files', '--all')
+        fetcher.assert_called_with()
+        fetcher.return_value.fetch.assert_called_with(fetch_all=True)
+
+    @patch('ditto.twitter.management.commands.fetch_twitter_files.FilesFetcher')
+    def test_sends_all_false_to_fetcher(self, fetcher):
+        call_command('fetch_twitter_files')
+        fetcher.assert_called_with()
+        fetcher.return_value.fetch.assert_called_with(fetch_all=False)
+
+    @patch('ditto.twitter.management.commands.fetch_twitter_files.FilesFetcher')
+    def test_success_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+                                            [{'success': True, 'fetched': 33}]
+        call_command('fetch_twitter_files', stdout=self.out)
+        self.assertIn('Fetched 33 Files', self.out.getvalue())
+
+    @patch('ditto.twitter.management.commands.fetch_twitter_files.FilesFetcher')
+    def test_success_output_verbosity_0(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+                                            [{'success': True, 'fetched': 33}]
+        call_command('fetch_twitter_files', verbosity=0, stdout=self.out)
+        self.assertEqual('', self.out.getvalue())
+
+    @patch('ditto.twitter.management.commands.fetch_twitter_files.FilesFetcher')
+    def test_error_output(self, fetcher):
+        fetcher.return_value.fetch.return_value =\
+                                    [{'success': False, 'messages': ['Oops']}]
+        call_command('fetch_twitter_files', stdout=self.out,
+                                                        stderr=self.out_err)
+        self.assertIn('Failed to fetch Files: Oops', self.out_err.getvalue())
 

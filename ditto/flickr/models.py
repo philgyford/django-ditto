@@ -8,9 +8,9 @@ from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
-from . import managers
 from . import app_settings
 from . import imagegenerators
+from . import managers
 from ..core.utils import truncate_string
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 

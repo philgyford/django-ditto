@@ -1,11 +1,15 @@
+import os
 import time
+
+from django.core.files import File
 
 from twython import Twython, TwythonError
 
 from . import FetchError
 from .savers import TweetSaver, UserSaver
-from ..models import Tweet, User
+from ..models import Media, Tweet, User
 from ...core.utils import datetime_now
+from ...core.utils.downloader import DownloadException, filedownloader
 
 
 # Classes which fetch data from the Twitter API for a single Account.
@@ -23,6 +27,7 @@ from ...core.utils import datetime_now
 #   FetchNewTweets
 #     FetchTweetsRecent
 #     FetchTweetsFavorite
+# FetchFiles
 
 
 class Fetch(object):
@@ -434,4 +439,126 @@ class FetchTweetsFavorite(FetchNewTweets):
             # Associate this tweet with the Account's user:
             self.account.user.favorites.add(tw)
             self.objects.append(tw)
+
+
+class FetchFiles(object):
+    """
+    For fetching image files and Animated GIFs' MP4 files.
+
+    Doesn't inherit from Fetch because it doesn't use the API or rely on having
+    an Account object.
+
+    Doesn't fetch MP4s (or other movie files) for videos because the URLs
+    for MP4 video files (as opposed to MP4 Animated GIF files) will be
+    discontinued from 2016-08-01.
+    https://twittercommunity.com/t/retiring-mp4-video-output/66093/15?u=philgyford
+
+    Use it like:
+        fetcher = FilesFetcher()
+        result = fetcher.fetch()
+    or:
+        result = fetcher.fetch(fetch_all=True)
+    """
+
+    # What we'll return for each account:
+    return_value = {}
+
+    # When fetching Tweets or Users this will be the total amount fetched.
+    results_count = 0
+
+    def fetch(self, fetch_all=False):
+        """
+        Download and save original images for all Media objects
+        (or just those that don't already have them).
+
+        fetch_all -- Boolean. Fetch ALL images, even if we've already
+                        got them?
+        """
+
+        self._fetch_files(fetch_all)
+
+        self.return_value['fetched'] = self.results_count
+
+        return self.return_value
+
+    def _fetch_files(self, fetch_all):
+        """
+        Download and save original images for all Media objects
+        (or just those that don't already have them).
+
+        fetch_all -- Boolean. Fetch ALL images, even if we've already
+                        got them?
+        """
+
+        media = Media.objects.all()
+
+        if not fetch_all:
+            media = media.filter(image_file='')
+
+        error_messages = []
+
+        for media_obj in media:
+            try:
+                self._fetch_and_save_file(
+                                    media_obj=media_obj, media_type='image')
+                self.results_count += 1
+            except FetchError as e:
+                error_messages.append(str(e))
+
+            if media_obj.media_type == 'animated_gif':
+                try:
+                    self._fetch_and_save_file(
+                                        media_obj=media_obj, media_type='mp4')
+                    self.results_count += 1
+                except FetchError as e:
+                    error_messages.append(str(e))
+
+        if len(error_messages) > 0:
+            self.return_value['success'] = False
+            self.return_value['messages'] = error_messages
+        else:
+            self.return_value['success'] = True
+
+    def _fetch_and_save_file(self, media_obj, media_type):
+        """
+        Downloads an image file and saves it to the Media object.
+
+        Expects:
+            media_obj -- A Media object.
+            media_type -- String, either 'image' or 'mp4'.
+
+        Raises FetchError if something goes wrong.
+        """
+
+        if media_type == 'mp4':
+            url = media_obj.mp4_url
+            acceptable_content_types = ['video/mp4',]
+        elif media_type == 'image':
+            url = media_obj.image_url
+            acceptable_content_types = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+        else:
+            raise FetchError('media_type should be "image" or "mp4"')
+
+        filepath = False
+        try:
+            # Saves the file to /tmp/:
+            filepath = filedownloader.download(url, acceptable_content_types)
+        except DownloadException as e:
+            raise FetchError(e)
+
+        if filepath:
+            # Reopen file and save to the Media object:
+            reopened_file = open(filepath, 'rb')
+            django_file = File(reopened_file)
+
+            if media_type == 'mp4':
+                media_obj.mp4_file.save(
+                                    os.path.basename(filepath), django_file)
+            else:
+                media_obj.image_file.save(
+                                    os.path.basename(filepath), django_file)
+
+
+
 
