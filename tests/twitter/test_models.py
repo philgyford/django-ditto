@@ -1,7 +1,8 @@
 # coding: utf-8
 import datetime
 import json
-from unittest.mock import patch
+import os
+from unittest.mock import Mock, patch
 
 import pytz
 import responses
@@ -10,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 
+from ditto.twitter import app_settings
 from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, PhotoFactory, TweetFactory,\
         UserFactory, VideoFactory, AnimatedGifFactory
@@ -158,15 +160,11 @@ class AccountTestCase(TestCase):
         account = AccountFactory.build(user=None)
         self.assertFalse(account.has_credentials())
 
-    def test_get_absolute_url_with_user(self):
+    def test_get_absolute_url(self):
         user = UserFactory(screen_name='bill')
         account = AccountFactory(user=user)
         self.assertEqual(account.get_absolute_url(),
             reverse('twitter:user_detail', kwargs={'screen_name': 'bill'}))
-
-    def test_get_absolute_url_no_user(self):
-        account = AccountFactory(user=None)
-        self.assertEqual(account.get_absolute_url(), '')
 
 
 class PhotoTestCase(TestCase):
@@ -212,6 +210,7 @@ class PhotoTestCase(TestCase):
         self.assertEqual(photo.medium_url, '%s:medium' % url)
         self.assertEqual(photo.small_url,  '%s:small' % url)
         self.assertEqual(photo.thumb_url,  '%s:thumb' % url)
+        self.assertEqual(photo.thumbnail_url,  '%s:thumb' % url)
 
     def test_tweets(self):
         "It should be possible to belong to more than one tweet."
@@ -221,6 +220,57 @@ class PhotoTestCase(TestCase):
         self.assertEqual(2, photo.tweets.count())
         self.assertEqual(photo.tweets.all()[0], tweet_2)
         self.assertEqual(photo.tweets.all()[1], tweet_1)
+
+    def test_thumnail_dimensions(self):
+        "Thumbnail dimensions should always be 150px."
+        photo = PhotoFactory(thumb_w=100, thumb_h=100)
+        self.assertEqual(150, photo.thumbnail_w)
+        self.assertEqual(150, photo.thumbnail_h)
+
+    def test_video_url(self):
+        photo = PhotoFactory()
+        self.assertEqual('', photo.video_url)
+
+
+class PhotoLocalTestCase(TestCase):
+    "Testing photos when using local files."
+
+    def setUp(self):
+        "Set the value of this setting that's used in ditto.twitter.models."
+        super().setUp()
+        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+
+    def tearDown(self):
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+
+    def test_size_urls(self):
+        url = 'http://www.example.org/image.jpg'
+        photo = PhotoFactory(image_url=url)
+        self.assertEqual(photo.large_url, photo.image_file.url)
+        self.assertRegexpMatches(photo.medium_url,
+            'CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg')
+        self.assertRegexpMatches(photo.small_url,
+            'CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg')
+        self.assertRegexpMatches(photo.thumb_url,
+            'CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg')
+        self.assertRegexpMatches(photo.thumbnail_url,
+            'CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg')
+
+    def test_image_url_when_original_missing(self):
+        "If we have no original file, we should use the 'missing' image."
+        photo = PhotoFactory(image_file='')
+        self.assertEqual(photo.small_url, '/static/img/original_missing.jpg')
+
+    def test_broken_image(self):
+        "We have an original file, but can't make a smaller version."
+        photo = PhotoFactory()
+        generator = Mock(side_effect=Exception('Error'))
+        # A minimal version of Medial.IMAGE_SIZES for our test:
+        image_sizes = {'small': {'generator': generator,},}
+        with patch.dict('ditto.twitter.models.Media.IMAGE_SIZES', image_sizes):
+            self.assertEqual(photo.small_url,
+                             '/static/img/original_error.jpg')
 
 
 class VideoTestCase(TestCase):
@@ -234,6 +284,57 @@ class VideoTestCase(TestCase):
         video = VideoFactory()
         self.assertEqual(video.media_type, 'video')
 
+    def test_video_url_xmpeg(self):
+        video = VideoFactory(xmpeg_url='https://example.org/test.m3u8')
+        self.assertEqual(video.video_url, video.xmpeg_url)
+
+    def test_video_url_dash(self):
+        video = VideoFactory(xmpeg_url='',
+                            dash_url='https://example.org/test.mpd')
+        self.assertEqual(video.video_url, video.dash_url)
+
+    def test_video_url_mp4(self):
+        video = VideoFactory(xmpeg_url='', dash_url='',
+                            mp4_url='https://example.org/test.mp4')
+        self.assertEqual(video.video_url, video.mp4_url)
+
+    def test_video_url_empty(self):
+        video = VideoFactory(xmpeg_url='', mp4_url='', dash_url='')
+        self.assertEqual(video.video_url, '')
+
+    def test_video_mime_type_xmpeg(self):
+        video = VideoFactory(xmpeg_url='https://example.org/test.m3u8')
+        self.assertEqual(video.video_mime_type, 'application/x-mpegURL')
+
+    def test_video_mime_type_dash(self):
+        video = VideoFactory(xmpeg_url='',
+                            dash_url='https://example.org/test.mpd')
+        self.assertEqual(video.video_mime_type, 'application/dash+xml')
+
+
+class VideoLocalTestCase(TestCase):
+    "Testing videos when using local files."
+
+    def setUp(self):
+        "Set the value of this setting that's used in ditto.twitter.models."
+        super().setUp()
+        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+
+    def tearDown(self):
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+
+    def test_video_url_xmpeg(self):
+        "Will be same as remote URL."
+        video = VideoFactory(xmpeg_url='https://example.org/test.m3u8')
+        self.assertEqual(video.video_url, video.xmpeg_url)
+
+    def test_video_url_dash(self):
+        "Will be same as remote URL."
+        video = VideoFactory(xmpeg_url='',
+                            dash_url='https://example.org/test.mpd')
+        self.assertEqual(video.video_url, video.dash_url)
+
 
 class AnimatedGifTestCase(TestCase):
     "Most things are the same for photos and videos, so not re-testing here."
@@ -245,6 +346,32 @@ class AnimatedGifTestCase(TestCase):
     def test_media_type(self):
         gif = AnimatedGifFactory()
         self.assertEqual(gif.media_type, 'animated_gif')
+
+    def test_video_url_mp4(self):
+        gif = AnimatedGifFactory(mp4_url='https://example.org/test.mp4')
+        self.assertEqual(gif.video_url, gif.mp4_url)
+
+    def test_video_mime_type_mp4(self):
+        gif = AnimatedGifFactory(xmpeg_url='https://example.org/test.mp4')
+        self.assertEqual(gif.video_mime_type, 'video/mp4')
+
+
+class AnimatedGifLocalTestCase(TestCase):
+    "Testing Animated GIFs when using local files."
+
+    def setUp(self):
+        "Set the value of this setting that's used in ditto.twitter.models."
+        super().setUp()
+        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+
+    def tearDown(self):
+        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+
+    def test_video_url_mp4(self):
+        gif = AnimatedGifFactory(mp4_url='https://example.org/test.mp4')
+        filename = os.path.basename(gif.mp4_file.name)
+        self.assertEqual(gif.video_url, 'twitter/media/mp/le/%s' % filename)
 
 
 class TweetTestCase(TestCase):
@@ -371,6 +498,14 @@ class TweetTestCase(TestCase):
         self.assertTrue(tweet_1.is_reply)
         tweet_2 = TweetFactory(in_reply_to_screen_name='')
         self.assertFalse(tweet_2.is_reply)
+
+    def test_in_reply_to_url(self):
+        tweet_1 = TweetFactory(in_reply_to_screen_name='bob',
+                                in_reply_to_status_id=1234567)
+        self.assertEqual(tweet_1.in_reply_to_url,
+                        'https://twitter.com/bob/status/1234567')
+        tweet_2 = TweetFactory(in_reply_to_screen_name='')
+        self.assertEqual(tweet_2.in_reply_to_url, '')
 
     @patch('ditto.twitter.models.htmlify_tweet')
     def test_makes_text_html(self, htmlify_method):
@@ -579,4 +714,8 @@ class UserTestCase(TestCase):
         htmlify_method.assert_called_once_with(
                                         {'description': 'my test description'})
         self.assertEqual(user.description_html, 'my test description')
+
+    def test_get_absolute_url(self):
+        user = UserFactory(screen_name='bob')
+        self.assertEqual(user.get_absolute_url(), '/twitter/bob/')
 

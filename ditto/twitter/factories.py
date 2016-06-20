@@ -76,8 +76,8 @@ class MediaFactory(factory.DjangoModelFactory):
     thumb_w = 150
     thumb_h = 150
 
-    image_file = factory.django.ImageField()
-    mp4_file = factory.django.FileField()
+    image_file = factory.django.ImageField(filename='example.jpg')
+    mp4_file = factory.django.FileField(filename='example.mp4')
 
     @factory.post_generation
     def tweets(self, create, extracted, **kwargs):

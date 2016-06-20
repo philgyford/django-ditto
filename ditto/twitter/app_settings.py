@@ -7,7 +7,7 @@ from django.conf import settings
 
 DITTO_TWITTER_DIR_BASE = getattr(settings, 'DITTO_TWITTER_DIR_BASE', 'twitter')
 
-#DITTO_TWITTER_USE_LOCAL_MEDIA = getattr(settings,
-                                    #'DITTO_TWITTER_USE_LOCAL_MEDIA', False)
+DITTO_TWITTER_USE_LOCAL_MEDIA = getattr(settings,
+                                    'DITTO_TWITTER_USE_LOCAL_MEDIA', False)
 
 

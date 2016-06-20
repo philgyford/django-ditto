@@ -374,7 +374,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     "Testing the URLs of photos and videos when we're using local original files."
 
     def setUp(self):
-        "Set the value of this setting that's used in ditto.flick.models."
+        "Set the value of this setting that's used in ditto.flickr.models."
         super().setUp()
         self.default_use_local = app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS
         app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS = True

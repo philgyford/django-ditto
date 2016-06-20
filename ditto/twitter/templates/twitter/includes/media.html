@@ -40,7 +40,7 @@ Expects:
                         {% if media.media_type == 'photo' %}
 
                             {% if view == 'detail' %}
-                                <a href="{{ media.image_url }}"><img src="{{ media.large_url }}" width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" alt="" class="img-fluid"></a>
+                                <a href="{{ media.large_url }}"><img src="{{ media.medium_url }}" width="{{ media.medium_w|unlocalize }}" height="{{ media.medium_h|unlocalize }}" alt="" class="img-fluid"></a>
                             {% else %}
                                 <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>
                             {% endif %}
@@ -50,19 +50,11 @@ Expects:
                             {# Video or Animated GIF #}
 
                             {% if view == 'detail' %}
-                                <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="metadata" class="img-fluid">
+                                <video width="{{ media.large_w|unlocalize }}" height="{{ media.large_h|unlocalize }}" poster="{{ media.large_url }}" controls preload="metadata" class="img-fluid">
                             {% else %}
-                                <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.image_url }}" controls preload="none">
+                                <video width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" poster="{{ media.large_url }}" controls preload="none">
                             {% endif %}
-                                {% if media.xmpeg_url %}
-                                    <source src="{{ media.xmpeg_url }}" type="application/x-mpegURL">
-                                {% endif %}
-                                {% if media.mp4_url %}
-                                    <source src="{{ media.mp4_url }}" type="video/mp4">
-                                {% endif %}
-                                {% if media.webm_url %}
-                                    <source src="{{ media.webm_url }}" type="video/webm">
-                                {% endif %}
+                                <source src="{{ media.video_url }}" type="{{ media.video_mime_type }}">
                             </video>
 
                         {% endif %}

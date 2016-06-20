@@ -77,12 +77,32 @@ class MediaAdmin(admin.ModelAdmin):
     exclude = ('tweets',)
 
     def show_thumb(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.thumb_url, instance.thumb_w, instance.thumb_h)
+        return '<img src="%(url)s" width="%(w)s" height="%(h)s" />' %\
+                {
+                    'url':  instance.thumbnail_url,
+                    'w':    instance.thumbnail_w,
+                    'h':    instance.thumbnail_h,
+                }
     show_thumb.allow_tags = True
     show_thumb.short_description = ''
 
     def show_image(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_w, instance.small_h)
+        if instance.media_type == 'photo':
+            return '<img src="%(url)s" width="%(w)s" height="%(h)" />' %\
+                {
+                    'url':  instance.small_url,
+                    'w':    instance.small_w,
+                    'h':    instance.small_h,
+                }
+        else:
+            return '<video width="%(w)s" height="%(h)s" poster="%(img)s" controls preload="metadata"><source src="%(video)s" type="%(mime)s"></video>' %\
+                {
+                    'w':        instance.small_w,
+                    'h':        instance.small_h,
+                    'img':      instance.small_url,
+                    'video':    instance.video_url,
+                    'mime':     instance.video_mime_type,
+                }
     show_image.allow_tags = True
     show_image.short_description = 'Image'
 

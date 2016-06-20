@@ -5,7 +5,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.templatetags.static import static
 
+from imagekit.cachefiles import ImageCacheFile
+
 from . import app_settings
+from . import imagegenerators
 from . import managers
 from .utils import htmlify_description, htmlify_tweet
 from ..core.managers import PublicItemManager
@@ -98,6 +101,14 @@ class Media(TimeStampedModelMixin, models.Model):
     They have a bunch of common fields, and then some extra for Videos.
     A Tweet could have zero, one or more Medias. Yes that's the plural shut up.
     """
+
+    # Mapping our internal names for sizes to the imagekit generators:
+    IMAGE_SIZES = {
+        'medium':       { 'generator': imagegenerators.Medium, },
+        'small':        { 'generator': imagegenerators.Small, },
+        'thumb':        { 'generator': imagegenerators.Thumbnail, },
+    }
+
     MEDIA_TYPES = (
         ('animated_gif', 'Animated GIF'),
         ('photo', 'Photo'),
@@ -140,9 +151,9 @@ class Media(TimeStampedModelMixin, models.Model):
     mp4_url = models.URLField(null=False, blank=True,
                         verbose_name='MP4 URL', help_text="For Animated GIFs")
     dash_url = models.URLField(null=False, blank=True,
-                                                verbose_name='MPEG-DASH URL')
+                                verbose_name='MPEG-DASH URL (.mpd, streaming)')
     xmpeg_url = models.URLField(null=False, blank=True,
-                                                    verbose_name='X-MPEG URL')
+                            verbose_name='X-MPEG URL (HLS, .m3u8, streaming')
 
     aspect_ratio = models.CharField(null=False, blank=True, max_length=5,
                                             help_text='eg, "4:3" or "16:9"')
@@ -187,20 +198,169 @@ class Media(TimeStampedModelMixin, models.Model):
         verbose_name_plural = 'Media items'
 
     @property
+    def thumbnail_w(self):
+        "Because we usually actually want 150, not whatever thumb_w is."
+        return 150
+
+    @property
+    def thumbnail_h(self):
+        "Because we usually actually want 150, not whatever thumb_h is."
+        return 150
+
+    @property
     def large_url(self):
-        return '%s:large' % self.image_url
+        "URL to local or remote original-size image."
+        return self._image_url('large')
 
     @property
     def medium_url(self):
-        return '%s:medium' % self.image_url
+        "URL to local or remote image, maximum 1200px high/wide."
+        return self._image_url('medium')
 
     @property
     def small_url(self):
-        return '%s:small' % self.image_url
+        "URL to local or remote image, maximum 680px high/wide."
+        return self._image_url('small')
 
     @property
     def thumb_url(self):
-        return '%s:thumb' % self.image_url
+        "URL to local or remote image, 150px square."
+        return self._image_url('thumb')
+
+    @property
+    def thumbnail_url(self):
+        "URL to local or remote image, 150px square. For consistency."
+        return self.thumb_url
+
+    @property
+    def video_url(self):
+        """
+        The URL to our preferred video source.
+        Depends on if we're hosting video locally or on twitter.com, what
+        kind of thing this is (GIF or video), and what URLs we have.
+        Returns a URL or an empty string.
+        """
+        url = ''
+        video_type = self._video_type()
+
+        if video_type is not None:
+            if video_type[1] == 'local':
+                if video_type[0] == 'mp4':
+                    return self.mp4_file.url
+            else:
+                if video_type[0] == 'mp4':
+                    url = self.mp4_url
+                elif video_type[0] == 'xmpeg':
+                    url = self.xmpeg_url
+                elif video_type[0] == 'dash':
+                    url = self.dash_url
+
+        return url
+
+    @property
+    def video_mime_type(self):
+        """
+        The MIME type for our preferred video URL.
+        Returns a mime type or an empty string.
+        """
+        mime_type = ''
+        video_type = self._video_type()
+
+        if video_type is not None:
+            if video_type[0] == 'mp4':
+                mime_type = 'video/mp4'
+            elif video_type[0] == 'xmpeg':
+                mime_type = 'application/x-mpegURL'
+            elif video_type[0] == 'dash':
+                mime_type = 'application/dash+xml'
+
+        return mime_type
+
+    def _image_url(self, size):
+        """
+        Helper for the self.*_url() property methods.
+        size -- one of 'large', 'medium', 'small', or 'thumbnail'.
+        """
+        if app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA:
+            return self._local_image_url(size)
+        else:
+            return self._remote_image_url(size)
+
+    def _local_image_url(self, size):
+        """
+        Generate the URL of an image of a particular size, hosted locally,
+        based on the original file (which must already be downloaded).
+        size -- one of 'large', 'medium', 'small', or 'thumbnail'.
+        """
+        if self.image_file:
+            if size == 'large':
+                # Essentially the original file.
+                return self.image_file.url
+            else:
+                generator = self.IMAGE_SIZES[size]['generator']
+                try:
+                    image_generator = generator(source=self.image_file)
+                    result = ImageCacheFile(image_generator)
+                    return result.url
+                except:
+                    # We have an original file but something's wrong with it.
+                    # Might be 0 bytes or something.
+                    return static('img/original_error.jpg')
+        else:
+            # We haven't downloaded an original file for this.
+            return static('img/original_missing.jpg')
+
+    def _remote_image_url(self, size):
+        """
+        Generate the URL of an image of a particular size, at Twitter.
+        size -- one of 'large', 'medium', 'small', or 'thumbnail'.
+        """
+        return  '%s:%s' % (self.image_url, size)
+
+    def _video_type(self):
+        """
+        Which video type should we use for this item?
+        Returns None or a tuple of type and 'remote'/'local',
+        eg: ('xmpeg', 'remote') or ('mp4', 'local')
+        """
+        if app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA:
+            return self._local_video_type()
+        else:
+            return self._remote_video_type()
+
+    def _local_video_type(self):
+        """
+        When hosting media locally, which video type should we use for this?
+        Returns None or a tuple of type and 'remote'/'local',
+        eg: ('xmpeg', 'remote') or ('mp4', 'local')
+        """
+        if self.media_type == 'animated_gif' and self.mp4_file:
+            return ('mp4', 'local')
+        else:
+            # We can't currently save video files except MP4s for animated
+            # gifs, so try to fall back to the remote URLs.
+            return self._remote_video_type()
+
+    def _remote_video_type(self):
+        """
+        When hosting media remotely, which video type should we use for this?
+        Returns None or a tuple of type and 'remote'/'local',
+        eg: ('xmpeg', 'remote') or ('mp4', 'local')
+        """
+        video_type = None
+        if self.media_type == 'video':
+            # Prefer the streaming URL over MP4:
+            if self.xmpeg_url:
+                video_type = ('xmpeg', 'remote')
+            elif self.mp4_url:
+                video_type = ('mp4', 'remote')
+            elif self.dash_url:
+                video_type = ('dash', 'remote')
+
+        elif self.media_type == 'animated_gif' and self.mp4_url:
+            video_type = ('mp4', 'remote')
+
+        return video_type
 
 
 class ExtraTweetManagers(models.Model):
@@ -290,12 +450,9 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        if self.user:
-            return reverse('twitter:tweet_detail', kwargs={
+        return reverse('twitter:tweet_detail', kwargs={
                                         'screen_name': self.user.screen_name,
                                         'twitter_id': self.twitter_id})
-        else:
-            return ''
 
     def get_next_public_by_post_time(self):
         "Next Tweet by this User, if they're public."
