@@ -186,7 +186,8 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         download.assert_called_once_with(user.original_icon_url,
                         ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
 
-        self.assertEqual(user.avatar, 'flickr/35034346050N01/avatars/%s' %
+        self.assertEqual(user.avatar,
+            'flickr/60/50/35034346050N01/avatars/%s' %
                                             os.path.basename(temp_filepath))
 
     @responses.activate

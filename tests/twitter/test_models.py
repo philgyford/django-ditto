@@ -634,8 +634,14 @@ class UserTestCase(TestCase):
         self.assertEqual(user.permalink, 'https://twitter.com/bill')
 
     def test_avatar_url(self):
-        user = UserFactory(twitter_id=1234, avatar__filename='my_face.jpg')
-        self.assertEqual(user.avatar_url, 'twitter/1234/avatars/my_face.jpg')
+        user = UserFactory(twitter_id=123456, avatar__filename='my_face.jpg')
+        self.assertEqual(user.avatar_url,
+                                    'twitter/avatars/34/56/123456/my_face.jpg')
+
+    def test_avatar_url_short_id(self):
+        user = UserFactory(twitter_id=12, avatar__filename='my_face.jpg')
+        self.assertEqual(user.avatar_url,
+                                    'twitter/avatars/12/12/my_face.jpg')
 
     def test_avatar_url_missing(self):
         user = UserFactory(avatar=None)

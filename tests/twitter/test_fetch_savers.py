@@ -348,7 +348,7 @@ class UserSaverTestCase(FetchTwitterTestCase):
         download.assert_called_once_with(saved_user.profile_image_url_https,
                         ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
 
-        self.assertEqual(saved_user.avatar, 'twitter/12552/avatars/%s' %
+        self.assertEqual(saved_user.avatar, 'twitter/avatars/25/52/12552/%s' %
                                             os.path.basename(temp_filepath))
 
     @patch.object(filedownloader, 'download')

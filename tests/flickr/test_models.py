@@ -76,7 +76,8 @@ class UserTestCase(TestCase):
         user = UserFactory(
                 nsid='12345678901@N01', avatar__filename='12345678901N01.jpg')
         self.assertEqual(
-            user.avatar_url, 'flickr/12345678901N01/avatars/12345678901N01.jpg')
+            user.avatar_url,
+                    'flickr/89/01/12345678901N01/avatars/12345678901N01.jpg')
 
     def test_avatar_url_missing(self):
         user = UserFactory(avatar=None)
@@ -391,7 +392,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     def test_original_url(self):
         filename = os.path.basename(self.photo.original_file.name)
         self.assertEqual(self.photo.original_url,
-                         'flickr/123456N01/photos/2015/08/14/%s' % filename)
+                     'flickr/34/56/123456N01/photos/2015/08/14/%s' % filename)
 
     def test_remote_original_url(self):
         "Should still return remote URL when we're using local photos."
@@ -403,13 +404,13 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     def test_medium_url(self):
         "Has a different format to most other image sizes."
         self.assertRegexpMatches(self.photo.medium_url,
-            'CACHE/images/flickr/123456N01/photos/2015/08/14/example.[^\.]+\.jpg')
+            'CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg')
 
     def test_image_urls(self):
         """Test all but the Original and Medium image URL properties."""
         for size, prop in self.photo_sizes.items():
             self.assertRegexpMatches(getattr(self.photo, prop),
-                'CACHE/images/flickr/123456N01/photos/2015/08/14/example.[^\.]+\.jpg')
+                'CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg')
 
     def test_image_url_with_invalid_size(self):
         with self.assertRaises(AttributeError):

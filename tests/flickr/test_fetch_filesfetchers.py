@@ -143,9 +143,13 @@ class FilesFetcherTestCase(TestCase):
         download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.photo_2, 'photo')
+        nsid = self.photo_2.user.nsid
+        nsid = nsid[ :nsid.index('@') ]
         self.assertEqual(
             self.photo_2.original_file.name,
-            'flickr/%s/photos/2015/08/14/%s' % (
+            'flickr/%s/%s/%s/photos/2015/08/14/%s' % (
+                nsid[-4:-2],
+                nsid[-2:],
                 self.photo_2.user.nsid.replace('@',''),
                 os.path.basename(temp_filepath)
             )
@@ -160,9 +164,13 @@ class FilesFetcherTestCase(TestCase):
         download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.video_2, 'video')
+        nsid = self.video_2.user.nsid
+        nsid = nsid[ :nsid.index('@') ]
         self.assertEqual(
             self.video_2.video_original_file.name,
-            'flickr/%s/photos/2015/08/14/%s' % (
+            'flickr/%s/%s/%s/photos/2015/08/14/%s' % (
+                nsid[-4:-2],
+                nsid[-2:],
                 self.video_2.user.nsid.replace('@',''),
                 os.path.basename(temp_filepath)
             )

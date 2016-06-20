@@ -403,8 +403,15 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     def upload_path(self, filename):
         "Make path under MEDIA_ROOT where original files will be saved."
+        # If NSID is '35034346050@N01', get '35034346050'
+        nsid = self.user.nsid[ :self.user.nsid.index('@') ]
+
+        # If NSID is '35034346050@N01'
+        # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
         return '/'.join([
             app_settings.DITTO_FLICKR_DIR_BASE,
+            nsid[-4:-2],
+            nsid[-2:],
             self.user.nsid.replace('@',''),
             'photos',
             str(self.taken_time.date().strftime(
@@ -716,8 +723,15 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
+        # If NSID is '35034346050@N01', get '35034346050'
+        nsid = self.nsid[ :self.nsid.index('@') ]
+
+        # If NSID is '35034346050@N01'
+        # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
         return '/'.join([
             app_settings.DITTO_FLICKR_DIR_BASE,
+            nsid[-4:-2],
+            nsid[-2:],
             self.nsid.replace('@',''),
             'avatars',
             filename

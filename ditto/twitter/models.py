@@ -609,10 +609,15 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def avatar_upload_path(self, filename):
         "Make path under MEDIA_ROOT where avatar file will be saved."
+
+        # eg, if twitter_id is 12345678,
+        # 'twitter/avatars/56/78/12345678/avatar_name.jpg'
         return '/'.join([
             app_settings.DITTO_TWITTER_DIR_BASE,
-            str(self.twitter_id),
             'avatars',
+            str(self.twitter_id)[-4:-2],
+            str(self.twitter_id)[-2:],
+            str(self.twitter_id),
             str(filename)
         ])
 
