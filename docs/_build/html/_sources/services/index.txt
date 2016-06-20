@@ -1,0 +1,10 @@
+
+.. toctree::
+   
+   flickr
+   pinboard
+   twitter
+
+
+Services
+========

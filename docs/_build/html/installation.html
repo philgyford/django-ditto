@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; Django Ditto 0.2 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Django Ditto 0.2 documentation" href="index.html"/>
+        <link rel="next" title="Flickr" href="services/flickr.html"/>
+        <link rel="prev" title="Introduction" href="introduction.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Django Ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pillow">Pillow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-to-installed-apps">Add to INSTALLED_APPS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-to-context-processors">Add to context processors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-to-urls-py">Add to urls.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#settings">Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#other-optional-settings">Other optional settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-up-each-service">Set up each service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Services supported</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/flickr.html">Flickr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/pinboard.html">Pinboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/twitter.html">Twitter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">For Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Elsewhere</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/philgyford/django-ditto">Django Ditto on GitHub</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Django Ditto</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Installation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/installation.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="pillow">
+<h2>Pillow<a class="headerlink" href="#pillow" title="Permalink to this headline">¶</a></h2>
+<p>Ditto uses <a class="reference external" href="http://pillow.readthedocs.io/en/latest/">Pillow</a> which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used <a class="reference external" href="http://brew.sh">Homebrew</a> to install libjpeg.)</p>
+</div>
+<div class="section" id="add-to-installed-apps">
+<h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Permalink to this headline">¶</a></h2>
+<p>To use Ditto in your own project (untested as yet), add the core <code class="docutils literal"><span class="pre">ditto.core</span></code> application to your project&#8217;s <code class="docutils literal"><span class="pre">INSTALLED_APPS</span></code> in your <code class="docutils literal"><span class="pre">settings.py</span></code>, and add the applications for the services you need. This example includes Flickr, Pinboard and Twitter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c1"># other apps listed here.</span>
+    <span class="c1"># ...</span>
+    <span class="s1">&#39;imagekit&#39;</span><span class="p">,</span>       <span class="c1"># Required only to use downloaded images and videos</span>
+    <span class="s1">&#39;sortedm2m&#39;</span><span class="p">,</span>      <span class="c1"># Required only for ditto.flickr</span>
+    <span class="s1">&#39;taggit&#39;</span><span class="p">,</span>         <span class="c1"># Required only for ditto.flickr and ditto.pinboard</span>
+    <span class="s1">&#39;ditto.core&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.flickr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.pinboard&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.twitter&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If you only wanted to use the Flickr part, including displaying downloaded photos, you would do this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c1"># other apps listed here.</span>
+    <span class="c1"># ...</span>
+    <span class="s1">&#39;imagekit&#39;</span><span class="p">,</span>       <span class="c1"># Required only to use downloaded images and videos</span>
+    <span class="s1">&#39;sortedm2m&#39;</span><span class="p">,</span>      <span class="c1"># Required only for ditto.flickr</span>
+    <span class="s1">&#39;taggit&#39;</span><span class="p">,</span>         <span class="c1"># Required only for ditto.flickr and ditto.pinboard</span>
+    <span class="s1">&#39;ditto.core&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.flickr&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Or, to use only the Twitter part, and not worry about using local versions of
+images:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c1"># other apps listed here.</span>
+    <span class="c1"># ...</span>
+    <span class="s1">&#39;ditto.core&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.twitter&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-to-context-processors">
+<h2>Add to context processors<a class="headerlink" href="#add-to-context-processors" title="Permalink to this headline">¶</a></h2>
+<p>Add the project&#8217;s context processor in your settings:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+        <span class="s1">&#39;OPTIONS&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;context_processors&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="c1"># other context processors listed here.</span>
+                <span class="s1">&#39;ditto.core.context_processors.ditto&#39;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-to-urls-py">
+<h2>Add to urls.py<a class="headerlink" href="#add-to-urls-py" title="Permalink to this headline">¶</a></h2>
+<p>To use Ditto&#8217;s supplied views you can include each app&#8217;s URLs in your project&#8217;s own <code class="docutils literal"><span class="pre">urls.py</span></code>. Note that each app requires the correct namespace (<code class="docutils literal"><span class="pre">flickr</span></code>, <code class="docutils literal"><span class="pre">pinboard</span></code> or <code class="docutils literal"><span class="pre">twitter</span></code>), eg:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="k">import</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="k">import</span> <span class="n">admin</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^flickr/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.flickr.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;flickr&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^pinboard/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.pinboard.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;pinboard&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^twitter/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.twitter.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;twitter&#39;</span><span class="p">)),</span>
+
+    <span class="c1"># To include the overall, aggregated views:</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;ditto/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.core.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;ditto&#39;</span><span class="p">)),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Change the URL include paths (eg, <code class="docutils literal"><span class="pre">r'^ditto/pinboard/'</span></code> as appropriate) to
+suit your project. See the <code class="docutils literal"><span class="pre">urls.py</span></code> in the <code class="docutils literal"><span class="pre">devproject/</span></code> project for a full
+example.</p>
+</div>
+<div class="section" id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
+<p>Some of the apps have optional settings which can be put in your project&#8217;s <code class="docutils literal"><span class="pre">settings.py</span></code>. They&#8217;re described in detail in each service&#8217;s documentation. This is the complete list with their default values:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_FLICKR_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;flickr&#39;</span>
+<span class="n">DITTO_FLICKR_DIR_PHOTOS_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">&#39;</span>
+<span class="n">DITTO_FLICKR_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
+<span class="n">DITTO_TWITTER_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<div class="section" id="other-optional-settings">
+<h3>Other optional settings<a class="headerlink" href="#other-optional-settings" title="Permalink to this headline">¶</a></h3>
+<p>To have large numbers formatted nicely in the included templates, ensure these are in your <code class="docutils literal"><span class="pre">settings.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">USE_L10N</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">USE_THOUSAND_SEPARATOR</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="set-up-each-service">
+<h3>Set up each service<a class="headerlink" href="#set-up-each-service" title="Permalink to this headline">¶</a></h3>
+<p>Each service (such as Flickr or Twitter) you want to use will require some set-up in order to link your account(s) on the service with Django Ditto. See the documentation for each service for how to do this.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="services/flickr.html" class="btn btn-neutral float-right" title="Flickr" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Introduction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Phil Gyford.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

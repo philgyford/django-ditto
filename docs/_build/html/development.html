@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Development &mdash; Django Ditto 0.2 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Django Ditto 0.2 documentation" href="index.html"/>
+        <link rel="prev" title="Twitter" href="services/twitter.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Django Ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Services supported</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/flickr.html">Flickr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/pinboard.html">Pinboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/twitter.html">Twitter</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-notes-for-development">Other notes for development</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Django Ditto</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Development</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/development.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="development">
+<h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<p>There&#8217;s a basic Django project in <code class="docutils literal"><span class="pre">devproject/</span></code> to make it easier to work on
+the app. This might be enough to get things up and running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r devproject/requirements.txt
+$ python setup.py develop
+$ ./devproject/manage.py runserver
+</pre></div>
+</div>
+<div class="section" id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<p>Run tests with tox. Install it with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install tox
+</pre></div>
+</div>
+<p>You&#8217;ll need to have all versions of python available that are tested against (see <code class="docutils literal"><span class="pre">tox.ini</span></code>). This might mean deactivating a virtualenv if you&#8217;re using one with <code class="docutils literal"><span class="pre">devproject/</span></code>. Then run all tests in all environments like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox
+</pre></div>
+</div>
+<p>To run tests in only one environment, specify it. In this case, Python 3.5 and
+Django 1.9:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e py35-django19
+</pre></div>
+</div>
+<p>To run a specific test, add its path after <code class="docutils literal"><span class="pre">--</span></code>, eg:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
+</pre></div>
+</div>
+<p>Running the tests in all environments will generate coverage output. There will
+also be an <code class="docutils literal"><span class="pre">htmlcov/</span></code> directory containing an HTML report. You can also
+generaet these reports without running all the other tests:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e coverage
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-notes-for-development">
+<h2>Other notes for development<a class="headerlink" href="#other-notes-for-development" title="Permalink to this headline">¶</a></h2>
+<p>Using coverage.py to check test coverage:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ coverage run --source=&#39;.&#39; ./manage.py test
+$ coverage report
+</pre></div>
+</div>
+<p>Instead of the in-terminal report, get an HTML version:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ coverage html
+$ open -a &quot;Google Chrome&quot; htmlcov/index.html
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="services/twitter.html" class="btn btn-neutral" title="Twitter" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Phil Gyford.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

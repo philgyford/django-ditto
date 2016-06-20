@@ -7,9 +7,17 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
+# Load package meta from the pkgmeta module without loading ditto.
+pkgmeta = {}
+# Python 3 replacement for execfile(pkgmeta_path, pkgmeta):
+pkgmeta_path = os.path.join(os.path.dirname(__file__), 'ditto', 'pkgmeta.py')
+with open(pkgmeta_path, 'r') as f:
+    code = compile(f.read(), pkgmeta_path, 'exec')
+    exec(code, pkgmeta)
+
 setup(
-    name='django-ditto',
-    version='0.1',
+    name=pkgmeta['__title__'],
+    version=pkgmeta['__version__'],
     packages=['ditto'],
     install_requires=[
         'django-imagekit>=3.3,<3.4',
@@ -30,11 +38,11 @@ setup(
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
-    license='MIT License',
+    license=pkgmeta['__license__'],
     description='A Django app to copy stuff from your accounts on other services.',
     long_description=README,
     url='https://github.com/philgyford/django-ditto',
-    author='Phil Gyford',
+    author=pkgmeta['__author__'],
     author_email='phil@gyford.com',
     classifiers=[
         'Environment :: Web Environment',

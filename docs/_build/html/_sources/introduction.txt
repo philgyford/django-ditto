@@ -1,14 +1,10 @@
-==============
- Django Ditto
-==============
-
-.. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
-  :target: https://travis-ci.org/philgyford/django-ditto?branch=master
-
-.. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
-  :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
+Introduction
+============
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
+
+Services covered
+****************
 
 Currently, Ditto can copy these things from these services:
 
@@ -24,6 +20,15 @@ Currently, Ditto can copy these things from these services:
     - Favorites/Likes
     - Images and Animated GIFs (but not videos)
     - Users
+
+It can save these things for one or more account on each service.
+
+See possible future services, and overall progress, in `this issue <https://github.com/philgyford/django-ditto/issues/23>`_.
+
+Public and private Photos, Bookmarks and Tweets are saved, but only public ones are displayed in the included Django views and templates; non-public ones are only visible in the Django admin.
+
+What Ditto includes
+*******************
 
 The Ditto apps provide:
 
