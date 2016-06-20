@@ -10,8 +10,6 @@
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
 
-**`Read the documentation <http://django-ditto.readthedocs.io/en/latest/>`_**
-
 Currently, Ditto can copy these things from these services:
 
 - `Flickr <https://flickr.com/>`_
@@ -36,3 +34,4 @@ The Ditto apps provide:
 - Templates (that use `Bootstrap 4 <http://v4-alpha.getbootstrap.com>`_)
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
 
+`Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
