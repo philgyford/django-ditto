@@ -608,18 +608,39 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     help_text="eg, the raw JSON from the API.")
 
     def avatar_upload_path(self, filename):
-        "Make path under MEDIA_ROOT where avatar file will be saved."
+        """
+        Make path under MEDIA_ROOT where avatar file will be saved.
 
-        # eg, if twitter_id is 12345678,
-        # 'twitter/avatars/56/78/12345678/avatar_name.jpg'
-        return '/'.join([
+        eg, if twitter_id is 12345678:
+            twitter/avatars/56/78/12345678/avatar_name.jpg
+        """
+
+        # We can't just join all these parts in one go, because if the ID
+        # isn't long enough to have two numbered directories, (ie, it's only
+        # 1 or 2 digits) then Django 1.8 creates a path with '//' rather than
+        # just ignoring that directory.
+
+        # So this is a bit laborious:
+
+        # 'twitter/avatars':
+        start = '/'.join([
             app_settings.DITTO_TWITTER_DIR_BASE,
-            'avatars',
-            str(self.twitter_id)[-4:-2],
+            'avatars'
+        ])
+        # '/78/12345678/avatar_name.jpg':
+        end = '/'.join([
             str(self.twitter_id)[-2:],
             str(self.twitter_id),
             str(filename)
         ])
+        # The bit that will be empty for 1-2 digit IDs:
+        # '56':
+        middle = str(self.twitter_id)[-4:-2]
+
+        if middle:
+            return '/'.join([start, middle, end])
+        else:
+            return '/'.join([start, end])
 
     avatar = models.ImageField(upload_to=avatar_upload_path,
                                             null=False, blank=True, default='')
