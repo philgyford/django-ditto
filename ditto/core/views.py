@@ -340,6 +340,15 @@ class DittoAppsMixin:
 class HomeView(DittoAppsMixin, TemplateView):
     template_name = 'ditto/home.html'
 
+    # Set to True to include photos sorted by taken date:
+    include_flickr_photos_by_taken_date = False
+
+    # Set to True to include Favorited Tweets:
+    include_twitter_favorites = False
+
+    # Set to True to include Tweets that are replies:
+    include_twitter_replies = False
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -350,11 +359,14 @@ class HomeView(DittoAppsMixin, TemplateView):
 
         # A bit hacky. Remove querysets we don't want.
         try:
-            # Otherwise we'll get two sets of photos, sorted by upload or taken:
-            app_varieties.remove(('flickr', 'photo-taken'))
-            # No easy way to tell in the template whether a tweet is posted
-            # or favorited, so remove the favorites:
-            app_varieties.remove(('twitter', 'favorite'))
+            if self.include_flickr_photos_by_taken_date == False:
+                # Otherwise we'll get two sets of photos, sorted by upload or taken:
+                app_varieties.remove(('flickr', 'photo-taken'))
+
+            if self.include_twitter_favorites == False:
+                # No easy way to tell in the template whether a tweet is posted
+                # or favorited, so remove the favorites:
+                app_varieties.remove(('twitter', 'favorite'))
         except ValueError:
             pass
 
@@ -364,10 +376,11 @@ class HomeView(DittoAppsMixin, TemplateView):
         for app_name, variety_name in app_varieties:
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
 
-            # More hackiness.
-            # Don't want to include Tweets that are replies on the home page.
-            if app_name == 'twitter' and variety_name == 'tweet':
-                qs = qs.filter(in_reply_to_screen_name__exact='')
+            if self.include_twitter_replies == False:
+                # More hackiness.
+                # Don't want to include Tweets that are replies on the home page.
+                if app_name == 'twitter' and variety_name == 'tweet':
+                    qs = qs.filter(in_reply_to_screen_name__exact='')
 
             querysets.append( qs[:items_to_list] )
 
