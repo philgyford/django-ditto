@@ -507,7 +507,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """
         URL of the original image file on Flickr.com.
         Usually we'd use self.original_url but if we have
-        DITTO_FLICKR_USE_LOCAL_PHOTOS as True, then we still need to be able
+        DITTO_FLICKR_USE_LOCAL_MEDIA as True, then we still need to be able
         to get the remote original file URL somehow. So use this.
         """
         return self._remote_image_url('original')
@@ -526,7 +526,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         See https://www.flickr.com/services/api/misc.urls.html
         size -- One of the keys from self.PHOTO_SIZES.
         """
-        if app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS:
+        if app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA:
             return self._local_image_url(size)
         else:
             return self._remote_image_url(size)
@@ -577,7 +577,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         #"""One day, if we work out how to translate our downloaded original
         #video files into something usable on the web in different sizes, then
         #we can have _video_url() call this if
-        #app_settings.DITTO_FLICKR_USE_LOCAL_PHOTOS is False.
+        #app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA is False.
         #"""
         #pass
 

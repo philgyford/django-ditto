@@ -11,6 +11,6 @@ DITTO_FLICKR_DIR_BASE = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
 DITTO_FLICKR_DIR_PHOTOS_FORMAT = getattr(settings,
                                 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
 
-DITTO_FLICKR_USE_LOCAL_PHOTOS = getattr(settings,
-                                        'DITTO_FLICKR_USE_LOCAL_PHOTOS', False)
+DITTO_FLICKR_USE_LOCAL_MEDIA = getattr(settings,
+                                        'DITTO_FLICKR_USE_LOCAL_MEDIA', False)
 
