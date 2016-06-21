@@ -13,6 +13,6 @@ install:
 script:
   - tox -e $TOX_ENV
 after_success:
-  - bash scripts/coveralls.sh
+  - bash ditto/scripts/coveralls.sh
 # containers
 sudo: false

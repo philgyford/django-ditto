@@ -13,13 +13,14 @@ By default this will only allow the fetching of fully public photos. To fetch
 all photos your Flickr account can access, you'll need to do this:
 
 1. Enter your API key and secret in the indicated place in the file
-   ``scripts/flickr_authorize.py``.
+   ``ditto/scripts/flickr_authorize.py``. (If you've installed Ditto using pip,
+   it might be easier to `download this script from GitHub <https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py>`_.)
 
 2. Run the script on the command line:
 
     .. code-block:: shell
 
-        $ python scripts/flickr_authorize.py
+        $ python ditto/scripts/flickr_authorize.py
 
 3. Follow the instructions. A new browser window should open for you to
    authorize your Flickr account. You'll then get a code to paste into your
