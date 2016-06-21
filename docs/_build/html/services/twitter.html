@@ -156,7 +156,7 @@
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
 <p>In the Django admin, add a new Account in the Twitter app, with your API credentials from <a class="reference external" href="https://apps.twitter.com/">https://apps.twitter.com/</a> .</p>
 <p>Then you <em>must</em> do:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
 </pre></div>
 </div>
 <p>which will fetch the data for that Account&#8217;s Twitter user.</p>
@@ -164,45 +164,45 @@
 <div class="section" id="tweets">
 <h2>Tweets<a class="headerlink" href="#tweets" title="Permalink to this headline">¶</a></h2>
 <p>If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at <a class="reference external" href="https://twitter.com/settings/account">https://twitter.com/settings/account</a> . When you&#8217;ve downloaded it, do:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py import_twitter_tweets --path<span class="o">=</span>/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 </pre></div>
 </div>
 <p>using the correct path to the directory you&#8217;ve downloaded and unzipped (in this case, the unzipped directory is <code class="docutils literal"><span class="pre">12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66</span></code>). This will import all of the Tweets found in the archive. The data in the archive isn&#8217;t complete, so to fully-populate those Tweets you should run this (replacing <code class="docutils literal"><span class="pre">philgyford</span></code> with your Twitter screen name):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_tweets --account=philgyford
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_tweets --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
 <p>This will fetch data for up to 6,000 Tweets. If you have more than that in your archive, run it every 15 minutes to avoid rate limiting, until you&#8217;ve fetched all of the Tweets. This command will fetch data for the least-recently fetched. It&#8217;s worth running every so often in the future, to fetch the latest data (such as Retweet and Like counts).</p>
 <p>If there are newer Tweets, not in your downloaded archive, then run this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account=philgyford --recent=3200
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>3200
 </pre></div>
 </div>
 <p>The <code class="docutils literal"><span class="pre">3200</span></code> is the number of recent Tweets to fetch, with <code class="docutils literal"><span class="pre">3200</span></code> being the maximum allowed in one go.</p>
 <p>Run this version periodically to fetch the Tweets since you last fetched any:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account=philgyford --recent=new
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
 </pre></div>
 </div>
 <p>You might also, or instead, want to fetch more than that, eg:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account=philgyford --recent=200
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>200
 </pre></div>
 </div>
 <p>This would update data such as the Retweet and Like counts for all of the 200
 fetched Tweets, even if they&#8217;re older than your last fetch.</p>
 <p>If you have more than one Twitter Account in Ditto, the above commands can be
 run across all of them by omitting the <code class="docutils literal"><span class="pre">--account</span></code> option. eg:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --recent=new
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --recent<span class="o">=</span>new
 </pre></div>
 </div>
 </div>
 <div class="section" id="favorites-likes">
 <h2>Favorites/Likes<a class="headerlink" href="#favorites-likes" title="Permalink to this headline">¶</a></h2>
 <p>To fetch recent Tweets that that all your Accounts have liked, run one of these:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --recent=new
-$ ./manage.py fetch_twitter_favorites --recent=200
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span>new
+$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span>200
 </pre></div>
 </div>
 <p>Or restrict to Tweets liked by a single Account:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --account=philgyford --recent=new
-$ ./manage.py fetch_twitter_favorites --account=philgyford --recent=200
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
+$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span>200
 </pre></div>
 </div>
 </div>
@@ -213,12 +213,12 @@ $ ./manage.py fetch_twitter_favorites --account=philgyford --recent=200
 </pre></div>
 </div>
 <p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with a Twitter ID <code class="docutils literal"><span class="pre">12345678</span></code> to something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">twitter</span><span class="o">/</span><span class="n">avatars</span><span class="o">/</span><span class="mi">56</span><span class="o">/</span><span class="mi">78</span><span class="o">/</span><span class="mi">12345678</span><span class="o">/</span><span class="n">my_avatar</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/avatars/56/78/12345678/my_avatar.jpg
 </pre></div>
 </div>
 <p>You may periodically want to update the stored data about all the Twitter users
 stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_users --account=philgyford
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_users --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
 <p>This requires an <code class="docutils literal"><span class="pre">account</span></code> as the data is fetched from that Twitter user&#8217;s point of view, when it comes to privacy etc.</p>
@@ -227,12 +227,12 @@ stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this:</p>
 <h2>Images<a class="headerlink" href="#images" title="Permalink to this headline">¶</a></h2>
 <p>Fetching Tweets (whether your own or your Likes) fetches all the data <em>about</em> them, but does not fetch any media files uploaded with them. (It&#8217;s not possible to fetch video files (as far as I can tell.) There&#8217;s a separate command for fetching images and the MP4 video files for animated GIFs. (There&#8217;s no way to fetch the original GIF files.)</p>
 <p>You <em>must</em> first download the Tweet data, and then fetch the files for all those Tweets:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files
 </pre></div>
 </div>
 <p>This will fetch the files for all Tweets whose files haven&#8217;t already been fetched (so, the first time, it&#8217;s all the Tweets).</p>
 <p>If you want to force a re-fetching of all files, whether they&#8217;ve already been downloaded or not:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files --all
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files --all
 </pre></div>
 </div>
 <p>Each image/MP4 is associated with the relevant Tweet(s) and saved within your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory, as defined in <code class="docutils literal"><span class="pre">settings.py</span></code>. There&#8217;s one optional setting to customise the directory in which the files are saved. Its default value is as shown here:</p>
@@ -242,7 +242,7 @@ stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this:</p>
 <p>Files are organised into separate directories according to the final characters
 of their file names (so as not to have too many in one directory). eg, an image
 might be saved in:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">twitter</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="mi">6</span><span class="n">T</span><span class="o">/</span><span class="n">ay</span><span class="o">/</span><span class="n">CRXEfBEWUAA6Tay</span><span class="o">.</span><span class="n">png</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.png
 </pre></div>
 </div>
 <p>Every uploaded image, animated GIF and video should have a single image.  Animated GIFs will also have an MP4 file.</p>
@@ -260,21 +260,21 @@ might be saved in:</p>
 </div>
 <p>Any requests in your templates for the URLs of photo files of any size will now use resized versions of your downloaded original files, generated by Imagekit.  The first time you load a page (especially if it lists many images) it will be slow, but the images are cached (in a <code class="docutils literal"><span class="pre">CACHE</span></code> directory in your media folder).</p>
 <p>For example, before changing this setting, the URL of small image (<code class="docutils literal"><span class="pre">Media.small_url</span></code>) would be something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pbs</span><span class="o">.</span><span class="n">twimg</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">CjuCDVLXIAALhYz</span><span class="o">.</span><span class="n">jpg</span><span class="p">:</span><span class="n">small</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>https://pbs.twimg.com/media/CjuCDVLXIAALhYz.jpg:small
 </pre></div>
 </div>
 <p>After choosing to use local photos, it would be something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">CACHE</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">twitter</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">Lh</span><span class="o">/</span><span class="n">Yz</span><span class="o">/</span><span class="n">CjuCDVLXIAALhYz</span><span class="o">/</span><span class="mi">5</span><span class="n">a726ea25d3bbd1b35b21b8b61b98c4c</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/media/CACHE/images/twitter/media/Lh/Yz/CjuCDVLXIAALhYz/5a726ea25d3bbd1b35b21b8b61b98c4c.jpg
 </pre></div>
 </div>
 <p>If you change your mind you can switch back to using the images hosted on Twitter by removing the <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> setting or changing it to <code class="docutils literal"><span class="pre">False</span></code>.</p>
 <p>Animated GIFs are converted into MP4 videos when first uploaded to Twitter.  Ditto downloads and uses these in a similar way to images. ie, by default the <code class="docutils literal"><span class="pre">video_url</span></code> property of a <code class="docutils literal"><span class="pre">Media</span></code> object that&#8217;s an Animated GIF would be like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pbs</span><span class="o">.</span><span class="n">twimg</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">tweet_video</span><span class="o">/</span><span class="n">CRXEfBEWUAA6Tay</span><span class="o">.</span><span class="n">mp4</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>https://pbs.twimg.com/tweet_video/CRXEfBEWUAA6Tay.mp4
 </pre></div>
 </div>
 <p>If it&#8217;s been downloaded and <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> is <code class="docutils literal"><span class="pre">True</span></code> then
 calling <code class="docutils literal"><span class="pre">video_url</span></code> would return a URL like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">twitter</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="mi">6</span><span class="n">T</span><span class="o">/</span><span class="n">ay</span><span class="o">/</span><span class="n">CRXEfBEWUAA6Tay</span><span class="o">.</span><span class="n">mp4</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.mp4
 </pre></div>
 </div>
 <p>However, there&#8217;s no way to download actual videos that were uploaded to Twitter, and so Ditto will always try to use videos hosted on Twitter, no matter what the value of <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code>.</p>

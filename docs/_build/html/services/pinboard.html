@@ -156,24 +156,24 @@
 <div class="section" id="bookmarks">
 <h2>Bookmarks<a class="headerlink" href="#bookmarks" title="Permalink to this headline">¶</a></h2>
 <p>Import all of your bookmarks:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all
 </pre></div>
 </div>
 <p>Periodically fetch the most recent bookmarks, eg 20 of them:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --recent=20
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --recent<span class="o">=</span>20
 </pre></div>
 </div>
 <p>Or fetch bookmarks posted on one date:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --date=2015-06-20
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --date<span class="o">=</span>2015-06-20
 </pre></div>
 </div>
 <p>Or fetch a single bookmark by its URL (eg, if you&#8217;ve changed the description
 of a particular bookmark you&#8217;ve alread fetched):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --url=http://new-aesthetic.tumblr.com/
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --url<span class="o">=</span>http://new-aesthetic.tumblr.com/
 </pre></div>
 </div>
 <p>The above commands fetch bookmark(s) for all Accounts you&#8217;ve added. To restrict to a single account use <code class="docutils literal"><span class="pre">--account</span></code> with the Pinboard username, eg:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all --account=philgyford
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
 <p>Be aware of the rate limits: <a class="reference external" href="https://pinboard.in/api/#limits">https://pinboard.in/api/#limits</a></p>

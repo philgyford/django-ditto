@@ -3,7 +3,9 @@ Development
 
 
 There's a basic Django project in ``devproject/`` to make it easier to work on
-the app. This might be enough to get things up and running::
+the app. This might be enough to get things up and running:
+
+.. code-block:: shell
 
     $ pip install -r devproject/requirements.txt
     $ python setup.py develop
@@ -13,26 +15,36 @@ the app. This might be enough to get things up and running::
 Tests
 *****
 
-Run tests with tox. Install it with::
+Run tests with tox. Install it with:
+
+.. code-block:: shell
 
     $ pip install tox
 
-You'll need to have all versions of python available that are tested against (see ``tox.ini``). This might mean deactivating a virtualenv if you're using one with ``devproject/``. Then run all tests in all environments like::
+You'll need to have all versions of python available that are tested against (see ``tox.ini``). This might mean deactivating a virtualenv if you're using one with ``devproject/``. Then run all tests in all environments like:
+
+.. code-block:: shell
 
     $ tox
 
 To run tests in only one environment, specify it. In this case, Python 3.5 and
-Django 1.9::
+Django 1.9:
+
+.. code-block:: shell
 
     $ tox -e py35-django19
 
-To run a specific test, add its path after ``--``, eg::
+To run a specific test, add its path after ``--``, eg:
+
+.. code-block:: shell
 
     $ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
 
 Running the tests in all environments will generate coverage output. There will
 also be an ``htmlcov/`` directory containing an HTML report. You can also
-generaet these reports without running all the other tests::
+generaet these reports without running all the other tests:
+
+.. code-block:: shell
 
     $ tox -e coverage
 
@@ -43,12 +55,16 @@ Other notes for development
 Coverage
 ========
 
-Using coverage.py to check test coverage::
+Using coverage.py to check test coverage:
+
+.. code-block:: shell
 
     $ coverage run --source='.' ./manage.py test
     $ coverage report
 
-Instead of the in-terminal report, get an HTML version::
+Instead of the in-terminal report, get an HTML version:
+
+.. code-block:: shell
 
     $ coverage html
     $ open -a "Google Chrome" htmlcov/index.html
@@ -56,7 +72,9 @@ Instead of the in-terminal report, get an HTML version::
 Documentation
 =============
 
-Build the documentation::
+Build the documentation:
+
+.. code-block:: shell
 
     $ cd docs
     $ make html

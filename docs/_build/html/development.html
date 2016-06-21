@@ -153,7 +153,7 @@
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
 <p>There&#8217;s a basic Django project in <code class="docutils literal"><span class="pre">devproject/</span></code> to make it easier to work on
 the app. This might be enough to get things up and running:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r devproject/requirements.txt
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install -r devproject/requirements.txt
 $ python setup.py develop
 $ ./devproject/manage.py runserver
 </pre></div>
@@ -161,26 +161,26 @@ $ ./devproject/manage.py runserver
 <div class="section" id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
 <p>Run tests with tox. Install it with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install tox
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install tox
 </pre></div>
 </div>
 <p>You&#8217;ll need to have all versions of python available that are tested against (see <code class="docutils literal"><span class="pre">tox.ini</span></code>). This might mean deactivating a virtualenv if you&#8217;re using one with <code class="docutils literal"><span class="pre">devproject/</span></code>. Then run all tests in all environments like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox
 </pre></div>
 </div>
 <p>To run tests in only one environment, specify it. In this case, Python 3.5 and
 Django 1.9:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e py35-django19
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e py35-django19
 </pre></div>
 </div>
 <p>To run a specific test, add its path after <code class="docutils literal"><span class="pre">--</span></code>, eg:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
 </pre></div>
 </div>
 <p>Running the tests in all environments will generate coverage output. There will
 also be an <code class="docutils literal"><span class="pre">htmlcov/</span></code> directory containing an HTML report. You can also
 generaet these reports without running all the other tests:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ tox -e coverage
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e coverage
 </pre></div>
 </div>
 </div>
@@ -189,20 +189,20 @@ generaet these reports without running all the other tests:</p>
 <div class="section" id="coverage">
 <h3>Coverage<a class="headerlink" href="#coverage" title="Permalink to this headline">¶</a></h3>
 <p>Using coverage.py to check test coverage:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ coverage run --source=&#39;.&#39; ./manage.py test
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ coverage run --source<span class="o">=</span><span class="s1">&#39;.&#39;</span> ./manage.py <span class="nb">test</span>
 $ coverage report
 </pre></div>
 </div>
 <p>Instead of the in-terminal report, get an HTML version:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ coverage html
-$ open -a &quot;Google Chrome&quot; htmlcov/index.html
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ coverage html
+$ open -a <span class="s2">&quot;Google Chrome&quot;</span> htmlcov/index.html
 </pre></div>
 </div>
 </div>
 <div class="section" id="documentation">
 <h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
 <p>Build the documentation:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd docs
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
 $ make html
 </pre></div>
 </div>

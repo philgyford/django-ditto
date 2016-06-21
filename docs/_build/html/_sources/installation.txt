@@ -99,7 +99,7 @@ Some of the apps have optional settings which can be put in your project's ``set
 
     DITTO_TWITTER_DIR_BASE = 'twitter'
     DITTO_TWITTER_USE_LOCAL_MEDIA = False
-    
+
 
 Other optional settings
 =======================

@@ -162,9 +162,11 @@ all photos your Flickr account can access, you&#8217;ll need to do this:</p>
 <code class="docutils literal"><span class="pre">scripts/flickr_authorize.py</span></code>.</p>
 </li>
 <li><p class="first">Run the script on the command line:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ python scripts/flickr_authorize.py
+<blockquote>
+<div><div class="highlight-shell"><div class="highlight"><pre><span></span>$ python scripts/flickr_authorize.py
 </pre></div>
 </div>
+</div></blockquote>
 </li>
 <li><p class="first">Follow the instructions. A new browser window should open for you to
 authorize your Flickr account. You&#8217;ll then get a code to paste into your
@@ -172,37 +174,37 @@ Terminal.</p>
 </li>
 </ol>
 <p>Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user (replacing <code class="docutils literal"><span class="pre">1</span></code> with your ID, if different):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id=1
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span>1
 </pre></div>
 </div>
 </div>
 <div class="section" id="photo-data">
 <h2>Photo data<a class="headerlink" href="#photo-data" title="Permalink to this headline">¶</a></h2>
 <p>Now you can fetch data about your Photos (including videos). This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days=all
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>all
 </pre></div>
 </div>
 <p>This will only fetch Photos uploaded in the past 3 days:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days=3
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>3
 </pre></div>
 </div>
 <p>Both options can be restricted to only fetch for a single Account by adding the NSID of the Account&#8217;s Flickr User, eg:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --account<span class="o">=</span>35034346050@N01 --days<span class="o">=</span>3
 </pre></div>
 </div>
 </div>
 <div class="section" id="photo-files">
 <h2>Photo files<a class="headerlink" href="#photo-files" title="Permalink to this headline">¶</a></h2>
 <p>The above only fetches data <em>about</em> the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the <code class="docutils literal"><span class="pre">fetch_flickr_originals</span></code> command, <em>after</em> fetching the photos&#8217; data:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals
 </pre></div>
 </div>
 <p>This took over 90 minutes for about 3,000 photos (and very few videos) for me. By default this command will fetch all the original files that haven&#8217;t yet been downloaded (so the first time, it will fetch all of them). To force it to download <em>all</em> the files again (if you&#8217;ve deleted them locally, but they&#8217;re still on Flickr) then:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --all
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --all
 </pre></div>
 </div>
 <p>Both variants can be restricted to fetching files for a single account:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --account=35034346050@N01
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --account<span class="o">=</span>35034346050@N01
 </pre></div>
 </div>
 <p>Files will be saved within your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory, as defined in <code class="docutils literal"><span class="pre">settings.py</span></code>. There are two optional settings to customise the directories in which the files are saved. Their default values are as shown here:</p>
@@ -212,7 +214,7 @@ Terminal.</p>
 </div>
 <p>These values are used if you don&#8217;t specify your own settings.</p>
 <p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above settings would save the Flickr photo <code class="docutils literal"><span class="pre">1234567_987654_o.jpg</span></code> to something like this, depending on the Flickr user&#8217;s NSID and the date the photo was taken (not uploaded):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">flickr</span><span class="o">/</span><span class="mi">35034346050</span><span class="n">N01</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="mi">2016</span><span class="o">/</span><span class="mi">08</span><span class="o">/</span><span class="mi">31</span><span class="o">/</span><span class="mi">1234567</span><span class="n">_987654_o</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/flickr/35034346050N01/photos/2016/08/31/1234567_987654_o.jpg
 </pre></div>
 </div>
 <p>Note that videos will have <em>two</em> &#8220;original&#8221; files downloaded: the video itself and a JPG image that Flickr created for it.</p>
@@ -230,11 +232,11 @@ Terminal.</p>
 </div>
 <p>Any requests in your templates for the URLs of photo files of any size will now use resized versions of your downloaded original files, generated by Imagekit.  The first time you load a page (especially if it lists many Flickr images) it will be slow, but the images are cached (in a <code class="docutils literal"><span class="pre">CACHE</span></code> directory in your media folder).</p>
 <p>For example, before changing this setting, the URL of small image (<code class="docutils literal"><span class="pre">Photo.small_url</span></code>) would be something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">farm8</span><span class="o">.</span><span class="n">static</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="mi">7442</span><span class="o">/</span><span class="mi">27289611500</span><span class="n">_d0debff24e_m</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>https://farm8.static.flickr.com/7442/27289611500_d0debff24e_m.jpg
 </pre></div>
 </div>
 <p>After choosing to use local photos, it would be something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">CACHE</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">flickr</span><span class="o">/</span><span class="mi">35034346050</span><span class="n">N01</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="mi">2016</span><span class="o">/</span><span class="mi">06</span><span class="o">/</span><span class="mi">09</span><span class="o">/</span><span class="mi">27289611500</span><span class="n">_d21f6f47a0_o</span><span class="o">/</span><span class="mi">0</span><span class="n">ee894a3438233848e6e9d85e1985260</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/media/CACHE/images/flickr/35034346050N01/photos/2016/06/09/27289611500_d21f6f47a0_o/0ee894a3438233848e6e9d85e1985260.jpg
 </pre></div>
 </div>
 <p>If you change your mind you can switch back to using the images hosted on flickr.com by removing the <code class="docutils literal"><span class="pre">DITTO_FLICKR_USE_LOCAL_MEDIA</span></code> setting or changing it to <code class="docutils literal"><span class="pre">False</span></code>.</p>
@@ -243,14 +245,13 @@ Terminal.</p>
 <div class="section" id="photosets">
 <h2>Photosets<a class="headerlink" href="#photosets" title="Permalink to this headline">¶</a></h2>
 <p>You can fetch data about your Photosets (also known as Albums) any time, but this won&#8217;t fetch detailed data about Photos within them.</p>
-<p>So, for best results, ensure all Photos are downloaded before fetching Photoset
-data.</p>
+<p>So, for best results, ensure all Photos are downloaded before fetching Photoset data.</p>
 <p>To fetch Photosets for all Accounts:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets
 </pre></div>
 </div>
 <p>Or fetch for only one Account:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets --account=35034346050@N01
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets --account<span class="o">=</span>35034346050@N01
 </pre></div>
 </div>
 </div>
@@ -261,7 +262,7 @@ data.</p>
 </pre></div>
 </div>
 <p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with NSID <code class="docutils literal"><span class="pre">35034346050&#64;N01</span></code> to something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">flickr</span><span class="o">/</span><span class="mi">46</span><span class="o">/</span><span class="mi">05</span><span class="o">/</span><span class="mi">35034346050</span><span class="n">N01</span><span class="o">/</span><span class="n">avatars</span><span class="o">/</span><span class="mi">35034346050</span><span class="n">N01</span><span class="o">.</span><span class="n">jpg</span>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/flickr/46/05/35034346050N01/avatars/35034346050N01.jpg
 </pre></div>
 </div>
 </div>

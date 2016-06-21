@@ -39,10 +39,10 @@ Pinboard, and displaying them on your Django site.
 
   
 
-Indices and tables
-******************
+.. Indices and tables
+.. ******************
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 
