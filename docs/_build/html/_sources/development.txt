@@ -40,6 +40,9 @@ generaet these reports without running all the other tests::
 Other notes for development
 ***************************
 
+Coverage
+========
+
 Using coverage.py to check test coverage::
 
     $ coverage run --source='.' ./manage.py test
@@ -50,6 +53,12 @@ Instead of the in-terminal report, get an HTML version::
     $ coverage html
     $ open -a "Google Chrome" htmlcov/index.html
 
+Documentation
+=============
 
+Build the documentation::
+
+    $ cd docs
+    $ make html
 
 
