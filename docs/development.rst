@@ -82,7 +82,11 @@ Build the documentation:
 Packaging
 =========
 
-Set version number in `ditto/pkgmeta.py`. Then, I think:
+Set version number in `ditto/pkgmeta.py`.
+
+Rebuild documentation (which includes the version number).
+
+Then, I think:
 
 .. code-block:: shell
 

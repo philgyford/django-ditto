@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Development &mdash; Django Ditto 0.2 documentation</title>
+  <title>Development &mdash; Django Ditto 0.2.4 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.2 documentation" href="index.html"/>
+    <link rel="top" title="Django Ditto 0.2.4 documentation" href="index.html"/>
         <link rel="prev" title="Twitter" href="services/twitter.html"/> 
 
   
@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#other-notes-for-development">Other notes for development</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#coverage">Coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#packaging">Packaging</a></li>
 </ul>
 </li>
 </ul>
@@ -207,6 +208,19 @@ $ make html
 </pre></div>
 </div>
 </div>
+<div class="section" id="packaging">
+<h3>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h3>
+<p>Set version number in <cite>ditto/pkgmeta.py</cite>.</p>
+<p>Rebuild documentation (which includes the version number).</p>
+<p>Then, I think:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ python setup.py sdist upload
+</pre></div>
+</div>
+<p>Maybe just to have the README update on pypi:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python setup.py register
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -249,7 +263,7 @@ $ make html
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2',
+            VERSION:'0.2.4',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

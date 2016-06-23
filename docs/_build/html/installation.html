@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Django Ditto 0.2 documentation</title>
+  <title>Installation &mdash; Django Ditto 0.2.4 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.2 documentation" href="index.html"/>
+    <link rel="top" title="Django Ditto 0.2.4 documentation" href="index.html"/>
         <link rel="next" title="Flickr" href="services/flickr.html"/>
         <link rel="prev" title="Introduction" href="introduction.html"/> 
 
@@ -85,6 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#pillow">Pillow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-django-ditto">Install django-ditto</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-installed-apps">Add to INSTALLED_APPS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-context-processors">Add to context processors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-urls-py">Add to urls.py</a></li>
@@ -158,6 +159,13 @@
 <div class="section" id="pillow">
 <h2>Pillow<a class="headerlink" href="#pillow" title="Permalink to this headline">¶</a></h2>
 <p>Ditto uses <a class="reference external" href="http://pillow.readthedocs.io/en/latest/">Pillow</a> which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used <a class="reference external" href="http://brew.sh">Homebrew</a> to install libjpeg.)</p>
+</div>
+<div class="section" id="install-django-ditto">
+<h2>Install django-ditto<a class="headerlink" href="#install-django-ditto" title="Permalink to this headline">¶</a></h2>
+<p>Ditto can be installed using <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a>:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install django-ditto
+</pre></div>
+</div>
 </div>
 <div class="section" id="add-to-installed-apps">
 <h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Permalink to this headline">¶</a></h2>
@@ -304,7 +312,7 @@ example.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2',
+            VERSION:'0.2.4',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

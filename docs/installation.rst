@@ -10,7 +10,7 @@ Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some pr
 Install django-ditto
 ********************
 
-Ditto can be installed using `pip https://pip.pypa.io/en/stable/>`_:
+Ditto can be installed using `pip <https://pip.pypa.io/en/stable/>`_:
 
 .. code-block:: shell
 
