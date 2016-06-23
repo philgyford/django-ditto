@@ -7,6 +7,16 @@ Pillow
 Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used `Homebrew <http://brew.sh>`_ to install libjpeg.)
 
 
+Install django-ditto
+********************
+
+Ditto can be installed using `pip https://pip.pypa.io/en/stable/>`_:
+
+.. code-block:: shell
+
+    $ pip install django-ditto
+
+
 Add to INSTALLED_APPS
 *********************
 

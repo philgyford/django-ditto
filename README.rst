@@ -12,6 +12,12 @@ A collection of Django apps for copying things from third-party sites and servic
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
+Install using `pip https://pip.pypa.io/en/stable/>`_::
+
+    $ pip install django-ditto
+
+NOTE: It will install `Pillow <http://pillow.readthedocs.io/en/latest/>`_, among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
+
 Currently, Ditto can copy these things from these services:
 
 - `Flickr <https://flickr.com/>`_
