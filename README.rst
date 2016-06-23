@@ -12,7 +12,7 @@ A collection of Django apps for copying things from third-party sites and servic
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
-Install using `pip https://pip.pypa.io/en/stable/>`_::
+Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
     $ pip install django-ditto
 

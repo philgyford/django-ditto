@@ -1,3 +1,4 @@
+import codecs
 import os
 from setuptools import setup
 
@@ -6,6 +7,8 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
 
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
+
+read = lambda filepath: codecs.open(filepath, 'r', 'utf-8').read()
 
 # Load package meta from the pkgmeta module without loading ditto.
 pkgmeta = {}
@@ -40,7 +43,7 @@ setup(
     include_package_data=True,
     license=pkgmeta['__license__'],
     description='A Django app to copy stuff from your accounts on Flickr, Pinboard and Twitter.',
-    long_description=README,
+    long_description=read(os.path.join(os.path.dirname(__file__), 'README.rst')),
     url='https://github.com/philgyford/django-ditto',
     author=pkgmeta['__author__'],
     author_email=pkgmeta['__author_email__'],

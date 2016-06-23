@@ -79,4 +79,18 @@ Build the documentation:
     $ cd docs
     $ make html
 
+Packaging
+=========
+
+Set version number in `ditto/pkgmeta.py`. Then, I think:
+
+.. code-block:: shell
+
+    $ python setup.py sdist
+    $ python setup.py sdist upload
+
+Maybe just to have the README update on pypi::
+
+    $ python setup.py register
+
 
