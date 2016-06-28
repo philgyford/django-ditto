@@ -1,12 +1,15 @@
+############
 Installation
 ############
 
+******
 Pillow
 ******
 
 Ditto uses `Pillow <http://pillow.readthedocs.io/en/latest/>`_ which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used `Homebrew <http://brew.sh>`_ to install libjpeg.)
 
 
+********************
 Install django-ditto
 ********************
 
@@ -17,6 +20,7 @@ Ditto can be installed using `pip <https://pip.pypa.io/en/stable/>`_:
     $ pip install django-ditto
 
 
+*********************
 Add to INSTALLED_APPS
 *********************
 
@@ -57,6 +61,7 @@ images::
     )
 
 
+*************************
 Add to context processors
 *************************
 
@@ -74,6 +79,8 @@ Add the project's context processor in your settings::
         }
     ]
 
+
+**************
 Add to urls.py
 **************
 
@@ -98,6 +105,7 @@ suit your project. See the ``urls.py`` in the ``devproject/`` project for a full
 example.
 
 
+********
 Settings
 ********
 
@@ -120,8 +128,9 @@ To have large numbers formatted nicely in the included templates, ensure these a
     USE_THOUSAND_SEPARATOR = True
 
 
+*******************
 Set up each service
-===================
+*******************
 
 Each service (such as Flickr or Twitter) you want to use will require some set-up in order to link your account(s) on the service with Django Ditto. See the documentation for each service for how to do this.
 

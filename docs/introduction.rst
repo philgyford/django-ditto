@@ -1,11 +1,13 @@
+############
 Introduction
-============
+############
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
 
 Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
 
 
+****************
 Services covered
 ****************
 
@@ -35,6 +37,7 @@ Ditto does not *sync* data -- it's a one-way fetch of data *from* the service *t
 For each item fetched, the original JSON data is saved on its object.
 
 
+*******************
 What Ditto includes
 *******************
 

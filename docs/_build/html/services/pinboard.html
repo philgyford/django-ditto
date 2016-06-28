@@ -90,7 +90,17 @@
 <li class="toctree-l1"><a class="reference internal" href="flickr.html">Flickr</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pinboard</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-up">Set-up</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bookmarks">Bookmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#managers">Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#template-tags">Template tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#recent-bookmarks">Recent Bookmarks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#day-bookmarks">Day Bookmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-bookmarks">Fetch Bookmarks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="twitter.html">Twitter</a></li>
@@ -102,6 +112,7 @@
 <p class="caption"><span class="caption-text">Elsewhere</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/philgyford/django-ditto">Django Ditto on GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pypi.python.org/pypi/django-ditto">Django Ditto on PyPI</a></li>
 </ul>
 
             
@@ -151,10 +162,90 @@
 <p>You can fetch, store and display data about all your bookmarks for one or more <a class="reference external" href="https://pinboard.in/">Pinboard</a> accounts.</p>
 <div class="section" id="set-up">
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
-<p>In the Django admin, add an Account in the Pinboard app with your API token from <a class="reference external" href="https://pinboard.in/settings/password">https://pinboard.in/settings/password</a> .</p>
+<p>In the Django admin, add an <code class="docutils literal"><span class="pre">Account</span></code> in the Pinboard app with your API token from <a class="reference external" href="https://pinboard.in/settings/password">https://pinboard.in/settings/password</a> .</p>
+<p>Then use the <a class="reference internal" href="#pinboard-management-commands"><span class="std std-ref">Management commands</span></a> to download your Bookmarks.</p>
 </div>
-<div class="section" id="bookmarks">
-<h2>Bookmarks<a class="headerlink" href="#bookmarks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>The models available in <code class="docutils literal"><span class="pre">ditto.pinboard.models</span></code> are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">Account</span></code></dt>
+<dd>A single Pinboard account. (Note: other services, like Twitter and Flickr, have separate <code class="docutils literal"><span class="pre">User</span></code> and <code class="docutils literal"><span class="pre">Account</span></code> models. Pinboard is currently simpler.)</dd>
+<dt><code class="docutils literal"><span class="pre">BookmarkTag</span></code></dt>
+<dd>A custom version of a Taggit Tag model, trying to match the way Pinboard creates slugs for tags.</dd>
+<dt><code class="docutils literal"><span class="pre">TaggedBookmark</span></code></dt>
+<dd>The through model linking Bookmarks and BookmarkTags.</dd>
+<dt><code class="docutils literal"><span class="pre">Bookmark</span></code></dt>
+<dd>A single URL added to Pinboard by a particular Account.</dd>
+</dl>
+</div>
+<div class="section" id="managers">
+<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">Bookmark</span></code> models have several managers:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">Bookmark.objects.all()</span></code></dt>
+<dd>The default manager fetches <em>all</em> Bookmarks, posted by all Accounts, whether they&#8217;re public or private.</dd>
+<dt><code class="docutils literal"><span class="pre">Bookmark.public_objects.all()</span></code></dt>
+<dd>To display all Bookmarks on public-facing pages, <code class="docutils literal"><span class="pre">public_objects</span></code> should be used. It won&#8217;t return Bookmarks marked as private.</dd>
+<dt><code class="docutils literal"><span class="pre">Bookmark.toread_objects.all()</span></code></dt>
+<dd>Returns <em>all</em> Bookmarks, public and private, that are marked as &#8216;To read&#8217;.</dd>
+<dt><code class="docutils literal"><span class="pre">Bookmark.public_toread_objects.all()</span></code></dt>
+<dd>Returns only public &#8216;To read&#8217; Bookmarks. Private &#8216;To read&#8217; Bookmarks will not be included.</dd>
+</dl>
+<p>Of course, these can all be filtered as usual. So, to display public &#8216;To read&#8217; Bookmarks posted by a particular Account:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.pinboard.models</span> <span class="k">import</span> <span class="n">Account</span><span class="p">,</span> <span class="n">Bookmark</span>
+
+<span class="n">account</span> <span class="o">=</span> <span class="n">Account</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span><span class="p">)</span>
+<span class="n">bookmarks</span> <span class="o">=</span> <span class="n">Bookmark</span><span class="o">.</span><span class="n">public_to_read_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">account</span><span class="o">=</span><span class="n">account</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="template-tags">
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
+<p>There are two assignment template tags available for displaying Bookmarks in your templates.</p>
+<div class="section" id="recent-bookmarks">
+<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this headline">¶</a></h3>
+<p>To display the most recently-posted Bookmarks use <code class="docutils literal"><span class="pre">recent_bookmarks</span></code>. By default it gets the 10 most recent Bookmarks posted by all Accounts:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a <code class="docutils literal"><span class="pre">username</span></code> of <code class="docutils literal"><span class="pre">'philgyford'</span></code>.:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="day-bookmarks">
+<h3>Day Bookmarks<a class="headerlink" href="#day-bookmarks" title="Permalink to this headline">¶</a></h3>
+<p>To display Bookmarks posted to Pinboard on a particular day, use
+<code class="docutils literal"><span class="pre">day_bookmarks</span></code>. By default it gets Bookmarks posted by all Accounts.
+In this example, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Or we can restrict this to the Boomarks posted by a single account on that day:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="management-commands">
+<span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h2>
+<p>Once you have set up an Account with your Pinboard API token (see above), you
+can fetch Bookmarks.</p>
+<div class="section" id="fetch-bookmarks">
+<h3>Fetch Bookmarks<a class="headerlink" href="#fetch-bookmarks" title="Permalink to this headline">¶</a></h3>
 <p>Import all of your bookmarks:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all
 </pre></div>
@@ -173,10 +264,11 @@ of a particular bookmark you&#8217;ve alread fetched):</p>
 </pre></div>
 </div>
 <p>The above commands fetch bookmark(s) for all Accounts you&#8217;ve added. To restrict to a single account use <code class="docutils literal"><span class="pre">--account</span></code> with the Pinboard username, eg:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all --account<span class="o">=</span>philgyford
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --recent<span class="o">=</span><span class="m">20</span> --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
 <p>Be aware of the rate limits: <a class="reference external" href="https://pinboard.in/api/#limits">https://pinboard.in/api/#limits</a></p>
+</div>
 </div>
 </div>
 

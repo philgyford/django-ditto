@@ -1,3 +1,4 @@
+###########
 Development
 ###########
 
@@ -12,6 +13,7 @@ the app. This might be enough to get things up and running:
     $ ./devproject/manage.py runserver
 
 
+*****
 Tests
 *****
 
@@ -49,6 +51,7 @@ generaet these reports without running all the other tests:
     $ tox -e coverage
 
 
+***************************
 Other notes for development
 ***************************
 

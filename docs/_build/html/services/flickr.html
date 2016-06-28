@@ -89,10 +89,26 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Flickr</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-up">Set-up</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#photo-data">Photo data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#photo-files">Photo files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#photosets">Photosets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#users">Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#managers">Managers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#photos">Photos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#users">Users</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#template-tags">Template tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#recent-photos">Recent Photos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#day-photos">Day Photos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#photosets">Photosets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#photo-license">Photo license</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-account-user">Fetch Account User</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-photos">Fetch Photos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-originals">Fetch originals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-photosets">Fetch Photosets</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pinboard.html">Pinboard</a></li>
@@ -105,6 +121,7 @@
 <p class="caption"><span class="caption-text">Elsewhere</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/philgyford/django-ditto">Django Ditto on GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pypi.python.org/pypi/django-ditto">Django Ditto on PyPI</a></li>
 </ul>
 
             
@@ -151,18 +168,17 @@
             
   <div class="section" id="flickr">
 <h1>Flickr<a class="headerlink" href="#flickr" title="Permalink to this headline">¶</a></h1>
-<p>You can fetch, store and display data about all your Photos and Photosets (Albums) for one or more <a class="reference external" href="https://flickr.com/">Flickr</a> accounts. By default the included models and templates will link to the photo files on flickr.com, but you can also download the original files to store locally. These can then be used to generate images in all other sizes, to be served locally.</p>
+<p>You can fetch, store and display data about all your Photos and Photosets (Albums) for one or more <a class="reference external" href="https://flickr.com/">Flickr</a> Accounts. By default the included models and templates will link to the photo files on flickr.com, but you can also download the original files to store locally. These can then be used to generate images in all other sizes, to be served locally.  See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
 <div class="section" id="set-up">
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
-<p>In the Django admin, create a new Account in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a></p>
-<p>By default this will only allow the fetching of fully public photos. To fetch
-all photos your Flickr account can access, you&#8217;ll need to do this:</p>
+<p>In the Django admin, create a new <code class="docutils literal"><span class="pre">Account</span></code> in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a></p>
+<p>By default this will only allow the fetching of fully public photos. To fetch all photos your Flickr account can access, you&#8217;ll need to do this:</p>
 <ol class="arabic">
 <li><p class="first">Enter your API key and secret in the indicated place in the file
 <code class="docutils literal"><span class="pre">ditto/scripts/flickr_authorize.py</span></code>. (If you&#8217;ve installed Ditto using pip,
-it might be easier to <a class="reference external" href="https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py">download this script from GitHub</a>.)</p>
+it might be easier to <a class="reference external" href="https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py">download the script from GitHub</a>.)</p>
 </li>
-<li><p class="first">Run the script on the command line:</p>
+<li><p class="first">Run the script on the command line (if you downloaded the file, change the path to wherever the script is):</p>
 <blockquote>
 <div><div class="highlight-shell"><div class="highlight"><pre><span></span>$ python ditto/scripts/flickr_authorize.py
 </pre></div>
@@ -174,14 +190,155 @@ authorize your Flickr account. You&#8217;ll then get a code to paste into your
 Terminal.</p>
 </li>
 </ol>
-<p>Finally, for each of those Accounts, note its ID from the Django admin, and do this to fetch information about its associated Flickr user (replacing <code class="docutils literal"><span class="pre">1</span></code> with your ID, if different):</p>
+<p>Finally, for each of those Accounts, note its ID from the Django admin, and run the following management command to fetch information about its associated Flickr <code class="docutils literal"><span class="pre">User</span></code> (replacing <code class="docutils literal"><span class="pre">1</span></code> with your <code class="docutils literal"><span class="pre">Account</span></code>&#8216;s Django ID, if different):</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span>1
+</pre></div>
+</div>
+<p>Now you can download your photos&#8217; data and, optionally, their original image/video files. See <a class="reference internal" href="#flickr-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
+</div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>The models available in <code class="docutils literal"><span class="pre">ditto.flickr.models</span></code> are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">Account</span></code></dt>
+<dd>Representing a Flickr account that has API credentials and that we fetch Photos for. It has a one-to-one relationship with a <code class="docutils literal"><span class="pre">User</span></code> model.</dd>
+<dt><code class="docutils literal"><span class="pre">TaggedPhoto</span></code></dt>
+<dd>The through model relating Photos to tags.</dd>
+<dt><code class="docutils literal"><span class="pre">Photo</span></code></dt>
+<dd>A photo (or video) on Flickr. The <code class="docutils literal"><span class="pre">media_type</span></code> property of <code class="docutils literal"><span class="pre">'photo'</span></code> or <code class="docutils literal"><span class="pre">'video'</span></code> indicates which type this is.</dd>
+<dt><code class="docutils literal"><span class="pre">Photoset</span></code></dt>
+<dd>A photoset (album) containing Photos.</dd>
+<dt><code class="docutils literal"><span class="pre">User</span></code></dt>
+<dd>A single user on Flickr. There could be lots of Users but only one (or a few) will have associated Account objects &#8211; these are the Users we fetch Photos for.</dd>
+</dl>
+</div>
+<div class="section" id="managers">
+<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="photos">
+<h3>Photos<a class="headerlink" href="#photos" title="Permalink to this headline">¶</a></h3>
+<p>There are several managers available for Photos. There are two main
+differentiators we want to restrict things by:</p>
+<ul class="simple">
+<li><strong>Public vs private:</strong> Whether a Photo is public or private (which includes those marked as for Friends and/or Family on Flickr.com).</li>
+<li><strong>Posted Photo vs Favorited Photo:</strong> In the future we may fetch Photos that have been favorited, rather than posted, by our Users that have Accounts. In this case we&#8217;d want to be able to differentiate between Photos that we posted, and Photos that we favorited.</li>
+</ul>
+<p>On public-facing web pages you should only use the mangaers starting <code class="docutils literal"><span class="pre">Photo.public_</span></code> as these will filter out all Photos that are not public.</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">Photo.objects.all()</span></code></dt>
+<dd>The default manager fetches <em>all</em> Photos in the system. Public, private, posted by you or (in the future) only favorited by you.</dd>
+<dt><code class="docutils literal"><span class="pre">Photo.public_objects.all()</span></code></dt>
+<dd>Gets all public Photos in the system, no matter who posted them to Flickr.</dd>
+<dt><code class="docutils literal"><span class="pre">Photo.photo_objects.all()</span></code></dt>
+<dd>Gets all Photos, public or private, that were posted by one of the Users associated with an API-credentialled Account.</dd>
+<dt><code class="docutils literal"><span class="pre">Photo.public_photo_objects.all()</span></code></dt>
+<dd>Gets public Photos that were posted by one of the Users associated with an API-credentialled Account.</dd>
+</dl>
+<p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Photos posted by a particular <code class="docutils literal"><span class="pre">User</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.flickr.models</span> <span class="k">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Photo</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span><span class="p">)</span>
+<span class="n">photos</span> <span class="o">=</span> <span class="n">Photo</span><span class="o">.</span><span class="n">public_photo_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>NOTE: You can find a user&#8217;s NSID (the ID used by Flickr) at <a class="reference external" href="http://idgettr.com">http://idgettr.com</a></p>
+</div>
+<div class="section" id="users">
+<h3>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">User.objects.all()</span></code></dt>
+<dd>The default manager fetches all Users in the system.</dd>
+<dt><code class="docutils literal"><span class="pre">User.objects_with_accounts.all()</span></code></dt>
+<dd>This only gets Users that are associated with Accounts.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="template-tags">
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
+<p>There are three assigment template tags and one simple template tag available for displaying Photos, Photosets and information about a Photo.</p>
+<div class="section" id="recent-photos">
+<h3>Recent Photos<a class="headerlink" href="#recent-photos" title="Permalink to this headline">¶</a></h3>
+<p>To display the most recent public Photos posted by any of the Users associated
+with Accounts. By default the most recent 10 are fetched:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">recent_photos</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photo</span> <span class="k">in</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">photo.title</span> <span class="cp">}}</span><span class="x">&lt;br&gt;</span>
+<span class="x">        &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_url</span> <span class="cp">}}</span><span class="x">&quot; width=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_width</span> <span class="cp">}}</span><span class="x">&quot; height=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_height</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The tag can also fetch a different number of Photos and/or only get Photos
+posted by a single User-with-an-Account. Here we only get the 5 most recent
+Photos posted by the User with an <code class="docutils literal"><span class="pre">nsid</span></code> of <code class="docutils literal"><span class="pre">'35034346050&#64;N01'</span></code>:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_photos</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="day-photos">
+<h3>Day Photos<a class="headerlink" href="#day-photos" title="Permalink to this headline">¶</a></h3>
+<p>Gets public Photos posted on a particular day by any of the Users-with-Accounts. In this example, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Or we can restrict this to Photos posted by a single User-with-an-Account:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="photosets">
+<h3>Photosets<a class="headerlink" href="#photosets" title="Permalink to this headline">¶</a></h3>
+<p>Gets Photosets. By default they are by any User and only 10 are returned.</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">photosets</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photoset</span> <span class="k">in</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">photoset.title</span> <span class="cp">}}</span><span class="x">&lt;br&gt;</span>
+<span class="x">        &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_url</span> <span class="cp">}}</span><span class="x">&quot; width=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_width</span> <span class="cp">}}</span><span class="x">&quot; height=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_height</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>You can restrict it to Photosets by a single User and/or change the number returned:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">photosets</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">300</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="photo-license">
+<h3>Photo license<a class="headerlink" href="#photo-license" title="Permalink to this headline">¶</a></h3>
+<p>When displaying information about a <code class="docutils literal"><span class="pre">Photo</span></code> you may want to display a user-friendly version of its <code class="docutils literal"><span class="pre">license</span></code> (indicating Creative Commons level, All rights reserved, etc). This tag makes that easy. Pass it the <code class="docutils literal"><span class="pre">license</span></code> property of a <code class="docutils literal"><span class="pre">Photo</span></code> object. Here, <code class="docutils literal"><span class="pre">photo</span></code> is a <code class="docutils literal"><span class="pre">Photo</span></code> object:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{{</span> <span class="nv">photo_license</span> <span class="nv">photo.license</span> <span class="cp">}}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>This would create HTML something like this, depending on the license:</p>
+<blockquote>
+<div>&lt;a href=&#8221;<a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/2.0/">https://creativecommons.org/licenses/by-nc-sa/2.0/</a>&#8221; title=&#8221;More about permissions&#8221;&gt;Attribution-NonCommercial-ShareAlike License&lt;/a&gt;</div></blockquote>
+</div>
+</div>
+<div class="section" id="management-commands">
+<span id="flickr-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fetch-account-user">
+<h3>Fetch Account User<a class="headerlink" href="#fetch-account-user" title="Permalink to this headline">¶</a></h3>
+<p>This is only used when setting up a new <code class="docutils literal"><span class="pre">Account</span></code> object with API credentials. It fetches data about the Flickr User associated with this <code class="docutils literal"><span class="pre">Account</span></code>.</p>
+<p>Once the <code class="docutils literal"><span class="pre">Account</span></code> has been created in the Django admin, and its API credentials entered, run this (using the Django ID for the object instead of <code class="docutils literal"><span class="pre">1</span></code>):</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span>1
 </pre></div>
 </div>
 </div>
-<div class="section" id="photo-data">
-<h2>Photo data<a class="headerlink" href="#photo-data" title="Permalink to this headline">¶</a></h2>
-<p>Now you can fetch data about your Photos (including videos). This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos):</p>
+<div class="section" id="fetch-photos">
+<h3>Fetch Photos<a class="headerlink" href="#fetch-photos" title="Permalink to this headline">¶</a></h3>
+<p>Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos):</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>all
 </pre></div>
 </div>
@@ -189,18 +346,28 @@ Terminal.</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>3
 </pre></div>
 </div>
-<p>Both options can be restricted to only fetch for a single Account by adding the NSID of the Account&#8217;s Flickr User, eg:</p>
+<p>Both options can be restricted to only fetch for a single Account by adding the NSID of the Account&#8217;s User, eg:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --account<span class="o">=</span>35034346050@N01 --days<span class="o">=</span>3
 </pre></div>
 </div>
+<p>Whenever a Photo is fetched, data about its User will also be fetched, if it hasn&#8217;t been fetched on this occasion.</p>
+<p>Profile photos of Users are downloaded and stored in your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory. You can optionally set the <code class="docutils literal"><span class="pre">DITTO_FLICKR_DIR_BASE</span></code> setting to change the location. The default is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_FLICKR_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;flickr&#39;</span>
+</pre></div>
 </div>
-<div class="section" id="photo-files">
-<h2>Photo files<a class="headerlink" href="#photo-files" title="Permalink to this headline">¶</a></h2>
-<p>The above only fetches data <em>about</em> the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the <code class="docutils literal"><span class="pre">fetch_flickr_originals</span></code> command, <em>after</em> fetching the photos&#8217; data:</p>
+<p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with NSID <code class="docutils literal"><span class="pre">35034346050&#64;N01</span></code> to something like this:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/flickr/46/05/35034346050N01/avatars/35034346050N01.jpg
+</pre></div>
+</div>
+</div>
+<div class="section" id="fetch-originals">
+<h3>Fetch originals<a class="headerlink" href="#fetch-originals" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">fetch_flickr_photos</span></code> management command only fetches data <em>about</em> the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the <code class="docutils literal"><span class="pre">fetch_flickr_originals</span></code> command, <em>after</em> fetching the photos&#8217; data:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals
 </pre></div>
 </div>
-<p>This took over 90 minutes for about 3,000 photos (and very few videos) for me. By default this command will fetch all the original files that haven&#8217;t yet been downloaded (so the first time, it will fetch all of them). To force it to download <em>all</em> the files again (if you&#8217;ve deleted them locally, but they&#8217;re still on Flickr) then:</p>
+<p>This took over 90 minutes for about 3,000 photos (and very few videos) for me.</p>
+<p>By default this command will fetch all the original files that haven&#8217;t yet been downloaded (so the first time, it will fetch all of them). To force it to download <em>all</em> the files again (if you&#8217;ve deleted them locally, but they&#8217;re still on Flickr) then:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --all
 </pre></div>
 </div>
@@ -243,10 +410,10 @@ Terminal.</p>
 <p>If you change your mind you can switch back to using the images hosted on flickr.com by removing the <code class="docutils literal"><span class="pre">DITTO_FLICKR_USE_LOCAL_MEDIA</span></code> setting or changing it to <code class="docutils literal"><span class="pre">False</span></code>.</p>
 <p>Note that Ditto currently can&#8217;t do the same for videos, even if the original video file has been downloaded. No matter what the  value of <code class="docutils literal"><span class="pre">DITTO_FLICKR_USE_LOCAL_MEDIA</span></code> the flickr.com URL for videos is always used.</p>
 </div>
-<div class="section" id="photosets">
-<h2>Photosets<a class="headerlink" href="#photosets" title="Permalink to this headline">¶</a></h2>
-<p>You can fetch data about your Photosets (also known as Albums) any time, but this won&#8217;t fetch detailed data about Photos within them.</p>
-<p>So, for best results, ensure all Photos are downloaded before fetching Photoset data.</p>
+<div class="section" id="fetch-photosets">
+<h3>Fetch Photosets<a class="headerlink" href="#fetch-photosets" title="Permalink to this headline">¶</a></h3>
+<p>You can fetch data about your Photosets any time, but it doesn&#8217;t fetch detailed data about Photos within them.</p>
+<p>So, for best results, only run this <em>after</em> getting running <code class="docutils literal"><span class="pre">fetch_flickr_photos</span></code>.</p>
 <p>To fetch Photosets for all Accounts:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets
 </pre></div>
@@ -255,16 +422,6 @@ Terminal.</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets --account<span class="o">=</span>35034346050@N01
 </pre></div>
 </div>
-</div>
-<div class="section" id="users">
-<h2>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h2>
-<p>Profile photos of Flickr Users are downloaded and stored in your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory. You can optionally set the <code class="docutils literal"><span class="pre">DITTO_FLICKR_DIR_BASE</span></code> setting to change the location. The default is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_FLICKR_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;flickr&#39;</span>
-</pre></div>
-</div>
-<p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with NSID <code class="docutils literal"><span class="pre">35034346050&#64;N01</span></code> to something like this:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/flickr/46/05/35034346050N01/avatars/35034346050N01.jpg
-</pre></div>
 </div>
 </div>
 </div>
