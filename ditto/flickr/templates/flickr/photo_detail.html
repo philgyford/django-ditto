@@ -104,7 +104,7 @@
                 <dd class="col-sm-9">{% photo_license photo.license %}</dd>
 
                 <dt class="col-sm-3">Safety level</dt>
-                <dd class="col-sm-9">{% photo_safety_level photo.safety_level %}</dd>
+                <dd class="col-sm-9">{{ photo.safety_level_str }}</dd>
             </dl>
 
             {% if photo.has_exif %}

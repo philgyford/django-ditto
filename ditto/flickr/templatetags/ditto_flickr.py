@@ -80,13 +80,3 @@ def photo_license(n):
     else:
         return '[missing]'
 
-@register.simple_tag
-def photo_safety_level(n):
-    """Returns the textual version of the Photo's safety level."""
-    levels = dict((x,y) for x,y in Photo.SAFETY_LEVELS)
-
-    try:
-        return levels[n]
-    except KeyError:
-        return '[missing]'
-

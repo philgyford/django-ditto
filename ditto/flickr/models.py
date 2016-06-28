@@ -229,7 +229,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     # https://www.flickr.com/services/api/flickr.photos.setSafetyLevel.html
     SAFETY_LEVELS = (
-        (0, 'none'), # Some have 0 as a safety_level.
+        (0, 'None'), # Some have 0 as a safety_level.
         (1, 'Safe'),
         (2, 'Moderate'),
         (3, 'Restricted'),
@@ -464,6 +464,16 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         try:
             return self.user.account_set.all()[0]
         except IndexError:
+            return None
+
+    @property
+    def safety_level_str(self):
+        "Returns the text version of the safety_level, eg 'Restricted'."
+        levels = dict((x,y) for x,y in self.SAFETY_LEVELS)
+
+        try:
+            return levels[self.safety_level]
+        except KeyError:
             return None
 
     @property

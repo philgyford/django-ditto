@@ -209,6 +209,14 @@ class PhotoTestCase(TestCase):
         photo = PhotoFactory(user=UserFactory())
         self.assertIsNone(photo.account)
 
+    def test_safety_level_str(self):
+        photo = PhotoFactory(safety_level=0)
+        self.assertEqual(photo.safety_level_str, 'None')
+        photo.safety_level=2
+        self.assertEqual(photo.safety_level_str, 'Moderate')
+        photo.safety_level=99
+        self.assertIsNone(photo.safety_level_str)
+
     def test_location_str(self):
         photo = PhotoFactory(
                     locality_name='Abbey Dore',

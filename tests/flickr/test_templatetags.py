@@ -117,14 +117,3 @@ class PhotoLicenseTestCase(TestCase):
         self.assertEqual(ditto_flickr.photo_license('99'), '[missing]')
 
 
-class PhotoSafetyLevelTestCase(TestCase):
-
-    def test_safety_level_0(self):
-        self.assertEqual(ditto_flickr.photo_safety_level(0), 'none')
-
-    def test_safety_level_1(self):
-        self.assertEqual(ditto_flickr.photo_safety_level(1), 'Safe')
-
-    def test_safety_level_4(self):
-        self.assertEqual(ditto_flickr.photo_safety_level(4), '[missing]')
-
