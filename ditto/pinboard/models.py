@@ -123,6 +123,18 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
 
     ditto_item_name = 'pinboard_bookmark'
 
+    # Properties inherited from DittoItemModel:
+    #
+    # title         (CharField)
+    # permalink     (URLField)
+    # summary       (CharField)
+    # is_private    (BooleanField)
+    # fetch_time    (DateTimeField, UTC)
+    # post_time     (DateTimeField, UTC)
+    # latitude      (DecimalField)
+    # longitude     (DecimalField)
+    # raw           (TextField)
+
     account = models.ForeignKey(Account, null=False, blank=False)
 
     # `url` in the Pinboard API:

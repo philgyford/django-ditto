@@ -262,12 +262,22 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         (2, 'outdoors'),
     )
 
+    # Properties inherited from DittoItemModel:
+    #
+    # title         (CharField)
+    # permalink     (URLField)
+    # summary       (CharField)
+    # is_private    (BooleanField)
+    # fetch_time    (DateTimeField, UTC)
+    # post_time     (DateTimeField, UTC)
+    # latitude      (DecimalField)
+    # longitude     (DecimalField)
+    # raw           (TextField)
+
     user = models.ForeignKey('User')
 
     flickr_id = models.BigIntegerField(unique=True, db_index=True,
                                     help_text="ID of this photo on Flickr.")
-    # title is in DittoItemModel
-    # is_private is in DittoItemModel
     description = models.TextField(blank=True, help_text="Can contain HTML")
 
     secret = models.CharField(max_length=20)
@@ -285,7 +295,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     has_people = models.BooleanField(default=False,
                             help_text="Are there Flickr users in this photo?")
 
-    # post_time (in GMT) is in DittoItemModel
     last_update_time = models.DateTimeField(null=True, blank=True,
         help_text="The last time the photo, or any of its metadata (tags, comments, etc.) was modified on Flickr. UTC.")
     taken_time = models.DateTimeField(null=True, blank=True,
@@ -351,8 +360,6 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     geo_is_private = models.BooleanField(default=False, null=False, blank=False,
         help_text="If true, the Photo's location info should not be displayed.")
-
-    # latitude and longitude are in DittoItemModel
 
     # https://www.flickr.com/services/api/flickr.photos.search.html
     location_accuracy = models.PositiveSmallIntegerField(

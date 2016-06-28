@@ -393,6 +393,18 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     ditto_item_name = 'twitter_tweet'
 
+    # Properties inherited from DittoItemModel:
+    #
+    # title         (CharField)
+    # permalink     (URLField)
+    # summary       (CharField)
+    # is_private    (BooleanField)
+    # fetch_time    (DateTimeField, UTC)
+    # post_time     (DateTimeField, UTC)
+    # latitude      (DecimalField)
+    # longitude     (DecimalField)
+    # raw           (TextField)
+
     user = models.ForeignKey('User')
 
     text = models.TextField(null=False, blank=False)
