@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tweet',
             name='favorite_count',
-            field=models.PositiveIntegerField(default=b'', help_text=b'Approximately how many times this had been favorited when fetched', blank=True),
+            field=models.PositiveIntegerField(default=0, help_text=b'Approximately how many times this had been favorited when fetched', blank=True),
         ),
         migrations.AlterField(
             model_name='tweet',
             name='retweet_count',
-            field=models.PositiveIntegerField(default=b'', help_text=b'Number of times this had been retweeted when fetched', blank=True),
+            field=models.PositiveIntegerField(default=0, help_text=b'Number of times this had been retweeted when fetched', blank=True),
         ),
         migrations.AlterField(
             model_name='user',
