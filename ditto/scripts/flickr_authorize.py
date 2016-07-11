@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import flickrapi
-import webbrowser
 
 # Put your API Key and Secret here:
 api_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
@@ -17,9 +16,9 @@ if not flickr.token_valid(perms='read'):
     # Open a browser at the authentication URL. Do this however
     # you want, as long as the user visits that URL.
     authorize_url = flickr.auth_url(perms='read')
-    webbrowser.open_new_tab(authorize_url)
 
-    print("Authorize your Flickr account in your web browser.")
+    print("Open this URL in your web browser and, once you've signed in, and have agreed to authorization, you should get a code to type in:")
+    print(authorize_url)
 
     # Get the verifier code from the user. Do this however you
     # want, as long as the user gives the application the code.
