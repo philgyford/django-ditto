@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Flickr &mdash; Django Ditto 0.2.4 documentation</title>
+  <title>Flickr &mdash; Django Ditto 0.2.6 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.2.4 documentation" href="../index.html"/>
+    <link rel="top" title="Django Ditto 0.2.6 documentation" href="../index.html"/>
         <link rel="next" title="Pinboard" href="pinboard.html"/>
         <link rel="prev" title="Installation" href="../installation.html"/> 
 
@@ -185,9 +185,9 @@ it might be easier to <a class="reference external" href="https://github.com/phi
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">Follow the instructions. A new browser window should open for you to
-authorize your Flickr account. You&#8217;ll then get a code to paste into your
-Terminal.</p>
+<li><p class="first">Follow the instructions. You should get a URL to paste into a web browser,
+in order to authorize your Flickr account. You&#8217;ll then get a code to paste
+into your Terminal.</p>
 </li>
 </ol>
 <p>Finally, for each of those Accounts, note its ID from the Django admin, and run the following management command to fetch information about its associated Flickr <code class="docutils literal"><span class="pre">User</span></code> (replacing <code class="docutils literal"><span class="pre">1</span></code> with your <code class="docutils literal"><span class="pre">Account</span></code>&#8216;s Django ID, if different):</p>
@@ -338,10 +338,12 @@ Photos posted by the User with an <code class="docutils literal"><span class="pr
 </div>
 <div class="section" id="fetch-photos">
 <h3>Fetch Photos<a class="headerlink" href="#fetch-photos" title="Permalink to this headline">¶</a></h3>
-<p>Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos):</p>
+<p>Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>all
 </pre></div>
 </div>
+<p><strong>NOTE 1:</strong> This took about 75 minutes to fetch data for 3,000 photos on my MacBook.</p>
+<p><strong>NOTE 2:</strong> Trying to run the same thing on a 512MB Digital Ocean machine resulted in the process being killed after fetching about 1,500 photos. See <a class="reference external" href="https://github.com/philgyford/django-ditto/issues/148">this bug</a>.</p>
 <p>This will only fetch Photos uploaded in the past 3 days:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>3
 </pre></div>
@@ -467,7 +469,7 @@ Photos posted by the User with an <code class="docutils literal"><span class="pr
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.2.4',
+            VERSION:'0.2.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
