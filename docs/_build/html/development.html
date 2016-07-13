@@ -213,6 +213,12 @@ $ make html
 <h3>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h3>
 <p>Set version number in <cite>ditto/pkgmeta.py</cite>.</p>
 <p>Rebuild documentation (which includes the version number).</p>
+<p>Commit changes to git.</p>
+<p>Add a version tag:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ git tag -a v0.2.6 -m <span class="s2">&quot;My message&quot;</span>
+$ git push origin --tags
+</pre></div>
+</div>
 <p>Then, I think:</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ python setup.py sdist upload
 </pre></div>

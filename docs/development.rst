@@ -89,6 +89,15 @@ Set version number in `ditto/pkgmeta.py`.
 
 Rebuild documentation (which includes the version number).
 
+Commit changes to git.
+
+Add a version tag:
+
+.. code-block:: shell
+
+    $ git tag -a v0.2.6 -m "My message"
+    $ git push origin --tags
+
 Then, I think:
 
 .. code-block:: shell
