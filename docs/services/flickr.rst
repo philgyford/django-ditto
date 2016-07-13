@@ -23,9 +23,9 @@ By default this will only allow the fetching of fully public photos. To fetch al
 
         $ python ditto/scripts/flickr_authorize.py
 
-3. Follow the instructions. A new browser window should open for you to
-   authorize your Flickr account. You'll then get a code to paste into your
-   Terminal.
+3. Follow the instructions. You should get a URL to paste into a web browser,
+   in order to authorize your Flickr account. You'll then get a code to paste
+   into your Terminal.
 
 Finally, for each of those Accounts, note its ID from the Django admin, and run the following management command to fetch information about its associated Flickr ``User`` (replacing ``1`` with your ``Account``'s Django ID, if different):
 
@@ -218,11 +218,15 @@ Once the ``Account`` has been created in the Django admin, and its API credentia
 Fetch Photos
 ============
 
-Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts (for me it took about 75 minutes for 3,000 photos):
+Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts:
 
 .. code-block:: shell
 
     $ ./manage.py fetch_flickr_photos --days=all
+
+**NOTE 1:** This took about 75 minutes to fetch data for 3,000 photos on my MacBook.
+
+**NOTE 2:** Trying to run the same thing on a 512MB Digital Ocean machine resulted in the process being killed after fetching about 1,500 photos. See `this bug <https://github.com/philgyford/django-ditto/issues/148>`_.
 
 This will only fetch Photos uploaded in the past 3 days:
 

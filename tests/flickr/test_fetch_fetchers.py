@@ -57,8 +57,8 @@ class FetcherTestCase(FlickrFetchTestCase):
             result = Fetcher(account=None)
 
     @patch.object(Fetcher, '_fetch_extra')
-    @patch.object(Fetcher, '_fetch_page')
-    def test_returns_false_when_extra_data_fetching_fails(self, fetch_page, fetch_extra):
+    @patch.object(Fetcher, '_call_api')
+    def test_returns_false_when_extra_data_fetching_fails(self, call_api, fetch_extra):
         fetch_extra.side_effect = FetchError('Oh dear')
         account = AccountFactory(user=UserFactory(username='terry'),
                                             api_key='1234', api_secret='9876')
@@ -146,7 +146,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
 
     @responses.activate
     @patch.object(UserFetcher, '_fetch_and_save_avatar')
-    def test_makes_one_api_calls(self, fetch_avatar):
+    def test_makes_one_api_call(self, fetch_avatar):
         "Should call people.getInfo"
         self.add_response('people.getInfo')
         result = UserFetcher(account=self.account).fetch(
@@ -379,7 +379,9 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
             self.fetcher._call_api()
 
     @responses.activate
-    def test_fetches_multiple_pages(self):
+    @patch.object(PhotosFetcher, '_fetch_extra')
+    @patch.object(PhotoSaver, 'save_photo')
+    def test_fetches_multiple_pages(self, save_photo, fetch_extra):
         """If the response from the API says there's more than 1 page of
         results _fetch_pages() should fetch them all."""
         # Alter our default response fixture to set the number of pages to 3:
@@ -393,11 +395,11 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         self.add_response('people.getPhotos', body=body, querystring={'page': '3'})
 
         with patch('time.sleep'):
-            self.fetcher._fetch_pages()
+            results = self.fetcher.fetch(days='all')
 
             self.assertEqual(len(responses.calls), 3)
             # Our fixture has 3 photos, so we should now have 9:
-            self.assertEqual(len(self.fetcher.results), 9)
+            self.assertEqual(results['fetched'], 9)
 
     @patch.object(PhotosFetcher, '_fetch_pages')
     def test_calls_fetch_pages(self, fetch_pages):
@@ -457,8 +459,7 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
             self.fetcher._call_api()
 
     @responses.activate
-    @patch.object(PhotosetsFetcher, '_fetch_extra')
-    def test_fetches_multiple_pages(self, fetch_extra):
+    def test_fetches_multiple_pages(self):
         """If the response from the API says there's more than 1 page of
         results _fetch_pages() should fetch them all."""
         # Alter our default response fixture to set the number of pages to 3:
@@ -473,12 +474,23 @@ class PhotosetsFetcherTestCase(FlickrFetchTestCase):
         self.add_response(
                     'photosets.getList', body=body, querystring={'page': '3'})
 
-        with patch('time.sleep'):
-            self.fetcher._fetch_pages()
+        # We need to mock all the calls to fetch the photosets' photos too:
+        body_2 = json.dumps(self.load_fixture('photosets.getPhotos'))
+        self.add_response('photosets.getPhotos', body=body_2,
+                            querystring={'photoset_id':'72157665648859705'})
+        self.add_response('photosets.getPhotos', body=body_2,
+                            querystring={'photoset_id':'72157662491524213'})
+        self.add_response('photosets.getPhotos', body=body_2,
+                            querystring={'photoset_id':'72157645155015916'})
 
-            self.assertEqual(len(responses.calls), 3)
-            # Our fixture has 3 photosets, so we should now have 9:
-            self.assertEqual(len(self.fetcher.results), 9)
+        with patch('time.sleep'):
+            results = self.fetcher.fetch()
+
+            # 3 Photosets x 3 pages each, plus one getPhotos per photoset:
+            self.assertEqual(len(responses.calls), 12)
+            # Our fixture has 3 photosets, and we get 3 pages for each
+            # photoset, so we should now have 9:
+            self.assertEqual(results['fetched'], 9)
 
     @patch.object(PhotosetsFetcher, '_fetch_pages')
     @patch.object(PhotosetsFetcher, '_fetch_extra')

@@ -54,9 +54,6 @@ class Fetcher(object):
         # Will be the FlickrAPI object for calling the Flickr API.
         self.api = None
 
-        # Are the things we're fetching in (possibly) multiple pages?
-        self.is_paged = False
-
         # Will be incremented if we're fetching multiple pages.
         self.page_number = 1
 
@@ -96,30 +93,11 @@ class Fetcher(object):
             self.return_value['messages'] = ['Account has no API credentials']
 
     def fetch(self, **kwargs):
-        if self.is_paged:
-            self._fetch_pages(**kwargs)
-        else:
-            self._fetch_page(**kwargs)
+        self._fetch_pages(**kwargs)
 
         if self._not_failed():
-            # OK so far; get extra data, if any, before saving.
-            try:
-                self._fetch_extra()
-            except FetchError as e:
-                self.return_value['success'] = False
-                self.return_value['messages'] = [
-                                    'Error when fetching extra data: %s' % e]
-
-        if self._not_failed():
-            # Still OK; save the data we've got.
-            try:
-                self._save_results()
-                self.return_value['success'] = True
-                self.return_value['fetched'] += self.results_count
-            except FetchError as e:
-                self.return_value['success'] = False
-                self.return_value['messages'] = [
-                                            'Error when saving data: %s' % e]
+            self.return_value['success'] = True
+            self.return_value['fetched'] = self.results_count
 
         return self.return_value
 
@@ -141,6 +119,26 @@ class Fetcher(object):
             self.return_value['success'] = False
             self.return_value['messages'] = [
                                     'Error when calling Flickr API: %s' % e]
+            return
+
+        try:
+            self._fetch_extra()
+        except FetchError as e:
+            self.return_value['success'] = False
+            self.return_value['messages'] = [
+                                    'Error when fetching extra data: %s' % e]
+            return
+
+        try:
+            self._save_results()
+            # Clear for the next page:
+            self.results = []
+        except FetchError as e:
+            self.return_value['success'] = False
+            self.return_value['messages'] = ['Error when saving data: %s' % e]
+            return
+
+        return
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""
@@ -263,9 +261,6 @@ class PhotosFetcher(Fetcher):
 
         super().__init__(*args, **kwargs)
 
-        # Photos come in pages.
-        self.is_paged = True
-
     def _call_api(self):
         """
         Should call self.api.a_function() and set self.results with the results.
@@ -365,7 +360,7 @@ class PhotosFetcher(Fetcher):
         saver = PhotoSaver()
         for photo in self.results:
             p = saver.save_photo(photo)
-        self.results_count = len(self.results)
+        self.results_count += len(self.results)
 
 
 class RecentPhotosFetcher(PhotosFetcher):
@@ -412,18 +407,11 @@ class RecentPhotosFetcher(PhotosFetcher):
             # First time, set the total_pages there are to fetch.
             self.total_pages = int(results['photos']['pages'])
 
-
         # Add the list of photos' data from this page on to our total list:
         self.results += results['photos']['photo']
 
 
 class PhotosetsFetcher(Fetcher):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Photosets come in pages.
-        self.is_paged = True
 
     def _call_api(self):
         """Fetch one page of results.
@@ -445,7 +433,6 @@ class PhotosetsFetcher(Fetcher):
         if self.page_number == 1 and 'photosets' in results and 'pages' in results['photosets']:
             # First time, set the total_pages there are to fetch.
             self.total_pages = int(results['photosets']['pages'])
-
 
         # Add the list of photosets' data from this page on to our total list:
         self.results += results['photosets']['photoset']
@@ -513,5 +500,5 @@ class PhotosetsFetcher(Fetcher):
         saver = PhotosetSaver()
         for photoset in self.results:
             p = saver.save_photoset(photoset)
-        self.results_count = len(self.results)
+        self.results_count += len(self.results)
 
