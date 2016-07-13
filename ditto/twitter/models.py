@@ -115,7 +115,7 @@ class Media(TimeStampedModelMixin, models.Model):
         ('video', 'Video'),
     )
 
-    media_type = models.CharField(null=False, blank=False, max_length=8,
+    media_type = models.CharField(null=False, blank=False, max_length=12,
                                                         choices=MEDIA_TYPES)
 
     # A media item can belong to more than one tweet. Why?
