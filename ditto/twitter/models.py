@@ -576,7 +576,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         help_text="Username, eg, 'samuelpepys'")
     name = models.CharField(null=False, blank=False, max_length=30,
         help_text="eg, 'Samuel Pepys'")
-    url = models.URLField(null=False, blank=True, default='',
+    url = models.URLField(null=False, blank=True, default='', max_length=255,
         help_text="A URL provided by the user as part of their profile")
     # Inverse of Twitter's 'protected', to be similar to DittoItemModel:
     is_private = models.BooleanField(null=False, default=False,
