@@ -105,13 +105,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fetch-accounts">Fetch Accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#import-tweets">Import Tweets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#update-tweets">Update Tweets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fetch-tweets">Fetch Tweets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fetch-favorites">Fetch Favorites</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#update-users">Update Users</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fetch-files-media">Fetch Files (Media)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetch-accounts">Fetch Accounts</a></li>
 </ul>
 </li>
 </ul>
@@ -174,14 +174,11 @@
 <p>You can fetch, store and display data about your own Tweets and Liked Tweets for one or more <a class="reference external" href="https://twitter.com/">Twitter</a> accounts. By default the included models and templates will link to image and video files at Twitter, but you can also download the original files to store locally. These can then be used to serve different sizes of images locally. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
 <div class="section" id="set-up">
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
-<p>In the Django admin, add a new <code class="docutils literal"><span class="pre">Account</span></code> in the Twitter app, with your API credentials from <a class="reference external" href="https://apps.twitter.com/">https://apps.twitter.com/</a> .</p>
-<p>Then you <em>must</em> do:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
-</pre></div>
-</div>
-<p>which will fetch the data for that Account&#8217;s Twitter user. You&#8217;ll be able to see it in the Users section of the Twitter admin screens.</p>
-<p>Once this is done you&#8217;ll need to import a downloaded archive of Tweets, and/or
-fetch Tweets from the Twitter API. See <a class="reference internal" href="#twitter-management-commands"><span class="std std-ref">Management commands</span></a> below.</p>
+<p>Go to <a class="reference external" href="https://apps.twitter.com/">https://apps.twitter.com/</a> and create a new Application for your Twitter account. You can leave the &#8216;Callback URL&#8217; field empty.</p>
+<p>When viewing the Application Settings, click &#8216;manage keys and access tokens&#8217;.</p>
+<p>On the next screen click the &#8216;Create my access token&#8217; button.</p>
+<p>Now, go to the Django admin, and add a new <code class="docutils literal"><span class="pre">Account</span></code> in the Twitter app. Copy the Consumer Key, Consumer Secret, Access Token and Access Token Secret from Twitter into the Django admin (ignore the other fields), and save the account. A new <code class="docutils literal"><span class="pre">User</span></code> object will be created, reflecting the Twitter user your API credentials are associated with.</p>
+<p>Once this is done you&#8217;ll need to import a downloaded archive of Tweets, and/or fetch Tweets from the Twitter API. See <a class="reference internal" href="#twitter-management-commands"><span class="std std-ref">Management commands</span></a> below.</p>
 </div>
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
@@ -315,13 +312,6 @@ have been favorited/liked by any of the Users-with-Accounts. Again, <code class=
 </div>
 <div class="section" id="management-commands">
 <span id="twitter-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="fetch-accounts">
-<h3>Fetch Accounts<a class="headerlink" href="#fetch-accounts" title="Permalink to this headline">¶</a></h3>
-<p>This only needs to be used whenever a new <code class="docutils literal"><span class="pre">Account</span></code> is added to the system.  It fetches the <code class="docutils literal"><span class="pre">User</span></code> data for each <code class="docutils literal"><span class="pre">Account</span></code> that has API credentials, and associates the two objects.</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
-</pre></div>
-</div>
-</div>
 <div class="section" id="import-tweets">
 <h3>Import Tweets<a class="headerlink" href="#import-tweets" title="Permalink to this headline">¶</a></h3>
 <p>If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at <a class="reference external" href="https://twitter.com/settings/account">https://twitter.com/settings/account</a> . When you&#8217;ve downloaded it, do:</p>
@@ -438,6 +428,14 @@ calling <code class="docutils literal"><span class="pre">video_url</span></code>
 </pre></div>
 </div>
 <p>However, there&#8217;s no way to download actual videos that were uploaded to Twitter, and so Ditto will always try to use videos hosted on Twitter, no matter what the value of <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code>.</p>
+</div>
+<div class="section" id="fetch-accounts">
+<h3>Fetch Accounts<a class="headerlink" href="#fetch-accounts" title="Permalink to this headline">¶</a></h3>
+<p><strong>Deprecated:</strong> This only needs to be used whenever a new <code class="docutils literal"><span class="pre">Account</span></code> is added to the system.  It fetches the <code class="docutils literal"><span class="pre">User</span></code> data for each <code class="docutils literal"><span class="pre">Account</span></code> that has API credentials, and associates the two objects.</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
+</pre></div>
+</div>
+<p>I don&#8217;t think this is needed now.</p>
 </div>
 </div>
 </div>

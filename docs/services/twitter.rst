@@ -8,18 +8,16 @@ You can fetch, store and display data about your own Tweets and Liked Tweets for
 Set-up
 ******
 
-In the Django admin, add a new ``Account`` in the Twitter app, with your API credentials from https://apps.twitter.com/ .
+Go to https://apps.twitter.com/ and create a new Application for your Twitter account. You can leave the 'Callback URL' field empty.
 
-Then you *must* do:
+When viewing the Application Settings, click 'manage keys and access tokens'.
 
-.. code-block:: shell
+On the next screen click the 'Create my access token' button.
 
-    $ ./manage.py fetch_twitter_accounts
+Now, go to the Django admin, and add a new ``Account`` in the Twitter app. Copy the Consumer Key, Consumer Secret, Access Token and Access Token Secret from Twitter into the Django admin (ignore the other fields), and save the account. A new ``User`` object will be created, reflecting the Twitter user your API credentials are associated with.
 
-which will fetch the data for that Account's Twitter user. You'll be able to see it in the Users section of the Twitter admin screens.
+Once this is done you'll need to import a downloaded archive of Tweets, and/or fetch Tweets from the Twitter API. See :ref:`twitter-management-commands` below.
 
-Once this is done you'll need to import a downloaded archive of Tweets, and/or
-fetch Tweets from the Twitter API. See :ref:`twitter-management-commands` below.
 
 ******
 Models
@@ -193,14 +191,6 @@ Again, we can restrict this to Tweets favorited by a single User-with-an-Account
 Management commands
 *******************
 
-Fetch Accounts
-==============
-
-This only needs to be used whenever a new ``Account`` is added to the system.  It fetches the ``User`` data for each ``Account`` that has API credentials, and associates the two objects.
-
-.. code-block:: shell
-
-    $ ./manage.py fetch_twitter_accounts
 
 Import Tweets
 =============
@@ -364,4 +354,15 @@ calling ``video_url`` would return a URL like:
 
 However, there's no way to download actual videos that were uploaded to Twitter, and so Ditto will always try to use videos hosted on Twitter, no matter what the value of ``DITTO_TWITTER_USE_LOCAL_MEDIA``.
 
+
+Fetch Accounts
+==============
+
+**Deprecated:** This only needs to be used whenever a new ``Account`` is added to the system.  It fetches the ``User`` data for each ``Account`` that has API credentials, and associates the two objects.
+
+.. code-block:: shell
+
+    $ ./manage.py fetch_twitter_accounts
+
+I don't think this is needed now.
 
