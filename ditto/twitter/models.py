@@ -155,7 +155,7 @@ class Media(TimeStampedModelMixin, models.Model):
     xmpeg_url = models.URLField(null=False, blank=True,
                             verbose_name='X-MPEG URL (HLS, .m3u8, streaming')
 
-    aspect_ratio = models.CharField(null=False, blank=True, max_length=5,
+    aspect_ratio = models.CharField(null=False, blank=True, max_length=21,
                                             help_text='eg, "4:3" or "16:9"')
     duration = models.PositiveIntegerField(null=True, blank=True,
                                                 help_text="In milliseconds")
