@@ -259,14 +259,18 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         "Fetches subsequent pages until enough counted tweets are returned."
         qs = {'user_id': self.account_1.user.twitter_id,
                                         'include_rts': 'true', 'count': 200}
-        # Return "[{id:1}, {id:1}, {id:1}...]" and patch _save_results() as
-        # we're only interested in how many times we ask for more results.
-        body = json.dumps([{'id':1} for x in range(200)])
+        # Return "[{id:999}, {id:998}, {id:997},...]" and patch _save_results()
+        # as we're only interested in how many times we ask for more results.
+        body = json.dumps([{'id':x} for x in reversed(range(800,1000))])
 
         # We're going to request 3 x 200 Tweets and then...
-        for n in range(3):
-            self.add_response(body=body, querystring=qs, match_querystring=True)
-        # ... 1 x 100 Tweets = 700 Tweets.
+        # ...1 x 100 Tweets = 700 Tweets.
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 799
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 599
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 399
         qs['count'] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
@@ -275,6 +279,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
                 result = RecentTweetsFetcher(screen_name='jill').fetch(
                                                                     count=700)
                 self.assertEqual(4, len(responses.calls))
+
 
 
 class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
@@ -439,14 +444,18 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     def test_fetches_multiple_pages_for_count(self):
         "Fetches subsequent pages until enough counted tweets are returned."
         qs = {'user_id': self.account_1.user.twitter_id, 'count': 200}
-        # Return "[{id:1}, {id:1}, {id:1}...]" and patch _save_results() as
-        # we're only interested in how many times we ask for more results.
-        body = json.dumps([{'id':1} for x in range(200)])
+        # Return "[{id:999}, {id:998}, {id:997},...]" and patch _save_results()
+        # as we're only interested in how many times we ask for more results.
+        body = json.dumps([{'id':x} for x in reversed(range(800,1000))])
 
         # We're going to request 3 x 200 Tweets and then...
-        for n in range(3):
-            self.add_response(body=body, querystring=qs, match_querystring=True)
-        # ... 1 x 100 Tweets = 700 Tweets.
+        # ...1 x 100 Tweets = 700 Tweets.
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 799
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 599
+        self.add_response(body=body, querystring=qs, match_querystring=True)
+        qs['max_id'] = 399
         qs['count'] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 

@@ -325,10 +325,10 @@ class FetchNewTweets(Fetch):
         if self.last_id is None:
             self.last_id = self.results[0]['id']
 
-        if self.fetch_type == 'new':
-            # The max_id for the next 'page' of tweets:
-            self.max_id = self.results[-1]['id'] - 1
-        elif self.fetch_type == 'number':
+        # The max_id for the next 'page' of tweets:
+        self.max_id = self.results[-1]['id'] - 1
+
+        if self.fetch_type == 'number':
             self.remaining_to_fetch -= len(self.results)
 
         self.results_count += len(self.results)
