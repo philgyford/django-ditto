@@ -91,6 +91,8 @@ class DittoViewTests(TestCase):
                 'ditto.flickr': False,
                 'ditto.pinboard': True,
                 'ditto.twitter': True,
+                # Without this Django 1.10 throws an error for some reason:
+                'django.contrib.staticfiles': True,
             }[x]
             response = self.client.get(reverse('ditto:home'))
             self.assertFalse('flickr_photo_list' in response.context)
@@ -103,6 +105,8 @@ class DittoViewTests(TestCase):
                 'ditto.flickr': True,
                 'ditto.pinboard': False,
                 'ditto.twitter': True,
+                # Without this Django 1.10 throws an error for some reason:
+                'django.contrib.staticfiles': True,
             }[x]
             response = self.client.get(reverse('ditto:home'))
             self.assertFalse('pinboard_bookmark_list' in response.context)
@@ -115,6 +119,8 @@ class DittoViewTests(TestCase):
                 'ditto.flickr': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': False,
+                # Without this Django 1.10 throws an error for some reason:
+                'django.contrib.staticfiles': True,
             }[x]
             response = self.client.get(reverse('ditto:home'))
             self.assertFalse('twitter_tweet_list' in response.context)

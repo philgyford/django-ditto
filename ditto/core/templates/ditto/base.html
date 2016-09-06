@@ -6,7 +6,7 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>{% block head_title %}{% block title %}{% endblock %} ({% block head_site_title %}Ditto{% endblock %}){% endblock %}</title>
 
-        {% load staticfiles %}
+        {% load static %}
         <link rel="stylesheet" href="{% static "bootstrap.css" %}">
 
         {% block head_extra %}
