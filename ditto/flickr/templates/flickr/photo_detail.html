@@ -43,9 +43,9 @@
             {% endif %}
 
             {% if photo.description %}
-                <p class="flickr-photo-description m-b-3">
-                    {{ photo.description|safe }}
-                </p>
+                <div class="flickr-photo-description m-b-2">
+                    {{ photo.description|safe|linebreaks }}
+                </div>
             {% endif %}
 
             {% load ditto_flickr %}
