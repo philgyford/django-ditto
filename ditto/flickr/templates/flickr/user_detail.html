@@ -1,9 +1,9 @@
 {% extends 'flickr/base.html' %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:home' %}">Home</a></li>
-    <li><a href="{% url 'flickr:home' %}">Flickr</a></li>
-    <li class="active">{{ flickr_user }}</li>
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'flickr:home' %}">Flickr</a></li>
+    <li class="breadcrumb-item active">{{ flickr_user }}</li>
 {% endblock %}
 
 {% block content %}

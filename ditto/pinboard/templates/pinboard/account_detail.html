@@ -1,9 +1,9 @@
 {% extends 'pinboard/base.html' %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:home' %}">Home</a></li>
-    <li><a href="{% url 'pinboard:home' %}">Pinboard</a></li>
-    <li class="active">{{ account.username }}</li>
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'pinboard:home' %}">Pinboard</a></li>
+    <li class="breadcrumb-item active">{{ account.username }}</li>
 {% endblock %}
 
 {% block content %}

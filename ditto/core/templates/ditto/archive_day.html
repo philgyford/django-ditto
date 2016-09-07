@@ -1,8 +1,8 @@
 {% extends 'ditto/base.html' %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:home' %}">Home</a></li>
-    <li class="active">{{ day|date:'j M Y' }}</li>
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item active">{{ day|date:'j M Y' }}</li>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +15,7 @@
     {% include 'ditto/includes/pager.html' with next=next_day previous=previous_day ditto_app_slug=ditto_app_slug ditto_variety_slug=ditto_variety_slug only %}
 
     <div class="row">
-        <div class="col-md-3 m-t-3 m-b-2">
+        <div class="col-md-3">
             {% include 'ditto/includes/variety_nav.html' with variety_counts=variety_counts ditto_app_name=ditto_app_name ditto_variety_name=ditto_variety_name day=day only %}
         </div> <!-- .col -->
 

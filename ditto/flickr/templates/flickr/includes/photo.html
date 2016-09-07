@@ -19,7 +19,7 @@ photo - A Photo object.
     <h3 class="media-heading h6 flickr-photo-title">
         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
     </h3>
-    <p class="m-b-0 flickr-photo-summary">{{ photo.summary }}</p>
+	<p class="m-b-0 flickr-photo-summary">{{ photo.summary|safe }}</p>
     <p class="flickr-photo-muted">
         <small class="text-muted">
             Uploaded by <a href="{% url 'flickr:user_detail' nsid=photo.user.nsid %}" title="More photos by this person">{{ photo.user.name }}</a> at {% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}

@@ -6,8 +6,8 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>{% block head_title %}{% block title %}{% endblock %} ({% block head_site_title %}Ditto{% endblock %}){% endblock %}</title>
 
-        {% load staticfiles %}
-        <link rel="stylesheet" href="{% static "bootstrap.css" %}">
+        {% load static %}
+        <link rel="stylesheet" href="{% static "bootstrap.min.css" %}">
 
         {% block head_extra %}
             {# Use this if you need to more to the <head> of every page. #}
@@ -22,8 +22,11 @@
                         Ditto
                     {% endblock %}
                 </a>
-                {% if enabled_apps %}
-                    <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav">
+                    {% block navbar_list_start %}
+                    {% endblock %}
+
+                    {% if enabled_apps %}
                         {% for app in enabled_apps %}
                             {% if app == 'pinboard' %}
                                 <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
@@ -45,8 +48,11 @@
                                 </li>
                             {% endif %}
                         {% endfor %}
-                    </ul>
-                {% endif %}
+                    {% endif %}
+
+                    {% block navbar_list_end %}
+                    {% endblock %}
+                </ul>
             </div>
         </nav>
 

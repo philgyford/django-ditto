@@ -198,8 +198,10 @@ class PhotoSaver(SaveUtilsMixin, object):
             defaults['longitude']           = loc['longitude']
             defaults['location_accuracy']   = loc['accuracy']
             defaults['location_context']    = loc['context']
-            defaults['location_place_id']   = loc['place_id']
-            defaults['location_woeid']      = loc['woeid']
+            if 'place_id' in loc:
+                defaults['location_place_id']   = loc['place_id']
+            if 'woeid' in loc:
+                defaults['location_woeid']      = loc['woeid']
             if 'locality' in loc:
                 defaults['locality_name']       = loc['locality']['_content']
                 defaults['locality_place_id']   = loc['locality']['place_id']

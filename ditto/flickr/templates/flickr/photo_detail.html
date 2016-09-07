@@ -1,10 +1,10 @@
 {% extends 'flickr/base.html' %}
 
 {% block breadcrumbs %}
-    <li><a href="{% url 'ditto:home' %}">Home</a></li>
-    <li><a href="{% url 'flickr:home' %}">Flickr</a></li>
-    <li><a href="{% url 'flickr:user_detail' nsid=flickr_user.nsid %}">{{ flickr_user }}</a></li>
-    <li class="active">Photo</li>
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'flickr:home' %}">Flickr</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'flickr:user_detail' nsid=flickr_user.nsid %}">{{ flickr_user }}</a></li>
+    <li class="breadcrumb-item active">Photo</li>
 {% endblock %}
 
 {% block content %}
@@ -43,9 +43,9 @@
             {% endif %}
 
             {% if photo.description %}
-                <p class="flickr-photo-description m-b-3">
-                    {{ photo.description|safe }}
-                </p>
+                <div class="flickr-photo-description m-b-2">
+                    {{ photo.description|safe|linebreaks }}
+                </div>
             {% endif %}
 
             {% load ditto_flickr %}
