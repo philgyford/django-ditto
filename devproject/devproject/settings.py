@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'taggit',
     'ditto.core',
     'ditto.flickr',
+    'ditto.lastfm',
     'ditto.pinboard',
     'ditto.twitter',
 )
