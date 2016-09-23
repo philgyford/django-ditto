@@ -1,0 +1,266 @@
+import calendar
+from datetime import datetime, timedelta
+import json
+import pytz
+import requests
+import time
+import urllib
+
+from .models import Account, Album, Artist, Scrobble, Track
+from ..core.utils import datetime_now
+
+
+LASTFM_API_ENDPOINT = 'http://ws.audioscrobbler.com/2.0/'
+
+
+class FetchError(Exception):
+    pass
+
+
+class ScrobblesFetcher(object):
+    """
+    Fetches scrobbles from the API for one Account.
+
+    Use like one of:
+        fetcher = ScrobblesFetcher(account)
+
+    And then one of these ('recent' is the default):
+        results = fetcher.fetch(fetch_type='recent')
+        results = fetcher.fetch(fetch_type='all')
+        results = fetcher.fetch(fetch_type='days', days=3)
+    """
+    # How many scrobbles do we fetch per page of results?
+    items_per_page = 200
+
+    def __init__(self, account):
+
+        # Will be an Account object, passed into init()
+        self.account = None
+
+        # We'll set this to a datetime if we're fetching scrobbles since x.
+        self.min_datetime = None
+
+        self.page_number = 1
+
+        self.total_pages = 1
+
+        self.results_count = 0
+
+        # What we'll return:
+        self.return_value = {'fetched': 0}
+
+        if isinstance(account, Account):
+            self.return_value['account'] = str(account)
+        else:
+            raise ValueError("An Account object is required")
+
+        if account.has_credentials():
+            self.account = account
+        else:
+            self.return_value['success'] = False
+            self.return_value['messages'] = ['Account has no API credentials']
+
+    def fetch(self, fetch_type='recent', days=None):
+        """
+        Fetch and save scrobbles.
+
+        Keyword arguments:
+        fetch_type -- 'all', 'days' or 'recent'. The latter will fetch
+                      scrobbles since the most recent Scrobble we already have.
+        days -- if fetch_type is 'days', this should be an integer.
+
+        Returns a dict like:
+            {'success': True, 'account': 'gyford', 'fetched': 47,}
+        Or:
+            {'success': False, 'account': 'gyford', 'messages': ['Oops..',],}
+        """
+
+        if self.account and self.account.is_active == False:
+            self.return_value['success'] = False
+            self.return_value['messages'] = [
+                    'The Account %s is currently marked as inactive.' %\
+                                                        self.account.username]
+            return self.return_value
+
+        valid_fetch_types = ['all', 'days', 'recent']
+        if fetch_type not in valid_fetch_types:
+            raise ValueError('fetch_type should be one of %s' %\
+                                                ', '.join(valid_fetch_types))
+
+        if fetch_type == 'days':
+            try:
+                test = days + 1
+            except TypeError:
+                raise ValueError('days argument should be an integer')
+
+            self.min_datetime = datetime_now() - timedelta(days=days)
+
+        elif fetch_type == 'recent':
+            try:
+                scrobble = Scrobble.objects.latest('post_time')
+                self.min_datetime = scrobble.post_time
+            except Scrobble.DoesNotExist:
+                pass
+
+        self._fetch_pages()
+
+        if self._not_failed():
+            self.return_value['success'] = True
+            self.return_value['fetched'] = self.results_count
+
+        return self.return_value
+
+    def _fetch_pages(self):
+        while self.page_number <= self.total_pages and self._not_failed():
+            self._fetch_page()
+            self.page_number += 1
+            time.sleep(0.5) # Being nice.
+
+    def _fetch_page(self):
+        """
+        Fetch a single page of results.
+        Uses the value of self.page_number.
+        """
+        fetch_time = datetime_now()
+
+        try:
+            results = self._send_request()
+        except FetchError as e:
+            self.return_value['success'] = False
+            self.return_value['messages'] = [str(e)]
+            return
+
+        for scrobble in results:
+            if 'date' in scrobble:
+                # Don't save nowplaying scrobbles, that have no 'date'.
+                self._save_scrobble(scrobble, fetch_time)
+                self.results_count += 1
+
+        return
+
+    def _not_failed(self):
+        """Has everything gone smoothly so far? ie, no failure registered?"""
+        if 'success' not in self.return_value or self.return_value['success'] == True:
+            return True
+        else:
+            return False
+
+    def _api_method(self):
+        "The name of the API method."
+        return 'user.getrecenttracks'
+
+    def _api_args(self):
+        "Returns a dict of args for the API call."
+        args = {
+            'user':     self.account.username,
+            'api_key':  self.account.api_key,
+            'format':   'json',
+            'method':   self._api_method(),
+            'page':     self.page_number,
+            'limit':    self.items_per_page,
+        }
+
+        if self.min_datetime:
+            # Turn our datetime object into a unix timestamp:
+            args['from'] = calendar.timegm(self.min_datetime.timetuple())
+
+        return args
+
+    def _send_request(self):
+        """
+        Send a request to the API.
+
+        Raises FetchError if something goes wrong.
+        Returns a list of results if all goes well.
+        """
+        query_string = urllib.parse.urlencode(self._api_args())
+
+        url = "{}?{}".format(LASTFM_API_ENDPOINT, query_string)
+
+        try:
+            response = requests.get(url,
+                        headers={'User-Agent': 'Mozilla/5.0 (Django Ditto)'})
+            response.raise_for_status() # Raises an exception on HTTP error.
+        except requests.exceptions.RequestException as e:
+            raise FetchError(
+                    "Error when fetching Scrobbles (page %s): %s" % \
+                                                        (self.page_number, e))
+
+        results = json.loads(response.text)
+
+        if 'error' in results:
+            raise FetchError(
+                    "Error %s when fetching Scrobbles (page %s): %s" % \
+                    (results['error'], self.page_number, results['message'])
+                )
+
+        # Set total number of pages first time round:
+        attr = results['recenttracks']['@attr']
+        if self.page_number == 1 and 'totalPages' in attr:
+            self.total_pages = int(attr['totalPages'])
+
+        return results['recenttracks']['track']
+
+    def _save_scrobble(self, scrobble, fetch_time):
+        """
+        Saves/updates a scrobble.
+
+        Arguments:
+        scrobble -- A dict of data from the Last.fm API.
+        fetch_time -- Datetime of when the data was fetched.
+        """
+
+        artist, created = Artist.objects.update_or_create(
+            name=scrobble['artist']['#text'],
+            mbid=scrobble['artist']['mbid'] # Might be "".
+        )
+
+        track, created = Track.objects.update_or_create(
+            name=scrobble['name'],
+            mbid=scrobble['mbid'], # Might be "".
+            artist=artist
+        )
+
+        if scrobble['album']['#text'] == '':
+            album = None
+        else:
+            album, created = Album.objects.update_or_create(
+                name=scrobble['album']['#text'],
+                mbid=scrobble['album']['mbid'], # Might be "".
+                artist=artist
+            )
+
+        # Prepare scrobble.
+
+        defaults = {
+            'artist':       artist,
+            'artist_name':  artist.name,
+            'artist_mbid':  artist.mbid,
+            'track_name':   track.name,
+            'track_mbid':   track.mbid,
+            'raw':          json.dumps(scrobble),
+            'fetch_time':   fetch_time,
+            'album':        album,
+        }
+
+        if album is None:
+            defaults['album_name'] = ''
+            defaults['album_mbid'] = ''
+        else:
+            defaults['album_name'] = album.name
+            defaults['album_mbid'] = album.mbid
+
+        # Unixtime to datetime object:
+        scrobble_time = datetime.utcfromtimestamp(
+                            int(scrobble['date']['uts'])
+                        ).replace(tzinfo=pytz.utc)
+
+        scrobble_obj, created = Scrobble.objects.update_or_create(
+            account=self.account,
+            track=track,
+            post_time=scrobble_time,
+            defaults=defaults
+        )
+
+        return scrobble_obj
+
