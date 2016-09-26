@@ -264,3 +264,55 @@ class ScrobblesFetcher(object):
 
         return scrobble_obj
 
+
+class ScrobblesMultiAccountFetcher(object):
+    """
+    For fetching Scrobbles for ALL or ONE account(s).
+
+    Usage example:
+        results = ScrobblesMultiAccountFetcher().fetch(fetch_type='recent')
+
+    Or:
+        results = ScrobblesMultiAccountFetcher(username='bob').fetch(fetch_type='recent')
+
+    results will be a list of dicts containing info about what was fetched (or
+    went wrong) for each account.
+    """
+
+    # Will be a list of Account objects.
+    accounts = []
+
+    def __init__(self, username=None):
+        """
+        Gets all of the Accounts, or the single Account specified.
+
+        username -- If username is set, we only use that Account, if active.
+                    If it's not set, we use all active Accounts.
+        """
+        self.return_value = []
+
+        if username is None:
+            # Get all active Accounts.
+            self.accounts = list(Account.objects.filter(is_active=True))
+            if len(self.accounts) == 0:
+                raise FetchError("No active Accounts were found to fetch.")
+        else:
+            # Find the Account associated with username.
+            try:
+                account = Account.objects.get(username=username)
+            except Account.DoesNotExist:
+                raise FetchError(
+                    "There is no Account with the username '%s'" % username)
+            if account.is_active == False:
+                raise FetchError(
+                    "The Account with the username '%s' is marked as inactive." % username)
+            self.accounts = [account]
+
+    def fetch(self, **kwargs):
+        for account in self.accounts:
+            self.return_value.append(
+                ScrobblesFetcher(account).fetch(**kwargs)
+            )
+
+        return self.return_value
+

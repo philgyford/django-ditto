@@ -1,7 +1,7 @@
 import datetime
 import json
 import pytz
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import responses
 from django.test import TestCase
@@ -10,7 +10,8 @@ from freezegun import freeze_time
 from ditto.core.utils import datetime_now
 from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
     ArtistFactory, ScrobbleFactory, TrackFactory
-from ditto.lastfm.fetch import FetchError, ScrobblesFetcher
+from ditto.lastfm.fetch import FetchError, ScrobblesFetcher,\
+    ScrobblesMultiAccountFetcher
 from ditto.lastfm.models import Album, Artist, Scrobble, Track
 
 
@@ -418,4 +419,86 @@ class ScrobblesFetcherSendTestCase(TestCase):
         self.assertEqual(scrobble.album, None)
         self.assertEqual(scrobble.album_name, '')
         self.assertEqual(scrobble.album_mbid, '')
+
+
+class ScrobblesMultiAccountFetcherTestCase(TestCase):
+    """
+    Testing the MultiAccount version by completely patching the standard
+    Fetcher that it calls.
+    """
+
+    def setUp(self):
+        self.account_1 = AccountFactory(api_key='1234', username='bob')
+        self.inactive_account = AccountFactory(api_key='2345', username='terry',
+                                                            is_active=False)
+        self.account_2 = AccountFactory(api_key='3456', username='thelma')
+
+        self.ScrobblesFetcher_patch = patch(
+                                        'ditto.lastfm.fetch.ScrobblesFetcher')
+        self.ScrobblesFetcher = self.ScrobblesFetcher_patch.start()
+
+    def tearDown(self):
+        self.ScrobblesFetcher_patch.stop()
+
+    def test_uses_all_active_accounts_by_default(self):
+        ScrobblesMultiAccountFetcher().fetch()
+        self.ScrobblesFetcher.assert_has_calls([
+            call(self.account_1),
+            call().fetch(),
+            call(self.account_2),
+            call().fetch(),
+        ])
+
+    def test_uses_one_account(self):
+        "If an account is supplied, only uses that."
+        ScrobblesMultiAccountFetcher(username='thelma').fetch()
+        self.ScrobblesFetcher.assert_has_calls([
+            call(self.account_2),
+            call().fetch(),
+        ])
+
+    def test_passes_kwargs_to_fetch(self):
+        "Passes kwargs to the ScrobbleFetcher.fetch() method"
+        ScrobblesMultiAccountFetcher(username='bob').fetch(
+                                                    fetch_type='days', days=3)
+        self.ScrobblesFetcher.assert_has_calls([
+            call(self.account_1),
+            call().fetch(fetch_type='days', days=3),
+        ])
+
+    def test_raises_error_if_no_accounts_are_active(self):
+        self.account_1.is_active = False
+        self.account_1.save()
+        self.account_2.is_active = False
+        self.account_2.save()
+        with self.assertRaises(FetchError):
+            ScrobblesMultiAccountFetcher().fetch()
+
+    def test_raises_error_if_supplied_account_does_not_exist(self):
+        with self.assertRaises(FetchError):
+            ScrobblesMultiAccountFetcher(username='audrey').fetch()
+
+    def test_raises_error_if_supplied_account_is_inactive(self):
+        with self.assertRaises(FetchError):
+            ScrobblesMultiAccountFetcher(username='terry').fetch()
+
+
+class ScrobblesMultiAccountFetcherResultsTestCase(TestCase):
+    """
+    Testing the return value from ScrobblesMultiAccountFetcher().fetch()
+    and only need to patch ScrobblesFetcher().fetch().
+    """
+    def setUp(self):
+        self.account_1 = AccountFactory(api_key='1234', username='bob')
+        self.account_2 = AccountFactory(api_key='3456', username='thelma')
+
+    @patch.object(ScrobblesFetcher, 'fetch')
+    def test_return_value(self, fetch):
+        "Return should be a list of return values from ScrobbleFetcher.fetch()"
+        ret = {'success': True, 'account': 'bob', 'fetched': 7,}
+        fetch.side_effect = [ret, ret,]
+
+        results = ScrobblesMultiAccountFetcher().fetch()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['account'], 'bob')
 
