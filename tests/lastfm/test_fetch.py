@@ -205,7 +205,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         body['recenttracks']['@attr']['totalPages'] = "2"
         self.add_recent_tracks_response(body=json.dumps(body))
         body['recenttracks']['@attr']['page'] = "2"
-        self.add_recent_tracks_response(body=json.dumps(body))
+        self.add_recent_tracks_response(body=json.dumps(body), page=2)
         self.fetcher.fetch()
         self.assertEqual(len(responses.calls), 2)
         self.assertIn('page=1', responses.calls[0].request.url)

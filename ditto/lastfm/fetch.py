@@ -184,7 +184,7 @@ class ScrobblesFetcher(object):
         except requests.exceptions.RequestException as e:
             raise FetchError(
                     "Error when fetching Scrobbles (page %s): %s" % \
-                                                        (self.page_number, e))
+                                                    (self.page_number, str(e)))
 
         results = json.loads(response.text)
 
