@@ -29,8 +29,11 @@ class AccountTestCase(TestCase):
 
     def test_permalink(self):
         account = AccountFactory(username='gyford')
-        self.assertEqual(account.permalink,
-                        'http://www.last.fm/user/gyford')
+        self.assertEqual(account.permalink, 'http://last.fm/user/gyford')
+
+    def test_absolute_url(self):
+        account = AccountFactory(username='gyford')
+        self.assertEqual(account.get_absolute_url(), '/lastfm/gyford/')
 
 
 class AlbumTestCase(TestCase):
@@ -46,6 +49,23 @@ class AlbumTestCase(TestCase):
         self.assertEqual(albums[0], album_2)
         self.assertEqual(albums[1], album_1)
 
+    def test_url_mbid(self):
+        mbid = '65497352-51ea-40a6-b1f0-1bdff6750369'
+        album = AlbumFactory(mbid=mbid)
+        self.assertEqual(album.get_absolute_url(),
+                        '/lastfm/album/%s/' % mbid)
+
+    def test_url_no_mbid(self):
+        album = AlbumFactory(mbid='')
+        self.assertEqual(album.get_absolute_url(),
+                        '/lastfm/album/%s/' % album.id)
+
+    def test_permalink(self):
+        artist = ArtistFactory(name='Life Without Buildings')
+        album = AlbumFactory(name='Any Other City', artist=artist)
+        self.assertEqual(album.permalink,
+                'http://last.fm/music/Life+Without+Buildings/Any+Other+City')
+
 
 class ArtistTestCase(TestCase):
 
@@ -59,6 +79,36 @@ class ArtistTestCase(TestCase):
         artists = Artist.objects.all()
         self.assertEqual(artists[0], artist_2)
         self.assertEqual(artists[1], artist_1)
+
+    def test_url_mbid(self):
+        mbid = '80fe34d0-6b4f-4ccd-81c3-281ab37f0451'
+        artist = ArtistFactory(mbid=mbid)
+        self.assertEqual(artist.get_absolute_url(),
+                        '/lastfm/artist/%s/' % mbid)
+
+    def test_url_no_mbid(self):
+        artist = ArtistFactory(mbid='')
+        self.assertEqual(artist.get_absolute_url(),
+                        '/lastfm/artist/%s/' % artist.id)
+
+    def test_permalink(self):
+        artist = ArtistFactory(name="Tom Waits")
+        self.assertEqual(artist.permalink, 'http://last.fm/music/Tom+Waits')
+
+    def test_permalink_2(self):
+        artist = ArtistFactory(name="/ # ? [ ] ' + ; %")
+        self.assertEqual(artist.permalink,
+                'http://last.fm/music/%2F+%2316+%3F+%5B+%5D+%27+%252B+%3B+%25')
+
+    def test_permalink_3(self):
+        artist = ArtistFactory(name='" < > \ ^ ` { | }')
+        self.assertEqual(artist.permalink,
+                'http://last.fm/music/%22+%3C+%3E+%5C%5C+%5E+%60+%7B+%7C+%7D')
+
+    def test_permalink_4(self):
+        "Things which don't get quoted."
+        artist = ArtistFactory(name=', . & ! ( )')
+        self.assertEqual(artist.permalink, 'http://last.fm/music/,+.+&+!+(+)')
 
 
 class ScrobbleTestCase(TestCase):
@@ -101,6 +151,48 @@ class ScrobbleTestCase(TestCase):
         scrobble = ScrobbleFactory(post_time=post_time)
         self.assertEqual(scrobble.summary, '2016-04-07 12:00:00+00:00')
 
+    def test_url_album_with_mbid(self):
+        mbid = '65497352-51ea-40a6-b1f0-1bdff6750369'
+        album = AlbumFactory(mbid=mbid)
+        scrobble = ScrobbleFactory(album=album, album_mbid=mbid)
+        self.assertEqual(scrobble.get_absolute_url_album(),
+                        '/lastfm/album/%s/' % mbid)
+
+    def test_url_album_with_no_mbid(self):
+        "Should use the Album's Django ID."
+        album = AlbumFactory(mbid='')
+        scrobble = ScrobbleFactory(album=album, album_mbid='')
+        self.assertEqual(scrobble.get_absolute_url_album(),
+                        '/lastfm/album/%s/' % album.id)
+
+    def test_url_artist_with_mbid(self):
+        mbid = '80fe34d0-6b4f-4ccd-81c3-281ab37f0451'
+        artist = ArtistFactory(mbid=mbid)
+        scrobble = ScrobbleFactory(artist=artist, artist_mbid=mbid)
+        self.assertEqual(scrobble.get_absolute_url_artist(),
+                        '/lastfm/artist/%s/' % mbid)
+
+    def test_url_artist_with_no_mbid(self):
+        "Should use the Artist's Django ID."
+        artist = ArtistFactory(mbid='')
+        scrobble = ScrobbleFactory(artist=artist, artist_mbid='')
+        self.assertEqual(scrobble.get_absolute_url_artist(),
+                        '/lastfm/artist/%s/' % artist.id)
+
+    def test_url_track_with_mbid(self):
+        mbid = '330fd2ed-785e-473a-bd9b-ab0b109029c8'
+        track = TrackFactory(mbid=mbid)
+        scrobble = ScrobbleFactory(track=track, track_mbid=mbid)
+        self.assertEqual(scrobble.get_absolute_url_track(),
+                        '/lastfm/track/%s/' % mbid)
+
+    def test_url_track_with_no_mbid(self):
+        "Should use the Track's Django ID."
+        track = TrackFactory(mbid='')
+        scrobble = ScrobbleFactory(track=track, track_mbid='')
+        self.assertEqual(scrobble.get_absolute_url_track(),
+                        '/lastfm/track/%s/' % track.id)
+
 
 class TrackTestCase(TestCase):
 
@@ -115,4 +207,19 @@ class TrackTestCase(TestCase):
         self.assertEqual(tracks[0], track_2)
         self.assertEqual(tracks[1], track_1)
 
+    def test_url_mbid(self):
+        mbid = '330fd2ed-785e-473a-bd9b-ab0b109029c8'
+        track = TrackFactory(mbid=mbid)
+        self.assertEqual(track.get_absolute_url(),
+                        '/lastfm/track/%s/' % mbid)
 
+    def test_url_no_mbid(self):
+        track = TrackFactory(mbid='')
+        self.assertEqual(track.get_absolute_url(),
+                        '/lastfm/track/%s/' % track.id)
+
+    def test_permalink(self):
+        artist = ArtistFactory(name='Death Cab for Cutie')
+        track = TrackFactory(name='A Lack of Color', artist=artist)
+        self.assertEqual(track.permalink,
+                'http://last.fm/music/Death+Cab+for+Cutie/_/A+Lack+of+Color')

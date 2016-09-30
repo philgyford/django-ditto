@@ -28,7 +28,19 @@
 
                     {% if enabled_apps %}
                         {% for app in enabled_apps %}
-                            {% if app == 'pinboard' %}
+                            {% if app == 'flickr' %}
+                                <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
+                                    <a class="nav-link" href="{% url 'flickr:home' %}">
+                                        Flickr
+                                    </a>
+                                </li>
+                            {% elif app == 'lastfm' %}
+                                <li class="nav-item {% block lastfm_nav_active %}{% endblock %}">
+                                    <a class="nav-link" href="{% url 'lastfm:home' %}">
+                                       Last.fm
+                                    </a>
+                                </li>
+                            {% elif app == 'pinboard' %}
                                 <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
                                     <a class="nav-link" href="{% url 'pinboard:home' %}">
                                         Pinboard
@@ -38,12 +50,6 @@
                                 <li class="nav-item {% block twitter_nav_active %}{% endblock %}">
                                     <a class="nav-link" href="{% url 'twitter:home' %}">
                                         Twitter
-                                    </a>
-                                </li>
-                            {% elif app == 'flickr' %}
-                                <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'flickr:home' %}">
-                                        Flickr
                                     </a>
                                 </li>
                             {% endif %}

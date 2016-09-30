@@ -1,0 +1,44 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item active">Artist</li>
+{% endblock %}
+
+{% block content %}
+
+    {% load ditto_core %}
+
+    <h1 class="m-y-2">
+        {% block title %}
+            {{ artist.name }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9 lastfm-artist">
+
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="{{ artist.permalink }}">At Last.fm</a>
+                    </li>
+                    {% if perms.lastfm.can_change_artist %}
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:lastfm_artist_change' artist.id %}" title="Edit this artist in the Django Admin">Edit</a>
+                        </li>
+                    {% endif %}
+                    <li class="list-group-item text-muted">
+                        <small>Last updated {% display_time artist.time_modified True %}</small>
+                    </li>
+                </ul>
+            </div>
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

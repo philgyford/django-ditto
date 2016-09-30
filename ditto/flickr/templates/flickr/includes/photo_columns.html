@@ -5,13 +5,13 @@ Expects:
  * request, the request object.
  * photo_list, a queryset of Photos.
  * perms - The Django perms object.
- * page_obj, optional, a DiggPaginator instance or False (default).
+ * page_obj - Optional, a DiggPaginator instance or False (default).
  * order - Either 'uploaded' or 'taken'.
  * view - 'list' (a generic list), 'detail' or 'day'.
 {% endcomment %}
 
 {% if photo_list|length > 0 %}
-    {% if page_obj and page_obj.number > 1 %}
+    {% if page_obj|default:False and page_obj.number > 1 %}
         {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
     {% endif %}
 

@@ -4,8 +4,11 @@ from django.core.urlresolvers import reverse
 
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
+# For generating permalinks.
+LASTFM_URL_ROOT = 'http://last.fm'
 
-def lastfm_get_absolute_url(kind, id, mbid=None):
+
+def lastfm_get_absolute_url(kind, id, mbid=''):
     """
     Generates the absolute URLs for artists, tracks and albums.
 
@@ -15,14 +18,48 @@ def lastfm_get_absolute_url(kind, id, mbid=None):
     """
     url_names = {
         'artist':   'lastfm:artist_detail',
-        'track':    'lastfm.track_detail',
+        'track':    'lastfm:track_detail',
         'album':    'lastfm:album_detail',
     }
 
     # We won't have an MBID for every thing, so we'll fall back to ID.
-    id = mbid if mbid is not None else id
+    url_id = mbid if mbid != '' else id
     url_name = url_names[kind]
-    return reverse(urlname, kwargs={'id': id})
+    return reverse(url_name, kwargs={'id': url_id})
+
+
+def lastfm_urlify(s):
+    """
+    Takes a string and returns the version used in a Last.fm URL
+
+    I don't think we can use something like urllib.parse.quote_plus() because
+    there are some things - eg, ,.&!() - which Last.fm doesn't escape.
+    """
+
+    replacements = (
+        ('%', '%25'), # Needs to be first.
+        ('"', '%22'),
+        ("'", '%27'),
+        ('/', '%2F'),
+        (';', '%3B'),
+        ('<', '%3C'),
+        ('>', '%3E'),
+        ('?', '%3F'),
+        ('[', '%5B'),
+        ('\\', '%5C%5C'), # Replaces one backslash with '%5C%5C'.
+        (']', '%5D'),
+        ('^', '%5E'),
+        ('`', '%60'),
+        ('{', '%7B'),
+        ('|', '%7C'),
+        ('}', '%7D'),
+        ('+', '%252B'),
+        ('#', '%2316'),
+        (' ', '+'), # Needs to be after the + encoding.
+    )
+    for find, repl in replacements:
+        s = s.replace(find, repl)
+    return s
 
 
 class Account(TimeStampedModelMixin, models.Model):
@@ -47,13 +84,13 @@ class Account(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['username']
 
-    #def get_absolute_url(self):
-        #return reverse('lastfm:account_detail',
-                        #kwargs={'username': self.account.username})
+    def get_absolute_url(self):
+        return reverse('lastfm:user_detail',
+                                        kwargs={'username': self.username})
 
     @property
     def permalink(self):
-        return 'http://www.last.fm/user/%s' % self.username
+        return '%s/user/%s' % (LASTFM_URL_ROOT, self.username)
 
     def has_credentials(self):
         "Does this at least have something in its API field? True or False"
@@ -93,8 +130,14 @@ class Album(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['name']
 
-    #def get_absolute_url(self):
-        #return lastfm_get_absolute_url('album', self.id, self.mbid)
+    def get_absolute_url(self):
+        return lastfm_get_absolute_url('album', self.id, self.mbid)
+
+    @property
+    def permalink(self):
+        return '%s/music/%s/%s' % (LASTFM_URL_ROOT,
+                                   lastfm_urlify(self.artist.name),
+                                   lastfm_urlify(self.name) )
 
 
 class Artist(TimeStampedModelMixin, models.Model):
@@ -112,8 +155,12 @@ class Artist(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['name']
 
-    #def get_absolute_url(self):
-        #return lastfm_get_absolute_url('artist', self.id, self.mbid)
+    def get_absolute_url(self):
+        return lastfm_get_absolute_url('artist', self.id, self.mbid)
+
+    @property
+    def permalink(self):
+        return '%s/music/%s' % (LASTFM_URL_ROOT, lastfm_urlify(self.name))
 
 
 class Scrobble(DittoItemModel, models.Model):
@@ -170,19 +217,19 @@ class Scrobble(DittoItemModel, models.Model):
         self.summary = str(self.post_time)
         super().save(*args, **kwargs)
 
+    def get_absolute_url_artist(self):
+        return lastfm_get_absolute_url(
+                                    'artist', self.artist.id, self.artist_mbid)
 
-    #def get_absolute_url_artist(self):
-        #return lastfm_get_absolute_url('artist', self.artist, self.artist_mbid)
+    def get_absolute_url_track(self):
+        return lastfm_get_absolute_url('track', self.track.id, self.track_mbid)
 
-    #def get_absolute_url_track(self):
-        #return lastfm_get_absolute_url('track', self.track, self.track_mbid)
-
-    #def get_absolute_url_album(self):
-        #if self.album:
-            #return lastfm_get_absolute_url(
-                                        #'album', self.album, self.album_mbid)
-        #else:
-            #return ''
+    def get_absolute_url_album(self):
+        if self.album:
+            return lastfm_get_absolute_url(
+                                    'album', self.album.id, self.album_mbid)
+        else:
+            return ''
 
 
 class Track(TimeStampedModelMixin, models.Model):
@@ -205,5 +252,12 @@ class Track(TimeStampedModelMixin, models.Model):
     class Meta:
         ordering = ['name']
 
-    #def get_absolute_url(self):
-        #return lastfm_get_absolute_url('track', self.id, self.mbid)
+    def get_absolute_url(self):
+        return lastfm_get_absolute_url('track', self.id, self.mbid)
+
+    @property
+    def permalink(self):
+        return '%s/music/%s/_/%s' % (LASTFM_URL_ROOT,
+                                     lastfm_urlify(self.artist.name),
+                                     lastfm_urlify(self.name) )
+

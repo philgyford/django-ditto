@@ -1,0 +1,10 @@
+{% extends 'ditto/base.html' %}
+
+{% block lastfm_nav_active %}active{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+{% endblock %}
+
+
