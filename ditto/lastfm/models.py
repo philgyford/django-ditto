@@ -162,6 +162,20 @@ class Artist(TimeStampedModelMixin, models.Model):
     def permalink(self):
         return '%s/music/%s' % (LASTFM_URL_ROOT, lastfm_urlify(self.name))
 
+    def get_top_albums(self, num=10):
+        "Returns a QuerySet of `num` most scrobbled Albums by this Artist."
+        qs = self.albums\
+                    .annotate(scrobble_count=models.Count('scrobbles'))\
+                    .order_by('-scrobble_count')
+        return qs[:num]
+
+    def get_top_tracks(self, num=10):
+        "Returns a QuerySet of `num` most scrobbled Tracks by this Artist."
+        qs = self.tracks\
+                    .annotate(scrobble_count=models.Count('scrobbles'))\
+                    .order_by('-scrobble_count')
+        return qs[:num]
+
 
 class Scrobble(DittoItemModel, models.Model):
     """

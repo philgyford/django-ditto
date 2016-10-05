@@ -110,6 +110,53 @@ class ArtistTestCase(TestCase):
         artist = ArtistFactory(name=', . & ! ( )')
         self.assertEqual(artist.permalink, 'http://last.fm/music/,+.+&+!+(+)')
 
+    def test_get_top_albums(self):
+        "Returns 10 albums, ordered by most-scrobbled first"
+        artist = ArtistFactory()
+        albums = AlbumFactory.create_batch(11, artist=artist)
+        # NB, Tracks & Albums are only associated via Scrobbles, not directly:
+        tracks = TrackFactory.create_batch(11, artist=artist)
+        # Scrobble all 11 tracks+albums once...
+        for idx, t in enumerate(tracks):
+            ScrobbleFactory(artist=artist, track=t, album=albums[idx])
+        # ... but scrobble one of them an additional time:
+        ScrobbleFactory(artist=artist, track=tracks[3], album=albums[3])
+        top_albums = artist.get_top_albums()
+        self.assertEqual(len(top_albums), 10)
+        self.assertEqual(top_albums[0], albums[3])
+
+    def test_get_top_albums_limit(self):
+        "Only returns the number of top albums requested"
+        artist = ArtistFactory()
+        albums = AlbumFactory.create_batch(4, artist=artist)
+        tracks = TrackFactory.create_batch(4, artist=artist)
+        for idx, t in enumerate(tracks):
+            ScrobbleFactory(artist=artist, track=t, album=albums[idx])
+        top_albums = artist.get_top_albums(num=3)
+        self.assertEqual(len(top_albums), 3)
+
+    def test_get_top_tracks(self):
+        "Returns 10 tracks, ordered by most-scrobbled first"
+        artist = ArtistFactory()
+        tracks = TrackFactory.create_batch(11, artist=artist)
+        # Scrobble all 11 tracks once...
+        for t in tracks:
+            ScrobbleFactory(artist=artist, track=t)
+        # ... but scrobble one of them an additional time:
+        ScrobbleFactory(artist=artist, track=tracks[3])
+        top_tracks = artist.get_top_tracks()
+        self.assertEqual(len(top_tracks), 10)
+        self.assertEqual(top_tracks[0], tracks[3])
+
+    def test_get_top_tracks_limit(self):
+        "Only returns the number of top tracks requested"
+        artist = ArtistFactory()
+        tracks = TrackFactory.create_batch(4, artist=artist)
+        for t in tracks:
+            ScrobbleFactory(artist=artist, track=t)
+        top_tracks = artist.get_top_tracks(num=3)
+        self.assertEqual(len(top_tracks), 3)
+
 
 class ScrobbleTestCase(TestCase):
 
