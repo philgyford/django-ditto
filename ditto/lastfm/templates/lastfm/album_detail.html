@@ -28,6 +28,11 @@
                     <li class="list-group-item">
                         <a href="{{ album.permalink }}">At Last.fm</a>
                     </li>
+                    {% if album.musicbrainz_url %}
+                        <li class="list-group-item">
+                            <a href="{{ album.musicbrainz_url }}">At MusicBrainz</a>
+                        </li>
+                    {% endif %}
                     {% if perms.lastfm.can_change_track %}
                         <li class="list-group-item">
                             <a href="{% url 'admin:lastfm_album_change' album.id %}" title="Edit this album in the Django Admin">Edit</a>

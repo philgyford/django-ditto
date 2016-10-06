@@ -7,6 +7,9 @@ from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 # For generating permalinks.
 LASTFM_URL_ROOT = 'http://last.fm'
 
+# For generating links to MB.
+MUSICBRAINZ_URL_ROOT = 'https://musicbrainz.org'
+
 
 def lastfm_get_absolute_url(kind, id, mbid=''):
     """
@@ -139,6 +142,13 @@ class Album(TimeStampedModelMixin, models.Model):
                                    lastfm_urlify(self.artist.name),
                                    lastfm_urlify(self.name) )
 
+    @property
+    def musicbrainz_url(self):
+        if self.mbid:
+            return '%s/release/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+        else:
+            return None
+
 
 class Artist(TimeStampedModelMixin, models.Model):
     "Minimal model of a music artist."
@@ -161,6 +171,13 @@ class Artist(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         return '%s/music/%s' % (LASTFM_URL_ROOT, lastfm_urlify(self.name))
+
+    @property
+    def musicbrainz_url(self):
+        if self.mbid:
+            return '%s/artist/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+        else:
+            return None
 
     def get_top_albums(self, num=10):
         "Returns a QuerySet of `num` most scrobbled Albums by this Artist."
@@ -274,4 +291,11 @@ class Track(TimeStampedModelMixin, models.Model):
         return '%s/music/%s/_/%s' % (LASTFM_URL_ROOT,
                                      lastfm_urlify(self.artist.name),
                                      lastfm_urlify(self.name) )
+
+    @property
+    def musicbrainz_url(self):
+        if self.mbid:
+            return '%s/recording/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+        else:
+            return None
 

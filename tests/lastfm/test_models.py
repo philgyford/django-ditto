@@ -66,6 +66,15 @@ class AlbumTestCase(TestCase):
         self.assertEqual(album.permalink,
                 'http://last.fm/music/Life+Without+Buildings/Any+Other+City')
 
+    def test_musicbrainz_url(self):
+        album = AlbumFactory(mbid='65497352-51ea-40a6-b1f0-1bdff6750369')
+        self.assertEqual(album.musicbrainz_url,
+            'https://musicbrainz.org/release/65497352-51ea-40a6-b1f0-1bdff6750369')
+
+    def test_musicbrainz_url_none(self):
+        album = AlbumFactory(mbid='')
+        self.assertIsNone(album.musicbrainz_url)
+
 
 class ArtistTestCase(TestCase):
 
@@ -109,6 +118,15 @@ class ArtistTestCase(TestCase):
         "Things which don't get quoted."
         artist = ArtistFactory(name=', . & ! ( )')
         self.assertEqual(artist.permalink, 'http://last.fm/music/,+.+&+!+(+)')
+
+    def test_musicbrainz_url(self):
+        artist = ArtistFactory(mbid='80fe34d0-6b4f-4ccd-81c3-281ab37f0451')
+        self.assertEqual(artist.musicbrainz_url,
+            'https://musicbrainz.org/artist/80fe34d0-6b4f-4ccd-81c3-281ab37f0451')
+
+    def test_musicbrainz_url_none(self):
+        artist = ArtistFactory(mbid='')
+        self.assertIsNone(artist.musicbrainz_url)
 
     def test_get_top_albums(self):
         "Returns 10 albums, ordered by most-scrobbled first"
@@ -156,7 +174,6 @@ class ArtistTestCase(TestCase):
             ScrobbleFactory(artist=artist, track=t)
         top_tracks = artist.get_top_tracks(num=3)
         self.assertEqual(len(top_tracks), 3)
-
 
 class ScrobbleTestCase(TestCase):
 
@@ -270,3 +287,13 @@ class TrackTestCase(TestCase):
         track = TrackFactory(name='A Lack of Color', artist=artist)
         self.assertEqual(track.permalink,
                 'http://last.fm/music/Death+Cab+for+Cutie/_/A+Lack+of+Color')
+
+    def test_musicbrainz_url(self):
+        track = TrackFactory(mbid='330fd2ed-785e-473a-bd9b-ab0b109029c8')
+        self.assertEqual(track.musicbrainz_url,
+            'https://musicbrainz.org/recording/330fd2ed-785e-473a-bd9b-ab0b109029c8')
+
+    def test_musicbrainz_url_none(self):
+        track = TrackFactory(mbid='')
+        self.assertIsNone(track.musicbrainz_url)
+
