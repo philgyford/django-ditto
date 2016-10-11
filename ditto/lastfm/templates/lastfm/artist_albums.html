@@ -3,7 +3,8 @@
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
-    <li class="breadcrumb-item active">Artist</li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_detail' artist_slug=artist.slug %}">Artist</a></li>
+    <li class="breadcrumb-item active">Albums</li>
 {% endblock %}
 
 {% block content %}
@@ -18,14 +19,13 @@
 
     <div class="row">
         <div class="col-md-9 lastfm-artist">
-            {% include 'lastfm/includes/nav_tabs.html' with active='tracks' artist=artist only %}
+            {% include 'lastfm/includes/nav_tabs.html' with active='albums'  artist=artist only %}
 
             {% load ditto_lastfm %}
 
-            {% artist_top_tracks artist=artist limit='all' as tracks %}
+            {% artist_top_albums artist=artist limit='all' as albums %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks only %}
-
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums only %}
         </div> <!-- .col -->
 
         <div class="col-md-3">

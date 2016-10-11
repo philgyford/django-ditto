@@ -1,0 +1,36 @@
+{% comment %}
+A chart of Tracks or Albums.
+
+Expects:
+
+* items - A QuerySet of either Tracks or Albums.
+* chart_type - Either 'tracks' (default') or 'albums'.
+{% endcomment %}
+
+{% with chart_type=chart_type|default_if_none:'tracks' %}
+	<table class="table table-striped table-sm lastfm-{{ chart_type }}">
+		<thead>
+			<tr>
+				<th class="text-xs-right">Rank</th>
+				<th>{% if chart_type == 'albums' %}Album{% else %}Track{% endif %}</th>
+				<th class="text-xs-right">Scrobbles</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in items %}
+				<tr>
+					<td class="text-xs-right">
+						{{ forloop.counter }}
+					</td>
+					<td>
+						<a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
+					</td>
+					<td class="text-xs-right">
+						{{ item.scrobble_count }}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endwith %}
+

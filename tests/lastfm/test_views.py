@@ -83,6 +83,34 @@ class ArtistDetailViewTests(TestCase):
         self.assertEquals(response.status_code, 404)
 
 
+class ArtistAlbumsViewTests(TestCase):
+
+    def setUp(self):
+        self.artist = ArtistFactory(slug='Lou+Reed')
+
+    def test_artist_albums_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('lastfm:artist_albums',
+                                    kwargs={'artist_slug': self.artist.slug,}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'lastfm/artist_albums.html')
+        self.assertTemplateUsed(response, 'lastfm/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_artist_albums_context(self):
+        "Sends the correct data to the templates"
+        response = self.client.get(reverse('lastfm:artist_albums',
+                                    kwargs={'artist_slug': self.artist.slug,}))
+        self.assertIn('artist', response.context)
+        self.assertEqual(self.artist.pk, response.context['artist'].pk)
+
+    def test_artist_albums_404s(self):
+        "Responds with 404 if we request an artist that doesn't exist."
+        response = self.client.get(reverse('lastfm:artist_albums',
+                                    kwargs={'artist_slug': 'Looper',}))
+        self.assertEquals(response.status_code, 404)
+
+
 class TrackDetailViewTests(TestCase):
 
     def setUp(self):

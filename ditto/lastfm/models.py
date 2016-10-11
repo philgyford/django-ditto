@@ -133,35 +133,35 @@ class Artist(TimeStampedModelMixin, models.Model):
         else:
             return None
 
-    def get_top_albums(self, num='all'):
+    def get_top_albums(self, limit='all'):
         """
         Returns a QuerySet of Albums by this Artist, ordered by most-scrobbled.
         By default returns all of them.
-        `num` is 'all' for all albums, or an integer to return that number.
+        `limit` is 'all' for all albums, or an integer to return that number.
         """
         qs = self.albums\
                     .annotate(scrobble_count=models.Count('scrobbles'))\
                     .order_by('-scrobble_count')
 
-        if num == 'all':
+        if limit == 'all':
             return qs
         else:
-            return qs[:num]
+            return qs[:limit]
 
-    def get_top_tracks(self, num='all'):
+    def get_top_tracks(self, limit='all'):
         """
         Returns a QuerySet of Tracks by this Artist, ordered by most-scrobbled.
         By default returns all of them.
-        `num` is 'all' for all tracks, or an integer to return that number.
+        `limit` is 'all' for all tracks, or an integer to return that number.
         """
         qs = self.tracks\
                     .annotate(scrobble_count=models.Count('scrobbles'))\
                     .order_by('-scrobble_count')
 
-        if num == 'all':
+        if limit == 'all':
             return qs
         else:
-            return qs[:num]
+            return qs[:limit]
 
 
 class Scrobble(DittoItemModel, models.Model):

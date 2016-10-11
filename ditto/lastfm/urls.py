@@ -14,18 +14,23 @@ urlpatterns = [
         name='home'
     ),
     url(
-        regex=r"^(?P<artist_slug>%s)/(?P<album_slug>%s)/$" % (
+        regex=r"^music/(?P<artist_slug>%s)/$" % slug_chars,
+        view=views.ArtistDetailView.as_view(),
+        name='artist_detail'
+    ),
+    url(
+        regex=r"^music/(?P<artist_slug>%s)/\+albums/$" % slug_chars,
+        view=views.ArtistAlbumsView.as_view(),
+        name='artist_albums'
+    ),
+    url(
+        regex=r"^music/(?P<artist_slug>%s)/(?P<album_slug>%s)/$" % (
                                                     slug_chars, slug_chars),
         view=views.AlbumDetailView.as_view(),
         name='album_detail'
     ),
     url(
-        regex=r"^(?P<artist_slug>%s)/$" % slug_chars,
-        view=views.ArtistDetailView.as_view(),
-        name='artist_detail'
-    ),
-    url(
-        regex=r"^(?P<artist_slug>%s)/_/(?P<track_slug>%s)/$" % (
+        regex=r"^music/(?P<artist_slug>%s)/_/(?P<track_slug>%s)/$" % (
                                                     slug_chars, slug_chars),
         view=views.TrackDetailView.as_view(),
         name='track_detail'

@@ -56,6 +56,12 @@ class ArtistDetailView(DetailView):
     slug_url_kwarg = 'artist_slug'
 
 
+class ArtistAlbumsView(DetailView):
+    model = Artist
+    slug_url_kwarg = 'artist_slug'
+    template_name = 'lastfm/artist_albums.html'
+
+
 class TrackDetailView(DetailView):
     model = Track
 

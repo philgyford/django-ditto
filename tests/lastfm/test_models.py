@@ -53,7 +53,7 @@ class AlbumTestCase(TestCase):
         artist = ArtistFactory(slug='Life+Without+Buildings')
         album = AlbumFactory(artist=artist, slug='Any+Other+City')
         self.assertEqual(album.get_absolute_url(),
-                        '/lastfm/Life+Without+Buildings/Any+Other+City/')
+                        '/lastfm/music/Life+Without+Buildings/Any+Other+City/')
 
     def test_permalink(self):
         artist = ArtistFactory(slug='Life+Without+Buildings')
@@ -87,7 +87,7 @@ class ArtistTestCase(TestCase):
     def test_absolute_url(self):
         mbid = '80fe34d0-6b4f-4ccd-81c3-281ab37f0451'
         artist = ArtistFactory(slug='Tom+Waits')
-        self.assertEqual(artist.get_absolute_url(), '/lastfm/Tom+Waits/')
+        self.assertEqual(artist.get_absolute_url(), '/lastfm/music/Tom+Waits/')
 
     def test_permalink(self):
         artist = ArtistFactory(slug="Tom+Waits")
@@ -124,7 +124,7 @@ class ArtistTestCase(TestCase):
         tracks = TrackFactory.create_batch(4, artist=artist)
         for idx, t in enumerate(tracks):
             ScrobbleFactory(artist=artist, track=t, album=albums[idx])
-        top_albums = artist.get_top_albums(num=3)
+        top_albums = artist.get_top_albums(limit=3)
         self.assertEqual(len(top_albums), 3)
 
     def test_get_top_tracks(self):
@@ -146,7 +146,7 @@ class ArtistTestCase(TestCase):
         tracks = TrackFactory.create_batch(4, artist=artist)
         for t in tracks:
             ScrobbleFactory(artist=artist, track=t)
-        top_tracks = artist.get_top_tracks(num=3)
+        top_tracks = artist.get_top_tracks(limit=3)
         self.assertEqual(len(top_tracks), 3)
 
 
@@ -212,7 +212,7 @@ class TrackTestCase(TestCase):
         artist = ArtistFactory(slug='The+Mountain+Goats')
         track = TrackFactory(slug='Dance+Music', artist=artist)
         self.assertEqual(track.get_absolute_url(),
-                        '/lastfm/The+Mountain+Goats/_/Dance+Music/')
+                        '/lastfm/music/The+Mountain+Goats/_/Dance+Music/')
 
     def test_permalink(self):
         artist = ArtistFactory(slug='The+Mountain+Goats')
