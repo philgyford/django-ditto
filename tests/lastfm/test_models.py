@@ -149,6 +149,23 @@ class ArtistTestCase(TestCase):
         top_tracks = artist.get_top_tracks(limit=3)
         self.assertEqual(len(top_tracks), 3)
 
+    def test_get_most_recent_scrobble(self):
+        artist = ArtistFactory()
+        post_time_1 = datetime.datetime.strptime(
+                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        post_time_2 = datetime.datetime.strptime(
+                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        scrobble1 = ScrobbleFactory(artist=artist, post_time=post_time_1)
+        scrobble2 = ScrobbleFactory(artist=artist, post_time=post_time_2)
+        self.assertEqual(artist.get_most_recent_scrobble(), scrobble2)
+
+    def test_scrobble_count(self):
+        artist = ArtistFactory()
+        scrobbles = ScrobbleFactory.create_batch(3, artist=artist)
+        self.assertEqual(artist.scrobble_count, 3)
+
 
 class ScrobbleTestCase(TestCase):
 

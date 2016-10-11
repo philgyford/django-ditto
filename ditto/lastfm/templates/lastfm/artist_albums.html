@@ -9,8 +9,6 @@
 
 {% block content %}
 
-    {% load ditto_core %}
-
     <h1 class="m-y-2">
         {% block title %}
             {{ artist.name }}
@@ -29,26 +27,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-3">
-            <div class="card">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="{{ artist.permalink }}">At Last.fm</a>
-                    </li>
-                    {% if artist.musicbrainz_url %}
-                        <li class="list-group-item">
-                            <a href="{{ artist.musicbrainz_url }}">At MusicBrainz</a>
-                        </li>
-                    {% endif %}
-                    {% if perms.lastfm.can_change_artist %}
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:lastfm_artist_change' artist.id %}" title="Edit this artist in the Django Admin">Edit</a>
-                        </li>
-                    {% endif %}
-                    <li class="list-group-item text-muted">
-                        <small>Last updated {% display_time artist.time_modified True %}</small>
-                    </li>
-                </ul>
-            </div>
+            {% include 'lastfm/includes/artist_sidebar.html' with artist=artist only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

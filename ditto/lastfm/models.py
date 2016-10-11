@@ -133,6 +133,10 @@ class Artist(TimeStampedModelMixin, models.Model):
         else:
             return None
 
+    @property
+    def scrobble_count(self):
+        return self.scrobbles.count()
+
     def get_top_albums(self, limit='all'):
         """
         Returns a QuerySet of Albums by this Artist, ordered by most-scrobbled.
@@ -162,6 +166,12 @@ class Artist(TimeStampedModelMixin, models.Model):
             return qs
         else:
             return qs[:limit]
+
+    def get_most_recent_scrobble(self):
+        """
+        Returns the most recent Scrobble object for this Artist.
+        """
+        return self.scrobbles.order_by('-post_time').first()
 
 
 class Scrobble(DittoItemModel, models.Model):
