@@ -11,7 +11,9 @@
     {% load ditto_core %}
 
     <h1 class="m-y-2">
-        <a href="{{ album.artist.get_absolute_url }}">{{ album.artist.name }}</a><br>
+        <a href="{% url 'lastfm:artist_detail' artist_slug=album.artist.slug %}">
+            {{ album.artist }}
+        </a><br>
         {% block title %}
             {{ album.name }}
         {% endblock %}

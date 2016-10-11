@@ -11,60 +11,6 @@ LASTFM_URL_ROOT = 'http://last.fm'
 MUSICBRAINZ_URL_ROOT = 'https://musicbrainz.org'
 
 
-def lastfm_get_absolute_url(kind, id, mbid=''):
-    """
-    Generates the absolute URLs for artists, tracks and albums.
-
-    kind -- One of 'artist', 'track' or 'album'.
-    id -- The Django ID of the object.
-    mbid -- The MBID of the object (Optional).
-    """
-    url_names = {
-        'artist':   'lastfm:artist_detail',
-        'track':    'lastfm:track_detail',
-        'album':    'lastfm:album_detail',
-    }
-
-    # We won't have an MBID for every thing, so we'll fall back to ID.
-    url_id = mbid if mbid != '' else id
-    url_name = url_names[kind]
-    return reverse(url_name, kwargs={'id': url_id})
-
-
-def lastfm_urlify(s):
-    """
-    Takes a string and returns the version used in a Last.fm URL
-
-    I don't think we can use something like urllib.parse.quote_plus() because
-    there are some things - eg, ,.&!() - which Last.fm doesn't escape.
-    """
-
-    replacements = (
-        ('%', '%25'), # Needs to be first.
-        ('"', '%22'),
-        ("'", '%27'),
-        ('/', '%2F'),
-        (';', '%3B'),
-        ('<', '%3C'),
-        ('>', '%3E'),
-        ('?', '%3F'),
-        ('[', '%5B'),
-        ('\\', '%5C%5C'), # Replaces one backslash with '%5C%5C'.
-        (']', '%5D'),
-        ('^', '%5E'),
-        ('`', '%60'),
-        ('{', '%7B'),
-        ('|', '%7C'),
-        ('}', '%7D'),
-        ('+', '%252B'),
-        ('#', '%2316'),
-        (' ', '+'), # Needs to be after the + encoding.
-    )
-    for find, repl in replacements:
-        s = s.replace(find, repl)
-    return s
-
-
 class Account(TimeStampedModelMixin, models.Model):
     "The account of a user, with API key, on Last.fm"
 
@@ -108,7 +54,7 @@ class Album(TimeStampedModelMixin, models.Model):
     Minimal model of a music album.
 
     Last.fm's data isn't great - the album might be by various artists but,
-    if in the scrobble the album has no MBID, we'll end up creating that album
+    if the album has no MBID in the scrobble, we'll end up creating that album
     for each artist on the album.
 
     eg, with artist/track/album scrobbles like:
@@ -121,9 +67,11 @@ class Album(TimeStampedModelMixin, models.Model):
     """
 
     name = models.TextField(null=False, blank=False)
+    # We're not using SlugField because a Track slug can be longer than 255
+    # characters and contain characters not allowed by SlugField().
+    slug = models.TextField(null=False, blank=False, db_index=True)
     artist = models.ForeignKey('Artist', related_name='albums')
     mbid = models.CharField(null=False, blank=True, max_length=36,
-            db_index=True,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
 
@@ -134,13 +82,15 @@ class Album(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
-        return lastfm_get_absolute_url('album', self.id, self.mbid)
+        return reverse('lastfm:album_detail', kwargs={
+            'artist_slug': self.artist.slug,
+            'album_slug': self.slug,
+        })
 
     @property
     def permalink(self):
-        return '%s/music/%s/%s' % (LASTFM_URL_ROOT,
-                                   lastfm_urlify(self.artist.name),
-                                   lastfm_urlify(self.name) )
+        return '%s/music/%s/%s' % (
+                                LASTFM_URL_ROOT, self.artist.slug, self.slug)
 
     @property
     def musicbrainz_url(self):
@@ -154,8 +104,10 @@ class Artist(TimeStampedModelMixin, models.Model):
     "Minimal model of a music artist."
 
     name = models.CharField(null=False, blank=False, max_length=255)
+    # We're not using SlugField because an Artist slug can be longer than 255
+    # characters and contain characters not allowed by SlugField().
+    slug = models.TextField(null=False, blank=False, unique=True)
     mbid = models.CharField(null=False, blank=True, max_length=36,
-            db_index=True,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
 
@@ -166,11 +118,13 @@ class Artist(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
-        return lastfm_get_absolute_url('artist', self.id, self.mbid)
+        return reverse('lastfm:artist_detail', kwargs={
+            'artist_slug': self.slug,
+        })
 
     @property
     def permalink(self):
-        return '%s/music/%s' % (LASTFM_URL_ROOT, lastfm_urlify(self.name))
+        return '%s/music/%s' % (LASTFM_URL_ROOT, self.slug)
 
     @property
     def musicbrainz_url(self):
@@ -179,19 +133,35 @@ class Artist(TimeStampedModelMixin, models.Model):
         else:
             return None
 
-    def get_top_albums(self, num=10):
-        "Returns a QuerySet of `num` most scrobbled Albums by this Artist."
+    def get_top_albums(self, num='all'):
+        """
+        Returns a QuerySet of Albums by this Artist, ordered by most-scrobbled.
+        By default returns all of them.
+        `num` is 'all' for all albums, or an integer to return that number.
+        """
         qs = self.albums\
                     .annotate(scrobble_count=models.Count('scrobbles'))\
                     .order_by('-scrobble_count')
-        return qs[:num]
 
-    def get_top_tracks(self, num=10):
-        "Returns a QuerySet of `num` most scrobbled Tracks by this Artist."
+        if num == 'all':
+            return qs
+        else:
+            return qs[:num]
+
+    def get_top_tracks(self, num='all'):
+        """
+        Returns a QuerySet of Tracks by this Artist, ordered by most-scrobbled.
+        By default returns all of them.
+        `num` is 'all' for all tracks, or an integer to return that number.
+        """
         qs = self.tracks\
                     .annotate(scrobble_count=models.Count('scrobbles'))\
                     .order_by('-scrobble_count')
-        return qs[:num]
+
+        if num == 'all':
+            return qs
+        else:
+            return qs[:num]
 
 
 class Scrobble(DittoItemModel, models.Model):
@@ -222,21 +192,6 @@ class Scrobble(DittoItemModel, models.Model):
     album = models.ForeignKey('Album', related_name='scrobbles',
                                                         blank=True, null=True)
 
-    # Let's try denormalizing these things so that we can list scrobbles from
-    # a particular day (etc) without making umpteen database requests:
-    artist_name = models.CharField(null=False, blank=True, max_length=255)
-    artist_mbid = models.CharField(null=False, blank=True, max_length=36,
-                                            verbose_name="Artist MBID",
-                                            help_text="MusicBrainz Identifier")
-    track_name = models.TextField(null=False, blank=True)
-    track_mbid = models.CharField(null=False, blank=True, max_length=36,
-                                            verbose_name="Track MBID",
-                                            help_text="MusicBrainz Identifier")
-    album_name = models.TextField(null=False, blank=True)
-    album_mbid = models.CharField(null=False, blank=True, max_length=36,
-                                            verbose_name="Album MBID",
-                                            help_text="MusicBrainz Identifier")
-
     def __str__(self):
         return '%s (%s)' % (self.title, self.post_time)
 
@@ -244,36 +199,25 @@ class Scrobble(DittoItemModel, models.Model):
         ordering = ['-post_time']
 
     def save(self, *args, **kwargs):
-        self.title = '%s – %s' % (self.artist_name, self.track_name)
+        self.title = '%s – %s' % (self.track.artist.name, self.track.name)
         self.summary = str(self.post_time)
         super().save(*args, **kwargs)
-
-    def get_absolute_url_artist(self):
-        return lastfm_get_absolute_url(
-                                    'artist', self.artist.id, self.artist_mbid)
-
-    def get_absolute_url_track(self):
-        return lastfm_get_absolute_url('track', self.track.id, self.track_mbid)
-
-    def get_absolute_url_album(self):
-        if self.album:
-            return lastfm_get_absolute_url(
-                                    'album', self.album.id, self.album_mbid)
-        else:
-            return ''
 
 
 class Track(TimeStampedModelMixin, models.Model):
     """
     Minimal model of a music track.
+
     We don't link Tracks to Albums directly. We only record the album info
     in the Scrobble, as it all seems a bit dodgy in Last.fm's modelling.
     """
 
     name = models.TextField(null=False, blank=False)
+    # We're not using SlugField because a Track slug can be longer than 255
+    # characters and contain characters not allowed by SlugField().
+    slug = models.TextField(null=False, blank=False, db_index=True)
     artist = models.ForeignKey('Artist', related_name='tracks')
     mbid = models.CharField(null=False, blank=True, max_length=36,
-            db_index=True,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
 
@@ -284,13 +228,15 @@ class Track(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
-        return lastfm_get_absolute_url('track', self.id, self.mbid)
+        return reverse('lastfm:track_detail', kwargs={
+            'artist_slug': self.artist.slug,
+            'track_slug': self.slug,
+        })
 
     @property
     def permalink(self):
-        return '%s/music/%s/_/%s' % (LASTFM_URL_ROOT,
-                                     lastfm_urlify(self.artist.name),
-                                     lastfm_urlify(self.name) )
+        return '%s/music/%s/_/%s' % (
+                                LASTFM_URL_ROOT, self.artist.slug, self.slug)
 
     @property
     def musicbrainz_url(self):

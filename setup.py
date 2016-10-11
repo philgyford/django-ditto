@@ -1,5 +1,6 @@
 import codecs
 import os
+import re
 from setuptools import setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
@@ -10,17 +11,29 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 read = lambda filepath: codecs.open(filepath, 'r', 'utf-8').read()
 
-# Load package meta from the pkgmeta module without loading ditto.
-pkgmeta = {}
-# Python 3 replacement for execfile(pkgmeta_path, pkgmeta):
-pkgmeta_path = os.path.join(os.path.dirname(__file__), 'ditto', 'pkgmeta.py')
-with open(pkgmeta_path, 'r') as f:
-    code = compile(f.read(), pkgmeta_path, 'exec')
-    exec(code, pkgmeta)
+def get_entity(package, entity):
+    """
+    eg, get_entity('ditto', 'version') returns `__version__` value in `init.py`.
+    """
+    init_py = open(os.path.join(package, '__init__.py')).read()
+    find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
+    return re.search(find, init_py).group(1)
+
+def get_version():
+    return get_entity('ditto', 'version')
+
+def get_license():
+    return get_entity('ditto', 'license')
+
+def get_author():
+    return get_entity('ditto', 'author')
+
+def get_author_email():
+    return get_entity('ditto', 'author_email')
 
 setup(
-    name=pkgmeta['__title__'],
-    version=pkgmeta['__version__'],
+    name='django-ditto',
+    version=get_version(),
     packages=['ditto'],
     install_requires=[
         'django-imagekit>=3.3,<3.4',
@@ -41,12 +54,12 @@ setup(
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
-    license=pkgmeta['__license__'],
+    license=get_license(),
     description='A Django app to copy stuff from your accounts on Flickr, Pinboard and Twitter.',
     long_description=read(os.path.join(os.path.dirname(__file__), 'README.rst')),
     url='https://github.com/philgyford/django-ditto',
-    author=pkgmeta['__author__'],
-    author_email=pkgmeta['__author_email__'],
+    author=get_author(),
+    author_email=get_author_email(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

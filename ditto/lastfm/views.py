@@ -18,58 +18,30 @@ class HomeView(PaginatedListView):
         return context
 
 
-class OptionalMbidDetailView(DetailView):
-    """
-    Extension of DetailView that allows us to look up an item by either an
-    MBID or a Django PK.
-    Expects an `id` from the URL.
-    If that looks like an MBID, we use that.
-    Otherwise, we try it as a Django PK.
-    """
-
-    def id_is_mbid(self, id):
-        "For testing if an ID from a URL is an MBID or a Django PK"
-        if '-' in id:
-            return True
-        else:
-            return False
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        # If we've come here with the PK, but the object actually has an MBID,
-        # redirect to the same page but using that:
-        if not self.id_is_mbid(self.kwargs.get('id')) and self.object.mbid:
-            return redirect('lastfm:%s' % request.resolver_match.url_name,
-                            id=self.object.mbid)
-
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+class AlbumDetailView(DetailView):
+    model = Album
 
     def get_object(self, queryset=None):
         """
         Returns the object the view is displaying.
-        This requires `self.queryset` and an `id` argument in the URLconf.
 
-        Mostly from DetailView.get_object() with our modification for checking
-        whether we're using a Django PK or an MBID.
+        This is based on DetailView's method.
         """
         # Use a custom queryset if provided; this is required for subclasses
         # like DateDetailView
         if queryset is None:
             queryset = self.get_queryset()
 
-        # Our modification:
-        id = self.kwargs.get('id')
-        if id is not None:
-            if self.id_is_mbid(id):
-                queryset = queryset.filter(mbid=id)
-            else:
-                queryset = queryset.filter(pk=id)
-        else:
-            raise AttributeError("This detail view %s must be called with "
-                                 "an id."
-                                 % self.__class__.__name__)
+        artist_slug = self.kwargs.get('artist_slug')
+        album_slug = self.kwargs.get('album_slug')
+
+        if artist_slug is None or album_slug is None:
+            raise AttributeError("AlbumDetailView must be called with "
+                     "artist_slug and album_slug")
+
+        artist = Artist.objects.get(slug=artist_slug)
+        queryset = queryset.filter(artist=artist, slug=album_slug)
+
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
@@ -79,16 +51,42 @@ class OptionalMbidDetailView(DetailView):
         return obj
 
 
-class AlbumDetailView(OptionalMbidDetailView):
-    model = Album
-
-
-class ArtistDetailView(OptionalMbidDetailView):
+class ArtistDetailView(DetailView):
     model = Artist
+    slug_url_kwarg = 'artist_slug'
 
 
-class TrackDetailView(OptionalMbidDetailView):
+class TrackDetailView(DetailView):
     model = Track
+
+    def get_object(self, queryset=None):
+        """
+        Returns the object the view is displaying.
+
+        This is based on DetailView's method.
+        """
+        # Use a custom queryset if provided; this is required for subclasses
+        # like DateDetailView
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        artist_slug = self.kwargs.get('artist_slug')
+        track_slug = self.kwargs.get('track_slug')
+
+        if artist_slug is None or track_slug is None:
+            raise AttributeError("TrackDetailView must be called with "
+                     "artist_slug and track_slug")
+
+        artist = Artist.objects.get(slug=artist_slug)
+        queryset = queryset.filter(artist=artist, slug=track_slug)
+
+        try:
+            # Get the single item from the filtered queryset
+            obj = queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(_("No %(verbose_name)s found matching the query") %
+                          {'verbose_name': queryset.model._meta.verbose_name})
+        return obj
 
 
 class UserDetailView(SingleObjectMixin, PaginatedListView):

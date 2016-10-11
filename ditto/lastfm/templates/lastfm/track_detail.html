@@ -11,7 +11,9 @@
     {% load ditto_core %}
 
     <h1 class="m-y-2">
-        <a href="{{ track.artist.get_absolute_url }}">{{ track.artist.name }}</a><br>
+        <a href="{% url 'lastfm:artist_detail' artist_slug=track.artist.slug %}">
+            {{ track.artist }}
+        </a><br>
         {% block title %}
             {{ track.name }}
         {% endblock %}
@@ -19,7 +21,6 @@
 
     <div class="row">
         <div class="col-md-9 lastfm-track">
-
         </div> <!-- .col -->
 
         <div class="col-md-3">

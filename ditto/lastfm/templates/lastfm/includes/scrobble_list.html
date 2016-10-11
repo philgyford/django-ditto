@@ -20,16 +20,20 @@ Expects:
         <thead class="sr-only">
             <tr>
                 <th>Track</th>
-                <th>Time</th>
+                <th class="text-xs-right">Time</th>
             </tr>
         </thead>
         <tbody>
             {% for scrobble in scrobble_list %}
                 <tr class="lastfm-scrobble">
                     <td>
-                        <a href="{{ scrobble.get_absolute_url_artist }}">{{ scrobble.artist_name }}</a>
+                        <a href="{% url 'lastfm:artist_detail' artist_slug=scrobble.artist.slug %}">
+                            {{ scrobble.artist.name }}
+                        </a>
                         –
-                        <a href="{{ scrobble.get_absolute_url_track }}">{{ scrobble.track_name}}</a>
+                        <a href="{% url 'lastfm:track_detail' artist_slug=scrobble.artist.slug track_slug=scrobble.track.slug %}">
+                            {{ scrobble.track.name }}
+                        </a>
                     </td>
                     <td class="text-nowrap text-xs-right">{% display_time scrobble.post_time link_to_day=True %}</td>
                 </tr>

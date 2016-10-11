@@ -6,7 +6,9 @@ import requests
 import time
 import urllib
 
+from ditto import TITLE, VERSION
 from .models import Account, Album, Artist, Scrobble, Track
+from .utils import slugify_name
 from ..core.utils import datetime_now
 
 
@@ -114,7 +116,7 @@ class ScrobblesFetcher(object):
         while self.page_number <= self.total_pages and self._not_failed():
             self._fetch_page()
             self.page_number += 1
-            time.sleep(0.5) # Being nice.
+            time.sleep(0.5)
 
     def _fetch_page(self):
         """
@@ -168,7 +170,7 @@ class ScrobblesFetcher(object):
 
     def _send_request(self):
         """
-        Send a request to the API.
+        Send a request to the Last.fm API.
 
         Raises FetchError if something goes wrong.
         Returns a list of results if all goes well.
@@ -179,7 +181,8 @@ class ScrobblesFetcher(object):
 
         try:
             response = requests.get(url,
-                        headers={'User-Agent': 'Mozilla/5.0 (Django Ditto)'})
+                        headers={'User-Agent': 'Mozilla/5.0 (%s v%s)' % (
+                                                            TITLE, VERSION)})
             response.raise_for_status() # Raises an exception on HTTP error.
         except requests.exceptions.RequestException as e:
             raise FetchError(
@@ -210,45 +213,47 @@ class ScrobblesFetcher(object):
         fetch_time -- Datetime of when the data was fetched.
         """
 
+        # 'https://www.last.fm/music/Artist/_/Track':
+        url = scrobble['url'].rstrip('/')
+        # www.last.fm/music/Artist/_/Track':
+        url_path = urllib.parse.urlparse(url).path
+        path_parts = url_path.split('/')
+
+        artist_slug = path_parts[-3]  # 'Artist'
+        track_slug = path_parts[-1]   # 'Track'
+
         artist, created = Artist.objects.update_or_create(
-            name=scrobble['artist']['#text'],
-            mbid=scrobble['artist']['mbid'] # Might be "".
+            slug=artist_slug,
+            defaults={
+                'name': scrobble['artist']['#text'],
+                'mbid': scrobble['artist']['mbid'], # Might be "".
+            }
         )
 
         track, created = Track.objects.update_or_create(
-            name=scrobble['name'],
-            mbid=scrobble['mbid'], # Might be "".
-            artist=artist
+            slug=track_slug,
+            artist=artist,
+            defaults={
+                'name': scrobble['name'],
+                'mbid': scrobble['mbid'], # Might be "".
+            }
         )
 
         if scrobble['album']['#text'] == '':
             album = None
         else:
+            # The API data doesn't provide a URL/slug for the album, so
+            # we make our own:
+            album_slug = slugify_name(scrobble['album']['#text'])
+
             album, created = Album.objects.update_or_create(
-                name=scrobble['album']['#text'],
-                mbid=scrobble['album']['mbid'], # Might be "".
-                artist=artist
+                slug=album_slug,
+                artist=artist,
+                defaults={
+                    'name': scrobble['album']['#text'],
+                    'mbid': scrobble['album']['mbid'], # Might be "".
+                }
             )
-
-        # Prepare scrobble.
-
-        defaults = {
-            'artist':       artist,
-            'artist_name':  artist.name,
-            'artist_mbid':  artist.mbid,
-            'track_name':   track.name,
-            'track_mbid':   track.mbid,
-            'raw':          json.dumps(scrobble),
-            'fetch_time':   fetch_time,
-            'album':        album,
-        }
-
-        if album is None:
-            defaults['album_name'] = ''
-            defaults['album_mbid'] = ''
-        else:
-            defaults['album_name'] = album.name
-            defaults['album_mbid'] = album.mbid
 
         # Unixtime to datetime object:
         scrobble_time = datetime.utcfromtimestamp(
@@ -259,7 +264,12 @@ class ScrobblesFetcher(object):
             account=self.account,
             track=track,
             post_time=scrobble_time,
-            defaults=defaults
+            defaults={
+                'artist':       artist,
+                'raw':          json.dumps(scrobble),
+                'fetch_time':   fetch_time,
+                'album':        album,
+            }
         )
 
         return scrobble_obj

@@ -3,6 +3,10 @@ from django.conf.urls import url
 from . import views
 
 
+# The pattern for matching an Album/Artist/Track slug:
+slug_chars = '[\w.,:=@&+%()-]+'
+
+
 urlpatterns = [
     url(
         regex=r"^$",
@@ -10,22 +14,24 @@ urlpatterns = [
         name='home'
     ),
     url(
-        regex=r"^album/(?P<id>[^/]+)/$",
+        regex=r"^(?P<artist_slug>%s)/(?P<album_slug>%s)/$" % (
+                                                    slug_chars, slug_chars),
         view=views.AlbumDetailView.as_view(),
         name='album_detail'
     ),
     url(
-        regex=r"^artist/(?P<id>[^/]+)/$",
+        regex=r"^(?P<artist_slug>%s)/$" % slug_chars,
         view=views.ArtistDetailView.as_view(),
         name='artist_detail'
     ),
     url(
-        regex=r"^track/(?P<id>[^/]+)/$",
+        regex=r"^(?P<artist_slug>%s)/_/(?P<track_slug>%s)/$" % (
+                                                    slug_chars, slug_chars),
         view=views.TrackDetailView.as_view(),
         name='track_detail'
     ),
     url(
-        regex=r"^(?P<username>[a-z]+)/$",
+        regex=r"^user/(?P<username>[a-z0-9]+)/$",
         view=views.UserDetailView.as_view(),
         name='user_detail'
     ),

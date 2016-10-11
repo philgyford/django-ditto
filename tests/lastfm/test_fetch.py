@@ -28,9 +28,12 @@ class ScrobblesFetcherTestCase(TestCase):
                                             ScrobblesFetcher, '_send_request')
         self.send_request = self.send_request_patch.start()
         self.send_request.return_value = []
+        self.sleep_patch = patch('time.sleep')
+        self.sleep = self.sleep_patch.start()
 
     def tearDown(self):
         self.send_request_patch.stop()
+        self.sleep_patch.stop()
 
     def test_requires_account_argument(self):
         "__init__ should throw error with no account argument."
@@ -90,7 +93,8 @@ class ScrobblesFetcherTestCase(TestCase):
 
 class ScrobblesFetcherSendTestCase(TestCase):
     """
-    Tests that DO involve sending requests to the API.
+    Tests that DO involve sending requests to the API, and so we need to
+    mock the requests.
     """
 
     fixture_path = 'tests/lastfm/fixtures/api/'
@@ -98,6 +102,11 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def setUp(self):
         self.account = AccountFactory(username='bob', api_key='1234')
         self.fetcher = ScrobblesFetcher(account=self.account)
+        self.sleep_patch = patch('time.sleep')
+        self.sleep = self.sleep_patch.start()
+
+    def tearDown(self):
+        self.sleep_patch.stop()
 
     def load_raw_fixture(self, fixture_name):
         """
@@ -232,120 +241,100 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Creates a new Artist if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artists = Artist.objects.filter(name='Lou Reed')
+        artists = Artist.objects.filter(slug='Lou+Reed')
         self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].slug, 'Lou+Reed')
+        self.assertEqual(artists[0].name, 'Lou Reed')
         self.assertEqual(artists[0].mbid,
                         '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
 
     @responses.activate
-    def test_updates_existing_artist_with_mbid(self):
-        "Doesn't create a new Artist with MBID if it already exists"
-        ArtistFactory(name='Lou Reed',
-                      mbid='9d1ebcfe-4c15-4d18-95d3-d919898638a1')
+    def test_updates_existing_artist(self):
+        "Doesn't create a new Artist if it already exists"
+        ArtistFactory(slug='Lou+Reed', mbid='')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artists = Artist.objects.filter(name='Lou Reed')
+        artists = Artist.objects.filter(slug='Lou+Reed')
         self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].slug, 'Lou+Reed')
+        self.assertEqual(artists[0].name, 'Lou Reed')
         self.assertEqual(artists[0].mbid,
                         '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
-
-    @responses.activate
-    def test_updates_existing_artist_with_no_mbid(self):
-        "Doesn't create a new Artist without MBID if it already exists"
-        ArtistFactory(name='Mothers', mbid='')
-        self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artists = Artist.objects.filter(name='Mothers')
-        self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].mbid, '')
 
     @responses.activate
     def test_creates_new_track(self):
         "Creates a new Track if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        loureed = Artist.objects.get(name='Lou Reed')
-        tracks = Track.objects.filter(name='Make Up')
+        loureed = Artist.objects.get(slug='Lou+Reed')
+        tracks = Track.objects.filter(name='Make Up', slug='Make+Up')
         self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].name,'Make Up')
+        self.assertEqual(tracks[0].slug,'Make+Up')
         self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
         self.assertEqual(tracks[0].artist, loureed)
 
     @responses.activate
-    def test_updates_existing_track_with_mbid(self):
-        "Doesn't create a new Track with MBID if it already exists"
-        loureed = ArtistFactory(name='Lou Reed',
-                                mbid='9d1ebcfe-4c15-4d18-95d3-d919898638a1')
-        TrackFactory(artist=loureed,
-                     name='Make Up',
-                     mbid='8e73b23a-6a01-4743-b414-047974f66e22')
+    def test_updates_existing_track(self):
+        "Doesn't create a new Track if it already exists"
+        loureed = ArtistFactory(slug='Lou+Reed')
+        TrackFactory(artist=loureed, slug='Make+Up')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        tracks = Track.objects.filter(name='Make Up')
+        tracks = Track.objects.filter(slug='Make+Up')
         self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].name,'Make Up')
+        self.assertEqual(tracks[0].slug,'Make+Up')
         self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
         self.assertEqual(tracks[0].artist, loureed)
-
-    @responses.activate
-    def test_updates_existing_track_with_no_mbid(self):
-        "Doesn't create a new Track without MBID if it already exists"
-        mothers = ArtistFactory(name='Mothers', mbid='')
-        track_name = 'Fat Chance / No Crying In Baseball – Live From Baby’s All Right'
-        TrackFactory(artist=mothers,
-                     name=track_name,
-                     mbid='')
-        self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        tracks = Track.objects.filter(name=track_name)
-        self.assertEqual(len(tracks), 1)
-        self.assertEqual(tracks[0].artist, mothers)
 
     @responses.activate
     def test_creates_new_album(self):
         "Creates a new Album if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        loureed = Artist.objects.get(name='Lou Reed')
-        albums = Album.objects.filter(name='Transformer')
+        loureed = Artist.objects.get(slug='Lou+Reed')
+        albums = Album.objects.filter(slug='Transformer')
         self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].slug,'Transformer')
+        self.assertEqual(albums[0].name,'Transformer')
         self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
         self.assertEqual(albums[0].artist, loureed)
 
     @responses.activate
-    def test_updates_existing_album_with_mbid(self):
-        "Doesn't create a new Album with MBID if it already exists"
-        loureed = ArtistFactory(name='Lou Reed',
-                                mbid='9d1ebcfe-4c15-4d18-95d3-d919898638a1')
-        AlbumFactory(artist=loureed,
-                     name='Transformer',
-                     mbid='4ee40d97-630c-3f0d-9ea2-d49fa253c354')
+    def test_updates_existing_album(self):
+        "Doesn't create a new Album if it already exists"
+        loureed = ArtistFactory(slug='Lou+Reed')
+        AlbumFactory(artist=loureed, slug='Transformer')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        albums = Album.objects.filter(name='Transformer')
+        albums = Album.objects.filter(slug='Transformer')
         self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].name,'Transformer')
+        self.assertEqual(albums[0].slug,'Transformer')
         self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
         self.assertEqual(albums[0].artist, loureed)
-
-    @responses.activate
-    def test_updates_existing_album_with_no_mbid(self):
-        "Doesn't create a new Album without MBID if it already exists"
-        mothers = ArtistFactory(name='Mothers', mbid='')
-        AlbumFactory(artist=mothers,
-                     name='Spotify Session',
-                     mbid='')
-        self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        albums = Album.objects.filter(name='Spotify Session')
-        self.assertEqual(len(albums), 1)
-        self.assertEqual(albums[0].artist, mothers)
 
     @responses.activate
     def test_does_not_create_album_if_it_has_no_name(self):
         "Doesn't create a new Album if the scrobble has none"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artist = Artist.objects.get(name='[unknown]')
+        artist = Artist.objects.get(slug='%5Bunknown%5D')
         albums = Album.objects.filter(artist=artist)
         self.assertEqual(len(albums), 0)
+
+    @responses.activate
+    @patch('ditto.lastfm.fetch.slugify_name')
+    def test_slugifies_album_name(self, slugify_name):
+        "It should call slugify_name for each scrobbled Album name."
+        slugify_name.side_effect = ['Spotify+Session', 'Transformer',]
+        self.add_recent_tracks_response()
+        results = self.fetcher.fetch()
+        slugify_name.assert_has_calls([
+            call('Spotify Session'),
+            call('Transformer'),
+        ])
 
     @responses.activate
     def test_creates_scrobbles(self):
@@ -360,11 +349,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def test_updates_existing_scrobbles(self):
         "Updates existing scrobble objects"
         # Make our existing scrobble:
-        artist = ArtistFactory(name='Lou Reed',
-                               mbid='9d1ebcfe-4c15-4d18-95d3-d919898638a1')
-        track = TrackFactory(artist=artist,
-                             name='Make Up',
-                             mbid='8e73b23a-6a01-4743-b414-047974f66e22')
+        artist = ArtistFactory(slug='Lou+Reed')
+        track = TrackFactory(artist=artist, slug='Make+Up')
         post_time = datetime.datetime.strptime(
                         '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
                     ).replace(tzinfo=pytz.utc)
@@ -387,20 +373,10 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Sets all the scrobble data correctly"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist_name='Lou Reed')
+        scrobble = Scrobble.objects.get(artist__slug='Lou+Reed')
         self.assertEqual(scrobble.account, self.account)
-        self.assertEqual(scrobble.artist.name, 'Lou Reed')
-        self.assertEqual(scrobble.track.name, 'Make Up')
-        self.assertEqual(scrobble.album.name, 'Transformer')
-        self.assertEqual(scrobble.artist_name, 'Lou Reed')
-        self.assertEqual(scrobble.artist_mbid,
-                         '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
-        self.assertEqual(scrobble.track_name, 'Make Up')
-        self.assertEqual(scrobble.track_mbid,
-                         '8e73b23a-6a01-4743-b414-047974f66e22')
-        self.assertEqual(scrobble.album_name, 'Transformer')
-        self.assertEqual(scrobble.album_mbid,
-                         '4ee40d97-630c-3f0d-9ea2-d49fa253c354')
+        self.assertEqual(scrobble.track.slug, 'Make+Up')
+        self.assertEqual(scrobble.album.slug, 'Transformer')
         self.assertEqual(scrobble.post_time,
                             datetime.datetime.strptime(
                                     '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
@@ -415,10 +391,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "If scrobble has no album, leaves its fields empty"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist_name='[unknown]')
+        scrobble = Scrobble.objects.get(artist__slug='%5Bunknown%5D')
         self.assertEqual(scrobble.album, None)
-        self.assertEqual(scrobble.album_name, '')
-        self.assertEqual(scrobble.album_mbid, '')
 
 
 class ScrobblesMultiAccountFetcherTestCase(TestCase):

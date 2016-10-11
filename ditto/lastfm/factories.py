@@ -18,12 +18,15 @@ class ArtistFactory(factory.DjangoModelFactory):
         model = models.Artist
 
     name = factory.Sequence(lambda n: 'Artist %04d' % n)
+    slug = factory.Sequence(lambda n: 'Artist+%04d' % n)
+
 
 class TrackFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Track
 
     name = factory.Sequence(lambda n: 'Track %04d' % n)
+    slug = factory.Sequence(lambda n: 'Track+%04d' % n)
     artist = factory.SubFactory(ArtistFactory)
 
 
@@ -32,6 +35,7 @@ class AlbumFactory(factory.DjangoModelFactory):
         model = models.Album
 
     name = factory.Sequence(lambda n: 'Album %04d' % n)
+    slug = factory.Sequence(lambda n: 'Album+%04d' % n)
     artist = factory.SubFactory(ArtistFactory)
 
 
@@ -40,11 +44,7 @@ class ScrobbleFactory(factory.DjangoModelFactory):
         model = models.Scrobble
 
     account = factory.SubFactory(AccountFactory)
-    artist = factory.SubFactory(ArtistFactory)
     track = factory.SubFactory(TrackFactory)
-
-    artist_name = factory.Sequence(lambda n: 'Artist Name %04d' % n)
-    track_name = factory.Sequence(lambda n: 'Track Name %04d' % n)
-
+    artist = factory.SubFactory(ArtistFactory)
     post_time = datetime_now()
 

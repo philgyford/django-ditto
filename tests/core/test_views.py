@@ -89,6 +89,7 @@ class DittoViewTests(TestCase):
             # Fake it so it looks like ditto.flickr isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': False,
+                'ditto.lastfm': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': True,
                 # Without this Django 1.10 throws an error for some reason:
@@ -103,6 +104,7 @@ class DittoViewTests(TestCase):
             # Fake it so it looks like ditto.pinboard isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': True,
+                'ditto.lastfm': True,
                 'ditto.pinboard': False,
                 'ditto.twitter': True,
                 # Without this Django 1.10 throws an error for some reason:
@@ -117,6 +119,7 @@ class DittoViewTests(TestCase):
             # Fake it so it looks like ditto.twitter isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': True,
+                'ditto.lastfm': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': False,
                 # Without this Django 1.10 throws an error for some reason:
