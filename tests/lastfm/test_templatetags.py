@@ -5,97 +5,132 @@ from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
         ArtistFactory, ScrobbleFactory, TrackFactory
 
 
-class ArtistTopTracksTestCase(TestCase):
+class TopTracksTestCase(TestCase):
 
     def setUp(self):
-        self.artist = ArtistFactory()
-        self.tracks = TrackFactory.create_batch(11, artist=self.artist)
-        # tracks[1] will be 1st, tracks[2] will be 2nd:
+        self.artist1 = ArtistFactory()
+        self.tracks = TrackFactory.create_batch(11, artist=self.artist1)
+        # Extra scrobbles.
+        # For artist1, tracks[1] will be 1st, tracks[2] will be 2nd:
         ScrobbleFactory.create_batch(2,
-                                    artist=self.artist, track=self.tracks[1])
+                                    artist=self.artist1, track=self.tracks[1])
         ScrobbleFactory.create_batch(1,
-                                    artist=self.artist, track=self.tracks[2])
+                                    artist=self.artist1, track=self.tracks[2])
+
+        # But artist2 has a more-scrobbled Track:
+        self.artist2 = ArtistFactory()
+        self.track2 = TrackFactory(artist=self.artist2)
+        ScrobbleFactory.create_batch(4,
+                                    artist=self.artist2, track=self.track2)
 
     def test_top_tracks(self):
         "By default should return 10 tracks."
-        tracks = ditto_lastfm.artist_top_tracks(artist=self.artist)
+        tracks = ditto_lastfm.top_tracks()
         self.assertEqual(len(tracks), 10)
-        self.assertEqual(tracks[0], self.tracks[1])
-        self.assertEqual(tracks[1], self.tracks[2])
+        self.assertEqual(tracks[0], self.track2)
+        self.assertEqual(tracks[1], self.tracks[1])
+        self.assertEqual(tracks[2], self.tracks[2])
 
     def test_top_tracks_limit(self):
         "Should return `limit` tracks."
-        tracks = ditto_lastfm.artist_top_tracks(artist=self.artist, limit=3)
+        tracks = ditto_lastfm.top_tracks(limit=3)
         self.assertEqual(len(tracks), 3)
-        self.assertEqual(tracks[0], self.tracks[1])
-        self.assertEqual(tracks[1], self.tracks[2])
+        self.assertEqual(tracks[0], self.track2)
+        self.assertEqual(tracks[1], self.tracks[1])
+        self.assertEqual(tracks[2], self.tracks[2])
 
     def test_top_tracks_all(self):
         "Should return all tracks if `limit` is 'all'."
-        tracks = ditto_lastfm.artist_top_tracks(artist=self.artist, limit='all')
+        tracks = ditto_lastfm.top_tracks(limit='all')
+        self.assertEqual(len(tracks), 12)
+        self.assertEqual(tracks[0], self.track2)
+        self.assertEqual(tracks[1], self.tracks[1])
+        self.assertEqual(tracks[2], self.tracks[2])
+
+    def test_top_tracks_for_artist(self):
+        "Should return only the Artist's tracks."
+        tracks = ditto_lastfm.top_tracks(artist=self.artist1, limit='all')
         self.assertEqual(len(tracks), 11)
         self.assertEqual(tracks[0], self.tracks[1])
         self.assertEqual(tracks[1], self.tracks[2])
 
     def test_artist_error(self):
-        "Should raise ValueError if no Artist is supplied."
+        "Should raise ValueError if invalid Artist is supplied."
         with self.assertRaises(ValueError):
-            ditto_lastfm.artist_top_tracks(limit=3)
+            ditto_lastfm.top_tracks(artist='bob', limit=3)
 
     def test_limit_error(self):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
-            ditto_lastfm.artist_top_tracks(artist=self.artist, limit='bob')
+            ditto_lastfm.top_tracks(artist=self.artist1, limit='bob')
 
 
-class ArtistTopAlbumsTestCase(TestCase):
+class TopAlbumsTestCase(TestCase):
 
     def setUp(self):
-        self.artist = ArtistFactory()
-        self.tracks = TrackFactory.create_batch(11, artist=self.artist)
-        self.albums = AlbumFactory.create_batch(11, artist=self.artist)
+        self.artist1 = ArtistFactory()
+        self.tracks = TrackFactory.create_batch(11, artist=self.artist1)
+        self.albums = AlbumFactory.create_batch(11, artist=self.artist1)
         # Scrobble each album/track once:
         for idx, track in enumerate(self.tracks):
-            ScrobbleFactory(artist=self.artist,
+            ScrobbleFactory(artist=self.artist1,
                             track=track,
                             album=self.albums[idx])
 
-        # tracks[1] will be 1st, tracks[2] will be 2nd:
-        ScrobbleFactory.create_batch(2, artist=self.artist,
+        # Extra scrobbles.
+        # For artist1, tracks[1] will be 1st, tracks[2] will be 2nd:
+        ScrobbleFactory.create_batch(2, artist=self.artist1,
                                     track=self.tracks[1], album=self.albums[1])
-        ScrobbleFactory.create_batch(1, artist=self.artist,
+        ScrobbleFactory.create_batch(1, artist=self.artist1,
                                     track=self.tracks[2], album=self.albums[2])
 
-    def test_top_albums(self):
+        # But artist2 has a more scrobbled album:
+        self.artist2 = ArtistFactory()
+        self.track2 = TrackFactory(artist=self.artist2)
+        self.album2 = AlbumFactory(artist=self.artist2)
+        ScrobbleFactory.create_batch(4, artist=self.artist2,
+                                track=self.track2, album=self.album2)
+
+    def test_top_albums_default_limit(self):
         "By default should return 10 albums."
-        albums = ditto_lastfm.artist_top_albums(artist=self.artist)
+        albums = ditto_lastfm.top_albums()
         self.assertEqual(len(albums), 10)
-        self.assertEqual(albums[0], self.albums[1])
-        self.assertEqual(albums[1], self.albums[2])
+        self.assertEqual(albums[0], self.album2)
+        self.assertEqual(albums[1], self.albums[1])
+        self.assertEqual(albums[2], self.albums[2])
 
     def test_top_albums_limit(self):
         "Should return `limit` albums."
-        albums = ditto_lastfm.artist_top_albums(artist=self.artist, limit=3)
+        albums = ditto_lastfm.top_albums(limit=3)
         self.assertEqual(len(albums), 3)
-        self.assertEqual(albums[0], self.albums[1])
-        self.assertEqual(albums[1], self.albums[2])
+        self.assertEqual(albums[0], self.album2)
+        self.assertEqual(albums[1], self.albums[1])
+        self.assertEqual(albums[2], self.albums[2])
 
     def test_top_albums_all(self):
         "Should return all albums if `limit` is 'all'."
-        albums = ditto_lastfm.artist_top_albums(artist=self.artist, limit='all')
+        albums = ditto_lastfm.top_albums(limit='all')
+        self.assertEqual(len(albums), 12)
+        self.assertEqual(albums[0], self.album2)
+        self.assertEqual(albums[1], self.albums[1])
+        self.assertEqual(albums[2], self.albums[2])
+
+    def test_top_albums_for_artist(self):
+        "Should only return the artist's albums"
+        albums = ditto_lastfm.top_albums(artist=self.artist1, limit='all')
         self.assertEqual(len(albums), 11)
         self.assertEqual(albums[0], self.albums[1])
         self.assertEqual(albums[1], self.albums[2])
 
-    def test_artist_error(self):
-        "Should raise ValueError if no Artist is supplied."
+    def test_top_albums_artist_error(self):
+        "Should raise ValueError if invalid Artist is supplied."
         with self.assertRaises(ValueError):
-            ditto_lastfm.artist_top_albums(limit=3)
+            ditto_lastfm.top_albums(artist='bob', limit=3)
 
-    def test_limit_error(self):
+    def test_top_albums_limit_error(self):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
-            ditto_lastfm.artist_top_albums(artist=self.artist, limit='bob')
+            ditto_lastfm.top_albums(artist=self.artist1, limit='bob')
 
 
 class RecentScrobblesTestCase(TestCase):

@@ -4,7 +4,7 @@ from . import views
 
 
 # The pattern for matching an Album/Artist/Track slug:
-slug_chars = '[\w.,:=@&+%()-]+'
+slug_chars = '[\w.,:=@&+%()$!-]+'
 
 
 urlpatterns = [
@@ -14,7 +14,7 @@ urlpatterns = [
         name='home'
     ),
     url(
-        regex=r"^scrobbles$",
+        regex=r"^library$",
         view=views.ScrobbleListView.as_view(),
         name='scrobble_list'
     ),

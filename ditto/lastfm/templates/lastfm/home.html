@@ -21,13 +21,25 @@
         <div class="col-md-9">
             {% load ditto_lastfm %}
 
-            <h2>Recent scrobbles</h2>
+            <h2>Recent tracks</h2>
 
             {% recent_scrobbles limit=10 as scrobbles %}
 
             {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
 
-            <p class="text-xs-right"><a href="{% url 'lastfm:scrobble_list' %}">More scrobbles</a></p>
+            <p class="text-xs-right"><a href="{% url 'lastfm:scrobble_list' %}">More tracks</a></p>
+
+            <h2>Top tracks </h2>
+
+            {% top_tracks limit=10 as tracks %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks only %}
+
+            <h2>Top albums</h2>
+
+            {% top_albums limit=10 as albums %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

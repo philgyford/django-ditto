@@ -21,9 +21,9 @@
 
             {% load ditto_lastfm %}
 
-            {% artist_top_albums artist=artist limit='all' as albums %}
+            {% top_albums artist=artist limit='all' as albums %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums include_artist=False only %}
         </div> <!-- .col -->
 
         <div class="col-md-3">

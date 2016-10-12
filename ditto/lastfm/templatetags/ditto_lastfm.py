@@ -1,46 +1,70 @@
 from django import template
+from django.db import models
 from django.utils.html import format_html
 
-from ..models import Account, Artist, Scrobble
+from ..models import Account, Album, Artist, Scrobble, Track
 
 
 register = template.Library()
 
 
 @register.assignment_tag
-def artist_top_tracks(artist=None, limit=10):
-    """Returns a QuerySet of an Artist's most-scrobbled Tracks, with the
-    most-scrobbled first.
+def top_tracks(artist=None, limit=10):
+    """Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
+    first.
+
+    Restrict to Tracks by one Artist by suppling the `artist`.
 
     Keyword arguments:
-    artist -- An Artist object.
-    limit -- Maximum number to fetch. Default is 10. 'all' for all tracks.
+    artist -- An Artist object or None.
+    limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
     """
-    if type(artist) is not Artist:
-        raise ValueError("`artist` must be an Artist object")
+    if type(artist) is not Artist and artist is not None:
+        raise ValueError("`artist` must be an Artist object or `None`")
 
     if limit != 'all' and isinstance(limit, int) == False:
         raise ValueError("`limit` must be an integer or 'all'")
 
-    return artist.get_top_tracks(limit=limit)
+    if artist is None:
+        qs = Track.objects\
+                        .annotate(scrobble_count=models.Count('scrobbles'))\
+                        .order_by('-scrobble_count')
+        if limit != 'all':
+            qs = qs[:limit]
+    else:
+        qs = artist.get_top_tracks(limit=limit)
+
+    return qs
 
 
 @register.assignment_tag
-def artist_top_albums(artist=None, limit=10):
-    """Returns a QuerySet of an Artist's most-scrobbled Albums, with the
-    most-scrobbled first.
+def top_albums(artist=None, limit=10):
+    """Returns a QuerySet of most-scrobbled Albums, with the most-scrobbled
+    first.
+
+    Restrict to Albums by one Artist by suppling the `artist`.
 
     Keyword arguments:
-    artist -- An Artist object.
-    limit -- Maximum number to fetch. Default is 10. 'all' for all albums.
+    artist -- An Artist object or None.
+    limit -- Maximum number to fetch. Default is 10. 'all' for all Albums.
     """
-    if type(artist) is not Artist:
-        raise ValueError("`artist` must be an Artist object")
+    if type(artist) is not Artist and artist is not None:
+        raise ValueError("`artist` must be an Artist object or `None`")
 
     if limit != 'all' and isinstance(limit, int) == False:
         raise ValueError("`limit` must be an integer or 'all'")
 
-    return artist.get_top_albums(limit=limit)
+    if artist is None:
+        qs = Album.objects\
+                    .annotate(scrobble_count=models.Count('scrobbles'))\
+                    .order_by('-scrobble_count')
+        if limit != 'all':
+            qs = qs[:limit]
+    else:
+        qs = artist.get_top_albums(limit=limit)
+
+    return qs
+
 
 @register.assignment_tag
 def recent_scrobbles(account=None, limit=10):

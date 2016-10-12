@@ -4,7 +4,8 @@ A chart of Tracks or Albums.
 Expects:
 
 * items - A QuerySet of either Tracks or Albums.
-* chart_type - Either 'tracks' (default') or 'albums'.
+* chart_type - Either 'tracks' (default) or 'albums'.
+* include_artist - Optional, boolean (True is default.)
 {% endcomment %}
 
 {% with chart_type=chart_type|default_if_none:'tracks' %}
@@ -23,7 +24,15 @@ Expects:
 						{{ forloop.counter }}
 					</td>
 					<td>
-						<a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
+						{% if include_artist|default_if_none:True %}
+							<a href="{{ item.artist.get_absolute_url }}">
+								{{ item.artist }}
+							</a>
+						    –	
+						{% endif %}
+						<a href="{{ item.get_absolute_url }}">
+							{{ item.name }}
+						</a>
 					</td>
 					<td class="text-xs-right">
 						{{ item.scrobble_count }}

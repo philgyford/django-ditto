@@ -20,9 +20,9 @@
 
             {% load ditto_lastfm %}
 
-            {% artist_top_tracks artist=artist limit='all' as tracks %}
+            {% top_tracks artist=artist limit='all' as tracks %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks include_artist=False only %}
 
         </div> <!-- .col -->
 
