@@ -184,6 +184,11 @@ class ArtistTestCase(TestCase):
         top_tracks = artist.get_top_tracks(limit=3)
         self.assertEqual(len(top_tracks), 3)
 
+    def test_get_scrobble_count(self):
+        artist = ArtistFactory()
+        scrobbles = ScrobbleFactory.create_batch(3, artist=artist)
+        self.assertEqual(artist.get_scrobble_count(), 3)
+
     def test_get_most_recent_scrobble(self):
         artist = ArtistFactory()
         post_time_1 = datetime.datetime.strptime(
@@ -195,11 +200,6 @@ class ArtistTestCase(TestCase):
         scrobble1 = ScrobbleFactory(artist=artist, post_time=post_time_1)
         scrobble2 = ScrobbleFactory(artist=artist, post_time=post_time_2)
         self.assertEqual(artist.get_most_recent_scrobble(), scrobble2)
-
-    def test_get_scrobble_count(self):
-        artist = ArtistFactory()
-        scrobbles = ScrobbleFactory.create_batch(3, artist=artist)
-        self.assertEqual(artist.get_scrobble_count(), 3)
 
 
 class ScrobbleTestCase(TestCase):
@@ -280,4 +280,45 @@ class TrackTestCase(TestCase):
     def test_musicbrainz_url_none(self):
         track = TrackFactory(mbid='')
         self.assertIsNone(track.musicbrainz_url)
+
+    def test_albums(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        album1 = AlbumFactory(artist=artist)
+        album2 = AlbumFactory(artist=artist)
+        # Scrobble album1 once, album2 twice:
+        ScrobbleFactory(artist=artist, track=track, album=album1)
+        ScrobbleFactory(artist=artist, track=track, album=album2)
+        ScrobbleFactory(artist=artist, track=track, album=album2)
+
+        albums = track.albums
+        self.assertEqual(len(albums), 2)
+        self.assertEqual(albums[0], album2)
+        self.assertEqual(albums[1], album1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+        self.assertEqual(albums[1].scrobble_count, 1)
+
+    def test_get_scrobble_count(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        # Scrobbled 3 times:
+        ScrobbleFactory.create_batch(2, artist=artist, track=track)
+        # And another Scrobble with different artist/track:
+        ScrobbleFactory()
+        self.assertEqual(track.get_scrobble_count(), 2)
+
+    def test_get_most_recent_scrobble(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        post_time_1 = datetime.datetime.strptime(
+                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        post_time_2 = datetime.datetime.strptime(
+                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        scrobble1 = ScrobbleFactory(
+                        artist=artist, track=track, post_time=post_time_1)
+        scrobble2 = ScrobbleFactory(
+                        artist=artist, track=track, post_time=post_time_2)
+        self.assertEqual(track.get_most_recent_scrobble(), scrobble2)
 

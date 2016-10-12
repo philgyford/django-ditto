@@ -21,29 +21,21 @@
 
     <div class="row">
         <div class="col-md-9 lastfm-track">
+
+            {% with track.albums as album_list %}
+
+                <p>This track appears on {% if album_list|length == 1 %}this album{% else %}these albums{% endif %}:</p>
+
+                {% include 'lastfm/includes/chart.html' with object_list=album_list chart_type='albums' only %}
+
+            {% endwith %}
+
         </div> <!-- .col -->
 
         <div class="col-md-3">
-            <div class="card">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="{{ track.permalink }}">At Last.fm</a>
-                    </li>
-                    {% if track.musicbrainz_url %}
-                        <li class="list-group-item">
-                            <a href="{{ track.musicbrainz_url }}">At MusicBrainz</a>
-                        </li>
-                    {% endif %}
-                    {% if perms.lastfm.can_change_track %}
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:lastfm_track_change' track.id %}" title="Edit this track in the Django Admin">Edit</a>
-                        </li>
-                    {% endif %}
-                    <li class="list-group-item text-muted">
-                        <small>Last updated {% display_time track.time_modified True %}</small>
-                    </li>
-                </ul>
-            </div>
+
+            {% include 'lastfm/includes/track_sidebar.html' with track=track perms=perms only %}
+
         </div> <!-- .col -->
     </div> <!-- .row -->
 

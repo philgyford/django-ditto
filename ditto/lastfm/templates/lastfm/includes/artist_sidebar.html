@@ -4,13 +4,16 @@ The sidebar used on Artist pages.
 Expects:
 
 artist -- An Artist object.
+perms -- The Django permissions object.
 {% endcomment %}
 
 {% load ditto_core %}
 
 <div class="card card-block">
     <p class="card-text">
-        {{ artist.name }} has been scrobbled {{ artist.get_scrobble_count }} time{{ artist.get_scrobble_count|pluralize }}
+        {% with artist.get_scrobble_count as scrobble_count %}
+            {{ artist.name }} has been scrobbled {{ scrobble_count }} time{{ scrobble_count|pluralize }}
+        {% endwith %}
     </p>
 </div>
 
