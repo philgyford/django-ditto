@@ -24,6 +24,11 @@ urlpatterns = [
         name='album_list'
     ),
     url(
+        regex=r"^library/artists$",
+        view=views.ArtistListView.as_view(),
+        name='artist_list'
+    ),
+    url(
         regex=r"^library/tracks$",
         view=views.TrackListView.as_view(),
         name='track_list'

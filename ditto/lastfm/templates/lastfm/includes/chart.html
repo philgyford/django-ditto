@@ -3,9 +3,10 @@ A chart of Tracks or Albums.
 
 Expects:
 
-* object_list - A QuerySet of either Tracks or Albums.
-* chart_type - Either 'tracks' (default) or 'albums'.
+* object_list - A QuerySet of either Tracks, Albums or Artists.
+* chart_type - Either 'tracks' (default), 'albums' or 'artists'.
 * include_artist - Optional, boolean (True is default.)
+                   For Tracks and Albums, this will include the Artist.
 * page_obj - Optional, a DiggPaginator instance of False (default).
 * request - Optional, required if page_obj is used. The request object.
 {% endcomment %}
@@ -22,7 +23,14 @@ Expects:
             <thead>
                 <tr>
                     <th class="text-xs-right">Rank</th>
-                    <th>{% if chart_type == 'albums' %}Album{% else %}Track{% endif %}</th>
+                    <th>
+                        {% if chart_type == 'albums' %}
+                            Album
+                        {% elif chart_type == 'artists' %}
+                            Artist
+                        {% else %}
+                            Track
+                        {% endif %}</th>
                     <th class="text-xs-right">Scrobbles</th>
                 </tr>
             </thead>
@@ -36,11 +44,13 @@ Expects:
                             {% endwith %}
                         </td>
                         <td>
-                            {% if include_artist|default_if_none:True %}
-                                <a href="{{ object.artist.get_absolute_url }}">
-                                    {{ object.artist }}
-                                </a>
-                                –	
+                            {% if chart_type != 'artists' %}
+                                {% if include_artist|default_if_none:True %}
+                                    <a href="{{ object.artist.get_absolute_url }}">
+                                        {{ object.artist }}
+                                    </a>
+                                    –	
+                                {% endif %}
                             {% endif %}
                             <a href="{{ object.get_absolute_url }}">
                                 {{ object.name }}
@@ -59,7 +69,7 @@ Expects:
         {% endif %}
 
     {% else %}
-        <p>There are no {% if chart_type == 'albums' %}Albums{% else %}Tracks{% endif %} to show.</p>
+        <p>There are no {% if chart_type == 'albums' %}albums{% elif chart_type == 'artists' %}artists{% else %}tracks{% endif %} to show.</p>
     {% endif %}
 
 {% endwith %}

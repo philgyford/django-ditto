@@ -20,7 +20,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% include 'lastfm/includes/chart.html' with object_list=album_list page_obj=page_obj request=request only %}
+            {% include 'lastfm/includes/chart.html' with object_list=album_list chart_type='albums' page_obj=page_obj request=request only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

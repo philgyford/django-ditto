@@ -28,17 +28,17 @@
             {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
 
             <p class="text-xs-right">
-                <a href="{% url 'lastfm:scrobble_list' %}">More tracks</a>
+                <a href="{% url 'lastfm:scrobble_list' %}">More scrobbles</a>
             </p>
 
-            <h2>Top tracks </h2>
+            <h2>Top artists</h2>
 
-            {% top_tracks limit=10 as tracks %}
+            {% top_artists limit=10 as artists %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='artists' object_list=artists only %}
 
             <p class="text-xs-right">
-                <a href="{% url 'lastfm:track_list' %}">More tracks</a>
+                <a href="{% url 'lastfm:artist_list' %}">More artists</a>
             </p>
 
             <h2>Top albums</h2>
@@ -51,6 +51,15 @@
                 <a href="{% url 'lastfm:album_list' %}">More albums</a>
             </p>
 
+            <h2>Top tracks </h2>
+
+            {% top_tracks limit=10 as tracks %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
+
+            <p class="text-xs-right">
+                <a href="{% url 'lastfm:track_list' %}">More tracks</a>
+            </p>
         </div> <!-- .col -->
     </div> <!-- .row -->
 

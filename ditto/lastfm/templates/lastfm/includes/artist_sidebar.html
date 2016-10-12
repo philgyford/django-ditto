@@ -10,7 +10,7 @@ artist -- An Artist object.
 
 <div class="card card-block">
     <p class="card-text">
-        {{ artist.name }} has been scrobbled {{ artist.scrobble_count }} time{{ artist.scrobble_count|pluralize }}
+        {{ artist.name }} has been scrobbled {{ artist.get_scrobble_count }} time{{ artist.get_scrobble_count|pluralize }}
     </p>
 </div>
 

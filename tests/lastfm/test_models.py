@@ -196,10 +196,10 @@ class ArtistTestCase(TestCase):
         scrobble2 = ScrobbleFactory(artist=artist, post_time=post_time_2)
         self.assertEqual(artist.get_most_recent_scrobble(), scrobble2)
 
-    def test_scrobble_count(self):
+    def test_get_scrobble_count(self):
         artist = ArtistFactory()
         scrobbles = ScrobbleFactory.create_batch(3, artist=artist)
-        self.assertEqual(artist.scrobble_count, 3)
+        self.assertEqual(artist.get_scrobble_count(), 3)
 
 
 class ScrobbleTestCase(TestCase):

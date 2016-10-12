@@ -118,6 +118,8 @@ class Artist(TimeStampedModelMixin, models.Model):
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
 
+    objects = managers.ArtistsManager()
+
     def __str__(self):
         return self.name
 
@@ -140,8 +142,10 @@ class Artist(TimeStampedModelMixin, models.Model):
         else:
             return None
 
-    @property
-    def scrobble_count(self):
+    def get_scrobble_count(self):
+        """If we just have a `scrobble_count` property it clashes when we use
+        the Artist.objects.with_scrobble_count() query.
+        """
         return self.scrobbles.count()
 
     def get_top_albums(self, limit='all'):

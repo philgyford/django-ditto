@@ -30,10 +30,11 @@ class ScrobbleListView(AccountsMixin, PaginatedListView):
     model = Scrobble
 
 
-class TrackListView(AccountsMixin, PaginatedListView):
-    "A multi-page chart of most-scrobbled Tracks."
-    template_name = 'lastfm/track_list.html'
-    model = Track
+class WithScrobbleCountsPaginatedListView(PaginatedListView):
+    """
+    For the Album, Artist and Track ListViews that are charts ordered by
+    scrobble_count.
+    """
     ordering = '-scrobble_count'
 
     def get_queryset(self):
@@ -44,18 +45,22 @@ class TrackListView(AccountsMixin, PaginatedListView):
         return queryset
 
 
-class AlbumListView(AccountsMixin, PaginatedListView):
+class AlbumListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
     template_name = 'lastfm/album_list.html'
     model = Album
-    ordering = '-scrobble_count'
 
-    def get_queryset(self):
-        "Basic version of ListView.get_queryset()"
-        queryset = self.model._default_manager.with_scrobble_counts()
-        ordering = (self.get_ordering(),)
-        queryset = queryset.order_by(*ordering)
-        return queryset
+
+class ArtistListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
+    "A multi-page chart of most-scrobbled Tracks."
+    template_name = 'lastfm/artist_list.html'
+    model = Artist
+
+
+class TrackListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
+    "A multi-page chart of most-scrobbled Tracks."
+    template_name = 'lastfm/track_list.html'
+    model = Track
 
 
 class AlbumDetailView(DetailView):

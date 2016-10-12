@@ -9,33 +9,6 @@ register = template.Library()
 
 
 @register.assignment_tag
-def top_tracks(artist=None, limit=10):
-    """Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
-    first.
-
-    Restrict to Tracks by one Artist by suppling the `artist`.
-
-    Keyword arguments:
-    artist -- An Artist object or None.
-    limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
-    """
-    if type(artist) is not Artist and artist is not None:
-        raise ValueError("`artist` must be an Artist object or `None`")
-
-    if limit != 'all' and isinstance(limit, int) == False:
-        raise ValueError("`limit` must be an integer or 'all'")
-
-    if artist is None:
-        qs = Track.objects.with_scrobble_counts().order_by('-scrobble_count')
-        if limit != 'all':
-            qs = qs[:limit]
-    else:
-        qs = artist.get_top_tracks(limit=limit)
-
-    return qs
-
-
-@register.assignment_tag
 def top_albums(artist=None, limit=10):
     """Returns a QuerySet of most-scrobbled Albums, with the most-scrobbled
     first.
@@ -63,7 +36,61 @@ def top_albums(artist=None, limit=10):
 
 
 @register.assignment_tag
+def top_artists(limit=10):
+    """Returns a QuerySet of the most-scrobbled Artists, with the
+    most-scrobbled first.
+
+    Keyword arguments:
+    account -- An Account object or None (for Scrobbles by all Accounts).
+    limit -- Maximum number to fetch. Default is 10. 'all' for all Artists.
+    """
+    if limit != 'all' and isinstance(limit, int) == False:
+        raise ValueError("`limit` must be an integer or 'all'")
+
+    qs = Artist.objects.with_scrobble_counts().order_by('-scrobble_count')
+
+    if limit != 'all':
+        qs = qs[:limit]
+
+    return qs
+
+
+@register.assignment_tag
+def top_tracks(artist=None, limit=10):
+    """Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
+    first.
+
+    Restrict to Tracks by one Artist by suppling the `artist`.
+
+    Keyword arguments:
+    artist -- An Artist object or None.
+    limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
+    """
+    if type(artist) is not Artist and artist is not None:
+        raise ValueError("`artist` must be an Artist object or `None`")
+
+    if limit != 'all' and isinstance(limit, int) == False:
+        raise ValueError("`limit` must be an integer or 'all'")
+
+    if artist is None:
+        qs = Track.objects.with_scrobble_counts().order_by('-scrobble_count')
+        if limit != 'all':
+            qs = qs[:limit]
+    else:
+        qs = artist.get_top_tracks(limit=limit)
+
+    return qs
+
+
+@register.assignment_tag
 def recent_scrobbles(account=None, limit=10):
+    """Returns a QuerySet of the most recent Scrobbles by all Accounts, or one,
+    most recent first.
+
+    Keyword arguments:
+    account -- An Account object or None (for Scrobbles by all Accounts).
+    limit -- Maximum number to fetch. Default is 10.
+    """
     if isinstance(limit, int) == False:
         raise ValueError("`limit` must be an integer")
 
