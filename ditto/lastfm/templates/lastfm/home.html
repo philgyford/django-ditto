@@ -15,7 +15,7 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'lastfm/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count only %}
+            {% include 'lastfm/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='scrobbles' only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">
@@ -27,19 +27,30 @@
 
             {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
 
-            <p class="text-xs-right"><a href="{% url 'lastfm:scrobble_list' %}">More tracks</a></p>
+            <p class="text-xs-right">
+                <a href="{% url 'lastfm:scrobble_list' %}">More tracks</a>
+            </p>
 
             <h2>Top tracks </h2>
 
             {% top_tracks limit=10 as tracks %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
+
+            <p class="text-xs-right">
+                <a href="{% url 'lastfm:track_list' %}">More tracks</a>
+            </p>
 
             <h2>Top albums</h2>
 
             {% top_albums limit=10 as albums %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' object_list=albums only %}
+
+            <p class="text-xs-right">
+                <a href="{% url 'lastfm:album_list' %}">More albums</a>
+            </p>
+
         </div> <!-- .col -->
     </div> <!-- .row -->
 

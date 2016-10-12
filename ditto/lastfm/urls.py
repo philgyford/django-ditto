@@ -19,6 +19,16 @@ urlpatterns = [
         name='scrobble_list'
     ),
     url(
+        regex=r"^library/albums$",
+        view=views.AlbumListView.as_view(),
+        name='album_list'
+    ),
+    url(
+        regex=r"^library/tracks$",
+        view=views.TrackListView.as_view(),
+        name='track_list'
+    ),
+    url(
         regex=r"^music/(?P<artist_slug>%s)/$" % slug_chars,
         view=views.ArtistDetailView.as_view(),
         name='artist_detail'

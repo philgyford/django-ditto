@@ -1,34 +1,65 @@
+from django.db import models
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 
 from ..core.views import PaginatedListView
 from .models import Account, Album, Artist, Scrobble, Track
 
 
-class HomeView(PaginatedListView):
-    template_name = 'lastfm/home.html'
-    model = Scrobble
-
+class AccountsMixin(object):
+    """
+    View Mixin for adding an `account_list` to context, with all Accounts in.
+    """
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['account_list'] = Account.objects.all()
         return context
 
 
-class ScrobbleListView(PaginatedListView):
+class HomeView(AccountsMixin, TemplateView):
+    "Uses template tags to display charts, recent Scrobbles, etc."
+    template_name = 'lastfm/home.html'
+
+
+class ScrobbleListView(AccountsMixin, PaginatedListView):
+    "A multi-page list of Scrobbles, most recent first."
     template_name = 'lastfm/scrobble_list.html'
     model = Scrobble
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['account_list'] = Account.objects.all()
-        return context
+
+class TrackListView(AccountsMixin, PaginatedListView):
+    "A multi-page chart of most-scrobbled Tracks."
+    template_name = 'lastfm/track_list.html'
+    model = Track
+    ordering = '-scrobble_count'
+
+    def get_queryset(self):
+        "Basic version of ListView.get_queryset()"
+        queryset = self.model._default_manager.with_scrobble_counts()
+        ordering = (self.get_ordering(),)
+        queryset = queryset.order_by(*ordering)
+        return queryset
+
+
+class AlbumListView(AccountsMixin, PaginatedListView):
+    "A multi-page chart of most-scrobbled Tracks."
+    template_name = 'lastfm/album_list.html'
+    model = Album
+    ordering = '-scrobble_count'
+
+    def get_queryset(self):
+        "Basic version of ListView.get_queryset()"
+        queryset = self.model._default_manager.with_scrobble_counts()
+        ordering = (self.get_ordering(),)
+        queryset = queryset.order_by(*ordering)
+        return queryset
 
 
 class AlbumDetailView(DetailView):
+    "A single Album by a particular Artist."
     model = Album
 
     def get_object(self, queryset=None):
@@ -62,17 +93,20 @@ class AlbumDetailView(DetailView):
 
 
 class ArtistDetailView(DetailView):
+    "One Artist. Uses a template tag to display a chart of their Tracks."
     model = Artist
     slug_url_kwarg = 'artist_slug'
 
 
 class ArtistAlbumsView(DetailView):
+    "One Artist. Uses a template tag to display a chart of their Albums."
     model = Artist
     slug_url_kwarg = 'artist_slug'
     template_name = 'lastfm/artist_albums.html'
 
 
 class TrackDetailView(DetailView):
+    "One Track by a particular Artist."
     model = Track
 
     def get_object(self, queryset=None):
@@ -106,6 +140,7 @@ class TrackDetailView(DetailView):
 
 
 class UserDetailView(SingleObjectMixin, PaginatedListView):
+    " TODO "
     slug_field = 'username'
     slug_url_kwarg = 'username'
 

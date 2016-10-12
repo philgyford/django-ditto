@@ -4,7 +4,7 @@ Display a list of the accounts we're showing scrobbles etc for.
 Expects:
 * account_list - All the accounts we're showing scrobbles etc for.
 * count - How many scrobbles etc are available.
-* list_type - 'recent' (default).
+* list_type - 'scrobbles' (default), 'albums', 'artists' or 'tracks'.
 {% endcomment %}
 
 {% load l10n %}
@@ -12,10 +12,16 @@ Expects:
 <div class="card">
     <div class="card-block">
         <p class="card-text">
-            {% with list_type=list_type|default_if_none:'recent' %}
-                {{ count|localize }}
+            {{ count|localize }}
+            {% if list_type == 'albums' %}
+                Album{{ count|pluralize }} scrobbled
+            {% elif list_type == 'artists' %}
+                Artist{{ count|pluralize }} scrobbled
+            {% elif list_type == 'tracks' %}
+                Track{{ count|pluralize }} scrobbled
+            {% else %}
                 Scrobble{{ count|pluralize }}
-            {% endwith %}
+            {% endif %}
             {% if account_list|length == 1 %}
                 by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.realname }}</a>
             {% else %}

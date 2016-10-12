@@ -23,7 +23,7 @@
 
             {% top_albums artist=artist limit='all' as albums %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='albums' items=albums include_artist=False only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' object_list=albums include_artist=False only %}
         </div> <!-- .col -->
 
         <div class="col-md-3">

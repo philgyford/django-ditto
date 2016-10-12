@@ -22,7 +22,7 @@
 
             {% top_tracks artist=artist limit='all' as tracks %}
 
-            {% include 'lastfm/includes/chart.html' with chart_type='tracks' items=tracks include_artist=False only %}
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks include_artist=False only %}
 
         </div> <!-- .col -->
 

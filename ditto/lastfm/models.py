@@ -3,6 +3,8 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from . import managers
+
 
 # For generating permalinks.
 LASTFM_URL_ROOT = 'http://last.fm'
@@ -78,6 +80,8 @@ class Album(TimeStampedModelMixin, models.Model):
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
 
+    objects = managers.AlbumsManager()
+
     def __str__(self):
         return self.name
 
@@ -146,9 +150,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         By default returns all of them.
         `limit` is 'all' for all albums, or an integer to return that number.
         """
-        qs = self.albums\
-                    .annotate(scrobble_count=models.Count('scrobbles'))\
-                    .order_by('-scrobble_count')
+        qs = self.albums.with_scrobble_counts().order_by('-scrobble_count')
 
         if limit == 'all':
             return qs
@@ -161,9 +163,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         By default returns all of them.
         `limit` is 'all' for all tracks, or an integer to return that number.
         """
-        qs = self.tracks\
-                    .annotate(scrobble_count=models.Count('scrobbles'))\
-                    .order_by('-scrobble_count')
+        qs = self.tracks.with_scrobble_counts().order_by('-scrobble_count')
 
         if limit == 'all':
             return qs
@@ -233,6 +233,8 @@ class Track(TimeStampedModelMixin, models.Model):
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
+
+    objects = managers.TracksManager()
 
     def __str__(self):
         return self.name

@@ -26,9 +26,7 @@ def top_tracks(artist=None, limit=10):
         raise ValueError("`limit` must be an integer or 'all'")
 
     if artist is None:
-        qs = Track.objects\
-                        .annotate(scrobble_count=models.Count('scrobbles'))\
-                        .order_by('-scrobble_count')
+        qs = Track.objects.with_scrobble_counts().order_by('-scrobble_count')
         if limit != 'all':
             qs = qs[:limit]
     else:
@@ -55,9 +53,7 @@ def top_albums(artist=None, limit=10):
         raise ValueError("`limit` must be an integer or 'all'")
 
     if artist is None:
-        qs = Album.objects\
-                    .annotate(scrobble_count=models.Count('scrobbles'))\
-                    .order_by('-scrobble_count')
+        qs = Album.objects.with_scrobble_counts().order_by('-scrobble_count')
         if limit != 'all':
             qs = qs[:limit]
     else:
