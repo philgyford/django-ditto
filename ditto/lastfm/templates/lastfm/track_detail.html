@@ -26,7 +26,7 @@
 
                 <p>This track appears on {% if album_list|length == 1 %}this album{% else %}these albums{% endif %}:</p>
 
-                {% include 'lastfm/includes/chart.html' with object_list=album_list chart_type='albums' only %}
+                {% include 'lastfm/includes/chart.html' with object_list=album_list chart_type='albums' include_artist=False only %}
 
             {% endwith %}
 

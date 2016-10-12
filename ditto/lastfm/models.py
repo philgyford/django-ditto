@@ -106,6 +106,30 @@ class Album(TimeStampedModelMixin, models.Model):
         else:
             return None
 
+    @property
+    def tracks(self):
+        """
+        A QuerySet of all the Tracks on this Album, ordered by how many times
+        they were scrobbled, most-scrobbled first.
+        """
+        return Track.objects\
+                        .with_scrobble_counts()\
+                        .filter(scrobbles__album=self)\
+                        .distinct()\
+                        .order_by('-scrobble_count')
+
+    def get_scrobble_count(self):
+        """If we just have a `scrobble_count` property it clashes when we use
+        the Album.objects.with_scrobble_count() query.
+        """
+        return self.scrobbles.count()
+
+    def get_most_recent_scrobble(self):
+        """
+        Returns the most recent Scrobble object for this Album.
+        """
+        return self.scrobbles.order_by('-post_time').first()
+
 
 class Artist(TimeStampedModelMixin, models.Model):
     "Minimal model of a music artist."
