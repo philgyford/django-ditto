@@ -35,6 +35,41 @@ class AccountTestCase(TestCase):
         account = AccountFactory(username='gyford')
         self.assertEqual(account.get_absolute_url(), '/lastfm/user/gyford/')
 
+    def test_recent_scrobbles(self):
+        "By default it returns 10 scrobbles"
+        account = AccountFactory()
+        scrobbles = ScrobbleFactory.create_batch(11, account=account)
+        self.assertEqual(len(account.get_recent_scrobbles()), 10)
+
+    def test_recent_scrobbles_limit(self):
+        "It returns `limit` scrobbles"
+        account = AccountFactory()
+        scrobbles = ScrobbleFactory.create_batch(5, account=account)
+        self.assertEqual(len(account.get_recent_scrobbles(limit=3)), 3)
+
+    def test_recent_scrobbles_order(self):
+        "It returns the most recent first"
+        account = AccountFactory()
+        post_time_1 = datetime.datetime.strptime(
+                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        post_time_2 = datetime.datetime.strptime(
+                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
+        scrobble1 = ScrobbleFactory(account=account, post_time=post_time_1)
+        scrobble2 = ScrobbleFactory(account=account, post_time=post_time_2)
+        self.assertEqual(account.get_recent_scrobbles()[0], scrobble2)
+
+    def test_recent_scrobbles_correct_account(self):
+        "It only returns scrobbles for itself, not another account"
+        account1 = AccountFactory()
+        account2 = AccountFactory()
+        scrobble1 = ScrobbleFactory(account=account1)
+        scrobble2 = ScrobbleFactory(account=account2)
+        scrobbles = account1.get_recent_scrobbles()
+        self.assertEqual(len(scrobbles), 1)
+        self.assertEqual(scrobbles[0], scrobble1)
+
 
 class AlbumTestCase(TestCase):
 

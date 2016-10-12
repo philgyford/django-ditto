@@ -2,14 +2,15 @@
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
-    <li class="breadcrumb-item active">Last.fm</li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item active">Scrobbles</li>
 {% endblock %}
 
 {% block content %}
 
     <h1 class="m-y-2">
         {% block title %}
-            Last.fm
+            Scrobbles
         {% endblock %}
     </h1>
 
@@ -19,15 +20,7 @@
         </div> <!-- .col -->
 
         <div class="col-md-9">
-            {% load ditto_lastfm %}
-
-            <h2>Recent scrobbles</h2>
-
-            {% recent_scrobbles limit=10 as scrobbles %}
-
-            {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
-
-            <p class="text-xs-right"><a href="{% url 'lastfm:scrobble_list' %}">More scrobbles</a></p>
+            {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobble_list page_obj=page_obj request=request only %}
         </div> <!-- .col -->
     </div> <!-- .row -->
 

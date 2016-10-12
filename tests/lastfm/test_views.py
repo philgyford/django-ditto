@@ -23,6 +23,25 @@ class HomeViewTests(TestCase):
         self.assertEqual(len(response.context['account_list']), 3)
 
 
+class ScrobbleListViewTests(TestCase):
+
+    def test_scrobble_list_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('lastfm:scrobble_list'))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'lastfm/scrobble_list.html')
+        self.assertTemplateUsed(response, 'lastfm/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_scrobble_list_context(self):
+        "Sends the correct data to the templates"
+        accounts = AccountFactory.create_batch(3)
+        response = self.client.get(reverse('lastfm:scrobble_list'))
+        self.assertIn('account_list', response.context)
+        self.assertEqual(len(response.context['account_list']), 3)
+        self.assertIn('scrobble_list', response.context)
+
+
 class AlbumDetailViewTests(TestCase):
 
     def setUp(self):

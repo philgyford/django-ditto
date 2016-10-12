@@ -48,6 +48,9 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return False
 
+    def get_recent_scrobbles(self, limit=10):
+        return self.scrobbles.order_by('-post_time')[:limit]
+
 
 class Album(TimeStampedModelMixin, models.Model):
     """
@@ -195,7 +198,7 @@ class Scrobble(DittoItemModel, models.Model):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    account = models.ForeignKey('Account')
+    account = models.ForeignKey('Account', related_name='scrobbles')
 
     artist = models.ForeignKey('Artist', related_name='scrobbles')
     track = models.ForeignKey('Track', related_name='scrobbles')

@@ -14,6 +14,11 @@ urlpatterns = [
         name='home'
     ),
     url(
+        regex=r"^scrobbles$",
+        view=views.ScrobbleListView.as_view(),
+        name='scrobble_list'
+    ),
+    url(
         regex=r"^music/(?P<artist_slug>%s)/$" % slug_chars,
         view=views.ArtistDetailView.as_view(),
         name='artist_detail'

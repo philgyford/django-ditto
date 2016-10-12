@@ -1,7 +1,7 @@
 from django import template
 from django.utils.html import format_html
 
-from ..models import Artist
+from ..models import Account, Artist, Scrobble
 
 
 register = template.Library()
@@ -41,4 +41,14 @@ def artist_top_albums(artist=None, limit=10):
         raise ValueError("`limit` must be an integer or 'all'")
 
     return artist.get_top_albums(limit=limit)
+
+@register.assignment_tag
+def recent_scrobbles(account=None, limit=10):
+    if isinstance(limit, int) == False:
+        raise ValueError("`limit` must be an integer")
+
+    if type(account) is Account:
+        return account.get_recent_scrobbles(limit)
+    else:
+        return Scrobble.objects.all().order_by('-post_time')[:limit]
 

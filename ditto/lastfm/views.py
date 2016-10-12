@@ -18,6 +18,16 @@ class HomeView(PaginatedListView):
         return context
 
 
+class ScrobbleListView(PaginatedListView):
+    template_name = 'lastfm/scrobble_list.html'
+    model = Scrobble
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account_list'] = Account.objects.all()
+        return context
+
+
 class AlbumDetailView(DetailView):
     model = Album
 

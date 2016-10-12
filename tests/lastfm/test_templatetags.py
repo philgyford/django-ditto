@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from ditto.lastfm.templatetags import ditto_lastfm
-from ditto.lastfm.factories import AlbumFactory, ArtistFactory,\
-        ScrobbleFactory, TrackFactory
+from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
+        ArtistFactory, ScrobbleFactory, TrackFactory
 
 
 class ArtistTopTracksTestCase(TestCase):
@@ -96,4 +96,35 @@ class ArtistTopAlbumsTestCase(TestCase):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
             ditto_lastfm.artist_top_albums(artist=self.artist, limit='bob')
+
+
+class RecentScrobblesTestCase(TestCase):
+
+    def setUp(self):
+        self.account1 = AccountFactory()
+        self.account2 = AccountFactory()
+        scrobbles1 = ScrobbleFactory.create_batch(11, account=self.account1)
+        self.scrobble2 = ScrobbleFactory(account=self.account2)
+
+    def test_for_account(self):
+        "With an Account, it gets its recent scrobbles"
+        scrobbles = ditto_lastfm.recent_scrobbles(
+                                            account=self.account1, limit=12)
+        self.assertEqual(len(scrobbles), 11)
+        self.assertNotIn(self.scrobble2, scrobbles)
+
+    def test_default_limit(self):
+        "It returns 10 by default"
+        scrobbles = ditto_lastfm.recent_scrobbles()
+        self.assertEqual(len(scrobbles), 10)
+
+    def test_limit(self):
+        "It returns `limit` scrobbles"
+        scrobbles = ditto_lastfm.recent_scrobbles(limit=3)
+        self.assertEqual(len(scrobbles), 3)
+
+    def test_limit_error(self):
+        "It throws an error if limit isn't an integer"
+        with self.assertRaises(ValueError):
+            ditto_lastfm.recent_scrobbles(limit='bob')
 
