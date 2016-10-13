@@ -49,9 +49,6 @@ perms -- The Django permissions object.
                 <a href="{% url 'admin:lastfm_artist_change' artist.id %}" title="Edit this artist in the Django Admin">Edit</a>
             </li>
         {% endif %}
-        <li class="list-group-item text-muted">
-            <small>Last updated {% display_time artist.time_modified True %}</small>
-        </li>
     </ul>
 </div>
 
