@@ -10,7 +10,7 @@ from freezegun import freeze_time
 import responses
 from requests.exceptions import HTTPError
 
-from ditto.core.utils import datetime_now, truncate_string
+from ditto.core.utils import datetime_now, datetime_from_str, truncate_string
 from ditto.core.utils.downloader import DownloadException, filedownloader
 
 
@@ -20,6 +20,17 @@ class DatetimeNowTestCase(TestCase):
     def test_datetime_now(self):
         self.assertEqual(datetime_now(),
                         datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+
+
+class DatetimeFromStrTestCase(TestCase):
+
+    def test_datetime_from_str(self):
+        s = '2015-08-12 12:00:00'
+        self.assertEqual(
+            datetime_from_str(s),
+            datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S').replace(
+                                                        tzinfo=pytz.utc)
+        )
 
 
 class TruncateStringTestCase(TestCase):

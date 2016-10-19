@@ -1,8 +1,6 @@
-import datetime
-import pytz
-
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
         ArtistFactory, ScrobbleFactory, TrackFactory
 from ditto.lastfm.models import Account, Album, Artist, Scrobble, Track
@@ -50,14 +48,10 @@ class AccountTestCase(TestCase):
     def test_recent_scrobbles_order(self):
         "It returns the most recent first"
         account = AccountFactory()
-        post_time_1 = datetime.datetime.strptime(
-                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        post_time_2 = datetime.datetime.strptime(
-                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        scrobble1 = ScrobbleFactory(account=account, post_time=post_time_1)
-        scrobble2 = ScrobbleFactory(account=account, post_time=post_time_2)
+        scrobble1 = ScrobbleFactory(account=account,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(account=account,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
         self.assertEqual(account.get_recent_scrobbles()[0], scrobble2)
 
     def test_recent_scrobbles_correct_account(self):
@@ -136,17 +130,75 @@ class AlbumTestCase(TestCase):
         artist = ArtistFactory()
         track = TrackFactory(artist=artist)
         album = AlbumFactory(artist=artist)
-        post_time_1 = datetime.datetime.strptime(
-                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        post_time_2 = datetime.datetime.strptime(
-                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
         scrobble1 = ScrobbleFactory(artist=artist, track=track, album=album,
-                                                        post_time=post_time_1)
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
         scrobble2 = ScrobbleFactory(artist=artist, track=track, album=album,
-                                                        post_time=post_time_2)
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
         self.assertEqual(album.get_most_recent_scrobble(), scrobble2)
+
+
+class AlbumManagersTestCase(TestCase):
+    "Testing the WithScrobbleCountsManager stuff."
+
+    def setUp(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        album = AlbumFactory(artist=artist)
+
+        # Scrobbled 4 times on different days:
+        scrobble1 = ScrobbleFactory(artist=artist, track=track, album=album,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track, album=album,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track, album=album,
+                            post_time=datetime_from_str('2015-08-13 12:00:00'))
+        scrobble4 = ScrobbleFactory(artist=artist, track=track, album=album,
+                            post_time=datetime_from_str('2015-08-14 12:00:00'))
+
+
+    def test_with_scrobble_counts(self):
+        "Should add a `scrobble_count` aggregate Count to each Album."
+        # Add another album, with 1 scrobble, as well as the one in setUp():
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+        album2 = AlbumFactory(artist=artist2)
+        scrobble2 = ScrobbleFactory(artist=artist2, track=track2, album=album2)
+        albums = Album.objects.with_scrobble_counts().order_by(
+                                                            '-scrobble_count')
+        self.assertEqual(len(albums), 2)
+        self.assertEqual(albums[0].scrobble_count, 4)
+        self.assertEqual(albums[1].scrobble_count, 1)
+
+    def test_with_scrobble_counts_min(self):
+        "Only aggregates scrobble_counts after supplied min time."
+        albums = Album.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                    )
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_max(self):
+        "Only aggregates scrobble_counts before supplied max time."
+        albums = Album.objects.with_scrobble_counts(
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00'),
+                    )
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_min_max(self):
+        "Only aggregates scrobble_counts within supplied times."
+        albums = Album.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00')
+                    )
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+    def test_errors(self):
+        with self.assertRaises(TypeError):
+            Album.objects.with_scrobble_counts(min_post_time='foo')
+        with self.assertRaises(TypeError):
+            Album.objects.with_scrobble_counts(max_post_time='foo')
 
 
 class ArtistTestCase(TestCase):
@@ -234,15 +286,72 @@ class ArtistTestCase(TestCase):
 
     def test_get_most_recent_scrobble(self):
         artist = ArtistFactory()
-        post_time_1 = datetime.datetime.strptime(
-                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        post_time_2 = datetime.datetime.strptime(
-                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        scrobble1 = ScrobbleFactory(artist=artist, post_time=post_time_1)
-        scrobble2 = ScrobbleFactory(artist=artist, post_time=post_time_2)
+        scrobble1 = ScrobbleFactory(artist=artist,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
         self.assertEqual(artist.get_most_recent_scrobble(), scrobble2)
+
+
+class ArtistManagersTestCase(TestCase):
+    "Testing the WithScrobbleCountsManager stuff."
+
+    def setUp(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+
+        # Scrobbled 4 times on different days:
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-13 12:00:00'))
+        scrobble4 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-14 12:00:00'))
+
+    def test_with_scrobble_counts(self):
+        "Should add a `scrobble_count` aggregate Count to each Artist."
+        # Add another track, with 1 scrobble, as well as the one in setUp():
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+        scrobble2 = ScrobbleFactory(artist=artist2, track=track2)
+        artists = Artist.objects.with_scrobble_counts().order_by(
+                                                            '-scrobble_count')
+        self.assertEqual(len(artists), 2)
+        self.assertEqual(artists[0].scrobble_count, 4)
+        self.assertEqual(artists[1].scrobble_count, 1)
+
+    def test_with_scrobble_counts_min(self):
+        "Only aggregates scrobble_counts after supplied min time."
+        artists = Artist.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                    )
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_max(self):
+        "Only aggregates scrobble_counts before supplied max time."
+        artists = Artist.objects.with_scrobble_counts(
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00'),
+                    )
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_min_max(self):
+        "Only aggregates scrobble_counts within supplied times."
+        artists = Artist.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00')
+                    )
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
+    def test_errors(self):
+        with self.assertRaises(TypeError):
+            Artist.objects.with_scrobble_counts(min_post_time='foo')
+        with self.assertRaises(TypeError):
+            Artist.objects.with_scrobble_counts(max_post_time='foo')
 
 
 class ScrobbleTestCase(TestCase):
@@ -253,25 +362,17 @@ class ScrobbleTestCase(TestCase):
 
 
     def test_str(self):
-        post_time = datetime.datetime.strptime(
-                        '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
-                    ).replace(tzinfo=pytz.utc)
-        scrobble = ScrobbleFactory(artist=self.artist,
-                                   track=self.track,
-                                   post_time=post_time)
+        scrobble = ScrobbleFactory(artist=self.artist, track=self.track,
+                           post_time=datetime_from_str('2016-04-07 12:00:00'))
         self.assertEqual(str(scrobble),
                 'The Mountain Goats – Dance Music (2016-04-07 12:00:00+00:00)')
 
     def test_ordering(self):
         "It should order by post_time descending."
-        post_time_1 = datetime.datetime.strptime(
-                        '2016-04-06 12:00:00', '%Y-%m-%d %H:%M:%S'
-                    ).replace(tzinfo=pytz.utc)
-        post_time_2 = datetime.datetime.strptime(
-                        '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
-                    ).replace(tzinfo=pytz.utc)
-        scrobble_1 = ScrobbleFactory(post_time=post_time_1)
-        scrobble_2 = ScrobbleFactory(post_time=post_time_2)
+        scrobble_1 = ScrobbleFactory(
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble_2 = ScrobbleFactory(
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
         scrobbles = Scrobble.objects.all()
         self.assertEqual(scrobbles[0], scrobble_2)
         self.assertEqual(scrobbles[1], scrobble_1)
@@ -283,10 +384,8 @@ class ScrobbleTestCase(TestCase):
 
     def test_summary(self):
         "It should set the summary on save."
-        post_time = datetime.datetime.strptime(
-                        '2016-04-07 12:00:00', '%Y-%m-%d %H:%M:%S'
-                    ).replace(tzinfo=pytz.utc)
-        scrobble = ScrobbleFactory(post_time=post_time)
+        scrobble = ScrobbleFactory(
+                            post_time=datetime_from_str('2016-04-07 12:00:00'))
         self.assertEqual(scrobble.summary, '2016-04-07 12:00:00+00:00')
 
 
@@ -353,15 +452,70 @@ class TrackTestCase(TestCase):
     def test_get_most_recent_scrobble(self):
         artist = ArtistFactory()
         track = TrackFactory(artist=artist)
-        post_time_1 = datetime.datetime.strptime(
-                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        post_time_2 = datetime.datetime.strptime(
-                '2015-08-12 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc)
-        scrobble1 = ScrobbleFactory(
-                        artist=artist, track=track, post_time=post_time_1)
-        scrobble2 = ScrobbleFactory(
-                        artist=artist, track=track, post_time=post_time_2)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
         self.assertEqual(track.get_most_recent_scrobble(), scrobble2)
+
+
+class TrackManagersTestCase(TestCase):
+    "Testing the WithScrobbleCountsManager stuff."
+
+    def setUp(self):
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+
+        # Scrobbled 4 times on different days:
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-11 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-12 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-13 12:00:00'))
+        scrobble4 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2015-08-14 12:00:00'))
+
+    def test_with_scrobble_counts(self):
+        "Should add a `scrobble_count` aggregate Count to each Track."
+        # Add another track, with 1 scrobble, as well as the one in setUp():
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+        scrobble2 = ScrobbleFactory(artist=artist2, track=track2)
+        tracks = Track.objects.with_scrobble_counts().order_by(
+                                                            '-scrobble_count')
+        self.assertEqual(len(tracks), 2)
+        self.assertEqual(tracks[0].scrobble_count, 4)
+        self.assertEqual(tracks[1].scrobble_count, 1)
+
+    def test_with_scrobble_counts_min(self):
+        "Only aggregates scrobble_counts after supplied min time."
+        tracks = Track.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                    )
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_max(self):
+        "Only aggregates scrobble_counts before supplied max time."
+        tracks = Track.objects.with_scrobble_counts(
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00'),
+                    )
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 3)
+
+    def test_with_scrobble_counts_min_max(self):
+        "Only aggregates scrobble_counts within supplied times."
+        tracks = Track.objects.with_scrobble_counts(
+                        min_post_time=datetime_from_str('2015-08-12 12:00:00'),
+                        max_post_time=datetime_from_str('2015-08-13 12:00:00')
+                    )
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
+    def test_errors(self):
+        with self.assertRaises(TypeError):
+            Track.objects.with_scrobble_counts(min_post_time='foo')
+        with self.assertRaises(TypeError):
+            Track.objects.with_scrobble_counts(max_post_time='foo')
 

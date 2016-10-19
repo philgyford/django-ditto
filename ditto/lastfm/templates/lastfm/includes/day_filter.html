@@ -1,0 +1,31 @@
+{% comment %}
+Displays the 'Days: 7 30 90 180 365 All time' filter links.
+
+Expects:
+* request -- The Request object.
+* current_days -- An integer, indicating number of days, or a string: 'all'.
+* valid_days -- A list of the days we list, eg [7, 30, 365, 'all',].
+{% endcomment %}
+
+{% load ditto_core %}
+<div class="row m-b-2">
+    <div class="col-xs-12">
+        <nav class="pull-xs-right">
+            <ul class="nav nav-inline">
+                <li class="nav-item">
+                    Recent days:
+                </li>
+                {% for day in valid_days %}
+                    <li class="nav-item">
+                        {% if current_days == day %}
+                            <strong>{{ day|title }}</strong>
+                        {% else %}
+                        <a class="nav-link" href="?{% query_string 'days' day %} ">{{ day|title }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</div>
+

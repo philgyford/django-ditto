@@ -17,9 +17,12 @@
     <div class="row">
         <div class="col-md-3">
             {% include 'lastfm/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='tracks' only %}
+            {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">
+            {% include 'lastfm/includes/day_filter.html' with request=request current_days=current_days valid_days=valid_days only %}
+
             {% include 'lastfm/includes/chart.html' with object_list=track_list chart_type='tracks' page_obj=page_obj request=request only %}
         </div> <!-- .col -->
     </div> <!-- .row -->

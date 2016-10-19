@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.http import Http404
 from django.shortcuts import redirect
@@ -5,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 
+from ..core.utils import datetime_now
 from ..core.views import PaginatedListView
 from .models import Account, Album, Artist, Scrobble, Track
 
@@ -12,10 +15,17 @@ from .models import Account, Album, Artist, Scrobble, Track
 class AccountsMixin(object):
     """
     View Mixin for adding an `account_list` to context, with all Accounts in.
+    And the total counts of Scrobbles, Albums, Artists and Tracks.
     """
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['account_list'] = Account.objects.all()
+        context['counts']   = {
+            'albums':       Album.objects.all().count(),
+            'artists':      Artist.objects.all().count(),
+            'scrobbles':    Scrobble.objects.all().count(),
+            'tracks':       Track.objects.all().count(),
+        }
         return context
 
 
@@ -30,7 +40,7 @@ class ScrobbleListView(AccountsMixin, PaginatedListView):
     model = Scrobble
 
 
-class WithScrobbleCountsPaginatedListView(PaginatedListView):
+class ChartPaginatedListView(PaginatedListView):
     """
     For the Album, Artist and Track ListViews that are charts ordered by
     scrobble_count.
@@ -38,26 +48,63 @@ class WithScrobbleCountsPaginatedListView(PaginatedListView):
     ordering = '-scrobble_count'
 
     def get_queryset(self):
-        "Basic version of ListView.get_queryset()"
-        queryset = self.model._default_manager.with_scrobble_counts()
+        """
+        Includes scrobble_counts with returned objects, and adds ability to
+        limit results to a time period based on the supplied `days`.
+        """
+        queryset = self.model._default_manager
+
+        days = self.get_days()
+
+        if days == 'all':
+            queryset = queryset.with_scrobble_counts()
+        else:
+            time_ago = datetime_now() - timedelta(days=days)
+            queryset = queryset.with_scrobble_counts(min_post_time=time_ago)
+
         ordering = (self.get_ordering(),)
         queryset = queryset.order_by(*ordering)
+
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_days'] = str(self.get_days())
+        context['valid_days'] = self.get_valid_days()
+        return context
 
-class AlbumListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
+    def get_valid_days(self):
+        return ['7', '30', '90', '180', '365', 'all',]
+
+    def get_days(self):
+        """
+        Returns the current number of recent days we're viewing.
+
+        Returns an integer (number of days) or 'all'.
+        """
+        days = self.request.GET.get('days')
+        if days and days in self.get_valid_days():
+            try:
+                return int(days)
+            except ValueError:
+                return days
+        else:
+            return 'all'
+
+
+class AlbumListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
     template_name = 'lastfm/album_list.html'
     model = Album
 
 
-class ArtistListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
+class ArtistListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
     template_name = 'lastfm/artist_list.html'
     model = Artist
 
 
-class TrackListView(AccountsMixin, WithScrobbleCountsPaginatedListView):
+class TrackListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
     template_name = 'lastfm/track_list.html'
     model = Track

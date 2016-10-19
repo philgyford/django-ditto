@@ -14,13 +14,13 @@ Expects:
         <p class="card-text">
             {{ count|localize }}
             {% if list_type == 'albums' %}
-                Album{{ count|pluralize }} scrobbled
+                album{{ count|pluralize }} scrobbled
             {% elif list_type == 'artists' %}
-                Artist{{ count|pluralize }} scrobbled
+                artist{{ count|pluralize }} scrobbled
             {% elif list_type == 'tracks' %}
-                Track{{ count|pluralize }} scrobbled
+                track{{ count|pluralize }} scrobbled
             {% else %}
-                Scrobble{{ count|pluralize }}
+                scrobble{{ count|pluralize }}
             {% endif %}
             {% if account_list|length == 1 %}
                 by <a href="{{ account_list.0.get_absolute_url }}">{{ account_list.0.realname }}</a>

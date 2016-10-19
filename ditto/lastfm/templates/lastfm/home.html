@@ -15,51 +15,48 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'lastfm/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='scrobbles' only %}
+            {% include 'lastfm/includes/account_list.html' with account_list=account_list count=counts.scrobbles list_type='scrobbles' only %}
+            {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">
             {% load ditto_lastfm %}
 
-            <h2>Recent tracks</h2>
+            <h2>
+                <a href="{% url 'lastfm:scrobble_list' %}">Recent tracks</a>
+            </h2>
 
             {% recent_scrobbles limit=10 as scrobbles %}
 
             {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
 
-            <p class="text-xs-right">
-                <a href="{% url 'lastfm:scrobble_list' %}">More scrobbles</a>
-            </p>
 
-            <h2>Top artists</h2>
+            <h2>
+                <a href="{% url 'lastfm:artist_list' %}">Top artists</a>
+            </h2>
 
             {% top_artists limit=10 as artists %}
 
             {% include 'lastfm/includes/chart.html' with chart_type='artists' object_list=artists only %}
 
-            <p class="text-xs-right">
-                <a href="{% url 'lastfm:artist_list' %}">More artists</a>
-            </p>
 
-            <h2>Top albums</h2>
+            <h2>
+                <a href="{% url 'lastfm:album_list' %}">Top albums</a>
+            </h2>
 
             {% top_albums limit=10 as albums %}
 
             {% include 'lastfm/includes/chart.html' with chart_type='albums' object_list=albums only %}
 
-            <p class="text-xs-right">
-                <a href="{% url 'lastfm:album_list' %}">More albums</a>
-            </p>
 
-            <h2>Top tracks </h2>
+            <h2>
+                <a href="{% url 'lastfm:track_list' %}">Top tracks</a>
+            </h2>
 
             {% top_tracks limit=10 as tracks %}
 
             {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
 
-            <p class="text-xs-right">
-                <a href="{% url 'lastfm:track_list' %}">More tracks</a>
-            </p>
         </div> <!-- .col -->
     </div> <!-- .row -->
 

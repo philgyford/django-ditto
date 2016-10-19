@@ -1,0 +1,25 @@
+{% comment %}
+Shows the links to the main Last.fm pages, for the sidebar.
+
+Expects:
+* request -- The Request object.
+* url_name -- The name of the current page, as described in the URL conf.
+{% endcomment %}
+
+<div class="card">
+    <div class="list-group list-group-flush">
+        <a href="{% url 'lastfm:scrobble_list' %}" class="list-group-item {% if url_name == 'scrobble_list' %}active{% else %}list-group-item-action{% endif %}">
+            Scrobbles
+        </a>
+        <a href="{% url 'lastfm:artist_list' %}" class="list-group-item {% if url_name == 'artist_list' %}active{% else %}list-group-item-action{% endif %}">
+            Artists
+        </a>
+        <a href="{% url 'lastfm:album_list' %}" class="list-group-item {% if url_name == 'album_list' %}active{% else %}list-group-item-action{% endif %}">
+            Albums
+        </a>
+        <a href="{% url 'lastfm:track_list' %}" class="list-group-item {% if url_name == 'track_list' %}active{% else %}list-group-item-action{% endif %}">
+            Tracks
+        </a>
+    </div>
+</div>
+

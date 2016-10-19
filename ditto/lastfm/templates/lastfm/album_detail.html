@@ -3,7 +3,9 @@
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_list' %}">Artists</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_detail' artist_slug=album.artist.slug %}">{{ album.artist.name|truncatewords:5 }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_albums' artist_slug=album.artist.slug %}">Albums</a></li>
     <li class="breadcrumb-item active">{{ album.name|truncatewords:5 }}</li>
 {% endblock %}
 

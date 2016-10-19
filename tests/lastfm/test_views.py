@@ -1,9 +1,13 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from freezegun import freeze_time
+
+from ditto.core.utils import datetime_from_str
 from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
         ArtistFactory, ScrobbleFactory, TrackFactory
 
+from ditto.lastfm.models import *
 
 class AlbumDetailViewTests(TestCase):
 
@@ -56,6 +60,47 @@ class AlbumListViewTests(TestCase):
         self.assertEqual(len(response.context['account_list']), 2)
         self.assertIn('album_list', response.context)
         self.assertEqual(len(response.context['album_list']), 3)
+        self.assertIn('valid_days', response.context)
+        self.assertEqual(response.context['valid_days'],
+                        ['7', '30', '90', '180', '365', 'all',])
+        self.assertIn('current_days', response.context)
+        self.assertEqual(response.context['current_days'], 'all')
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_default_days(self):
+        "Has correct scrobble count context when all days are viewed, the default."
+        artist = ArtistFactory()
+        album = AlbumFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get(reverse('lastfm:album_list'))
+        self.assertEqual(response.context['album_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_all_days(self):
+        "Has correct scrobble count context when all days are viewed."
+        artist = ArtistFactory()
+        album = AlbumFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get("%s?days=all" % reverse('lastfm:album_list'))
+        self.assertEqual(response.context['album_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_7_days(self):
+        "Has correct scrobble count context when a restricted number of days are viewed."
+        artist = ArtistFactory()
+        album = AlbumFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, album=album,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get("%s?days=7" % reverse('lastfm:album_list'))
+        self.assertEqual(response.context['album_list'][0].scrobble_count, 1)
 
 
 class ArtistAlbumsViewTests(TestCase):
@@ -133,6 +178,48 @@ class ArtistListViewTests(TestCase):
         self.assertEqual(len(response.context['account_list']), 2)
         self.assertIn('artist_list', response.context)
         self.assertEqual(len(response.context['artist_list']), 3)
+        self.assertIn('valid_days', response.context)
+        self.assertEqual(response.context['valid_days'],
+                        ['7', '30', '90', '180', '365', 'all',])
+        self.assertIn('current_days', response.context)
+        self.assertEqual(response.context['current_days'], 'all')
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_default_days(self):
+        "Has correct scrobble count context when all days are viewed, the default."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get(reverse('lastfm:artist_list'))
+        self.assertEqual(response.context['artist_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_all_days(self):
+        "Has correct scrobble count context when all days are viewed."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get(
+                                "%s?days=all" % reverse('lastfm:artist_list'))
+        self.assertEqual(response.context['artist_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_7_days(self):
+        "Has correct scrobble count context when a restricted number of days are viewed."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get("%s?days=7" % reverse('lastfm:artist_list'))
+        self.assertEqual(response.context['artist_list'][0].scrobble_count, 1)
 
 
 class HomeViewTests(TestCase):
@@ -148,9 +235,14 @@ class HomeViewTests(TestCase):
     def test_context(self):
         "Sends the correct data to the templates"
         accounts = AccountFactory.create_batch(3)
+        scrobble1 = ScrobbleFactory(account=accounts[0])
+        scrobble2 = ScrobbleFactory(account=accounts[1])
         response = self.client.get(reverse('lastfm:home'))
         self.assertIn('account_list', response.context)
         self.assertEqual(len(response.context['account_list']), 3)
+        self.assertIn('counts', response.context)
+        self.assertIn('scrobbles', response.context['counts'])
+        self.assertEqual(response.context['counts']['scrobbles'], 2)
 
 
 class ScrobbleListViewTests(TestCase):
@@ -223,4 +315,45 @@ class TrackListViewTests(TestCase):
         self.assertEqual(len(response.context['account_list']), 2)
         self.assertIn('track_list', response.context)
         self.assertEqual(len(response.context['track_list']), 3)
+        self.assertIn('valid_days', response.context)
+        self.assertEqual(response.context['valid_days'],
+                        ['7', '30', '90', '180', '365', 'all',])
+        self.assertIn('current_days', response.context)
+        self.assertEqual(response.context['current_days'], 'all')
 
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_default_days(self):
+        "Has correct scrobble count context when all days are viewed, the default."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get(reverse('lastfm:track_list'))
+        self.assertEqual(response.context['track_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_all_days(self):
+        "Has correct scrobble count context when all days are viewed."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get(
+                                "%s?days=all" % reverse('lastfm:track_list'))
+        self.assertEqual(response.context['track_list'][0].scrobble_count, 2)
+
+    @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
+    def test_7_days(self):
+        "Has correct scrobble count context when a restricted number of days are viewed."
+        artist = ArtistFactory()
+        track = TrackFactory(artist=artist)
+        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2012-10-01 12:00:00'))
+        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+                            post_time=datetime_from_str('2016-10-01 12:00:00'))
+        response = self.client.get("%s?days=7" % reverse('lastfm:track_list'))
+        self.assertEqual(response.context['track_list'][0].scrobble_count, 1)

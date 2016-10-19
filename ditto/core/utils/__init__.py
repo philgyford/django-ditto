@@ -2,6 +2,7 @@
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
+
 def truncate_string(text, strip_html=True, chars=255, truncate=u'…', at_word_boundary=False):
     """Truncate a string to a certain length, removing line breaks and mutliple
     spaces, optionally removing HTML, and appending a 'truncate' string.
@@ -34,4 +35,11 @@ def datetime_now():
     """
     return datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
+
+def datetime_from_str(s):
+    """A shortcut for making a UTC datetime from a string like
+    '2015-08-11 12:00:00'.
+    """
+    return datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S').replace(
+                                                            tzinfo=pytz.utc)
 
