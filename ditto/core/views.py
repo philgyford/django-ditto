@@ -366,6 +366,9 @@ class HomeView(DittoAppsMixin, TemplateView):
     # Set to True to include Tweets that are replies:
     include_twitter_replies = False
 
+    # Set to True to include Scrobbles:
+    include_lastfm_scrobbles = False
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -379,6 +382,9 @@ class HomeView(DittoAppsMixin, TemplateView):
             if self.include_flickr_photos_by_taken_date == False:
                 # Otherwise we'll get two sets of photos, sorted by upload or taken:
                 app_varieties.remove(('flickr', 'photo-taken'))
+
+            if self.include_lastfm_scrobbles == False:
+                app_varieties.remove(('lastfm', 'scrobble'))
 
             if self.include_twitter_favorites == False:
                 # No easy way to tell in the template whether a tweet is posted

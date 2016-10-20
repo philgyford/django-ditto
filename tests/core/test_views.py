@@ -29,6 +29,8 @@ class DittoViewTests(TestCase):
         photos_2 = flickrfactories.PhotoFactory.create_batch(2,
                                                 user=flickr_accounts[1].user)
 
+        scrobbles = lastfmfactories.ScrobbleFactory.create_batch(2)
+
         pinboard_accounts = pinboardfactories.AccountFactory.create_batch(2)
         bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
                                             2, account=pinboard_accounts[0])
@@ -99,6 +101,21 @@ class DittoViewTests(TestCase):
             }[x]
             response = self.client.get(reverse('ditto:home'))
             self.assertFalse('flickr_photo_list' in response.context)
+
+    def test_home_no_lastfm(self):
+        "Shouldn't try to get scrobbles if lastfm app isn't installed"
+        with patch.object(apps, 'is_installed') as mock_method:
+            # Fake it so it looks like ditto.pinboard isn't installed:
+            mock_method.side_effect = lambda x: {
+                'ditto.flickr': True,
+                'ditto.lastfm': False,
+                'ditto.pinboard': True,
+                'ditto.twitter': True,
+                # Without this Django 1.10 throws an error for some reason:
+                'django.contrib.staticfiles': True,
+            }[x]
+            response = self.client.get(reverse('ditto:home'))
+            self.assertFalse('lastfm_scrobble_list' in response.context)
 
     def test_home_no_pinboard(self):
         "Shouldn't try to get bookmarks if pinboard app isn't installed"
