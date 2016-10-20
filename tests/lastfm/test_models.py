@@ -145,7 +145,7 @@ class AlbumManagersTestCase(TestCase):
         track = TrackFactory(artist=artist)
         album = AlbumFactory(artist=artist)
 
-        # Scrobbled 4 times on different days:
+        # Scrobbled 4 times on different days, by 2 different Accounts:
         scrobble1 = ScrobbleFactory(artist=artist, track=track, album=album,
                             post_time=datetime_from_str('2015-08-11 12:00:00'))
         scrobble2 = ScrobbleFactory(artist=artist, track=track, album=album,
@@ -154,7 +154,6 @@ class AlbumManagersTestCase(TestCase):
                             post_time=datetime_from_str('2015-08-13 12:00:00'))
         scrobble4 = ScrobbleFactory(artist=artist, track=track, album=album,
                             post_time=datetime_from_str('2015-08-14 12:00:00'))
-
 
     def test_with_scrobble_counts(self):
         "Should add a `scrobble_count` aggregate Count to each Album."
@@ -194,11 +193,41 @@ class AlbumManagersTestCase(TestCase):
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0].scrobble_count, 2)
 
-    def test_errors(self):
+    def test_account(self):
+        "Should only return Scrobbles by supplied Account"
+        account = AccountFactory()
+        album2 = AlbumFactory()
+        scrobble2 = ScrobbleFactory(account=account, album=album2)
+        albums = Album.objects.with_scrobble_counts(account=account)
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0], album2)
+
+    def test_artist(self):
+        "Should only return Scrobbles by supplied Artist"
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+        album2 = AlbumFactory(artist=artist2)
+        scrobble2 = ScrobbleFactory(artist=artist2, track=track2, album=album2)
+        albums = Album.objects.with_scrobble_counts(artist=artist2)
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].artist, artist2)
+        self.assertEqual(albums[0].scrobble_count, 1)
+
+    def test_min_post_time_error(self):
         with self.assertRaises(TypeError):
             Album.objects.with_scrobble_counts(min_post_time='foo')
+
+    def test_max_post_time_error(self):
         with self.assertRaises(TypeError):
             Album.objects.with_scrobble_counts(max_post_time='foo')
+
+    def test_account_error(self):
+        with self.assertRaises(TypeError):
+            Album.objects.with_scrobble_counts(account='foo')
+
+    def test_artist_error(self):
+        with self.assertRaises(TypeError):
+            Album.objects.with_scrobble_counts(artist='foo')
 
 
 class ArtistTestCase(TestCase):
@@ -297,17 +326,17 @@ class ArtistManagersTestCase(TestCase):
     "Testing the WithScrobbleCountsManager stuff."
 
     def setUp(self):
-        artist = ArtistFactory()
-        track = TrackFactory(artist=artist)
+        self.artist = ArtistFactory()
+        track = TrackFactory(artist=self.artist)
 
         # Scrobbled 4 times on different days:
-        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+        scrobble1 = ScrobbleFactory(artist=self.artist, track=track,
                             post_time=datetime_from_str('2015-08-11 12:00:00'))
-        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+        scrobble2 = ScrobbleFactory(artist=self.artist, track=track,
                             post_time=datetime_from_str('2015-08-12 12:00:00'))
-        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+        scrobble2 = ScrobbleFactory(artist=self.artist, track=track,
                             post_time=datetime_from_str('2015-08-13 12:00:00'))
-        scrobble4 = ScrobbleFactory(artist=artist, track=track,
+        scrobble4 = ScrobbleFactory(artist=self.artist, track=track,
                             post_time=datetime_from_str('2015-08-14 12:00:00'))
 
     def test_with_scrobble_counts(self):
@@ -347,11 +376,25 @@ class ArtistManagersTestCase(TestCase):
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 2)
 
-    def test_errors(self):
+    def test_account(self):
+        "Should only return Scrobbles by supplied Account"
+        account = AccountFactory()
+        scrobble2 = ScrobbleFactory(artist=self.artist, account=account)
+        artists = Artist.objects.with_scrobble_counts(account=account)
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 1)
+
+    def test_min_post_time_error(self):
         with self.assertRaises(TypeError):
             Artist.objects.with_scrobble_counts(min_post_time='foo')
+
+    def test_max_post_time_error(self):
         with self.assertRaises(TypeError):
             Artist.objects.with_scrobble_counts(max_post_time='foo')
+
+    def test_account_error(self):
+        with self.assertRaises(TypeError):
+            Artist.objects.with_scrobble_counts(account='foo')
 
 
 class ScrobbleTestCase(TestCase):
@@ -463,17 +506,17 @@ class TrackManagersTestCase(TestCase):
     "Testing the WithScrobbleCountsManager stuff."
 
     def setUp(self):
-        artist = ArtistFactory()
-        track = TrackFactory(artist=artist)
+        self.artist = ArtistFactory()
+        self.track = TrackFactory(artist=self.artist)
 
         # Scrobbled 4 times on different days:
-        scrobble1 = ScrobbleFactory(artist=artist, track=track,
+        scrobble1 = ScrobbleFactory(artist=self.artist, track=self.track,
                             post_time=datetime_from_str('2015-08-11 12:00:00'))
-        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+        scrobble2 = ScrobbleFactory(artist=self.artist, track=self.track,
                             post_time=datetime_from_str('2015-08-12 12:00:00'))
-        scrobble2 = ScrobbleFactory(artist=artist, track=track,
+        scrobble2 = ScrobbleFactory(artist=self.artist, track=self.track,
                             post_time=datetime_from_str('2015-08-13 12:00:00'))
-        scrobble4 = ScrobbleFactory(artist=artist, track=track,
+        scrobble4 = ScrobbleFactory(artist=self.artist, track=self.track,
                             post_time=datetime_from_str('2015-08-14 12:00:00'))
 
     def test_with_scrobble_counts(self):
@@ -513,9 +556,39 @@ class TrackManagersTestCase(TestCase):
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].scrobble_count, 2)
 
-    def test_errors(self):
+    def test_account(self):
+        "Should only return Scrobbles by supplied Account"
+        account = AccountFactory()
+        scrobble2 = ScrobbleFactory(
+                        account=account, track=self.track, artist=self.artist)
+        tracks = Track.objects.with_scrobble_counts(account=account)
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0], self.track)
+        self.assertEqual(tracks[0].scrobble_count, 1)
+
+    def test_artist(self):
+        "Should only return Scrobbles by supplied Artist"
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+        scrobble2 = ScrobbleFactory(artist=artist2, track=track2)
+        tracks = Track.objects.with_scrobble_counts(artist=artist2)
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].artist, artist2)
+        self.assertEqual(tracks[0].scrobble_count, 1)
+
+    def test_min_post_time_error(self):
         with self.assertRaises(TypeError):
             Track.objects.with_scrobble_counts(min_post_time='foo')
+
+    def test_max_post_time_error(self):
         with self.assertRaises(TypeError):
             Track.objects.with_scrobble_counts(max_post_time='foo')
+
+    def test_account_error(self):
+        with self.assertRaises(TypeError):
+            Track.objects.with_scrobble_counts(account='foo')
+
+    def test_artist_error(self):
+        with self.assertRaises(TypeError):
+            Track.objects.with_scrobble_counts(artist='foo')
 

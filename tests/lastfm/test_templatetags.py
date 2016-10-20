@@ -60,9 +60,25 @@ class TopAlbumsTestCase(TestCase):
         self.assertEqual(albums[0], self.albums[1])
         self.assertEqual(albums[1], self.albums[2])
 
+    def test_for_account(self):
+        "Should only count scrobbles by supplied Account."
+        account = AccountFactory()
+        # Our 1 scrobble by this account:
+        ScrobbleFactory(account=account,
+            artist=self.artist1, track=self.tracks[1], album=self.albums[1])
+        albums = ditto_lastfm.top_albums(account=account, limit='all')
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0], self.albums[1])
+        self.assertEqual(albums[0].scrobble_count, 1)
+
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_albums(account='bob', limit=3)
+
     def test_artist_error(self):
-        "Should raise ValueError if invalid Artist is supplied."
-        with self.assertRaises(ValueError):
+        "Should raise TypeError if invalid Artist is supplied."
+        with self.assertRaises(TypeError):
             ditto_lastfm.top_albums(artist='bob', limit=3)
 
     def test_limit_error(self):
@@ -100,6 +116,16 @@ class TopArtistsTestCase(TestCase):
         artists = ditto_lastfm.top_artists()
         self.assertEqual(len(artists), 10)
 
+    def test_for_account(self):
+        "Should only count Scrobbles by the supplied Account."
+        account = AccountFactory()
+        # Our one scrobble by this account:
+        ScrobbleFactory(account=account,
+                                artist=self.artists[1], track=self.tracks[1])
+        artists = ditto_lastfm.top_artists(account=account)
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 1)
+
     def test_limit(self):
         "Should return `limit` artists."
         artists = ditto_lastfm.top_artists(limit=3)
@@ -109,6 +135,11 @@ class TopArtistsTestCase(TestCase):
         "Should return all artists if `limit` is 'all'."
         artists = ditto_lastfm.top_artists(limit='all')
         self.assertEqual(len(artists), 11)
+
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_artists(account='bob', limit=3)
 
     def test_limit_error(self):
         "Should raise ValueError if `limit` is invalid."
@@ -156,16 +187,32 @@ class TopTracksTestCase(TestCase):
         tracks = ditto_lastfm.top_tracks(limit='all')
         self.assertEqual(len(tracks), 12)
 
+    def test_for_account(self):
+        "Should only count scrobbles by the supplied Account."
+        account = AccountFactory()
+        # Our one scrobble by this account:
+        ScrobbleFactory(account=account,
+                        artist=self.artist1, track=self.tracks[1])
+        tracks = ditto_lastfm.top_tracks(account=account, limit='all')
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0], self.tracks[1])
+        self.assertEqual(tracks[0].scrobble_count, 1)
+
     def test_for_artist(self):
         "Should return only the Artist's tracks."
         tracks = ditto_lastfm.top_tracks(artist=self.artist1, limit='all')
-        self.assertEqual(len(tracks), 11)
+        self.assertEqual(len(tracks), 2)
         self.assertEqual(tracks[0], self.tracks[1])
         self.assertEqual(tracks[1], self.tracks[2])
 
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_tracks(account='bob', limit=3)
+
     def test_artist_error(self):
-        "Should raise ValueError if invalid Artist is supplied."
-        with self.assertRaises(ValueError):
+        "Should raise TypeError if invalid Artist is supplied."
+        with self.assertRaises(TypeError):
             ditto_lastfm.top_tracks(artist='bob', limit=3)
 
     def test_limit_error(self):
@@ -198,6 +245,11 @@ class RecentScrobblesTestCase(TestCase):
         "It returns `limit` scrobbles"
         scrobbles = ditto_lastfm.recent_scrobbles(limit=3)
         self.assertEqual(len(scrobbles), 3)
+
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.recent_scrobbles(account='bob', limit=3)
 
     def test_limit_error(self):
         "It throws an error if limit isn't an integer"
