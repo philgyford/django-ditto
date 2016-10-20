@@ -357,6 +357,9 @@ class DittoAppsMixin:
 class HomeView(DittoAppsMixin, TemplateView):
     template_name = 'ditto/home.html'
 
+    # How many things do we list on the page?
+    items_to_list = 20
+
     # Set to True to include photos sorted by taken date:
     include_flickr_photos_by_taken_date = False
 
@@ -371,9 +374,6 @@ class HomeView(DittoAppsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # How many items do we want to list?
-        items_to_list = 20
 
         app_varieties = self.get_app_varieties()
 
@@ -405,7 +405,7 @@ class HomeView(DittoAppsMixin, TemplateView):
                 if app_name == 'twitter' and variety_name == 'tweet':
                     qs = qs.filter(in_reply_to_screen_name__exact='')
 
-            querysets.append( qs[:items_to_list] )
+            querysets.append( qs[:self.items_to_list] )
 
         # Aggregate the individual items from all querysets into one list,
         # sorted by post_time descending.
@@ -413,7 +413,7 @@ class HomeView(DittoAppsMixin, TemplateView):
             chain(*querysets),
             key=attrgetter('post_time'),
             reverse=True
-        )[:items_to_list]
+        )[:self.items_to_list]
 
         return context
 

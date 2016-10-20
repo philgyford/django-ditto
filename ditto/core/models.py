@@ -80,7 +80,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # Should be overridden for child classes.
     # eg, 'flickr_photo', 'twitter_tweet', etc.
     # Used in templates.
-    ditto_item_name = 'ditto_item'
+    ditto_item_name = 'set__ditto_item_name__in_child_class'
 
     title = models.CharField(blank=True, max_length=255)
     permalink = models.URLField(blank=True,

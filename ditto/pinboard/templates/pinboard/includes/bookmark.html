@@ -51,7 +51,7 @@ Expects:
             {% if perms.pinboard.can_change_bookmark %}
                 • <a href="{% url 'admin:pinboard_bookmark_change' bookmark.id %}">Edit</a>
             {% endif %}
-        {% if not detail %}</small>{% endif %}
+        {% if view != 'detail' %}</small>{% endif %}
     </p>
 </div> <!-- .media-body -->
 

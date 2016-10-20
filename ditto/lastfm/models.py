@@ -214,6 +214,8 @@ class Scrobble(DittoItemModel, models.Model):
     Album model.
     """
 
+    ditto_item_name = 'lastfm_scrobble'
+
     # Properties inherited from DittoItemModel:
     #
     # title         (CharField)
