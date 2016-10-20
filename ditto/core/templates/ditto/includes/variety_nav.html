@@ -29,7 +29,9 @@ And one of:
         {% endif %}
         class="list-group-item{% if variety.is_active %} active{% endif %}">
             <span class="label label-default label-pill pull-xs-right">{{ variety.count }}</span>
-            {% if variety.app_name == 'pinboard' %}
+            {% if variety.app_name == 'lastfm' %}
+                Last.fm scrobbles
+            {% elif variety.app_name == 'pinboard' %}
                 Pinboard bookmarks
             {% elif variety.app_name == 'flickr' %}
                 {% if variety.variety_name == 'photo-taken' %}

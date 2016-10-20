@@ -21,6 +21,9 @@ from .paginator import DiggPaginator
 if ditto_apps.is_installed('flickr'):
     from ..flickr.models import Photo
 
+if ditto_apps.is_installed('lastfm'):
+    from ..lastfm.models import Scrobble
+
 if ditto_apps.is_installed('pinboard'):
     from ..pinboard.models import Bookmark
 
@@ -124,6 +127,20 @@ class DittoAppsMixin:
                         'date_field': 'taken_time',
                         'context_object_name': 'flickr_photo_list',
                         'queryset': Photo.public_objects.all(),
+                    },
+                ],
+            })
+
+        if 'lastfm' in enabled_apps:
+            self.apps.append({
+                'slug': 'lastfm',
+                'name': 'lastfm',
+                'varieties': [
+                    {
+                        'slug': 'listens',
+                        'name': 'scrobble',
+                        'context_object_name': 'lastfm_scrobble_list',
+                        'queryset': Scrobble.objects.all(),
                     },
                 ],
             })
@@ -493,9 +510,9 @@ class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
                 '%s__lt' % date_field: until,
             })
             paginate_by = self.get_paginate_by(qs)
-            if not allow_future:
-                now = timezone.now() if self.uses_datetime_field else timezone_today()
-                qs = qs.filter(**{'%s__lte' % date_field: now})
+            #if not allow_future:
+                #now = timezone.now() if self.uses_datetime_field else timezone_today()
+                #qs = qs.filter(**{'%s__lte' % date_field: now})
             if not allow_empty:
                 # When pagination is enabled, it's better to do a cheap query
                 # than to load the unpaginated queryset in memory.
