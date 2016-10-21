@@ -48,19 +48,37 @@ class ChartPaginatedListView(PaginatedListView):
     ordering = '-scrobble_count'
 
     def get_queryset(self):
+        return self.get_queryset_with_counts()
+
+    def get_queryset_with_counts(self):
         """
         Includes scrobble_counts with returned objects, and adds ability to
         limit results to a time period based on the supplied `days`.
+
+        This was just get_queryset(), but then combining this class with the
+        SingleAccountMixin didn't work; child classes were using
+        SingleObjectMixin's get_queryset().
+
+        So now, each child class has to call this method from its own
+        get_queryset().
         """
         queryset = self.model._default_manager
 
-        days = self.get_days()
+        # This will contain filters on the queryset:
+        qs_kwargs = {}
 
-        if days == 'all':
-            queryset = queryset.with_scrobble_counts()
-        else:
+        days = self.get_days()  # eg 7, 30 or 'all'
+
+        if days != 'all':
             time_ago = datetime_now() - timedelta(days=days)
-            queryset = queryset.with_scrobble_counts(min_post_time=time_ago)
+            qs_kwargs['min_post_time'] = time_ago
+
+        if hasattr(self, 'object') and isinstance(self.object, Account):
+            # We need to filter the results to only get Tracks (or whatever)
+            # scrobbled by this Account.
+            qs_kwargs['account'] = self.object
+
+        queryset = queryset.with_scrobble_counts(**qs_kwargs)
 
         ordering = (self.get_ordering(),)
         queryset = queryset.order_by(*ordering)
@@ -191,11 +209,16 @@ class TrackDetailView(DetailView):
         return obj
 
 
-class UserDetailView(DetailView):
+class SingleAccountMixin(SingleObjectMixin):
+    """Used for views that need data about an Account based on username in
+    the URL.
+    """
     slug_field = 'username'
     slug_url_kwarg = 'username'
-    model = Account
-    template_name = 'lastfm/user_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Account.objects.all())
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         "Add counts of things for this Account only."
@@ -211,4 +234,68 @@ class UserDetailView(DetailView):
             'tracks':     qs.values('track_id').distinct().count(),
         }
         return context
+
+
+class UserDetailView(SingleAccountMixin, DetailView):
+    "Overview of the user; top 10s of everything."
+    template_name = 'lastfm/user_detail.html'
+    model = Account
+
+
+class UserAlbumListView(SingleAccountMixin, ChartPaginatedListView):
+    "Chart of Albums scrobbled by one user."
+    template_name = 'lastfm/user_album_list.html'
+    model = Album
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['album_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        return self.get_queryset_with_counts()
+
+
+class UserArtistListView(SingleAccountMixin, ChartPaginatedListView):
+    "Chart of Artists scrobbled by one user."
+    template_name = 'lastfm/user_artist_list.html'
+    model = Artist
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['artist_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        return self.get_queryset_with_counts()
+
+
+class UserScrobbleListView(SingleAccountMixin, PaginatedListView):
+    "All scrobbles by one user."
+    template_name = 'lastfm/user_scrobble_list.html'
+    model = Scrobble
+
+    def get_queryset(self):
+        "All Scrobbles by this Account."
+        queryset = super().get_queryset()
+        return queryset.filter(account=self.object)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['scrobble_list'] = context['object_list']
+        return context
+
+
+class UserTrackListView(SingleAccountMixin, ChartPaginatedListView):
+    "Chart of Tracks scrobbled by one user."
+    template_name = 'lastfm/user_track_list.html'
+    model = Track
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['track_list'] = context['object_list']
+        return context
+
+    def get_queryset(self):
+        return self.get_queryset_with_counts()
 

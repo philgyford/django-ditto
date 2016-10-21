@@ -14,22 +14,22 @@ urlpatterns = [
         name='home'
     ),
     url(
-        regex=r"^library$",
+        regex=r"^library/$",
         view=views.ScrobbleListView.as_view(),
         name='scrobble_list'
     ),
     url(
-        regex=r"^library/albums$",
+        regex=r"^library/albums/$",
         view=views.AlbumListView.as_view(),
         name='album_list'
     ),
     url(
-        regex=r"^library/artists$",
+        regex=r"^library/artists/$",
         view=views.ArtistListView.as_view(),
         name='artist_list'
     ),
     url(
-        regex=r"^library/tracks$",
+        regex=r"^library/tracks/$",
         view=views.TrackListView.as_view(),
         name='track_list'
     ),
@@ -55,9 +55,32 @@ urlpatterns = [
         view=views.TrackDetailView.as_view(),
         name='track_detail'
     ),
+
+    # User pages.
+
     url(
         regex=r"^user/(?P<username>[a-z0-9]+)/$",
         view=views.UserDetailView.as_view(),
         name='user_detail'
+    ),
+    url(
+        regex=r"^user/(?P<username>[a-z0-9]+)/library/$",
+        view=views.UserScrobbleListView.as_view(),
+        name='user_scrobble_list'
+    ),
+    url(
+        regex=r"^user/(?P<username>[a-z0-9]+)/library/albums/$",
+        view=views.UserAlbumListView.as_view(),
+        name='user_album_list'
+    ),
+    url(
+        regex=r"^user/(?P<username>[a-z0-9]+)/library/artists/$",
+        view=views.UserArtistListView.as_view(),
+        name='user_artist_list'
+    ),
+    url(
+        regex=r"^user/(?P<username>[a-z0-9]+)/library/tracks/$",
+        view=views.UserTrackListView.as_view(),
+        name='user_track_list'
     ),
 ]
