@@ -357,3 +357,53 @@ class TrackListViewTests(TestCase):
                             post_time=datetime_from_str('2016-10-01 12:00:00'))
         response = self.client.get("%s?days=7" % reverse('lastfm:track_list'))
         self.assertEqual(response.context['track_list'][0].scrobble_count, 1)
+
+
+class UserDetailViewTestCase(TestCase):
+
+    def setUp(self):
+        bob = AccountFactory(username='bob')
+        terry = AccountFactory(username='terry')
+
+        artist1 = ArtistFactory()
+        track1 = TrackFactory(artist=artist1)
+        album1 = AlbumFactory(artist=artist1)
+
+        artist2 = ArtistFactory()
+        track2 = TrackFactory(artist=artist2)
+
+        bobs1 = ScrobbleFactory.create_batch(2, account=bob,
+                                track=track1, artist=artist1, album=album1)
+        bobs2 = ScrobbleFactory.create_batch(5, account=bob,
+                                track=track2, artist=artist2)
+
+        terrys1 = ScrobbleFactory.create_batch(3, account=terry,
+                                track=track1, artist=artist1, album=album1)
+        terrys2 = ScrobbleFactory.create_batch(7, account=terry,
+                                track=track2, artist=artist2)
+
+    def test_templates(self):
+        "Uses the correct templates"
+        response = self.client.get(reverse('lastfm:user_detail',
+                                    kwargs={'username': 'bob',}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'lastfm/user_detail.html')
+        self.assertTemplateUsed(response, 'lastfm/base.html')
+        self.assertTemplateUsed(response, 'ditto/base.html')
+
+    def test_context(self):
+        "Sends the correct data to the templates"
+        response = self.client.get(reverse('lastfm:user_detail',
+                                    kwargs={'username': 'bob',}))
+        self.assertIn('counts', response.context)
+        self.assertEqual(response.context['counts']['albums'], 1)
+        self.assertEqual(response.context['counts']['artists'], 2)
+        self.assertEqual(response.context['counts']['scrobbles'], 7)
+        self.assertEqual(response.context['counts']['tracks'], 2)
+
+    def test_404s(self):
+        "Responds with 404 if we request a user that doesn't exist."
+        response = self.client.get(reverse('lastfm:user_detail',
+                                    kwargs={'username': 'thelma',}))
+        self.assertEquals(response.status_code, 404)
+
