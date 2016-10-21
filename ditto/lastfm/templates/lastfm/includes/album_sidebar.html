@@ -17,19 +17,19 @@ perms -- The Django permissions object.
     </p>
 </div>
 
-<div class="card card-block">
-    <p class="card-text">
-        {% with album.get_most_recent_scrobble as scrobble %}
-            {% if scrobble %}
-                {{ album.name }} was most recently scrobbled by
-                <a href="{{ scrobble.account.get_absolute_url }}">
-                    {{ scrobble.account.realname }}
-                </a>
-                at {% display_time scrobble.post_time link_to_day=True %}
-            {% endif %}
-        {% endwith %}
-    </p>
-</div>
+{% with album.get_most_recent_scrobble as scrobble %}
+	{% if scrobble %}
+		<div class="card card-block">
+			<p class="card-text">
+				{{ album.name }} was most recently scrobbled by
+				<a href="{{ scrobble.account.get_absolute_url }}">
+					{{ scrobble.account.realname }}
+				</a>
+				at {% display_time scrobble.post_time link_to_day=True %}
+			</p>
+		</div>
+	{% endif %}
+{% endwith %}
 
 <div class="card">
     <ul class="list-group list-group-flush">
