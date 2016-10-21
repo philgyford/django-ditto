@@ -4,7 +4,7 @@ from . import views
 
 
 # The pattern for matching an Album/Artist/Track slug:
-slug_chars = '[\w.,:=@&+%()$!°-]+'
+slug_chars = '[\w.,:=@&+%()$!°’~-]+'
 
 
 urlpatterns = [
