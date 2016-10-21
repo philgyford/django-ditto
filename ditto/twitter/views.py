@@ -34,7 +34,7 @@ class FavoriteListView(PaginatedListView):
         return Tweet.public_favorite_objects.all().select_related()
 
 
-class UserDetailMixin(SingleObjectMixin):
+class SingleUserMixin(SingleObjectMixin):
     """Used for views that need data about a User based on screen_name in
     the URL, and its Account if it has one.
     """
@@ -56,7 +56,7 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetailView(UserDetailMixin, PaginatedListView):
+class UserDetailView(SingleUserMixin, PaginatedListView):
     """A single Twitter User and its Tweets.
     The user might have an Account associated with it, or might not.
     """
@@ -72,7 +72,7 @@ class UserDetailView(UserDetailMixin, PaginatedListView):
         return context
 
 
-class AccountFavoriteListView(UserDetailMixin, PaginatedListView):
+class AccountFavoriteListView(SingleUserMixin, PaginatedListView):
     "A single Twitter User associated with an Account, and its Favorites."
     template_name = 'twitter/account_favorite_list.html'
 
