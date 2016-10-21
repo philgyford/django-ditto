@@ -1,0 +1,64 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item active">{{ account.realname }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="m-y-2">
+        {% block title %}
+            {{ account.realname }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% load ditto_lastfm %}
+
+            <h2>
+                <a href="{% url 'lastfm:scrobble_list' %}">Recent tracks</a>
+            </h2>
+
+            {% recent_scrobbles account=account limit=10 as scrobbles %}
+
+            {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:artist_list' %}">Top artists</a>
+            </h2>
+
+            {% top_artists account=account limit=10 as artists %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='artists' object_list=artists only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:album_list' %}">Top albums</a>
+            </h2>
+
+            {% top_albums account=account limit=10 as albums %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' object_list=albums only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:track_list' %}">Top tracks</a>
+            </h2>
+
+            {% top_tracks account=account limit=10 as tracks %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
+
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

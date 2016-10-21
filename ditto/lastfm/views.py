@@ -191,10 +191,24 @@ class TrackDetailView(DetailView):
         return obj
 
 
-class UserDetailView(SingleObjectMixin, PaginatedListView):
-    " TODO "
+class UserDetailView(DetailView):
     slug_field = 'username'
     slug_url_kwarg = 'username'
+    model = Account
+    template_name = 'lastfm/user_detail.html'
 
-    queryset = Scrobble.objects
+    def get_context_data(self, **kwargs):
+        "Add counts of things for this Account only."
+        context = super().get_context_data(**kwargs)
+
+        qs = Scrobble.objects.filter(account=self.object)
+
+        context['counts'] = {
+            'albums':     qs.exclude(album_id__isnull=True)\
+                                .values('album_id').distinct().count(),
+            'artists':    qs.values('artist_id').distinct().count(),
+            'scrobbles':  qs.count(),
+            'tracks':     qs.values('track_id').distinct().count(),
+        }
+        return context
 
