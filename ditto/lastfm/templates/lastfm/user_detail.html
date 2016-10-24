@@ -17,6 +17,8 @@
     <div class="row">
         <div class="col-md-3">
             {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts account=account only %}
+
+            {% include 'lastfm/includes/annual_scrobble_counts.html' with account=account only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

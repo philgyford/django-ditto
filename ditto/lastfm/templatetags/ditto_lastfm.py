@@ -1,5 +1,6 @@
 from django import template
-from django.db import models
+from django.db.models import Count
+from django.db.models.functions import ExtractYear
 from django.utils.html import format_html
 
 from ..models import Account, Album, Artist, Scrobble, Track
@@ -143,4 +144,32 @@ def recent_scrobbles(account=None, limit=10):
         return account.get_recent_scrobbles(limit)
     else:
         return Scrobble.objects.all().order_by('-post_time')[:limit]
+
+
+@register.assignment_tag
+def annual_scrobble_counts(account=None):
+    """
+    Get the number of Scrobbles per year.
+    Returns a list of dicts, sorted by year, like:
+        [ {'year': 2015, 'count': 1234}, {'year': 2016, 'count': 9876} ]
+
+    Keyword arguments:
+    account -- An Account object or None (for Scrobbles by all Accounts).
+    """
+
+    if account is not None and not isinstance(account, Account):
+        raise TypeError('account must be an Account instance, '
+                        'not a %s' % type(account))
+
+    qs = Scrobble.objects
+
+    if account:
+        qs = qs.filter(account=account)
+
+    return qs.annotate(year=ExtractYear('post_time'))\
+                .values('year')\
+                .annotate(count=Count('id'))\
+                .values('year', 'count')\
+                .order_by('year')
+
 

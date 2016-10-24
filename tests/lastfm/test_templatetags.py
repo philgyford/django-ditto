@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.lastfm.templatetags import ditto_lastfm
 from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
         ArtistFactory, ScrobbleFactory, TrackFactory
@@ -255,4 +256,44 @@ class RecentScrobblesTestCase(TestCase):
         "It throws an error if limit isn't an integer"
         with self.assertRaises(ValueError):
             ditto_lastfm.recent_scrobbles(limit='bob')
+
+
+class AnnualScrobbleCountsTestCase(TestCase):
+
+    def setUp(self):
+        self.account1 = AccountFactory()
+        self.account2 = AccountFactory()
+        # Some for account1 in 2015 and 2016:
+        scrobbles1 = ScrobbleFactory.create_batch(3,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'),
+                            account=self.account1)
+        scrobbles2 = ScrobbleFactory.create_batch(2,
+                            post_time=datetime_from_str('2016-01-01 12:00:00'),
+                            account=self.account1)
+        # And one for account2 in 2015:
+        scrobble3 = ScrobbleFactory(account=self.account2,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+
+    def test_response(self):
+        "Returns correct data."
+        scrobbles = ditto_lastfm.annual_scrobble_counts()
+        self.assertEqual(len(scrobbles), 2)
+        self.assertEqual(scrobbles[0]['year'], 2015)
+        self.assertEqual(scrobbles[0]['count'], 4)
+        self.assertEqual(scrobbles[1]['year'], 2016)
+        self.assertEqual(scrobbles[1]['count'], 2)
+
+    def test_response_for_account(self):
+        "Returns correct data for one account."
+        scrobbles = ditto_lastfm.annual_scrobble_counts(account=self.account1)
+        self.assertEqual(len(scrobbles), 2)
+        self.assertEqual(scrobbles[0]['year'], 2015)
+        self.assertEqual(scrobbles[0]['count'], 3)
+        self.assertEqual(scrobbles[1]['year'], 2016)
+        self.assertEqual(scrobbles[1]['count'], 2)
+
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.recent_scrobbles(account='bob', limit=3)
 
