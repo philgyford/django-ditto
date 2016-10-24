@@ -359,41 +359,56 @@ class TrackListViewTests(TestCase):
         self.assertEqual(response.context['track_list'][0].scrobble_count, 1)
 
 
-class UserDetailViewTestCase(TestCase):
+class UserCommonTests(object):
+    """Parent for all user-specific views.
+    Doesn't inherit from TestCase because we don't want the tests in this class
+    to run, only in its child classes.
+
+    Child classes should inherit like:
+
+        class MyChildTestCase(UserCommonTests, TestCase):
+
+    in that order, so that setUp() runs.
+    """
+
+    # eg, 'user_album_list':
+    view_name = 'DEFINE IN CHILD CLASSES'
 
     def setUp(self):
         bob = AccountFactory(username='bob')
         terry = AccountFactory(username='terry')
 
-        artist1 = ArtistFactory()
-        track1 = TrackFactory(artist=artist1)
-        album1 = AlbumFactory(artist=artist1)
+        self.artist1 = ArtistFactory()
+        self.track1 = TrackFactory(artist=self.artist1)
+        self.album1 = AlbumFactory(artist=self.artist1)
 
-        artist2 = ArtistFactory()
-        track2 = TrackFactory(artist=artist2)
+        self.artist2 = ArtistFactory()
+        self.track2 = TrackFactory(artist=self.artist2)
 
         bobs1 = ScrobbleFactory.create_batch(2, account=bob,
-                                track=track1, artist=artist1, album=album1)
+                    track=self.track1, artist=self.artist1, album=self.album1)
         bobs2 = ScrobbleFactory.create_batch(5, account=bob,
-                                track=track2, artist=artist2)
+                    track=self.track2, artist=self.artist2)
 
         terrys1 = ScrobbleFactory.create_batch(3, account=terry,
-                                track=track1, artist=artist1, album=album1)
+                    track=self.track1, artist=self.artist1, album=self.album1)
         terrys2 = ScrobbleFactory.create_batch(7, account=terry,
-                                track=track2, artist=artist2)
+                    track=self.track2, artist=self.artist2)
 
     def test_templates(self):
         "Uses the correct templates"
-        response = self.client.get(reverse('lastfm:user_detail',
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
                                     kwargs={'username': 'bob',}))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'lastfm/user_detail.html')
+        self.assertTemplateUsed(response, 'lastfm/%s.html' % self.view_name)
         self.assertTemplateUsed(response, 'lastfm/base.html')
         self.assertTemplateUsed(response, 'ditto/base.html')
 
-    def test_context(self):
-        "Sends the correct data to the templates"
-        response = self.client.get(reverse('lastfm:user_detail',
+    def test_context_counts(self):
+        """Sends the correct count data to the templates.
+        All user_* views should have these same counts in their context.
+        """
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
                                     kwargs={'username': 'bob',}))
         self.assertIn('counts', response.context)
         self.assertEqual(response.context['counts']['albums'], 1)
@@ -403,7 +418,74 @@ class UserDetailViewTestCase(TestCase):
 
     def test_404s(self):
         "Responds with 404 if we request a user that doesn't exist."
-        response = self.client.get(reverse('lastfm:user_detail',
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
                                     kwargs={'username': 'thelma',}))
         self.assertEquals(response.status_code, 404)
+
+
+class UserDetailViewTestCase(UserCommonTests, TestCase):
+
+    view_name = 'user_detail'
+
+
+class UserAlbumListViewTestCase(UserCommonTests, TestCase):
+
+    view_name = 'user_album_list'
+
+    def test_context_albums(self):
+        "Sends the correct album data to the templates"
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
+                                    kwargs={'username': 'bob',}))
+        self.assertIn('album_list', response.context)
+        albums = response.context['album_list']
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0], self.album1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+
+class UserArtistListViewTestCase(UserCommonTests, TestCase):
+
+    view_name = 'user_artist_list'
+
+    def test_context_albums(self):
+        "Sends the correct album data to the templates"
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
+                                    kwargs={'username': 'bob',}))
+        self.assertIn('artist_list', response.context)
+        artists = response.context['artist_list']
+        self.assertEqual(len(artists), 2)
+        self.assertEqual(artists[0], self.artist2)
+        self.assertEqual(artists[1], self.artist1)
+        self.assertEqual(artists[0].scrobble_count, 5)
+        self.assertEqual(artists[1].scrobble_count, 2)
+
+
+class UserScrobbleListViewTestCase(UserCommonTests, TestCase):
+
+    view_name = 'user_scrobble_list'
+
+    def test_context_scrobbles(self):
+        "Sends the correct scrobble data to the templates"
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
+                                    kwargs={'username': 'bob',}))
+        self.assertIn('scrobble_list', response.context)
+        scrobbles = response.context['scrobble_list']
+        self.assertEqual(len(scrobbles), 7)
+
+
+class UserTrackListViewTestCase(UserCommonTests, TestCase):
+
+    view_name = 'user_track_list'
+
+    def test_context_tracks(self):
+        "Sends the correct track data to the templates"
+        response = self.client.get(reverse('lastfm:%s' % self.view_name,
+                                    kwargs={'username': 'bob',}))
+        self.assertIn('track_list', response.context)
+        tracks = response.context['track_list']
+        self.assertEqual(len(tracks), 2)
+        self.assertEqual(tracks[0], self.track2)
+        self.assertEqual(tracks[0].scrobble_count, 5)
+        self.assertEqual(tracks[1], self.track1)
+        self.assertEqual(tracks[1].scrobble_count, 2)
 
