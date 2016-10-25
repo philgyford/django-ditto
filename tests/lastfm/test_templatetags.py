@@ -61,6 +61,54 @@ class TopAlbumsTestCase(TestCase):
         self.assertEqual(albums[0], self.albums[1])
         self.assertEqual(albums[1], self.albums[2])
 
+    def test_for_day(self):
+        "Should return only albums from the requested day."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        albums = ditto_lastfm.top_albums(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+    def test_for_month(self):
+        "Should return only albums from the requested month."
+        # 2 scrobbles in this month:
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-09-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-09-30 12:00:00'))
+        # 1 scrobble in this month:
+        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
+                        post_time=datetime_from_str('2016-10-01 12:00:00'))
+
+        albums = ditto_lastfm.top_albums(period='month',
+                        date=datetime_from_str('2016-09-15 00:00:00'))
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+    def test_for_year(self):
+        "Should return only albums from the requested year."
+        # 2 scrobbles in this year:
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2015-01-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2015-12-31 12:00:00'))
+        # 1 scrobble in this year:
+        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
+                        post_time=datetime_from_str('2016-03-01 12:00:00'))
+
+        albums = ditto_lastfm.top_albums(period='year',
+                        date=datetime_from_str('2015-09-01 00:00:00'))
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
     def test_for_account(self):
         "Should only count scrobbles by supplied Account."
         account = AccountFactory()
@@ -86,6 +134,28 @@ class TopAlbumsTestCase(TestCase):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
             ditto_lastfm.top_albums(artist=self.artist1, limit='bob')
+
+    def test_date_error(self):
+        "Should raise TypeError if invalid date is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_albums(date='bob', period='month')
+
+    def test_period_error(self):
+        "Should raise TypeError if invalid period is supplied."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_albums(date=d, period='bob')
+
+    def test_date_but_no_period_error(self):
+        "Should raise TypeError if date is supplied but not period."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_albums(date=d)
+
+    def test_period_but_no_date_error(self):
+        "Should raise TypeError if period is supplied but not date."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_albums(period='month')
 
 
 class TopArtistsTestCase(TestCase):
@@ -127,6 +197,54 @@ class TopArtistsTestCase(TestCase):
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 1)
 
+    def test_for_day(self):
+        "Should return only artists from the requested day."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        artists = ditto_lastfm.top_artists(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
+    def test_for_month(self):
+        "Should return only tracks from the requested month."
+        # 2 scrobbles in this month:
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-09-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-09-30 12:00:00'))
+        # 1 scrobble in this month:
+        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
+                        post_time=datetime_from_str('2016-10-01 12:00:00'))
+
+        artists = ditto_lastfm.top_artists(period='month',
+                        date=datetime_from_str('2016-09-15 00:00:00'))
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
+    def test_for_year(self):
+        "Should return only tracks from the requested year."
+        # 2 scrobbles in this year:
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2015-01-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2015-12-31 12:00:00'))
+        # 1 scrobble in this year:
+        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
+                        post_time=datetime_from_str('2016-03-01 12:00:00'))
+
+        artists = ditto_lastfm.top_artists(period='year',
+                        date=datetime_from_str('2015-09-01 00:00:00'))
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
     def test_limit(self):
         "Should return `limit` artists."
         artists = ditto_lastfm.top_artists(limit=3)
@@ -146,6 +264,28 @@ class TopArtistsTestCase(TestCase):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
             ditto_lastfm.top_artists(limit='bob')
+
+    def test_date_error(self):
+        "Should raise TypeError if invalid date is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_artists(date='bob', period='month')
+
+    def test_period_error(self):
+        "Should raise TypeError if invalid period is supplied."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_artists(date=d, period='bob')
+
+    def test_date_but_no_period_error(self):
+        "Should raise TypeError if date is supplied but not period."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_artists(date=d)
+
+    def test_period_but_no_date_error(self):
+        "Should raise TypeError if period is supplied but not date."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_artists(period='month')
 
 
 class TopTracksTestCase(TestCase):
@@ -206,6 +346,54 @@ class TopTracksTestCase(TestCase):
         self.assertEqual(tracks[0], self.tracks[1])
         self.assertEqual(tracks[1], self.tracks[2])
 
+    def test_for_day(self):
+        "Should return only tracks from the requested day."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        tracks = ditto_lastfm.top_tracks(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
+    def test_for_month(self):
+        "Should return only tracks from the requested month."
+        # 2 scrobbles in this month:
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-09-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-09-30 12:00:00'))
+        # 1 scrobble in this month:
+        ScrobbleFactory(track=self.tracks[2],
+                        post_time=datetime_from_str('2016-10-01 12:00:00'))
+
+        tracks = ditto_lastfm.top_tracks(period='month',
+                        date=datetime_from_str('2016-09-15 00:00:00'))
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
+    def test_for_year(self):
+        "Should return only tracks from the requested year."
+        # 2 scrobbles in this year:
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2015-01-01 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2015-12-31 12:00:00'))
+        # 1 scrobble in this year:
+        ScrobbleFactory(track=self.tracks[2],
+                        post_time=datetime_from_str('2016-03-01 12:00:00'))
+
+        tracks = ditto_lastfm.top_tracks(period='year',
+                        date=datetime_from_str('2015-09-01 00:00:00'))
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
     def test_account_error(self):
         "Should raise TypeError if invalid Account is supplied."
         with self.assertRaises(TypeError):
@@ -220,6 +408,28 @@ class TopTracksTestCase(TestCase):
         "Should raise ValueError if `limit` is invalid."
         with self.assertRaises(ValueError):
             ditto_lastfm.top_tracks(artist=self.artist1, limit='bob')
+
+    def test_date_error(self):
+        "Should raise TypeError if invalid date is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_tracks(date='bob', period='month')
+
+    def test_period_error(self):
+        "Should raise TypeError if invalid period is supplied."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_tracks(date=d, period='bob')
+
+    def test_date_but_no_period_error(self):
+        "Should raise TypeError if date is supplied but not period."
+        d = datetime_from_str('2016-10-24 12:00:00')
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_tracks(date=d)
+
+    def test_period_but_no_date_error(self):
+        "Should raise TypeError if period is supplied but not date."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.top_tracks(period='month')
 
 
 class RecentScrobblesTestCase(TestCase):
