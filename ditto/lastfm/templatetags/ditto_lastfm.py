@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import pytz
 
 from django import template
 from django.db.models import Count
@@ -29,17 +30,19 @@ def check_top_kwargs(**kwargs):
     period  = kwargs['period']
 
     if account is not None and not isinstance(account, Account):
-        raise TypeError('account must be an Account instance, '
+        raise TypeError('`account` must be an Account instance, '
                         'not a %s' % type(account))
 
     if limit != 'all' and isinstance(limit, int) == False:
         raise ValueError("`limit` must be an integer or 'all'")
 
-    if date is not None and not isinstance(date, datetime.datetime):
-        raise TypeError('date must be a datetime, not a %s' % type(date))
+    if date is not None and not isinstance(date, datetime.datetime) \
+            and not isinstance(date, datetime.date):
+        raise TypeError('`date` must be a datetime or date, '
+                        'not a %s' % type(date))
 
     if period not in ['day', 'month', 'year']:
-        raise TypeError('period must be one of "day", "month" or "year", '
+        raise TypeError('`period` must be one of "day", "month" or "year", '
                         'not %s' % type(period))
 
 
@@ -49,12 +52,19 @@ def get_post_times(date, period):
     top_artists() or top_tracks() to a particular time period.
 
     Arguments:
-    date -- A datetime.
+    date -- A datetime or date.
     period -- String, 'day', 'month' or 'year'.
     """
-    min_post_time = date.replace(hour=0, minute=0, second=0)
-    max_post_time = date.replace(
-                        hour=23, minute=59, second=59, microsecond=999999)
+    if isinstance(date, datetime.datetime):
+        min_post_time = date.replace(hour=0, minute=0, second=0)
+        max_post_time = date.replace(
+                            hour=23, minute=59, second=59, microsecond=999999)
+    else:
+        # `date` is a datetime.date
+        min_post_time = datetime.datetime.combine(
+                                            date, datetime.datetime.min.time()).replace(tzinfo=pytz.utc)
+        max_post_time = datetime.datetime.combine(
+                                            date, datetime.datetime.max.time()).replace(tzinfo=pytz.utc)
 
     if period == 'month':
         min_post_time = min_post_time.replace(day=1)
@@ -86,7 +96,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
     account -- An Account object or None (for Scrobbles by all Accounts).
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Albums.
-    date -- A datetime, for only getting Albums from a single time period.
+    date -- A datetime or date, for getting Albums from a single time period.
     period -- A String: 'day', 'month', or 'year'.
     """
 
@@ -137,7 +147,7 @@ def top_artists(account=None, limit=10, date=None, period='day'):
     Keyword arguments:
     account -- An Account object or None (for Scrobbles by all Accounts).
     limit -- Maximum number to fetch. Default is 10. 'all' for all Artists.
-    date -- A datetime, for only getting Artists from a single time period.
+    date -- A datetime or date, for getting Artists from a single time period.
     period -- A String: 'day', 'month', or 'year'.
     """
     check_top_kwargs(**{
@@ -182,7 +192,7 @@ def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
     account -- An Account object or None (for Scrobbles by all Accounts).
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
-    date -- A datetime, for only getting Tracks from a single time period.
+    date -- A datetime or date, for getting Tracks from a single time period.
     period -- A String: 'day', 'month', or 'year'.
     """
 

@@ -61,8 +61,8 @@ class TopAlbumsTestCase(TestCase):
         self.assertEqual(albums[0], self.albums[1])
         self.assertEqual(albums[1], self.albums[2])
 
-    def test_for_day(self):
-        "Should return only albums from the requested day."
+    def test_for_day_with_datetime(self):
+        "Should return only albums from the requested day, using datetime."
         # 2 scrobbles on this day:
         ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
                         post_time=datetime_from_str('2016-10-01 00:00:00'))
@@ -74,6 +74,22 @@ class TopAlbumsTestCase(TestCase):
 
         albums = ditto_lastfm.top_albums(period='day',
                         date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+    def test_for_day_with_date(self):
+        "Should return only albums from the requested day, using date."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        albums = ditto_lastfm.top_albums(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00').date())
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0].scrobble_count, 2)
 
@@ -186,8 +202,8 @@ class TopArtistsTestCase(TestCase):
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 1)
 
-    def test_for_day(self):
-        "Should return only artists from the requested day."
+    def test_for_day_with_datetime(self):
+        "Should return only artists from the requested day, using datetime."
         # 2 scrobbles on this day:
         ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
                         post_time=datetime_from_str('2016-10-01 00:00:00'))
@@ -199,6 +215,22 @@ class TopArtistsTestCase(TestCase):
 
         artists = ditto_lastfm.top_artists(period='day',
                         date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
+    def test_for_day_with_date(self):
+        "Should return only artists from the requested day, using date."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        artists = ditto_lastfm.top_artists(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00').date())
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 2)
 
@@ -324,8 +356,8 @@ class TopTracksTestCase(TestCase):
         self.assertEqual(tracks[0], self.tracks[1])
         self.assertEqual(tracks[1], self.tracks[2])
 
-    def test_for_day(self):
-        "Should return only tracks from the requested day."
+    def test_for_day_with_datetime(self):
+        "Should return only tracks from the requested day, using datetime."
         # 2 scrobbles on this day:
         ScrobbleFactory(track=self.tracks[1],
                         post_time=datetime_from_str('2016-10-01 00:00:00'))
@@ -337,6 +369,22 @@ class TopTracksTestCase(TestCase):
 
         tracks = ditto_lastfm.top_tracks(period='day',
                         date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
+    def test_for_day_with_date(self):
+        "Should return only tracks from the requested day, using date."
+        # 2 scrobbles on this day:
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-10-01 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2016-10-01 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2],
+                        post_time=datetime_from_str('2016-10-02 12:00:00'))
+
+        tracks = ditto_lastfm.top_tracks(period='day',
+                        date=datetime_from_str('2016-10-01 00:00:00').date())
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].scrobble_count, 2)
 
