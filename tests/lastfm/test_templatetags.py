@@ -474,3 +474,66 @@ class AnnualScrobbleCountsTestCase(TestCase):
         with self.assertRaises(TypeError):
             ditto_lastfm.recent_scrobbles(account='bob', limit=3)
 
+
+class DayScrobblesTestCase(TestCase):
+
+    def setUp(self):
+        self.account1 = AccountFactory()
+        self.account2 = AccountFactory()
+        # Some for account1 on 1st Oct:
+        self.scrobble1 = ScrobbleFactory(
+                            post_time=datetime_from_str('2016-10-01 12:00:00'),
+                            account=self.account1)
+        self.scrobble2 = ScrobbleFactory(
+                            post_time=datetime_from_str('2016-10-01 12:05:00'),
+                            account=self.account1)
+        # One for account1 on 2nd Oct:
+        self.scrobble3 = ScrobbleFactory(
+                            post_time=datetime_from_str('2016-10-02 00:00:01'),
+                            account=self.account1)
+        # And one for account2 on 1st Oct:
+        self.scrobble4 = ScrobbleFactory(account=self.account2,
+                            post_time=datetime_from_str('2016-10-01 13:00:00'))
+
+    def test_for_all_accounts(self):
+        "Returns ALL scrobbles from requested date."
+        scrobbles = ditto_lastfm.day_scrobbles(
+                                    datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(scrobbles), 3)
+        self.assertEqual(scrobbles[0], self.scrobble1)
+        self.assertEqual(scrobbles[1], self.scrobble2)
+        self.assertEqual(scrobbles[2], self.scrobble4)
+
+    def test_for_one_accounts(self):
+        "Only returns scrobbles for one account on requested date."
+        scrobbles = ditto_lastfm.day_scrobbles(
+                                account=self.account1,
+                                date=datetime_from_str('2016-10-01 00:00:00'))
+        self.assertEqual(len(scrobbles), 2)
+        self.assertEqual(scrobbles[0], self.scrobble1)
+        self.assertEqual(scrobbles[1], self.scrobble2)
+
+    def test_with_date(self):
+        "Returns when using a date, not a datetime."
+        d = datetime_from_str('2016-10-01 00:00:00').date()
+        scrobbles = ditto_lastfm.day_scrobbles(date=d)
+        self.assertEqual(len(scrobbles), 3)
+        self.assertEqual(scrobbles[0], self.scrobble1)
+        self.assertEqual(scrobbles[1], self.scrobble2)
+        self.assertEqual(scrobbles[2], self.scrobble4)
+
+    def test_date_error(self):
+        "Should raise ValueError if no date is supplied."
+        with self.assertRaises(ValueError):
+            ditto_lastfm.day_scrobbles()
+
+    def test_date_error(self):
+        "Should raise TypeError if invalid date is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.day_scrobbles(date='bob')
+
+    def test_account_error(self):
+        "Should raise TypeError if invalid Account is supplied."
+        with self.assertRaises(TypeError):
+            ditto_lastfm.day_scrobbles(account='bob')
+

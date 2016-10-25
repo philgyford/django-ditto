@@ -36,8 +36,7 @@ def check_top_kwargs(**kwargs):
         raise ValueError("`limit` must be an integer or 'all'")
 
     if date is not None and not isinstance(date, datetime.datetime):
-        raise TypeError('date must be a datetime, '
-                        'not a %s' % type(date))
+        raise TypeError('date must be a datetime, not a %s' % type(date))
 
     if period not in ['day', 'month', 'year']:
         raise TypeError('period must be one of "day", "month" or "year", '
@@ -240,6 +239,48 @@ def recent_scrobbles(account=None, limit=10):
         return account.get_recent_scrobbles(limit)
     else:
         return Scrobble.objects.all().order_by('-post_time')[:limit]
+
+
+@register.assignment_tag
+def day_scrobbles(date, account=None):
+    """
+    Returns a QuerySet of all Scrobbles from a particular day, in ascending
+    order.
+
+    Restrict to only one user's scrobbles by supplying the `account`.
+
+    Keyword arguments:
+    date -- A datetime or date. Required.
+            If a datetime, we use the start and end of this day.
+    account -- An Account object or None (default, Scrobbles by all Accounts).
+    """
+    if not isinstance(date, datetime.datetime) and not isinstance(
+                                                        date, datetime.date):
+        raise TypeError('date must be a datetime or date, '
+                        'not a %s' % type(date))
+
+    if account is not None and not isinstance(account, Account):
+        raise TypeError('account must be an Account instance, '
+                        'not a %s' % type(account))
+
+    qs_kwargs = {}
+
+    if isinstance(date, datetime.datetime):
+        qs_kwargs['post_time__gte'] = date.replace(
+                                hour=0, minute=0, second=0, microsecond=0)
+        qs_kwargs['post_time__lte'] = date.replace(
+                        hour=23, minute=59, second=59, microsecond=999999)
+    else:
+        # `date` is a datetime.date
+        # __date filter is only available from Django >= 1.9
+        qs_kwargs['post_time__contains'] = date
+
+    qs = Scrobble.objects
+
+    if account:
+        qs_kwargs['account'] = account
+
+    return qs.filter(**qs_kwargs).order_by('post_time')
 
 
 @register.assignment_tag
