@@ -35,19 +35,11 @@ def check_top_kwargs(**kwargs):
     if limit != 'all' and isinstance(limit, int) == False:
         raise ValueError("`limit` must be an integer or 'all'")
 
-    if date is not None and period is None:
-        raise TypeError('Both `date` and `period` are required to restrict'
-                        'results to a time period. Only `date` was supplied.')
-
-    if date is None and period is not None:
-        raise TypeError('Both `date` and `period` are required to restrict'
-                        'results to a time period. Only `period` was supplied.')
-
     if date is not None and not isinstance(date, datetime.datetime):
         raise TypeError('date must be a datetime, '
                         'not a %s' % type(date))
 
-    if date is not None and period is not None and period not in ['day', 'month', 'year']:
+    if period not in ['day', 'month', 'year']:
         raise TypeError('period must be one of "day", "month" or "year", '
                         'not %s' % type(period))
 
@@ -80,7 +72,7 @@ def get_post_times(date, period):
 
 
 @register.assignment_tag
-def top_albums(account=None, artist=None, limit=10, date=None, period=None):
+def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
     """Returns a QuerySet of most-scrobbled Albums, with the most-scrobbled
     first.
 
@@ -96,7 +88,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period=None):
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Albums.
     date -- A datetime, for only getting Albums from a single time period.
-    period -- None or a String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'month', or 'year'.
     """
 
     check_top_kwargs(**{
@@ -133,7 +125,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period=None):
 
 
 @register.assignment_tag
-def top_artists(account=None, limit=10, date=None, period=None):
+def top_artists(account=None, limit=10, date=None, period='day'):
     """Returns a QuerySet of the most-scrobbled Artists, with the
     most-scrobbled first.
 
@@ -147,7 +139,7 @@ def top_artists(account=None, limit=10, date=None, period=None):
     account -- An Account object or None (for Scrobbles by all Accounts).
     limit -- Maximum number to fetch. Default is 10. 'all' for all Artists.
     date -- A datetime, for only getting Artists from a single time period.
-    period -- None or a String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'month', or 'year'.
     """
     check_top_kwargs(**{
         'account': account,
@@ -176,7 +168,7 @@ def top_artists(account=None, limit=10, date=None, period=None):
 
 
 @register.assignment_tag
-def top_tracks(account=None, artist=None, limit=10, date=None, period=None):
+def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
     """Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
     first.
 
@@ -192,7 +184,7 @@ def top_tracks(account=None, artist=None, limit=10, date=None, period=None):
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
     date -- A datetime, for only getting Tracks from a single time period.
-    period -- None or a String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'month', or 'year'.
     """
 
     check_top_kwargs(**{

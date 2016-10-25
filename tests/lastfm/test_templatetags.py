@@ -146,17 +146,6 @@ class TopAlbumsTestCase(TestCase):
         with self.assertRaises(TypeError):
             ditto_lastfm.top_albums(date=d, period='bob')
 
-    def test_date_but_no_period_error(self):
-        "Should raise TypeError if date is supplied but not period."
-        d = datetime_from_str('2016-10-24 12:00:00')
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_albums(date=d)
-
-    def test_period_but_no_date_error(self):
-        "Should raise TypeError if period is supplied but not date."
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_albums(period='month')
-
 
 class TopArtistsTestCase(TestCase):
 
@@ -275,17 +264,6 @@ class TopArtistsTestCase(TestCase):
         d = datetime_from_str('2016-10-24 12:00:00')
         with self.assertRaises(TypeError):
             ditto_lastfm.top_artists(date=d, period='bob')
-
-    def test_date_but_no_period_error(self):
-        "Should raise TypeError if date is supplied but not period."
-        d = datetime_from_str('2016-10-24 12:00:00')
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_artists(date=d)
-
-    def test_period_but_no_date_error(self):
-        "Should raise TypeError if period is supplied but not date."
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_artists(period='month')
 
 
 class TopTracksTestCase(TestCase):
@@ -419,17 +397,6 @@ class TopTracksTestCase(TestCase):
         d = datetime_from_str('2016-10-24 12:00:00')
         with self.assertRaises(TypeError):
             ditto_lastfm.top_tracks(date=d, period='bob')
-
-    def test_date_but_no_period_error(self):
-        "Should raise TypeError if date is supplied but not period."
-        d = datetime_from_str('2016-10-24 12:00:00')
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_tracks(date=d)
-
-    def test_period_but_no_date_error(self):
-        "Should raise TypeError if period is supplied but not date."
-        with self.assertRaises(TypeError):
-            ditto_lastfm.top_tracks(period='month')
 
 
 class RecentScrobblesTestCase(TestCase):
