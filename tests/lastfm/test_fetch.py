@@ -90,6 +90,16 @@ class ScrobblesFetcherTestCase(TestCase):
         results = self.fetcher.fetch()
         self.assertEqual(results['account'], 'bob')
 
+    def test_get_slugs_with_semicolon(self):
+        """Successfully handles a URL that contains a semicolon.
+        A track with a URL of 'http://www.last.fm/music/iamamiwhoami/_/;+john'
+        was ending up with an empty track slug because ';' is seen as an
+        alternative to '&' for separating query strings.
+        """
+        artist_slug, track_slug = self.fetcher._get_slugs(
+                            'http://www.last.fm/music/iamamiwhoami/_/;+john')
+        self.assertEqual(track_slug, ';+john')
+
 
 class ScrobblesFetcherSendTestCase(TestCase):
     """

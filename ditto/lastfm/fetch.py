@@ -212,15 +212,7 @@ class ScrobblesFetcher(object):
         scrobble -- A dict of data from the Last.fm API.
         fetch_time -- Datetime of when the data was fetched.
         """
-
-        # 'https://www.last.fm/music/Artist/_/Track':
-        url = scrobble['url'].rstrip('/')
-        # www.last.fm/music/Artist/_/Track':
-        url_path = urllib.parse.urlparse(url).path
-        path_parts = url_path.split('/')
-
-        artist_slug = path_parts[-3]  # 'Artist'
-        track_slug = path_parts[-1]   # 'Track'
+        artist_slug, track_slug = self._get_slugs(scrobble['url'])
 
         artist, created = Artist.objects.update_or_create(
             slug=artist_slug,
@@ -273,6 +265,34 @@ class ScrobblesFetcher(object):
         )
 
         return scrobble_obj
+
+    def _get_slugs(self, scrobble_url):
+        """
+        Get the artist and track slugs from a scrobble's URL.
+        The scrobble's URL is also the Track's URL.
+
+        scrobble_url is like 'https://www.last.fm/music/Artist/_/Track'
+        returns two strings, artist_slug and track_slug.
+        """
+        url = scrobble_url.rstrip('/')
+
+        # Need to replace semicolons as urlparse() treats them (legitimately)
+        # as alternatives to '&' as a query string separator, and so omits
+        # anything after them.
+        url = url.replace(';', '%3B')
+
+        # www.last.fm/music/Artist/_/Track':
+        url_path = urllib.parse.urlparse(url).path
+        path_parts = url_path.split('/')
+
+        artist_slug = path_parts[-3]  # 'Artist'
+        track_slug = path_parts[-1]   # 'Track'
+
+        # Put those naughty semicolons back in:
+        artist_slug = artist_slug.replace('%3B', ';')
+        track_slug = track_slug.replace('%3B', ';')
+
+        return artist_slug, track_slug
 
 
 class ScrobblesMultiAccountFetcher(object):

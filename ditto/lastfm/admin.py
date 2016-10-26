@@ -53,6 +53,7 @@ class TrackAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ('time_created', 'time_modified',)
+    raw_id_fields = ('artist',)
 
 
 @admin.register(Album)
@@ -70,6 +71,7 @@ class AlbumAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ('time_created', 'time_modified',)
+    raw_id_fields = ('artist',)
 
 
 @admin.register(Scrobble)
