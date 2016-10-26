@@ -7,7 +7,7 @@ from . import managers
 
 
 # For generating permalinks.
-LASTFM_URL_ROOT = 'http://last.fm'
+LASTFM_URL_ROOT = 'http://www.last.fm'
 
 # For generating links to MB.
 MUSICBRAINZ_URL_ROOT = 'https://musicbrainz.org'
@@ -74,7 +74,10 @@ class Album(TimeStampedModelMixin, models.Model):
     name = models.TextField(null=False, blank=False)
     # We're not using SlugField because a Track slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, db_index=True)
+    slug = models.TextField(null=False, blank=False, db_index=True,
+            help_text="Lowercase")
+    original_slug = models.TextField(null=False, blank=False,
+            help_text="As used on Last.fm. Mixed case.")
     artist = models.ForeignKey('Artist', related_name='albums')
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
@@ -89,6 +92,7 @@ class Album(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
+        "The Album's URL locally."
         return reverse('lastfm:album_detail', kwargs={
             'artist_slug': self.artist.slug,
             'album_slug': self.slug,
@@ -96,8 +100,10 @@ class Album(TimeStampedModelMixin, models.Model):
 
     @property
     def permalink(self):
-        return '%s/music/%s/%s' % (
-                                LASTFM_URL_ROOT, self.artist.slug, self.slug)
+        "The Album's URL at Last.fm."
+        return '%s/music/%s/%s' % (LASTFM_URL_ROOT,
+                                   self.artist.original_slug,
+                                   self.original_slug)
 
     @property
     def musicbrainz_url(self):
@@ -137,7 +143,10 @@ class Artist(TimeStampedModelMixin, models.Model):
     name = models.CharField(null=False, blank=False, max_length=255)
     # We're not using SlugField because an Artist slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, unique=True)
+    slug = models.TextField(null=False, blank=False, unique=True,
+            help_text="Lowercase")
+    original_slug = models.TextField(null=False, blank=False, unique=True,
+            help_text="As used on Last.fm. Mixed case.")
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
@@ -151,13 +160,15 @@ class Artist(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
+        "The Artist's URL locally."
         return reverse('lastfm:artist_detail', kwargs={
             'artist_slug': self.slug,
         })
 
     @property
     def permalink(self):
-        return '%s/music/%s' % (LASTFM_URL_ROOT, self.slug)
+        "The Artist's URL at Last.fm."
+        return '%s/music/%s' % (LASTFM_URL_ROOT, self.original_slug)
 
     @property
     def musicbrainz_url(self):
@@ -258,7 +269,10 @@ class Track(TimeStampedModelMixin, models.Model):
     name = models.TextField(null=False, blank=False)
     # We're not using SlugField because a Track slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, db_index=True)
+    slug = models.TextField(null=False, blank=False, db_index=True,
+            help_text="Lowercase")
+    original_slug = models.TextField(null=False, blank=False,
+            help_text="As used on Last.fm. Mixed case.")
     artist = models.ForeignKey('Artist', related_name='tracks')
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
@@ -273,6 +287,7 @@ class Track(TimeStampedModelMixin, models.Model):
         ordering = ['name']
 
     def get_absolute_url(self):
+        "The track's URL locally."
         return reverse('lastfm:track_detail', kwargs={
             'artist_slug': self.artist.slug,
             'track_slug': self.slug,
@@ -280,8 +295,10 @@ class Track(TimeStampedModelMixin, models.Model):
 
     @property
     def permalink(self):
-        return '%s/music/%s/_/%s' % (
-                                LASTFM_URL_ROOT, self.artist.slug, self.slug)
+        "The Track's URL at Last.fm."
+        return '%s/music/%s/_/%s' % (LASTFM_URL_ROOT,
+                                     self.artist.original_slug,
+                                    self.original_slug)
 
     @property
     def musicbrainz_url(self):

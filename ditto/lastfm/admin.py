@@ -28,7 +28,7 @@ class ArtistAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'mbid',)
+            'fields': ('name', 'slug', 'original_slug', 'mbid',)
         }),
         ('Data', {
             'fields': ('time_created', 'time_modified',)
@@ -45,7 +45,7 @@ class TrackAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'artist', 'mbid',)
+            'fields': ('name', 'slug', 'original_slug', 'artist', 'mbid',)
         }),
         ('Data', {
             'fields': ('time_created', 'time_modified',)
@@ -63,7 +63,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'artist', 'mbid',)
+            'fields': ('name', 'slug', 'original_slug', 'artist', 'mbid',)
         }),
         ('Data', {
             'fields': ('time_created', 'time_modified',)

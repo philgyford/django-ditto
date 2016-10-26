@@ -18,7 +18,8 @@ class ArtistFactory(factory.DjangoModelFactory):
         model = models.Artist
 
     name = factory.Sequence(lambda n: 'Artist %04d' % n)
-    slug = factory.Sequence(lambda n: 'Artist+%04d' % n)
+    slug = factory.Sequence(lambda n: 'artist+%04d' % n)
+    original_slug = factory.Sequence(lambda n: 'Artist+%04d' % n)
 
 
 class TrackFactory(factory.DjangoModelFactory):
@@ -26,7 +27,8 @@ class TrackFactory(factory.DjangoModelFactory):
         model = models.Track
 
     name = factory.Sequence(lambda n: 'Track %04d' % n)
-    slug = factory.Sequence(lambda n: 'Track+%04d' % n)
+    slug = factory.Sequence(lambda n: 'track+%04d' % n)
+    original_slug = factory.Sequence(lambda n: 'Track+%04d' % n)
     artist = factory.SubFactory(ArtistFactory)
 
 
@@ -35,7 +37,8 @@ class AlbumFactory(factory.DjangoModelFactory):
         model = models.Album
 
     name = factory.Sequence(lambda n: 'Album %04d' % n)
-    slug = factory.Sequence(lambda n: 'Album+%04d' % n)
+    slug = factory.Sequence(lambda n: 'album+%04d' % n)
+    original_slug = factory.Sequence(lambda n: 'Album+%04d' % n)
     artist = factory.SubFactory(ArtistFactory)
 
 

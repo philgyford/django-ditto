@@ -27,7 +27,7 @@ class AccountTestCase(TestCase):
 
     def test_permalink(self):
         account = AccountFactory(username='gyford')
-        self.assertEqual(account.permalink, 'http://last.fm/user/gyford')
+        self.assertEqual(account.permalink, 'http://www.last.fm/user/gyford')
 
     def test_absolute_url(self):
         account = AccountFactory(username='gyford')
@@ -79,16 +79,20 @@ class AlbumTestCase(TestCase):
         self.assertEqual(albums[1], album_1)
 
     def test_absolute_url(self):
-        artist = ArtistFactory(slug='Life+Without+Buildings')
-        album = AlbumFactory(artist=artist, slug='Any+Other+City')
+        artist = ArtistFactory(slug='life+without+buildings',
+                               original_slug='Life+Without+Buildings')
+        album = AlbumFactory(artist=artist, slug='any+other+city',
+                               original_slug='Any+Other+City')
         self.assertEqual(album.get_absolute_url(),
-                        '/lastfm/music/Life+Without+Buildings/Any+Other+City/')
+                        '/lastfm/music/life+without+buildings/any+other+city/')
 
     def test_permalink(self):
-        artist = ArtistFactory(slug='Life+Without+Buildings')
-        album = AlbumFactory(artist=artist, slug='Any+Other+City')
+        artist = ArtistFactory(slug='life+without+buildings',
+                               original_slug='Life+Without+Buildings')
+        album = AlbumFactory(artist=artist, slug='any+other+city',
+                                original_slug='Any+Other+City')
         self.assertEqual(album.permalink,
-                'http://last.fm/music/Life+Without+Buildings/Any+Other+City')
+            'http://www.last.fm/music/Life+Without+Buildings/Any+Other+City')
 
     def test_musicbrainz_url(self):
         album = AlbumFactory(mbid='65497352-51ea-40a6-b1f0-1bdff6750369')
@@ -245,12 +249,13 @@ class ArtistTestCase(TestCase):
 
     def test_absolute_url(self):
         mbid = '80fe34d0-6b4f-4ccd-81c3-281ab37f0451'
-        artist = ArtistFactory(slug='Tom+Waits')
-        self.assertEqual(artist.get_absolute_url(), '/lastfm/music/Tom+Waits/')
+        artist = ArtistFactory(slug='tom+waits', original_slug='Tom+Waits')
+        self.assertEqual(artist.get_absolute_url(), '/lastfm/music/tom+waits/')
 
     def test_permalink(self):
-        artist = ArtistFactory(slug="Tom+Waits")
-        self.assertEqual(artist.permalink, 'http://last.fm/music/Tom+Waits')
+        artist = ArtistFactory(slug='tom+waits', original_slug='Tom+Waits')
+        self.assertEqual(artist.permalink,
+                                        'http://www.last.fm/music/Tom+Waits')
 
     def test_musicbrainz_url(self):
         artist = ArtistFactory(mbid='80fe34d0-6b4f-4ccd-81c3-281ab37f0451')
@@ -446,16 +451,20 @@ class TrackTestCase(TestCase):
         self.assertEqual(tracks[1], track_1)
 
     def test_absolute_url(self):
-        artist = ArtistFactory(slug='The+Mountain+Goats')
-        track = TrackFactory(slug='Dance+Music', artist=artist)
+        artist = ArtistFactory(slug='the+mountain+goats',
+                                original_slug='The+Mountain+Goats')
+        track = TrackFactory(slug='dance+music', original_slug='Dance+Music',
+                                artist=artist)
         self.assertEqual(track.get_absolute_url(),
-                        '/lastfm/music/The+Mountain+Goats/_/Dance+Music/')
+                        '/lastfm/music/the+mountain+goats/_/dance+music/')
 
     def test_permalink(self):
-        artist = ArtistFactory(slug='The+Mountain+Goats')
-        track = TrackFactory(slug='Dance+Music', artist=artist)
+        artist = ArtistFactory(slug='the+mountain+goats',
+                                original_slug='The+Mountain+Goats')
+        track = TrackFactory(slug='dance+music',original_slug='Dance+Music',
+                                artist=artist)
         self.assertEqual(track.permalink,
-                    'http://last.fm/music/The+Mountain+Goats/_/Dance+Music')
+                'http://www.last.fm/music/The+Mountain+Goats/_/Dance+Music')
 
     def test_musicbrainz_url(self):
         track = TrackFactory(mbid='330fd2ed-785e-473a-bd9b-ab0b109029c8')

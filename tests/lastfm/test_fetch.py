@@ -251,9 +251,10 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Creates a new Artist if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artists = Artist.objects.filter(slug='Lou+Reed')
+        artists = Artist.objects.filter(slug='lou+reed')
         self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].slug, 'Lou+Reed')
+        self.assertEqual(artists[0].slug, 'lou+reed')
+        self.assertEqual(artists[0].original_slug, 'Lou+Reed')
         self.assertEqual(artists[0].name, 'Lou Reed')
         self.assertEqual(artists[0].mbid,
                         '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
@@ -261,40 +262,52 @@ class ScrobblesFetcherSendTestCase(TestCase):
     @responses.activate
     def test_updates_existing_artist(self):
         "Doesn't create a new Artist if it already exists"
-        ArtistFactory(slug='Lou+Reed', mbid='')
+        ArtistFactory(slug='lou+reed', mbid='')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artists = Artist.objects.filter(slug='Lou+Reed')
+        artists = Artist.objects.filter(slug='lou+reed')
         self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].slug, 'Lou+Reed')
+        self.assertEqual(artists[0].slug, 'lou+reed')
+        self.assertEqual(artists[0].original_slug, 'Lou+Reed')
         self.assertEqual(artists[0].name, 'Lou Reed')
         self.assertEqual(artists[0].mbid,
                         '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
+
+    @responses.activate
+    def test_ignores_case_when_finding_artist(self):
+        "Should match an Artist with slug 'Lou+Reed' with 'lou+reed'."
+        ArtistFactory(slug='lou+reed', name='Lou Reed', mbid='')
+        self.add_recent_tracks_response()
+        results = self.fetcher.fetch()
+        artists = Artist.objects.filter(name='Lou Reed')
+        self.assertEqual(len(artists), 1)
 
     @responses.activate
     def test_creates_new_track(self):
         "Creates a new Track if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        loureed = Artist.objects.get(slug='Lou+Reed')
-        tracks = Track.objects.filter(name='Make Up', slug='Make+Up')
+        loureed = Artist.objects.get(slug='lou+reed')
+        tracks = Track.objects.filter(name='Make Up', slug='make+up')
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].name,'Make Up')
-        self.assertEqual(tracks[0].slug,'Make+Up')
+        self.assertEqual(tracks[0].slug,'make+up')
+        self.assertEqual(tracks[0].original_slug,'Make+Up')
         self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
         self.assertEqual(tracks[0].artist, loureed)
 
     @responses.activate
     def test_updates_existing_track(self):
         "Doesn't create a new Track if it already exists"
-        loureed = ArtistFactory(slug='Lou+Reed')
-        TrackFactory(artist=loureed, slug='Make+Up')
+        loureed = ArtistFactory(slug='lou+reed')
+        TrackFactory(artist=loureed, slug='make+up')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        tracks = Track.objects.filter(slug='Make+Up')
+        tracks = Track.objects.filter(slug='make+up')
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].name,'Make Up')
-        self.assertEqual(tracks[0].slug,'Make+Up')
+        self.assertEqual(tracks[0].slug,'make+up')
+        self.assertEqual(tracks[0].original_slug,'Make+Up')
         self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
         self.assertEqual(tracks[0].artist, loureed)
 
@@ -303,10 +316,11 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Creates a new Album if it doesn't exist"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        loureed = Artist.objects.get(slug='Lou+Reed')
-        albums = Album.objects.filter(slug='Transformer')
+        loureed = Artist.objects.get(slug='lou+reed')
+        albums = Album.objects.filter(slug='transformer')
         self.assertEqual(len(albums), 1)
-        self.assertEqual(albums[0].slug,'Transformer')
+        self.assertEqual(albums[0].slug,'transformer')
+        self.assertEqual(albums[0].original_slug,'Transformer')
         self.assertEqual(albums[0].name,'Transformer')
         self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
         self.assertEqual(albums[0].artist, loureed)
@@ -314,14 +328,15 @@ class ScrobblesFetcherSendTestCase(TestCase):
     @responses.activate
     def test_updates_existing_album(self):
         "Doesn't create a new Album if it already exists"
-        loureed = ArtistFactory(slug='Lou+Reed')
-        AlbumFactory(artist=loureed, slug='Transformer')
+        loureed = ArtistFactory(slug='lou+reed')
+        AlbumFactory(artist=loureed, slug='transformer')
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        albums = Album.objects.filter(slug='Transformer')
+        albums = Album.objects.filter(slug='transformer')
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0].name,'Transformer')
-        self.assertEqual(albums[0].slug,'Transformer')
+        self.assertEqual(albums[0].slug,'transformer')
+        self.assertEqual(albums[0].original_slug,'Transformer')
         self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
         self.assertEqual(albums[0].artist, loureed)
 
@@ -330,7 +345,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Doesn't create a new Album if the scrobble has none"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
-        artist = Artist.objects.get(slug='%5Bunknown%5D')
+        artist = Artist.objects.get(slug='%5bunknown%5d')
         albums = Album.objects.filter(artist=artist)
         self.assertEqual(len(albums), 0)
 
@@ -359,8 +374,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def test_updates_existing_scrobbles(self):
         "Updates existing scrobble objects"
         # Make our existing scrobble:
-        artist = ArtistFactory(slug='Lou+Reed')
-        track = TrackFactory(artist=artist, slug='Make+Up')
+        artist = ArtistFactory(slug='lou+reed')
+        track = TrackFactory(artist=artist, slug='make+up')
         post_time = datetime.datetime.strptime(
                         '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
                     ).replace(tzinfo=pytz.utc)
@@ -383,10 +398,10 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Sets all the scrobble data correctly"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist__slug='Lou+Reed')
+        scrobble = Scrobble.objects.get(artist__slug='lou+reed')
         self.assertEqual(scrobble.account, self.account)
-        self.assertEqual(scrobble.track.slug, 'Make+Up')
-        self.assertEqual(scrobble.album.slug, 'Transformer')
+        self.assertEqual(scrobble.track.slug, 'make+up')
+        self.assertEqual(scrobble.album.slug, 'transformer')
         self.assertEqual(scrobble.post_time,
                             datetime.datetime.strptime(
                                     '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
@@ -401,7 +416,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "If scrobble has no album, leaves its fields empty"
         self.add_recent_tracks_response()
         results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist__slug='%5Bunknown%5D')
+        scrobble = Scrobble.objects.get(artist__slug='%5bunknown%5d')
         self.assertEqual(scrobble.album, None)
 
 

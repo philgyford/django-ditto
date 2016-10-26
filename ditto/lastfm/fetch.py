@@ -215,18 +215,20 @@ class ScrobblesFetcher(object):
         artist_slug, track_slug = self._get_slugs(scrobble['url'])
 
         artist, created = Artist.objects.update_or_create(
-            slug=artist_slug,
+            slug=artist_slug.lower(),
             defaults={
                 'name': scrobble['artist']['#text'],
+                'original_slug': artist_slug,
                 'mbid': scrobble['artist']['mbid'], # Might be "".
             }
         )
 
         track, created = Track.objects.update_or_create(
-            slug=track_slug,
+            slug=track_slug.lower(),
             artist=artist,
             defaults={
                 'name': scrobble['name'],
+                'original_slug': track_slug,
                 'mbid': scrobble['mbid'], # Might be "".
             }
         )
@@ -239,10 +241,11 @@ class ScrobblesFetcher(object):
             album_slug = slugify_name(scrobble['album']['#text'])
 
             album, created = Album.objects.update_or_create(
-                slug=album_slug,
+                slug=album_slug.lower(),
                 artist=artist,
                 defaults={
                     'name': scrobble['album']['#text'],
+                    'original_slug': album_slug,
                     'mbid': scrobble['album']['mbid'], # Might be "".
                 }
             )
