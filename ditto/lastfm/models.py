@@ -125,7 +125,8 @@ class Album(TimeStampedModelMixin, models.Model):
                         .order_by('-scrobble_count')
 
     def get_scrobble_count(self):
-        """If we just have a `scrobble_count` property it clashes when we use
+        """
+        If we just have a `scrobble_count` property it clashes when we use
         the Album.objects.with_scrobble_count() query.
         """
         return self.scrobbles.count()
@@ -178,7 +179,8 @@ class Artist(TimeStampedModelMixin, models.Model):
             return None
 
     def get_scrobble_count(self):
-        """If we just have a `scrobble_count` property it clashes when we use
+        """
+        If we just have a `scrobble_count` property it clashes when we use
         the Artist.objects.with_scrobble_count() query.
         """
         return self.scrobbles.count()
@@ -320,7 +322,8 @@ class Track(TimeStampedModelMixin, models.Model):
                         .order_by('-scrobble_count')
 
     def get_scrobble_count(self):
-        """If we just have a `scrobble_count` property it clashes when we use
+        """
+        If we just have a `scrobble_count` property it clashes when we use
         the Track.objects.with_scrobble_count() query.
         """
         return self.scrobbles.count()

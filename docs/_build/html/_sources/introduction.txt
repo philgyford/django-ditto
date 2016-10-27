@@ -18,6 +18,8 @@ Currently, Ditto can copy these things from these services:
     - Photosets
     - Original image and video files
     - Users
+- `Last.fm <https://www.last.fm/>`_
+    - Scrobbles (Artist, Track and Album)
 - `Pinboard <https://pinboard.in/>`_
     - Bookmarks
 - `Twitter <https://twitter.com/>`_

@@ -85,7 +85,7 @@ Build the documentation:
 Packaging
 =========
 
-Set version number in `ditto/pkgmeta.py`.
+Set version number in `ditto/__init__.py`.
 
 Rebuild documentation (which includes the version number).
 

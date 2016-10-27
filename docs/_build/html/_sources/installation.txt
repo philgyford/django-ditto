@@ -24,7 +24,7 @@ Ditto can be installed using `pip <https://pip.pypa.io/en/stable/>`_:
 Add to INSTALLED_APPS
 *********************
 
-To use Ditto in your own project (untested as yet), add the core ``ditto.core`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This example includes Flickr, Pinboard and Twitter::
+To use Ditto in your own project (untested as yet), add the core ``ditto.core`` application to your project's ``INSTALLED_APPS`` in your ``settings.py``, and add the applications for the services you need. This example includes Flickr, Last.fm, Pinboard and Twitter::
 
     INSTALLED_APPS = (
         # other apps listed here.
@@ -34,6 +34,7 @@ To use Ditto in your own project (untested as yet), add the core ``ditto.core`` 
         'taggit',         # Required only for ditto.flickr and ditto.pinboard
         'ditto.core',
         'ditto.flickr',
+        'ditto.lastfm',
         'ditto.pinboard',
         'ditto.twitter',
     )
@@ -84,7 +85,7 @@ Add the project's context processor in your settings::
 Add to urls.py
 **************
 
-To use Ditto's supplied views you can include each app's URLs in your project's own ``urls.py``. Note that each app requires the correct namespace (``flickr``, ``pinboard`` or ``twitter``), eg::
+To use Ditto's supplied views you can include each app's URLs in your project's own ``urls.py``. Note that each app requires the correct namespace (``flickr``, ``lastfm``, ``pinboard`` or ``twitter``), eg::
 
     from django.conf.urls import include, url
     from django.contrib import admin
@@ -93,6 +94,7 @@ To use Ditto's supplied views you can include each app's URLs in your project's 
         url(r'^admin/', include(admin.site.urls)),
 
         url(r'^flickr/', include('ditto.flickr.urls', namespace='flickr')),
+        url(r'^lastfm/', include('ditto.lastfm.urls', namespace='lastfm')),
         url(r'^pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
         url(r'^twitter/', include('ditto.twitter.urls', namespace='twitter')),
 

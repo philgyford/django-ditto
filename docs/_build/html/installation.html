@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Django Ditto 0.3.0 documentation</title>
+  <title>Installation &mdash; Django Ditto 0.4.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.3.0 documentation" href="index.html"/>
+    <link rel="top" title="Django Ditto 0.4.0 documentation" href="index.html"/>
         <link rel="next" title="Flickr" href="services/flickr.html"/>
         <link rel="prev" title="Introduction" href="introduction.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4
               </div>
             
           
@@ -100,6 +100,7 @@
 <p class="caption"><span class="caption-text">Services supported</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="services/flickr.html">Flickr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/lastfm.html">Last.fm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/pinboard.html">Pinboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/twitter.html">Twitter</a></li>
 </ul>
@@ -170,7 +171,7 @@
 </div>
 <div class="section" id="add-to-installed-apps">
 <h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Permalink to this headline">¶</a></h2>
-<p>To use Ditto in your own project (untested as yet), add the core <code class="docutils literal"><span class="pre">ditto.core</span></code> application to your project&#8217;s <code class="docutils literal"><span class="pre">INSTALLED_APPS</span></code> in your <code class="docutils literal"><span class="pre">settings.py</span></code>, and add the applications for the services you need. This example includes Flickr, Pinboard and Twitter:</p>
+<p>To use Ditto in your own project (untested as yet), add the core <code class="docutils literal"><span class="pre">ditto.core</span></code> application to your project&#8217;s <code class="docutils literal"><span class="pre">INSTALLED_APPS</span></code> in your <code class="docutils literal"><span class="pre">settings.py</span></code>, and add the applications for the services you need. This example includes Flickr, Last.fm, Pinboard and Twitter:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># other apps listed here.</span>
     <span class="c1"># ...</span>
@@ -179,6 +180,7 @@
     <span class="s1">&#39;taggit&#39;</span><span class="p">,</span>         <span class="c1"># Required only for ditto.flickr and ditto.pinboard</span>
     <span class="s1">&#39;ditto.core&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ditto.flickr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ditto.lastfm&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ditto.pinboard&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ditto.twitter&#39;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -226,7 +228,7 @@ images:</p>
 </div>
 <div class="section" id="add-to-urls-py">
 <h2>Add to urls.py<a class="headerlink" href="#add-to-urls-py" title="Permalink to this headline">¶</a></h2>
-<p>To use Ditto&#8217;s supplied views you can include each app&#8217;s URLs in your project&#8217;s own <code class="docutils literal"><span class="pre">urls.py</span></code>. Note that each app requires the correct namespace (<code class="docutils literal"><span class="pre">flickr</span></code>, <code class="docutils literal"><span class="pre">pinboard</span></code> or <code class="docutils literal"><span class="pre">twitter</span></code>), eg:</p>
+<p>To use Ditto&#8217;s supplied views you can include each app&#8217;s URLs in your project&#8217;s own <code class="docutils literal"><span class="pre">urls.py</span></code>. Note that each app requires the correct namespace (<code class="docutils literal"><span class="pre">flickr</span></code>, <code class="docutils literal"><span class="pre">lastfm</span></code>, <code class="docutils literal"><span class="pre">pinboard</span></code> or <code class="docutils literal"><span class="pre">twitter</span></code>), eg:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="k">import</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
 <span class="kn">from</span> <span class="nn">django.contrib</span> <span class="k">import</span> <span class="n">admin</span>
 
@@ -234,6 +236,7 @@ images:</p>
     <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
 
     <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^flickr/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.flickr.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;flickr&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^lastfm/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.lastfm.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;lastfm&#39;</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^pinboard/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.pinboard.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;pinboard&#39;</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^twitter/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.twitter.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;twitter&#39;</span><span class="p">)),</span>
 
@@ -312,7 +315,7 @@ images:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

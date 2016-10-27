@@ -77,8 +77,8 @@ class WithScrobbleCountsManager(models.Manager):
         qs = self.filter(**filter_kwargs)
 
         return qs.annotate(
-                    scrobble_count = models.Count('scrobbles', distinct=True)
-                )
+                scrobble_count = models.Count('scrobbles', distinct=True)
+            )
 
 
 class TracksManager(WithScrobbleCountsManager):

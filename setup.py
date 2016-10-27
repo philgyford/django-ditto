@@ -13,7 +13,8 @@ read = lambda filepath: codecs.open(filepath, 'r', 'utf-8').read()
 
 def get_entity(package, entity):
     """
-    eg, get_entity('ditto', 'version') returns `__version__` value in `init.py`.
+    eg, get_entity('ditto', 'version') returns `__version__` value in
+    `__init__.py`.
     """
     init_py = open(os.path.join(package, '__init__.py')).read()
     find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
