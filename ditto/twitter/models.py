@@ -564,6 +564,10 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         self._retweeted_tweet = tweet
         return tweet
 
+    def _summary_source(self):
+        "Used to make the `summary` property."
+        return self.title
+
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """A Twitter user.

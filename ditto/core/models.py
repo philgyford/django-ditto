@@ -3,6 +3,7 @@ from django.db import models
 from django.forms.models import model_to_dict
 
 from .managers import PublicItemManager
+from .utils import truncate_string
 
 
 class TimeStampedModelMixin(models.Model):
@@ -87,7 +88,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
                     help_text="URL of the item on the service's website.")
     # Ensures that all children have a common short piece of text for display:
     summary = models.CharField(blank=True, max_length=255,
-        help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
+        help_text="eg, Brief summary or excerpt of item's text content. No linebreaks or HTML.")
     is_private = models.BooleanField(default=False,
         help_text="If true, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
@@ -117,4 +118,28 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.summary = self._make_summary()
+        super().save(*args, **kwargs)
+
+    def _summary_source(self):
+        """
+        Child classes can return a string that's used to make the truncated,
+        HTML-free `summary`.
+        e.g.:
+            return self.description
+        """
+        return ''
+
+    def _make_summary(self):
+        """
+        Returns the string to be used for the `summary` property.
+        """
+        return truncate_string(self._summary_source(),
+                                strip_html=True,
+                                chars=255,
+                                truncate='…',
+                                at_word_boundary=True).replace('\n', ' ')\
+                                                      .replace('\r', ' ')
 

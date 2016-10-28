@@ -6,7 +6,6 @@ from taggit.models import Tag
 
 from . import FetchError
 from ..models import Photo, Photoset, User
-from ...core.utils import truncate_string
 
 
 # These classes are passed JSON data from the Flickr API and create/update
@@ -135,12 +134,6 @@ class PhotoSaver(SaveUtilsMixin, object):
         # }
         permalink = next(url for url in photo['info']['urls']['url'] if url['type'] == 'photopage')['_content']
 
-        summary = truncate_string(photo['info']['description']['_content'],
-                                    strip_html=True,
-                                    chars=255,
-                                    truncate=u'…',
-                                    at_word_boundary=True)
-
         defaults = {
             # DittoItemModel fields
             'title':                photo['info']['title']['_content'],
@@ -155,7 +148,6 @@ class PhotoSaver(SaveUtilsMixin, object):
             'user':                 photo['user_obj'],
             'flickr_id':            photo['info']['id'],
             'description':          photo['info']['description']['_content'],
-            'summary':              summary,
             'secret':               photo['info']['secret'],
             'original_secret':      photo['info']['originalsecret'],
             'server':               photo['info']['server'],

@@ -434,7 +434,7 @@ class ScrobbleTestCase(TestCase):
         "It should set the summary on save."
         scrobble = ScrobbleFactory(
                             post_time=datetime_from_str('2016-04-07 12:00:00'))
-        self.assertEqual(scrobble.summary, '2016-04-07 12:00:00+00:00')
+        self.assertEqual(scrobble.summary, '2016-04-07 12:00')
 
 
 class TrackTestCase(TestCase):

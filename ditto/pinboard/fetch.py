@@ -6,7 +6,7 @@ import requests
 import urllib
 
 from .models import Account, Bookmark
-from ..core.utils import datetime_now, truncate_string
+from ..core.utils import datetime_now
 
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"
@@ -210,10 +210,6 @@ class BookmarksFetcher(object):
                 'is_private': not bookmark['shared'],
                 'raw': bookmark['json'],
                 'description': bookmark['extended'],
-                'summary': truncate_string(
-                                bookmark['extended'],
-                                strip_html=True, chars=255, truncate=u'…',
-                                at_word_boundary=True),
                 'to_read': bookmark['toread'],
                 'fetch_time': fetch_time,
                 'post_time': bookmark['time'],

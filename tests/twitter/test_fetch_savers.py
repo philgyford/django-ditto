@@ -47,7 +47,7 @@ class TweetSaverTestCase(FetchTwitterTestCase):
 
         #And check it's all there:
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
-        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
+        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.latitude, Decimal('40.057016'))
         self.assertEqual(tweet.longitude, Decimal('-75.143103'))

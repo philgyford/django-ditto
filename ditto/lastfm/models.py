@@ -256,8 +256,11 @@ class Scrobble(DittoItemModel, models.Model):
 
     def save(self, *args, **kwargs):
         self.title = '%s – %s' % (self.track.artist.name, self.track.name)
-        self.summary = str(self.post_time)
         super().save(*args, **kwargs)
+
+    def _summary_source(self):
+        "Used to make the `summary` property."
+        return self.post_time.strftime('%Y-%m-%d %H:%M')
 
 
 class Track(TimeStampedModelMixin, models.Model):
