@@ -4,7 +4,7 @@
     <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:user_detail' username=account.username %}">{{ account.realname }}</a></li>
-    <li class="breadcrumb-item active">Scrobbles</li>
+    <li class="breadcrumb-item active">Listens</li>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
             {{ account.realname }}
         </a><br>
         {% block title %}
-            Scrobbles
+            Listens
         {% endblock %}
     </h1>
 

@@ -3,14 +3,14 @@
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
     <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
-    <li class="breadcrumb-item active">Scrobbles</li>
+    <li class="breadcrumb-item active">Listens</li>
 {% endblock %}
 
 {% block content %}
 
     <h1 class="m-y-2">
         {% block title %}
-            Scrobbles
+            Listens
         {% endblock %}
     </h1>
 

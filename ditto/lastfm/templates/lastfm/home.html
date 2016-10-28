@@ -17,7 +17,6 @@
         <div class="col-md-3">
             {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Last.fm' only %}
 
-
             {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts only %}
 
             {% include 'lastfm/includes/annual_scrobble_counts.html' only %}
@@ -28,7 +27,7 @@
             {% load ditto_lastfm %}
 
             <h2>
-                <a href="{% url 'lastfm:scrobble_list' %}">Recent tracks</a>
+                <a href="{% url 'lastfm:scrobble_list' %}">Recent listens</a>
             </h2>
 
             {% recent_scrobbles limit=10 as scrobbles %}

@@ -20,7 +20,7 @@ Expects:
                 {% url 'lastfm:scrobble_list' %}
             {% endif %}
         {% endspaceless %}" class="list-group-item {% if 'scrobble_list' in url_name %}active{% else %}list-group-item-action{% endif %}">
-            Scrobbles
+            Listens
             <span class="tag tag-default tag-pill pull-xs-right">
                 {{ counts.scrobbles }}
             </span>

@@ -25,7 +25,7 @@
             {% load ditto_lastfm %}
 
             <h2>
-                <a href="{% url 'lastfm:user_scrobble_list' username=account.username %}">Recent tracks</a>
+                <a href="{% url 'lastfm:user_scrobble_list' username=account.username %}">Recent listens</a>
             </h2>
 
             {% recent_scrobbles account=account limit=10 as scrobbles %}
