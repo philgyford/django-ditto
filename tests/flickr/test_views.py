@@ -297,6 +297,7 @@ class TagViewTests(TestCase):
         "Sends the correct data to templates"
         response = self.client.get(reverse('flickr:tag_list'))
         self.assertIn('tag_list', response.context)
+        self.assertIn('account_list', response.context)
         self.assertEqual(len(response.context['tag_list']), 3)
 
     def test_tag_list_privacy(self):
