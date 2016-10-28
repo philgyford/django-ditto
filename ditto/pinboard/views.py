@@ -87,6 +87,11 @@ class TagListView(ListView):
     def get_queryset(self):
         return Bookmark.tags.most_common()[:100]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account_list'] = Account.objects.all()
+        return context
+
 
 class TagDetailView(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain tag from all Accounts"
