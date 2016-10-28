@@ -358,49 +358,41 @@ class HomeView(DittoAppsMixin, TemplateView):
     template_name = 'ditto/home.html'
 
     # How many things do we list on the page?
-    items_to_list = 20
+    items_to_list = 30
 
-    # Set to True to include photos sorted by taken date:
-    include_flickr_photos_by_taken_date = False
+    # What we want to display:
+    app_varieties_to_display = [
+        ('flickr', 'photo-uploaded'),
+        ('pinboard', 'bookmark'),
+        ('twitter', 'tweet'),
 
-    # Set to True to include Favorited Tweets:
-    include_twitter_favorites = False
+        # Things we could display, but are currently hidden:
 
+        # Otherwise we'll get two sets of photos, sorted by upload or taken:
+        #('flickr', 'photo-taken'),
+
+        # No easy way to tell in the template whether a tweet is posted
+        # or favorited, so remove the favorites:
+        #('twitter', 'favorite'),
+
+        # These are liable to swamp out all other things:
+        #('lastfm', 'scrobble'),
+    ]
+
+    # Hacky.
     # Set to True to include Tweets that are replies:
     include_twitter_replies = False
-
-    # Set to True to include Scrobbles:
-    include_lastfm_scrobbles = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        app_varieties = self.get_app_varieties()
-
-        # A bit hacky. Remove querysets we don't want.
-        try:
-            if self.include_flickr_photos_by_taken_date == False:
-                # Otherwise we'll get two sets of photos, sorted by upload or taken:
-                app_varieties.remove(('flickr', 'photo-taken'))
-
-            if self.include_lastfm_scrobbles == False:
-                app_varieties.remove(('lastfm', 'scrobble'))
-
-            if self.include_twitter_favorites == False:
-                # No easy way to tell in the template whether a tweet is posted
-                # or favorited, so remove the favorites:
-                app_varieties.remove(('twitter', 'favorite'))
-        except ValueError:
-            pass
-
         # Put all querysets for available apps in this list:
         querysets = []
 
-        for app_name, variety_name in app_varieties:
+        for app_name, variety_name in self.get_app_varieties_to_display():
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
 
             if self.include_twitter_replies == False:
-                # More hackiness.
                 # Don't want to include Tweets that are replies on the home page.
                 if app_name == 'twitter' and variety_name == 'tweet':
                     qs = qs.filter(in_reply_to_screen_name__exact='')
@@ -416,6 +408,20 @@ class HomeView(DittoAppsMixin, TemplateView):
         )[:self.items_to_list]
 
         return context
+
+    def get_app_varieties_to_display(self):
+        """
+        Get the union of self.app_varieties and the varieties that are
+        actually installed.
+        """
+        available_app_varieties = self.get_app_varieties()
+        to_display = []
+
+        for app_variety in self.app_varieties_to_display:
+            if app_variety in available_app_varieties:
+                to_display.append(app_variety)
+
+        return to_display
 
 
 class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
