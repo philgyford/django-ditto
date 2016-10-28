@@ -39,11 +39,11 @@ Expects:
 
 <div class="card twitter-user">
     <ul class="list-group list-group-flush twitter-user-counts">
-        <li class="list-group-item">{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}</li>
-        <li class="list-group-item">{{ user.favorites_count|localize }} Like{{ user.favorites_count|pluralize }}</li>
-        <li class="list-group-item">{{ user.followers_count|localize }} Follower{{ user.followers_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.statuses_count|localize }} tweet{{ user.statuses_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.favorites_count|localize }} like{{ user.favorites_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.followers_count|localize }} follower{{ user.followers_count|pluralize }}</li>
         <li class="list-group-item">Following {{ user.friends_count|localize }}</li>
-        <li class="list-group-item">On {{ user.listed_count|localize }} List{{ user.listed_count|pluralize }}</li>
+        <li class="list-group-item">On {{ user.listed_count|localize }} list{{ user.listed_count|pluralize }}</li>
     </ul>
 </div>
 
