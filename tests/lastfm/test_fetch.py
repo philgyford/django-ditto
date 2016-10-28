@@ -21,7 +21,8 @@ class ScrobblesFetcherTestCase(TestCase):
     """
 
     def setUp(self):
-        self.fetcher = ScrobblesFetcher(account=AccountFactory(username='bob'))
+        self.fetcher = ScrobblesFetcher(account=AccountFactory(
+                                        username='bob', realname='Bob Ferris'))
 
         # Patch the _send_request() method:
         self.send_request_patch = patch.object(
@@ -88,7 +89,7 @@ class ScrobblesFetcherTestCase(TestCase):
     def test_returns_account(self):
         "Returned data should include the account name"
         results = self.fetcher.fetch()
-        self.assertEqual(results['account'], 'bob')
+        self.assertEqual(results['account'], 'Bob Ferris')
 
     def test_get_slugs_with_semicolon(self):
         """Successfully handles a URL that contains a semicolon.

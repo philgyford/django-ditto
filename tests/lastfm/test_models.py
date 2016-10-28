@@ -9,8 +9,8 @@ from ditto.lastfm.models import Account, Album, Artist, Scrobble, Track
 class AccountTestCase(TestCase):
 
     def test_str(self):
-        account = AccountFactory(username='gyford')
-        self.assertEqual(str(account), 'gyford')
+        account = AccountFactory(realname='Phil Gyford')
+        self.assertEqual(str(account), 'Phil Gyford')
 
     def test_ordering(self):
         account_1 = AccountFactory(username='bb', realname='Alan')

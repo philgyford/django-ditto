@@ -30,7 +30,7 @@ class Account(TimeStampedModelMixin, models.Model):
                         help_text="If false, new scrobbles won't be fetched.")
 
     def __str__(self):
-        return self.username
+        return self.realname
 
     class Meta:
         ordering = ['username']

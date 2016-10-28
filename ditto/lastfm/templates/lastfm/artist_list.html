@@ -16,7 +16,8 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'lastfm/includes/account_list.html' with account_list=account_list only %}
+            {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Last.fm' only %}
+
             {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts only %}
         </div> <!-- .col -->
 
