@@ -238,6 +238,11 @@ class AlbumManagersTestCase(TestCase):
         with self.assertRaises(TypeError):
             Album.objects.with_scrobble_counts(artist='foo')
 
+    def test_album_error(self):
+        album = AlbumFactory()
+        with self.assertRaises(ValueError):
+            Album.objects.with_scrobble_counts(album=album)
+
 
 class ArtistTestCase(TestCase):
 
@@ -361,6 +366,22 @@ class ArtistManagersTestCase(TestCase):
         self.assertEqual(artists[0].scrobble_count, 4)
         self.assertEqual(artists[1].scrobble_count, 1)
 
+    def test_with_scrobble_counts_album(self):
+        "Only aggregates scrobble_counts for a particular album."
+        artist2 = ArtistFactory()
+        album1 = AlbumFactory()
+        album2 = AlbumFactory()
+        track = TrackFactory()
+        ScrobbleFactory(album=album1, artist=self.artist, track=track)
+        ScrobbleFactory(album=album1, artist=self.artist, track=track)
+        ScrobbleFactory(album=album1, artist=artist2, track=track)
+        ScrobbleFactory(album=album2, artist=self.artist, track=track)
+        artists = Artist.objects.with_scrobble_counts(album=album1).order_by(
+                                                            '-scrobble_count')
+        self.assertEqual(len(artists), 2)
+        self.assertEqual(artists[0].scrobble_count, 2)
+        self.assertEqual(artists[1].scrobble_count, 1)
+
     def test_with_scrobble_counts_min(self):
         "Only aggregates scrobble_counts after supplied min time."
         artists = Artist.objects.with_scrobble_counts(
@@ -405,6 +426,11 @@ class ArtistManagersTestCase(TestCase):
     def test_account_error(self):
         with self.assertRaises(TypeError):
             Artist.objects.with_scrobble_counts(account='foo')
+
+    def test_artist_error(self):
+        artist = ArtistFactory()
+        with self.assertRaises(ValueError):
+            Artist.objects.with_scrobble_counts(artist=artist)
 
 
 class ScrobbleTestCase(TestCase):
@@ -544,6 +570,22 @@ class TrackManagersTestCase(TestCase):
         self.assertEqual(len(tracks), 2)
         self.assertEqual(tracks[0].scrobble_count, 4)
         self.assertEqual(tracks[1].scrobble_count, 1)
+
+    def test_with_scrobble_counts_album(self):
+        "Only aggregates scrobble_counts in supplied album."
+        album1 = AlbumFactory()
+        album2 = AlbumFactory()
+        track1 = TrackFactory()
+        ScrobbleFactory.create_batch(2, album=album1, track=self.track)
+        ScrobbleFactory.create_batch(1, album=album1, track=track1)
+        ScrobbleFactory.create_batch(1, album=album2, track=self.track)
+        tracks = Track.objects.with_scrobble_counts(album=album1).order_by(
+                                                            '-scrobble_count')
+        self.assertEqual(len(tracks), 2)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+        self.assertEqual(tracks[0], self.track)
+        self.assertEqual(tracks[1].scrobble_count, 1)
+        self.assertEqual(tracks[1], track1)
 
     def test_with_scrobble_counts_min(self):
         "Only aggregates scrobble_counts after supplied min time."

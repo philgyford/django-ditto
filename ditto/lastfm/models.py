@@ -118,11 +118,9 @@ class Album(TimeStampedModelMixin, models.Model):
         A QuerySet of all the Tracks on this Album, ordered by how many times
         they were scrobbled, most-scrobbled first.
         """
-        return Track.objects\
-                        .with_scrobble_counts()\
-                        .filter(scrobbles__album=self)\
-                        .distinct()\
-                        .order_by('-scrobble_count')
+        qs = Track.objects.with_scrobble_counts(album=self)\
+                            .order_by('-scrobble_count')
+        return qs
 
     def get_scrobble_count(self):
         """
@@ -244,7 +242,7 @@ class Scrobble(DittoItemModel, models.Model):
     account = models.ForeignKey('Account', related_name='scrobbles')
 
     artist = models.ForeignKey('Artist', related_name='scrobbles')
-    track = models.ForeignKey('Track', related_name='scrobbles')
+    track = models.ForeignKey('Track', related_name='scrobbles', db_index=True)
     album = models.ForeignKey('Album', related_name='scrobbles',
                                                         blank=True, null=True)
     post_year = models.PositiveSmallIntegerField(
