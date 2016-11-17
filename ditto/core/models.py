@@ -94,7 +94,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     fetch_time = models.DateTimeField(null=True, blank=True,
                         help_text="The time the item's data was last fetched.")
 
-    post_time = models.DateTimeField(null=True, blank=True,
+    post_time = models.DateTimeField(null=True, blank=True, db_index=True,
         help_text="The time the item was originally posted/created on its service.")
 
     # Obviously not relevant to some items, like Bookmarks.
