@@ -8,12 +8,6 @@ from django.utils.html import format_html
 
 from ..models import Account, Album, Artist, Scrobble, Track
 
-try:
-    # ExtractYear is only in Django >= 1.10.0
-    from django.db.models.functions import ExtractYear
-except ImportError:
-    from django.db.models.expressions import RawSQL
-
 
 register = template.Library()
 
@@ -313,24 +307,8 @@ def annual_scrobble_counts(account=None):
     if account:
         qs = qs.filter(account=account)
 
-    # ExtractYear is only available in Django >=1.10.
-    # And trying to use Django's SUBSTR(), LOWER() functions on a datetime
-    # column (post_time) when using Sqlite generates errors:
-    # http://stackoverflow.com/questions/33481443/get-year-from-django-datetimefield-with-values#comment67740412_33482323
-
-    try:
-        # For Django >= 1.10:
-        qs = qs.annotate(year=ExtractYear('post_time'))
-    except NameError:
-        # For Django < 1.10, we're resorting to RawSQL().
-        # Trim the datetime down to the year, and make it an integer:
-        qs = qs.annotate(year=RawSQL(
-                "CAST(SUBSTR('lastfm_scrobble'.'post_time', 1, 4) AS integer)",
-                ()
-             ))
-
-    return qs.values('year')\
+    return qs.values('post_year')\
             .annotate(count=Count('id'))\
-            .values('year', 'count')\
-            .order_by('year')
+            .values('post_year', 'count')\
+            .order_by('post_year')
 

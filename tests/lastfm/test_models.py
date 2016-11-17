@@ -19,6 +19,11 @@ class AccountTestCase(TestCase):
         self.assertEqual(accounts[0], account_2)
         self.assertEqual(accounts[1], account_1)
 
+    def test_post_year(self):
+        "It should auto-generate the post_year based on post_time."
+        s = ScrobbleFactory(post_time=datetime_from_str('2015-08-11 12:00:00'))
+        self.assertEqual(s.post_year, 2015)
+
     def test_has_credentials(self):
         account = AccountFactory(api_key='1234')
         self.assertTrue(account.has_credentials())

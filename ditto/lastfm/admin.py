@@ -82,7 +82,8 @@ class ScrobbleAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('account', 'artist', 'track', 'album', 'post_time',)
+            'fields': ('account', 'artist', 'track', 'album',
+                        'post_time', 'post_year',)
         }),
         ('Data', {
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
@@ -90,5 +91,6 @@ class ScrobbleAdmin(admin.ModelAdmin):
     )
 
     raw_id_fields = ('artist', 'track', 'album',)
-    readonly_fields = ('raw', 'fetch_time', 'time_created', 'time_modified',)
+    readonly_fields = ('post_year', 'raw', 'fetch_time',
+                        'time_created', 'time_modified',)
 

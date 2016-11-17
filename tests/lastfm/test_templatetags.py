@@ -503,18 +503,18 @@ class AnnualScrobbleCountsTestCase(TestCase):
         "Returns correct data."
         scrobbles = ditto_lastfm.annual_scrobble_counts()
         self.assertEqual(len(scrobbles), 2)
-        self.assertEqual(scrobbles[0]['year'], 2015)
+        self.assertEqual(scrobbles[0]['post_year'], 2015)
         self.assertEqual(scrobbles[0]['count'], 4)
-        self.assertEqual(scrobbles[1]['year'], 2016)
+        self.assertEqual(scrobbles[1]['post_year'], 2016)
         self.assertEqual(scrobbles[1]['count'], 2)
 
     def test_response_for_account(self):
         "Returns correct data for one account."
         scrobbles = ditto_lastfm.annual_scrobble_counts(account=self.account1)
         self.assertEqual(len(scrobbles), 2)
-        self.assertEqual(scrobbles[0]['year'], 2015)
+        self.assertEqual(scrobbles[0]['post_year'], 2015)
         self.assertEqual(scrobbles[0]['count'], 3)
-        self.assertEqual(scrobbles[1]['year'], 2016)
+        self.assertEqual(scrobbles[1]['post_year'], 2016)
         self.assertEqual(scrobbles[1]['count'], 2)
 
     def test_account_error(self):

@@ -247,6 +247,9 @@ class Scrobble(DittoItemModel, models.Model):
     track = models.ForeignKey('Track', related_name='scrobbles')
     album = models.ForeignKey('Album', related_name='scrobbles',
                                                         blank=True, null=True)
+    post_year = models.PositiveSmallIntegerField(
+                                    null=True, blank=True, db_index=True,
+                                    help_text="Set automatically on save")
 
     def __str__(self):
         return '%s (%s)' % (self.title, self.post_time)
@@ -256,6 +259,7 @@ class Scrobble(DittoItemModel, models.Model):
 
     def save(self, *args, **kwargs):
         self.title = '%s – %s' % (self.track.artist.name, self.track.name)
+        self.post_year = self.post_time.year
         super().save(*args, **kwargs)
 
     def _summary_source(self):

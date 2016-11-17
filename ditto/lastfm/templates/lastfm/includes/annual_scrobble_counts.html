@@ -29,7 +29,7 @@ account -- Optional, an Account, to restrict counts to that Account's scrobbles
 				<tbody>
 					{% for s in scrobbles %}
 						<tr>
-							<td>{{ s.year|unlocalize }}</td>
+							<td>{{ s.post_year|unlocalize }}</td>
 							<td class="text-xs-right">{{ s.count }}</td>
 						</tr>
 					{% endfor %}
