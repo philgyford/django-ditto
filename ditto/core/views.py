@@ -118,7 +118,7 @@ class DittoAppsMixin:
                         'slug': 'photos',
                         'name': 'photo-uploaded',
                         'context_object_name': 'flickr_photo_list',
-                        'queryset': Photo.public_objects.all(),
+                        'queryset': Photo.public_objects.all().prefetch_related('user'),
                     },
                     {
                         # A bit cheeky as a slug, but seems to work:
@@ -126,7 +126,7 @@ class DittoAppsMixin:
                         'name': 'photo-taken',
                         'date_field': 'taken_time',
                         'context_object_name': 'flickr_photo_list',
-                        'queryset': Photo.public_objects.all(),
+                        'queryset': Photo.public_objects.all().prefetch_related('user'),
                     },
                 ],
             })
@@ -140,7 +140,7 @@ class DittoAppsMixin:
                         'slug': 'listens',
                         'name': 'scrobble',
                         'context_object_name': 'lastfm_scrobble_list',
-                        'queryset': Scrobble.objects.all(),
+                        'queryset': Scrobble.objects.all().prefetch_related('artist', 'track'),
                     },
                 ],
             })
@@ -154,7 +154,7 @@ class DittoAppsMixin:
                         'slug': 'bookmarks',
                         'name': 'bookmark',
                         'context_object_name': 'pinboard_bookmark_list',
-                        'queryset': Bookmark.public_objects.all(),
+                        'queryset': Bookmark.public_objects.all().prefetch_related('account'),
                     },
                 ],
             })
@@ -168,13 +168,13 @@ class DittoAppsMixin:
                         'slug': 'tweets',
                         'name': 'tweet',
                         'context_object_name': 'twitter_tweet_list',
-                        'queryset': Tweet.public_tweet_objects.all().select_related(),
+                        'queryset': Tweet.public_tweet_objects.all().prefetch_related('user'),
                     },
                     {
                         'slug': 'likes',
                         'name': 'favorite',
                         'context_object_name': 'twitter_favorite_list',
-                        'queryset': Tweet.public_favorite_objects.all().select_related(),
+                        'queryset': Tweet.public_favorite_objects.all().prefetch_related('user'),
                     },
                 ],
             })
