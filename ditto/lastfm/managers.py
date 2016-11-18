@@ -9,28 +9,52 @@ class WithScrobbleCountsManager(models.Manager):
     """
 
     # Can we filter these (things) by Album?
-    filterable_by_album = True
+    is_filterable_by_album = True
 
     # Can we filter these (things) by Artist?
-    filterable_by_artist = True
+    is_filterable_by_artist = True
+
+    # Can we filter these (things) by Track?
+    is_filterable_by_track = True
 
     def with_scrobble_counts(self, **kwargs):
         """
         Adds a `scrobble_count` field to the Queryset's objects.
 
         eg:
+            # All Tracks, each with a scrobble_count:
             Track.objects.with_scrobble_counts()
-        or:
+
+            # All Albums, each with a total scrobble_count:
+            Album.objects.with_scrobble_counts()
+
+            # All Artists, each with a total scrobble_count:
+            Artist.objects.with_scrobble_counts()
+
+            # Tracks by artist_obj:
+            Track.objects.with_scrobble_counts(artist=artist_obj)
+
+            # Tracks appearing on album_obj:
+            Track.objects.with_scrobble_counts(album=album_obj)
+
+            # Albums on which track_obj appears:
+            Album.objects.with_scrobble_counts(track=track_obj)
+
+        or combine filters:
+
+            # Tracks by artist_obj, scrobbled by account_obj between
+            # datetime_obj_1 and datetime_obj2:
             Track.objects.with_scrobble_counts(
-                account         = my_account_obj,
-                artist          = my_artist_obj,
-                min_post_time   = my_datetime_obj_1,
-                max_post_time   = my_datetime_obj_2,
+                account         = account_obj,
+                artist          = artist_obj,
+                min_post_time   = datetime_obj_1,
+                max_post_time   = datetime_obj_2,
             )
-        or something in between.
 
         Include an `account` to only include Scrobbles by that Account.
+        Include an `album` to only include Scrobbles on that Album.
         Include an `artist` to only include Scrobbles by that Artist.
+        Include a `track` to only include Scrobbles including that Track.
         Include a `min_post_time` to only include Scrobbles after then.
         Include a `max_post_time` to only include Scrobbles before then.
         """
@@ -39,12 +63,16 @@ class WithScrobbleCountsManager(models.Manager):
         max_post_time   = kwargs.get('max_post_time', None)
         album           = kwargs.get('album', None)
         artist          = kwargs.get('artist', None)
+        track           = kwargs.get('track', None)
 
-        if album and not self.filterable_by_album:
+        if album and not self.is_filterable_by_album:
             raise ValueError('This is not filterable by album')
 
-        if artist and not self.filterable_by_artist:
+        if artist and not self.is_filterable_by_artist:
             raise ValueError('This is not filterable by artist')
+
+        if track and not self.is_filterable_by_track:
+            raise ValueError('This is not filterable by track')
 
         if account is not None and account.__class__.__name__ != 'Account':
             raise TypeError('account must be an Account instance, '
@@ -77,6 +105,9 @@ class WithScrobbleCountsManager(models.Manager):
         if artist:
             filter_kwargs['scrobbles__artist'] = artist
 
+        if track:
+            filter_kwargs['scrobbles__track'] = track
+
         if min_post_time and max_post_time:
             filter_kwargs['scrobbles__post_time__gte'] = min_post_time
             filter_kwargs['scrobbles__post_time__lte'] = max_post_time
@@ -95,20 +126,28 @@ class WithScrobbleCountsManager(models.Manager):
 
 
 class TracksManager(WithScrobbleCountsManager):
-    "Adds a `scrobble_count` field to the Track objects."
-    pass
+    """
+    Adds a `scrobble_count` field to the Track objects.
+    See WithScrobbleCountsManager for docs.
+    """
+    # We can't filter a list of Tracks by Tracks.
+    is_filterable_by_track = False
 
 
 class AlbumsManager(WithScrobbleCountsManager):
-    "Adds a `scrobble_count` field to the Album objects."
-
-    # Obviously, we can't filter a list of Albums by Album.
-    filterable_by_album = False
+    """
+    Adds a `scrobble_count` field to the Album objects.
+    See WithScrobbleCountsManager for docs.
+    """
+    # We can't filter a list of Albums by Album.
+    is_filterable_by_album = False
 
 
 class ArtistsManager(WithScrobbleCountsManager):
-    "Adds a `scrobble_count` field to the Artist objects."
-
-    # Obviously, we can't filter a list of Artists by Artist.
-    filterable_by_artist = False
+    """
+    Adds a `scrobble_count` field to the Artist objects.
+    See WithScrobbleCountsManager for docs.
+    """
+    # We can't filter a list of Artists by Artist.
+    is_filterable_by_artist = False
 

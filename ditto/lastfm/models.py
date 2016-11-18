@@ -320,11 +320,8 @@ class Track(TimeStampedModelMixin, models.Model):
         A QuerySet of all the Albums on which this Track has appeared, ordered
         by how many times the Album was scrobbled, most-scrobbled first.
         """
-        return Album.objects\
-                        .with_scrobble_counts()\
-                        .filter(scrobbles__track=self)\
-                        .distinct()\
-                        .order_by('-scrobble_count')
+        return Album.objects.with_scrobble_counts(track=self)\
+                                .order_by('-scrobble_count')
 
     def get_scrobble_count(self):
         """
