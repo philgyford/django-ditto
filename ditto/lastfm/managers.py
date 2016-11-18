@@ -134,6 +134,13 @@ class TracksManager(WithScrobbleCountsManager):
     # We can't filter a list of Tracks by Tracks.
     is_filterable_by_track = False
 
+    def with_scrobble_counts(self, **kwargs):
+        "Pre-fetch all the Tracks' Artists."
+        qs = super(TracksManager, self)\
+                    .with_scrobble_counts(**kwargs)\
+                    .prefetch_related('artist')
+        return qs
+
 
 class AlbumsManager(WithScrobbleCountsManager):
     """
@@ -142,6 +149,13 @@ class AlbumsManager(WithScrobbleCountsManager):
     """
     # We can't filter a list of Albums by Album.
     is_filterable_by_album = False
+
+    def with_scrobble_counts(self, **kwargs):
+        "Pre-fetch all the Albums' Artists."
+        qs = super(AlbumsManager, self)\
+                    .with_scrobble_counts(**kwargs)\
+                    .prefetch_related('artist')
+        return qs
 
 
 class ArtistsManager(WithScrobbleCountsManager):

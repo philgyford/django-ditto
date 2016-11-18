@@ -249,7 +249,9 @@ def recent_scrobbles(account=None, limit=10):
     if type(account) is Account:
         return account.get_recent_scrobbles(limit)
     else:
-        return Scrobble.objects.all().order_by('-post_time')[:limit]
+        return Scrobble.objects.all()\
+                            .order_by('-post_time')\
+                            .prefetch_related('artist', 'track')[:limit]
 
 
 @register.assignment_tag
@@ -291,7 +293,8 @@ def day_scrobbles(date, account=None):
     if account:
         qs_kwargs['account'] = account
 
-    return qs.filter(**qs_kwargs).order_by('post_time')
+    return qs.filter(**qs_kwargs).prefetch_related('artist', 'track')\
+                                    .order_by('post_time')
 
 
 @register.assignment_tag

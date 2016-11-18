@@ -51,7 +51,8 @@ class Account(TimeStampedModelMixin, models.Model):
             return False
 
     def get_recent_scrobbles(self, limit=10):
-        return self.scrobbles.order_by('-post_time')[:limit]
+        return self.scrobbles.prefetch_related('artist', 'track')\
+                                .order_by('-post_time')[:limit]
 
 
 class Album(TimeStampedModelMixin, models.Model):

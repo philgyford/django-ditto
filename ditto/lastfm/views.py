@@ -39,6 +39,11 @@ class ScrobbleListView(AccountsMixin, PaginatedListView):
     template_name = 'lastfm/scrobble_list.html'
     model = Scrobble
 
+    def get_queryset(self):
+        "Pre-fetch Artists and Tracks to reduce number of queries."
+        qs = super(ScrobbleListView, self).get_queryset()
+        return qs.prefetch_related('artist', 'track')
+
 
 class ChartPaginatedListView(PaginatedListView):
     """
@@ -276,9 +281,13 @@ class UserScrobbleListView(SingleAccountMixin, PaginatedListView):
     model = Scrobble
 
     def get_queryset(self):
-        "All Scrobbles by this Account."
+        """
+        All Scrobbles by this Account.
+        And pre-fetch Artists and Tracks to reduce number of queries.
+        """
         queryset = super().get_queryset()
-        return queryset.filter(account=self.object)
+        return queryset.filter(account=self.object)\
+                        .prefetch_related('artist', 'track')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
