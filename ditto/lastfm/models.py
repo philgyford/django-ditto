@@ -241,7 +241,7 @@ class Scrobble(DittoItemModel, models.Model):
     account = models.ForeignKey('Account', related_name='scrobbles')
 
     artist = models.ForeignKey('Artist', related_name='scrobbles')
-    track = models.ForeignKey('Track', related_name='scrobbles', db_index=True)
+    track = models.ForeignKey('Track', related_name='scrobbles')
     album = models.ForeignKey('Album', related_name='scrobbles',
                                                         blank=True, null=True)
     post_year = models.PositiveSmallIntegerField(
