@@ -21,7 +21,7 @@ def recent_photos(nsid=None, limit=10):
                     Photos for all Flickr users that have Accounts.
     limit -- Maximum number to fetch. Default is 10.
     """
-    photos = Photo.public_photo_objects.all()
+    photos = Photo.public_photo_objects.all().prefetch_related('user')
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
     return photos.select_related()[:limit]
@@ -44,6 +44,7 @@ def day_photos(date, nsid=None):
     photos = Photo.public_photo_objects.filter(post_time__range=[start, end])
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
+    photos = photos.prefetch_related('user')
     return photos
 
 @register.assignment_tag
@@ -58,7 +59,7 @@ def photosets(nsid=None, limit=10):
     photosets = Photoset.objects.all()
     if nsid is not None:
         photosets = photosets.filter(user__nsid=nsid)
-    return photosets.select_related()[:limit]
+    return photosets.prefetch_related('primary_photo', 'user')[:limit]
 
 
 @register.simple_tag

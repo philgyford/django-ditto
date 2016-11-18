@@ -63,10 +63,19 @@ class HomeView(PhotosOrderMixin, PaginatedListView):
         context['account_list'] = Account.objects.all()
         return context
 
+    def get_queryset(self):
+        """
+        Adding the prefetch_related() to self.queryset caused some tests to
+        fail for some reason.
+        """
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('user')
+
+
 
 class PhotosetListView(ListView):
     template_name = 'flickr/photoset_list.html'
-    model = Photoset
+    queryset = Photoset.objects.all().prefetch_related('primary_photo', 'user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -107,7 +116,7 @@ class UserDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     def get_queryset(self):
         "All public Photos from this Account."
         queryset = super().get_queryset()
-        return queryset.filter(user=self.object).select_related()
+        return queryset.filter(user=self.object).prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -161,7 +170,7 @@ class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
     "All Photos with a certain tag from all Accounts"
     template_name = 'flickr/tag_detail.html'
     allow_empty = False
-    queryset = Photo.public_objects
+    queryset = Photo.public_objects.prefetch_related('user')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Tag.objects.all())
@@ -184,7 +193,7 @@ class UserTagDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
     template_name = 'flickr/user_tag_detail.html'
     allow_empty = False
-    queryset = Photo.public_objects
+    queryset = Photo.public_objects.prefetch_related('user')
 
     def get(self, request, *args, **kwargs):
         self.tag_object = self.get_tag_object()
@@ -213,7 +222,7 @@ class UserTagDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
 
 class UserPhotosetListView(SingleUserMixin, ListView):
     template_name = 'flickr/user_photoset_list.html'
-    model = Photoset
+    queryset = Photoset.objects.all().prefetch_related('primary_photo', 'user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
