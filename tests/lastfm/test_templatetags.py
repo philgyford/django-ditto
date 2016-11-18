@@ -301,20 +301,22 @@ class TopArtistsTestCase(TestCase):
 class TopTracksTestCase(TestCase):
 
     def setUp(self):
+        self.album1 = AlbumFactory()
         self.artist1 = ArtistFactory()
         self.tracks = TrackFactory.create_batch(11, artist=self.artist1)
         # Extra scrobbles.
         # For artist1, tracks[1] will be 1st, tracks[2] will be 2nd:
         ScrobbleFactory.create_batch(2,
-                                    artist=self.artist1, track=self.tracks[1])
+                album=self.album1, artist=self.artist1, track=self.tracks[1])
         ScrobbleFactory.create_batch(1,
-                                    artist=self.artist1, track=self.tracks[2])
+                album=self.album1, artist=self.artist1, track=self.tracks[2])
 
         # But artist2 has a more-scrobbled Track:
+        self.album2 = AlbumFactory()
         self.artist2 = ArtistFactory()
         self.track2 = TrackFactory(artist=self.artist2)
         ScrobbleFactory.create_batch(4,
-                                    artist=self.artist2, track=self.track2)
+                album=self.album2, artist=self.artist2, track=self.track2)
 
     def test_order(self):
         "The most scrobbled tracks should be first."
@@ -348,6 +350,13 @@ class TopTracksTestCase(TestCase):
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0], self.tracks[1])
         self.assertEqual(tracks[0].scrobble_count, 1)
+
+    def test_for_album(self):
+        "Should return only the tracks on that Album."
+        tracks = ditto_lastfm.top_tracks(album=self.album1, limit='all')
+        self.assertEqual(len(tracks), 2)
+        self.assertEqual(tracks[0], self.tracks[1])
+        self.assertEqual(tracks[1], self.tracks[2])
 
     def test_for_artist(self):
         "Should return only the Artist's tracks."

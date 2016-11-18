@@ -171,10 +171,12 @@ def top_artists(account=None, limit=10, date=None, period='day'):
 
 
 @register.assignment_tag
-def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
-    """Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
+def top_tracks(account=None, album=None, artist=None, limit=10, date=None, period='day'):
+    """
+    Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
     first.
 
+    Restrict to Tracks from one Album by supplying the 'album'.
     Restrict to Tracks by one Artist by suppling the `artist`.
     Restrict to only one user's scrobbles by supplying the `account`.
 
@@ -184,6 +186,7 @@ def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
 
     Keyword arguments:
     account -- An Account object or None (for Scrobbles by all Accounts).
+    album -- An Album object or None.
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
     date -- A datetime or date, for getting Tracks from a single time period.
@@ -197,6 +200,10 @@ def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
         'period': period,
     })
 
+    if album is not None and type(album) is not Album:
+        raise TypeError('album must be an Album instance, '
+                        'not a %s' % type(album))
+
     if artist is not None and type(artist) is not Artist:
         raise TypeError('artist must be an Artist instance, '
                         'not a %s' % type(artist))
@@ -205,6 +212,9 @@ def top_tracks(account=None, artist=None, limit=10, date=None, period='day'):
 
     if account:
         qs_kwargs['account'] = account
+
+    if album:
+        qs_kwargs['album'] = album
 
     if artist:
         qs_kwargs['artist'] = artist
