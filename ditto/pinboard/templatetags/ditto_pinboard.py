@@ -20,6 +20,7 @@ def recent_bookmarks(account=None, limit=10):
     bookmarks = Bookmark.public_objects.all()
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)
+    bookmarks = bookmarks.prefetch_related('account')
     return bookmarks[:limit]
 
 @register.assignment_tag
@@ -39,5 +40,6 @@ def day_bookmarks(date, account=None):
     bookmarks = Bookmark.public_objects.filter(post_time__range=[start, end])
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)
+    bookmarks = bookmarks.prefetch_related('account')
     return bookmarks
 
