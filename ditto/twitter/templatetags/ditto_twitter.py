@@ -21,7 +21,7 @@ def recent_tweets(screen_name=None, limit=10):
     tweets = Tweet.public_tweet_objects.all()
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
-    return tweets.select_related()[:limit]
+    return tweets.prefetch_related('user')[:limit]
 
 @register.assignment_tag
 def recent_favorites(screen_name=None, limit=10):
@@ -41,7 +41,7 @@ def recent_favorites(screen_name=None, limit=10):
             tweets = Tweet.objects.none()
         else:
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
-    return tweets.select_related()[:limit]
+    return tweets.prefetch_related('user')[:limit]
 
 @register.assignment_tag
 def day_tweets(date, screen_name=None):
@@ -62,6 +62,7 @@ def day_tweets(date, screen_name=None):
     tweets = Tweet.public_tweet_objects.filter(post_time__range=[start, end])
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
+    tweets = tweets.prefetch_related('user')
     return tweets
 
 @register.assignment_tag
@@ -93,5 +94,6 @@ def day_favorites(date, screen_name=None):
         else:
             tweets = Tweet.public_favorite_objects.filter(
                 post_time__range=[start, end]).filter(favoriting_users=user)
+    tweets = tweets.prefetch_related('user')
     return tweets
 

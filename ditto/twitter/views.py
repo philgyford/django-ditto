@@ -18,7 +18,7 @@ class HomeView(PaginatedListView):
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
         # Use select_related to fetch user details too. Could be nasty...
-        return Tweet.public_tweet_objects.all().select_related()
+        return Tweet.public_tweet_objects.all().prefetch_related('user')
 
 
 class FavoriteListView(PaginatedListView):
@@ -31,7 +31,7 @@ class FavoriteListView(PaginatedListView):
 
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
-        return Tweet.public_favorite_objects.all().select_related()
+        return Tweet.public_favorite_objects.all().prefetch_related('user')
 
 
 class SingleUserMixin(SingleObjectMixin):
@@ -64,7 +64,8 @@ class UserDetailView(SingleUserMixin, PaginatedListView):
 
     def get_queryset(self):
         "All public tweets from this Account."
-        return Tweet.public_objects.filter(user=self.object).select_related()
+        return Tweet.public_objects.filter(user=self.object)\
+                                                    .prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,7 +80,8 @@ class AccountFavoriteListView(SingleUserMixin, PaginatedListView):
     def get_queryset(self):
         "All public favorites from this Account."
         return Tweet.public_favorite_objects.filter(
-                        favoriting_users__in=[self.object]).select_related()
+                        favoriting_users__in=[self.object])\
+                                                    .prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
