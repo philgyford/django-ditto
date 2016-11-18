@@ -31,8 +31,7 @@ class AlbumManagersWithScrobbleCountsTestCase(TestCase):
         track2 = TrackFactory(artist=artist2)
         album2 = AlbumFactory(artist=artist2)
         scrobble2 = ScrobbleFactory(artist=artist2, track=track2, album=album2)
-        albums = Album.objects.with_scrobble_counts().order_by(
-                                                            '-scrobble_count')
+        albums = Album.objects.with_scrobble_counts()
         self.assertEqual(len(albums), 2)
         self.assertEqual(albums[0].scrobble_count, 4)
         self.assertEqual(albums[1].scrobble_count, 1)
@@ -77,7 +76,7 @@ class AlbumManagersWithScrobbleCountsTestCase(TestCase):
         track2 = TrackFactory()
         ScrobbleFactory(album=album2, track=track2)
         ScrobbleFactory(album=album2, track=track2)
-        albums = Album.objects.with_scrobble_counts(track=track2).order_by('-scrobble_count')
+        albums = Album.objects.with_scrobble_counts(track=track2)
         self.assertEqual(len(albums), 1)
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0], album2)
@@ -139,8 +138,7 @@ class ArtistManagersWithScrobbleCountsTestCase(TestCase):
         artist2 = ArtistFactory()
         track2 = TrackFactory(artist=artist2)
         scrobble2 = ScrobbleFactory(artist=artist2, track=track2)
-        artists = Artist.objects.with_scrobble_counts().order_by(
-                                                            '-scrobble_count')
+        artists = Artist.objects.with_scrobble_counts()
         self.assertEqual(len(artists), 2)
         self.assertEqual(artists[0].scrobble_count, 4)
         self.assertEqual(artists[1].scrobble_count, 1)
@@ -155,8 +153,7 @@ class ArtistManagersWithScrobbleCountsTestCase(TestCase):
         ScrobbleFactory(album=album1, artist=self.artist, track=track)
         ScrobbleFactory(album=album1, artist=artist2, track=track)
         ScrobbleFactory(album=album2, artist=self.artist, track=track)
-        artists = Artist.objects.with_scrobble_counts(album=album1).order_by(
-                                                            '-scrobble_count')
+        artists = Artist.objects.with_scrobble_counts(album=album1)
         self.assertEqual(len(artists), 2)
         self.assertEqual(artists[0].scrobble_count, 2)
         self.assertEqual(artists[1].scrobble_count, 1)
@@ -235,8 +232,7 @@ class TrackManagersWithScrobbleCountsTestCase(TestCase):
         artist2 = ArtistFactory()
         track2 = TrackFactory(artist=artist2)
         scrobble2 = ScrobbleFactory(artist=artist2, track=track2)
-        tracks = Track.objects.with_scrobble_counts().order_by(
-                                                            '-scrobble_count')
+        tracks = Track.objects.with_scrobble_counts()
         self.assertEqual(len(tracks), 2)
         self.assertEqual(tracks[0].scrobble_count, 4)
         self.assertEqual(tracks[1].scrobble_count, 1)
@@ -249,8 +245,7 @@ class TrackManagersWithScrobbleCountsTestCase(TestCase):
         ScrobbleFactory.create_batch(2, album=album1, track=self.track)
         ScrobbleFactory.create_batch(1, album=album1, track=track1)
         ScrobbleFactory.create_batch(1, album=album2, track=self.track)
-        tracks = Track.objects.with_scrobble_counts(album=album1).order_by(
-                                                            '-scrobble_count')
+        tracks = Track.objects.with_scrobble_counts(album=album1)
         self.assertEqual(len(tracks), 2)
         self.assertEqual(tracks[0].scrobble_count, 2)
         self.assertEqual(tracks[0], self.track)

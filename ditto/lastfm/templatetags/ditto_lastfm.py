@@ -118,8 +118,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 
-    qs = Album.objects.with_scrobble_counts(**qs_kwargs)\
-                        .order_by('-scrobble_count')
+    qs = Album.objects.with_scrobble_counts(**qs_kwargs)
 
     if limit != 'all':
         qs = qs[:limit]
@@ -161,8 +160,7 @@ def top_artists(account=None, limit=10, date=None, period='day'):
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 
-    qs = Artist.objects.with_scrobble_counts(**qs_kwargs)\
-                        .order_by('-scrobble_count')
+    qs = Artist.objects.with_scrobble_counts(**qs_kwargs)
 
     if limit != 'all':
         qs = qs[:limit]
@@ -224,8 +222,7 @@ def top_tracks(account=None, album=None, artist=None, limit=10, date=None, perio
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 
-    qs = Track.objects.with_scrobble_counts(**qs_kwargs)\
-                        .order_by('-scrobble_count')
+    qs = Track.objects.with_scrobble_counts(**qs_kwargs)
 
     if limit != 'all':
         qs = qs[:limit]

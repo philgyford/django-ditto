@@ -118,8 +118,7 @@ class Album(TimeStampedModelMixin, models.Model):
         A QuerySet of all the Tracks on this Album, ordered by how many times
         they were scrobbled, most-scrobbled first.
         """
-        qs = Track.objects.with_scrobble_counts(album=self)\
-                            .order_by('-scrobble_count')
+        qs = Track.objects.with_scrobble_counts(album=self)
         return qs
 
     def get_scrobble_count(self):
@@ -189,7 +188,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         By default returns all of them.
         `limit` is 'all' for all albums, or an integer to return that number.
         """
-        qs = self.albums.with_scrobble_counts().order_by('-scrobble_count')
+        qs = self.albums.with_scrobble_counts()
 
         if limit == 'all':
             return qs
@@ -202,7 +201,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         By default returns all of them.
         `limit` is 'all' for all tracks, or an integer to return that number.
         """
-        qs = self.tracks.with_scrobble_counts().order_by('-scrobble_count')
+        qs = self.tracks.with_scrobble_counts()
 
         if limit == 'all':
             return qs
@@ -320,8 +319,7 @@ class Track(TimeStampedModelMixin, models.Model):
         A QuerySet of all the Albums on which this Track has appeared, ordered
         by how many times the Album was scrobbled, most-scrobbled first.
         """
-        return Album.objects.with_scrobble_counts(track=self)\
-                                .order_by('-scrobble_count')
+        return Album.objects.with_scrobble_counts(track=self)
 
     def get_scrobble_count(self):
         """

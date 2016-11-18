@@ -19,7 +19,8 @@ class WithScrobbleCountsManager(models.Manager):
 
     def with_scrobble_counts(self, **kwargs):
         """
-        Adds a `scrobble_count` field to the Queryset's objects.
+        Adds a `scrobble_count` field to the Queryset's objects, and
+        orders the results by that, descending.
 
         eg:
             # All Tracks, each with a scrobble_count:
@@ -122,7 +123,7 @@ class WithScrobbleCountsManager(models.Manager):
 
         return qs.annotate(
                 scrobble_count = models.Count('scrobbles', distinct=True)
-            )
+            ).order_by('-scrobble_count')
 
 
 class TracksManager(WithScrobbleCountsManager):
