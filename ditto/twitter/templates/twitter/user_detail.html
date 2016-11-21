@@ -18,6 +18,8 @@
     <div class="row">
         <div class="col-md-3">
             {% include 'twitter/includes/user.html' with user=twitter_user account=account perms=perms only %}
+
+            {% include 'twitter/includes/annual_tweet_counts.html' with user=twitter_user only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

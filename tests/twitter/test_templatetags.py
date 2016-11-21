@@ -3,6 +3,7 @@ import pytz
 
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.twitter.factories import AccountFactory, TweetFactory, UserFactory
 from ditto.twitter.templatetags import ditto_twitter
 
@@ -178,4 +179,46 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
         tweets = ditto_twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='thelma')
         self.assertEqual(0, len(tweets))
+
+
+class AnnualTweetCountsTestCase(TestCase):
+
+    def setUp(self):
+        user_1 = UserFactory(screen_name='terry')
+        user_2 = UserFactory(screen_name='bob')
+        user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=user_1)
+        account_2 = AccountFactory(user=user_2)
+        account_3 = AccountFactory(user=user_3)
+        # Tweets in 2015 and 2016 for user 1:
+        TweetFactory.create_batch(3,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'),
+                            user=user_1)
+        TweetFactory.create_batch(2,
+                            post_time=datetime_from_str('2016-01-01 12:00:00'),
+                            user=user_1)
+        # And one for user_2 in 2015:
+        TweetFactory(user=user_2,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+        # And one tweet in 2015 for the private user 3.
+        tw = TweetFactory(user=user_3, is_private=True,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+
+    def test_response(self):
+        "Returns correct data for all users."
+        tweets = ditto_twitter.annual_tweet_counts()
+        self.assertEqual(len(tweets), 2)
+        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['count'], 4)
+        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['count'], 2)
+
+    def test_response_for_user(self):
+        "Returns correct data for one user."
+        tweets = ditto_twitter.annual_tweet_counts(screen_name='terry')
+        self.assertEqual(len(tweets), 2)
+        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['count'], 3)
+        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['count'], 2)
 

@@ -2,6 +2,7 @@ import datetime
 import pytz
 
 from django import template
+from django.db.models import Count
 
 from ..models import Tweet, User
 
@@ -96,4 +97,27 @@ def day_favorites(date, screen_name=None):
                 post_time__range=[start, end]).filter(favoriting_users=user)
     tweets = tweets.prefetch_related('user')
     return tweets
+
+
+@register.assignment_tag
+def annual_tweet_counts(screen_name=None):
+    """
+    Get the number of public Tweets per year.
+    Returns a list of dicts, sorted by year, like:
+        [ {'year': 2015, 'count': 1234}, {'year': 2016, 'count': 9876} ]
+
+    Keyword arguments:
+    screen_name -- A Twitter user's screen_name. If not supplied, we fetch
+                    all public Tweets.
+    """
+
+    tweets = Tweet.public_tweet_objects
+
+    if screen_name is not None:
+        tweets = tweets.filter(user__screen_name=screen_name)
+
+    return tweets.values('post_year')\
+                    .annotate(count=Count('id'))\
+                    .values('post_year', 'count')\
+                    .order_by('post_year')
 

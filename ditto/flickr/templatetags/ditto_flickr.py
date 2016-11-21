@@ -2,6 +2,7 @@ import datetime
 import pytz
 
 from django import template
+from django.db.models import Count
 from django.utils.html import format_html
 
 from ..models import Photo, Photoset, User
@@ -25,7 +26,7 @@ def recent_photos(nsid=None, limit=10):
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
     photos = photos.prefetch_related('user')
-    return photos.select_related()[:limit]
+    return photos[:limit]
 
 @register.assignment_tag
 def day_photos(date, nsid=None):
@@ -81,4 +82,26 @@ def photo_license(n):
             return licenses[n]
     else:
         return '[missing]'
+
+
+@register.assignment_tag
+def annual_photo_counts(nsid=None):
+    """
+    Get the number of public Photos per year.
+    Returns a list of dicts, sorted by year, like:
+        [ {'year': 2015, 'count': 1234}, {'year': 2016, 'count': 9876} ]
+
+    Keyword arguments:
+    nsid -- A Flickr user's NSID or None (for Photos by all Users).
+    """
+
+    photos = Photo.public_photo_objects
+
+    if nsid is not None:
+        photos = photos.filter(user__nsid=nsid)
+
+    return photos.values('post_year')\
+                    .annotate(count=Count('id'))\
+                    .values('post_year', 'count')\
+                    .order_by('post_year')
 

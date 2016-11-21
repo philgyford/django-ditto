@@ -509,7 +509,7 @@ class AnnualScrobbleCountsTestCase(TestCase):
                             post_time=datetime_from_str('2015-01-01 12:00:00'))
 
     def test_response(self):
-        "Returns correct data."
+        "Returns correct data for all accounts."
         scrobbles = ditto_lastfm.annual_scrobble_counts()
         self.assertEqual(len(scrobbles), 2)
         self.assertEqual(scrobbles[0]['post_year'], 2015)

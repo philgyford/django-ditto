@@ -1,0 +1,41 @@
+{% comment %}
+Displays a table of number of Tweets per year.
+
+Expects:
+
+* user -- Optional, a single Twitter User object, to restrict counts to that.
+{% endcomment %}
+
+{% load ditto_twitter %}
+{% load l10n %}
+
+{% if user %}
+	{% annual_tweet_counts screen_name=user.screen_name as tweets %}
+{% else %}
+	{% annual_tweet_counts as tweets %}
+{% endif %}
+
+{% if tweets %}
+	<div class="card">
+		<div class="card-block">
+			<h2 class="h5 card-title">Tweets per year</h2>
+			<table class="table table-sm flickr-tweets-annual">
+				<thead class="sr-only">
+					<tr>
+						<th>Year</th>
+						<th class="text-xs-right">Tweets</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in tweets %}
+						<tr>
+							<td>{{ s.post_year|unlocalize }}</td>
+							<td class="text-xs-right">{{ s.count }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endif %}
+

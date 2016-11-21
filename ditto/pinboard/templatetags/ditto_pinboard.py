@@ -2,6 +2,7 @@ import datetime
 import pytz
 
 from django import template
+from django.db.models import Count
 
 from ..models import Bookmark
 
@@ -42,4 +43,24 @@ def day_bookmarks(date, account=None):
         bookmarks = bookmarks.filter(account__username=account)
     bookmarks = bookmarks.prefetch_related('account')
     return bookmarks
+
+@register.assignment_tag
+def annual_bookmark_counts(account=None):
+    """
+    Get the number of public Bookmarks per year.
+    Returns a list of dicts, sorted by year, like:
+        [ {'year': 2015, 'count': 1234}, {'year': 2016, 'count': 9876} ]
+
+    Keyword arguments:
+    account -- An account username, 'philgyford', or None to fetch for all.
+    """
+    bookmarks = Bookmark.public_objects
+
+    if account:
+        bookmarks = bookmarks.filter(account__username=account)
+
+    return bookmarks.values('post_year')\
+                    .annotate(count=Count('id'))\
+                    .values('post_year', 'count')\
+                    .order_by('post_year')
 

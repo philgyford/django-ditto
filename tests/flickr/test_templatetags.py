@@ -6,7 +6,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from ditto.core.templatetags.ditto_core import display_time
-from ditto.core.utils import datetime_now
+from ditto.core.utils import datetime_now, datetime_from_str
 from ditto.flickr.templatetags import ditto_flickr
 from ditto.flickr.factories import AccountFactory, PhotoFactory,\
         PhotosetFactory, UserFactory
@@ -116,4 +116,43 @@ class PhotoLicenseTestCase(TestCase):
     def test_license_99(self):
         self.assertEqual(ditto_flickr.photo_license('99'), '[missing]')
 
+
+class AnnualPhotoCountsTestCase(TestCase):
+
+    def setUp(self):
+        user_1 = UserFactory(nsid='1234567890@N01')
+        user_2 = UserFactory(nsid='9876543210@N01')
+        AccountFactory(user=user_1)
+        AccountFactory(user=user_2)
+        # Photos in 2015 and 2016 for user 1:
+        PhotoFactory.create_batch(3,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'),
+                            user=user_1)
+        PhotoFactory.create_batch(2,
+                            post_time=datetime_from_str('2016-01-01 12:00:00'),
+                            user=user_1)
+        # And one for user_2 in 2015:
+        PhotoFactory(user=user_2,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+        # And one private photo for user_1 in 2015:
+        PhotoFactory(user=user_1, is_private=True,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+
+    def test_response(self):
+        "Returns correct data for all users."
+        photos = ditto_flickr.annual_photo_counts()
+        self.assertEqual(len(photos), 2)
+        self.assertEqual(photos[0]['post_year'], 2015)
+        self.assertEqual(photos[0]['count'], 4)
+        self.assertEqual(photos[1]['post_year'], 2016)
+        self.assertEqual(photos[1]['count'], 2)
+
+    def test_response_for_user(self):
+        "Returns correct data for one user."
+        photos = ditto_flickr.annual_photo_counts(nsid='1234567890@N01')
+        self.assertEqual(len(photos), 2)
+        self.assertEqual(photos[0]['post_year'], 2015)
+        self.assertEqual(photos[0]['count'], 3)
+        self.assertEqual(photos[1]['post_year'], 2016)
+        self.assertEqual(photos[1]['count'], 2)
 
