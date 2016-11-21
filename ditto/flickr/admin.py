@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import TextInput
 
+from ..core.admin import DittoItemModelAdmin
 from .models import Account, Photo, Photoset, User
 
 
@@ -96,7 +97,7 @@ class TaggedPhotoInline(admin.TabularInline):
 
 
 @admin.register(Photo)
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAdmin(DittoItemModelAdmin):
     list_display = ('title', 'show_thumb', 'post_time', 'taken_time', )
     list_display_links = ('title', 'show_thumb',)
     list_filter = ('post_time', 'fetch_time', )
@@ -111,7 +112,8 @@ class PhotoAdmin(admin.ModelAdmin):
         }),
         ('Times', {
             'classes': ('collapse',),
-            'fields': ('post_time', 'last_update_time', 'taken_time', 'taken_granularity',
+            'fields': ('post_time', 'post_year_str',
+                        'last_update_time', 'taken_time', 'taken_granularity',
                 'taken_unknown', )
         }),
         ('Counts, secrets, server, etc', {
@@ -146,8 +148,9 @@ class PhotoAdmin(admin.ModelAdmin):
         }),
     )
     radio_fields = {'media': admin.HORIZONTAL}
-    readonly_fields = ('show_image', 'raw', 'fetch_time', 'time_created', 'time_modified',
-        'sizes_raw', 'exif_raw', )
+    readonly_fields = ('post_year_str', 'show_image', 'raw',
+                        'fetch_time', 'time_created', 'time_modified',
+                        'sizes_raw', 'exif_raw', )
 
     formfield_overrides = {
         # Make the inputs full-width.

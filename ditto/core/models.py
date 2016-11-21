@@ -96,6 +96,9 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     post_time = models.DateTimeField(null=True, blank=True, db_index=True,
         help_text="The time the item was originally posted/created on its service.")
+    post_year = models.PositiveSmallIntegerField(
+                                    null=True, blank=True, db_index=True,
+                                    help_text="Set automatically on save")
 
     # Obviously not relevant to some items, like Bookmarks.
     latitude = models.DecimalField(null=True, blank=True,
@@ -121,6 +124,10 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def save(self, *args, **kwargs):
         self.summary = self._make_summary()
+        if self.post_time:
+            self.post_year = self.post_time.year
+        else:
+            self.post_year = None
         super().save(*args, **kwargs)
 
     def _summary_source(self):

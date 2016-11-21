@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
 
+from ..core.admin import DittoItemModelAdmin
 from .models import Account, Media, Tweet, User
 
 
@@ -108,7 +109,7 @@ class MediaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tweet)
-class TweetAdmin(admin.ModelAdmin):
+class TweetAdmin(DittoItemModelAdmin):
     list_display = ('user','is_private', 'title', 'post_time', )
     list_display_links = ('title', )
     list_filter = ('post_time', 'fetch_time', )
@@ -117,7 +118,8 @@ class TweetAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('user', 'text', 'text_html', 'title', 'summary',
-                'post_time', 'is_private', 'twitter_id', 'permalink', )
+                'post_time', 'post_year_str',
+                'is_private', 'twitter_id', 'permalink', )
         }),
         (None, {
             'fields': ('favorite_count', 'retweet_count', 'media_count',
@@ -138,7 +140,7 @@ class TweetAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ('text_html', 'raw',
+    readonly_fields = ('post_year_str', 'text_html', 'raw',
                         'fetch_time', 'time_created', 'time_modified',)
 
     inlines = [

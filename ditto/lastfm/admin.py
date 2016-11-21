@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
+from ..core.admin import DittoItemModelAdmin
 from .models import Account, Album, Artist, Scrobble, Track
 
 
@@ -75,7 +76,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 
 @admin.register(Scrobble)
-class ScrobbleAdmin(admin.ModelAdmin):
+class ScrobbleAdmin(DittoItemModelAdmin):
     list_display = ('title', 'post_time',)
     list_filter = ('post_time', )
     search_fields = ('title', 'track__name',)
@@ -83,7 +84,7 @@ class ScrobbleAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('account', 'artist', 'track', 'album',
-                        'post_time', 'post_year',)
+                        'post_time', 'post_year_str',)
         }),
         ('Data', {
             'fields': ('raw', 'fetch_time', 'time_created', 'time_modified',)
@@ -91,6 +92,6 @@ class ScrobbleAdmin(admin.ModelAdmin):
     )
 
     raw_id_fields = ('artist', 'track', 'album',)
-    readonly_fields = ('post_year', 'raw', 'fetch_time',
+    readonly_fields = ('post_year_str', 'raw', 'fetch_time',
                         'time_created', 'time_modified',)
 

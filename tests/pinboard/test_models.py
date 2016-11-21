@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from ditto.core.utils import datetime_from_str
 from ditto.pinboard.factories import AccountFactory, BookmarkFactory
 from ditto.pinboard.models import Account, Bookmark, BookmarkTag
 
@@ -176,6 +177,29 @@ class BookmarkTestCase(TestCase):
         self.assertEqual(len(bookmarks), 2)
         self.assertEqual(bookmarks[0].pk, public_bookmark_2.pk)
         self.assertEqual(bookmarks[1].pk, public_bookmark_1.pk)
+
+    def test_summary(self):
+        "The summary should be created from the description on save."
+        bookmark = BookmarkFactory(
+            description='Testing. <a href="http://example.org">A link</a> '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly.\nLorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget, sollicitudins '
+            'odales felis.')
+        self.assertEqual(
+            bookmark.summary,
+            'Testing. A link '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly. Lorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget,…')
+
+    def test_post_year(self):
+        "The post_year should be set based on post_time on save."
+        bookmark = BookmarkFactory(
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+        self.assertEqual(bookmark.post_year, 2015)
 
 
 class BookmarkNextPrevTestCase(TestCase):

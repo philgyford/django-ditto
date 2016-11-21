@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.twitter import app_settings
 from ditto.twitter.factories import AccountFactory,\
         AccountWithCredentialsFactory, PhotoFactory, TweetFactory,\
@@ -560,6 +561,28 @@ class TweetTestCase(TestCase):
         photo_1.tweets.add(tweet)
         photo_2.tweets.add(tweet)
         self.assertEqual(2, tweet.media.count())
+
+    def test_summary(self):
+        "The summary should be created from the description on save."
+        tweet = TweetFactory(
+            title='Testing. <a href="http://example.org">A link</a> '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly.\nLorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget, sollicitudins '
+            'odales felis.')
+        self.assertEqual(
+            tweet.summary,
+            'Testing. A link '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly. Lorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget,…')
+
+    def test_post_year(self):
+        "The post_year should be set based on post_time on save."
+        tweet = TweetFactory(post_time=datetime_from_str('2015-01-01 12:00:00'))
+        self.assertEqual(tweet.post_year, 2015)
 
 
 class TweetNextPrevTestCase(TestCase):

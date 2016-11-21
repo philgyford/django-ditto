@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 from django.db import IntegrityError
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.flickr import app_settings
 from ditto.flickr.factories import AccountFactory, PhotoFactory,\
         PhotosetFactory, UserFactory
@@ -292,6 +293,28 @@ class PhotoTestCase(TestCase):
         photo = PhotoFactory()
         for prop, size in sizes.items():
             self.assertEqual(getattr(photo, prop), size)
+
+    def test_summary(self):
+        "The summary should be created from the description on save."
+        photo = PhotoFactory(
+            description='Testing. <a href="http://example.org">A link</a> '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly.\nLorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget, sollicitudins '
+            'odales felis.')
+        self.assertEqual(
+            photo.summary,
+            'Testing. A link '
+            'and more text which goes on a bit so that this goes to more than '
+            '255 characters so that we can test it will be truncated '
+            'correctly. Lorem ipsum dolor sit amet, consectetur adipiscing '
+            'elit. Etiam odio tortor, maximus ut mauris eget,…')
+
+    def test_post_year(self):
+        "The post_year should be set based on post_time on save."
+        photo = PhotoFactory(post_time=datetime_from_str('2015-01-01 12:00:00'))
+        self.assertEqual(photo.post_year, 2015)
 
 
 class PhotoUrlsTestCase(TestCase):
