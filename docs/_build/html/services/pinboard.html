@@ -94,9 +94,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#managers">Managers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#template-tags">Template tags</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#recent-bookmarks">Recent Bookmarks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#annual-bookmark-counts">Annual Bookmark Counts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-bookmarks">Day Bookmarks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#recent-bookmarks">Recent Bookmarks</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
@@ -205,23 +205,6 @@
 <div class="section" id="template-tags">
 <h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
 <p>There are two assignment template tags available for displaying Bookmarks in your templates.</p>
-<div class="section" id="recent-bookmarks">
-<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this headline">¶</a></h3>
-<p>To display the most recently-posted Bookmarks use <code class="docutils literal"><span class="pre">recent_bookmarks</span></code>. By default it gets the 10 most recent Bookmarks posted by all Accounts:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
-<span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
-</pre></div>
-</div>
-<p>The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a <code class="docutils literal"><span class="pre">username</span></code> of <code class="docutils literal"><span class="pre">'philgyford'</span></code>.:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="annual-bookmark-counts">
 <h3>Annual Bookmark Counts<a class="headerlink" href="#annual-bookmark-counts" title="Permalink to this headline">¶</a></h3>
 <p>Get the number of bookmarks per year for all or one Account. This fetches totals for all Accounts:</p>
@@ -258,6 +241,23 @@ In this example, <code class="docutils literal"><span class="pre">my_date</span>
 </div>
 <p>Or we can restrict this to the Boomarks posted by a single account on that day:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="recent-bookmarks">
+<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this headline">¶</a></h3>
+<p>To display the most recently-posted Bookmarks use <code class="docutils literal"><span class="pre">recent_bookmarks</span></code>. By default it gets the 10 most recent Bookmarks posted by all Accounts:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a <code class="docutils literal"><span class="pre">username</span></code> of <code class="docutils literal"><span class="pre">'philgyford'</span></code>.:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>

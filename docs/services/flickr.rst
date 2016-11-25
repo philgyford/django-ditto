@@ -111,6 +111,7 @@ Template tags
 
 There are three assigment template tags and one simple template tag available for displaying Photos, Photosets and information about a Photo.
 
+
 Annual Photo Counts
 ===================
 
@@ -149,34 +150,6 @@ To restrict totals to a single User-with-Account, include their ``nsid``:
     {% annual_photo_counts nsid='35034346050@N01' count_by='taken_time' as counts %}
 
 
-Recent Photos
-=============
-
-To display the most recent public Photos posted by any of the Users associated
-with Accounts. By default the most recent 10 are fetched:
-
-.. code-block:: django
-
-    {% load ditto_flickr %}
-
-    {% recent_photos as photos %}
-
-    {% for photo in photos %}
-        <p>
-            {{ photo.title }}<br>
-            <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}">
-        </p>
-    {% endfor %}
-
-The tag can also fetch a different number of Photos and/or only get Photos
-posted by a single User-with-an-Account. Here we only get the 5 most recent
-Photos posted by the User with an ``nsid`` of ``'35034346050@N01'``:
-
-.. code-block:: django
-
-    {% recent_photos nsid='35034346050@N01' limit=5 as photos %}
-
-
 Day Photos
 ==========
 
@@ -193,6 +166,7 @@ Or we can restrict this to Photos posted by a single User-with-an-Account:
 .. code-block:: django
 
     {% day_photos my_date nsid='35034346050@N01' as photos %}
+
 
 Photosets
 =========
@@ -220,6 +194,7 @@ You can restrict it to Photosets by a single User and/or change the number retur
 
     {% photosets nsid='35034346050@N01' limit=300 as photoset_list %}
 
+
 Photo license
 =============
 
@@ -234,6 +209,34 @@ When displaying information about a ``Photo`` you may want to display a user-fri
 This would create HTML something like this, depending on the license:
 
     <a href="https://creativecommons.org/licenses/by-nc-sa/2.0/" title="More about permissions">Attribution-NonCommercial-ShareAlike License</a>
+
+
+Recent Photos
+=============
+
+To display the most recent public Photos posted by any of the Users associated
+with Accounts. By default the most recent 10 are fetched:
+
+.. code-block:: django
+
+    {% load ditto_flickr %}
+
+    {% recent_photos as photos %}
+
+    {% for photo in photos %}
+        <p>
+            {{ photo.title }}<br>
+            <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}">
+        </p>
+    {% endfor %}
+
+The tag can also fetch a different number of Photos and/or only get Photos
+posted by a single User-with-an-Account. Here we only get the 5 most recent
+Photos posted by the User with an ``nsid`` of ``'35034346050@N01'``:
+
+.. code-block:: django
+
+    {% recent_photos nsid='35034346050@N01' limit=5 as photos %}
 
 
 .. _flickr-management-commands:

@@ -189,6 +189,46 @@ To restrict scrobbles to a single ``Account`` (assuming ``account`` is an ``Acco
     {% recent_scrobbles account=account limit=30 as scrobbles %}
 
 
+Top Albums
+==========
+
+Get a QuerySet of the most-scrobbled ``Album`` s with the most-scrobbled first. This works in exactly the same way as the ``top_tracks`` template tag, above, with identical arguments. e.g.:
+
+.. code-block:: django
+
+    {% load ditto_lastfm %}
+
+    {% top_albums artist=artist account=account date=my_date period='month' limit=5 as albums %}
+
+    {% for album in albums %}
+        <p>
+            {{ forloop.counter }}.
+            {{ album.artist.name }} - {{ album.name }}:
+            {{ album.scrobble_count }}
+        </p>
+    {% endfor %}
+
+
+Top Artists
+===========
+
+Get a QuerySet of the most-scrobbled ``Artist`` s with the most-scrobbled first. This works in a similar way to the ``top_tracks`` and ``top_albums`` template tags, above. The only difference is that results cannot be filtered by ``artist``. e.g.:
+
+.. code-block:: django
+
+    {% load ditto_lastfm %}
+
+    {% top_artists account=account date=my_date period='month' limit=5 as albums %}
+
+    {% for artist in artists %}
+        <p>
+            {{ forloop.counter }}.
+            {{ artist.name }}:
+            {{ album.scrobble_count }}
+        </p>
+    {% endfor %}
+
+
 Top Tracks
 ==========
 
@@ -239,46 +279,6 @@ Example of fetching only 5 tracks by a single ``Artist``, scrobbled by a single 
     {% top_tracks artist=artist account=account date=my_date period='month' limit=5 as tracks %}
 
 Arguments can be in any order.
-
-
-Top Albums
-==========
-
-Get a QuerySet of the most-scrobbled ``Album`` s with the most-scrobbled first. This works in exactly the same way as the ``top_tracks`` template tag, above, with identical arguments. e.g.:
-
-.. code-block:: django
-
-    {% load ditto_lastfm %}
-
-    {% top_albums artist=artist account=account date=my_date period='month' limit=5 as albums %}
-
-    {% for album in albums %}
-        <p>
-            {{ forloop.counter }}.
-            {{ album.artist.name }} - {{ album.name }}:
-            {{ album.scrobble_count }}
-        </p>
-    {% endfor %}
-
-
-Top Artists
-===========
-
-Get a QuerySet of the most-scrobbled ``Artist`` s with the most-scrobbled first. This works in a similar way to the ``top_tracks`` and ``top_albums`` template tags, above. The only difference is that results cannot be filtered by ``artist``. e.g.:
-
-.. code-block:: django
-
-    {% load ditto_lastfm %}
-
-    {% top_artists account=account date=my_date period='month' limit=5 as albums %}
-
-    {% for artist in artists %}
-        <p>
-            {{ forloop.counter }}.
-            {{ artist.name }}:
-            {{ album.scrobble_count }}
-        </p>
-    {% endfor %}
 
 
 .. _flickr-management-commands:

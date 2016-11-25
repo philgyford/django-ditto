@@ -65,27 +65,6 @@ Template tags
 
 There are two assignment template tags available for displaying Bookmarks in your templates.
 
-Recent Bookmarks
-================
-
-To display the most recently-posted Bookmarks use ``recent_bookmarks``. By default it gets the 10 most recent Bookmarks posted by all Accounts:
-
-.. code-block:: django
-
-    {% load ditto_pinboard %}
-
-    {% recent_bookmarks as bookmarks %}
-
-    {% for bookmark in bookmarks %}
-        <p><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></p>
-    {% endfor %}
-
-The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a ``username`` of ``'philgyford'``.:
-
-.. code-block:: django
-
-    {% recent_bookmarks account='philgyford' limit=5 as bookmarks %}
-
 
 Annual Bookmark Counts
 ======================
@@ -135,6 +114,28 @@ Or we can restrict this to the Boomarks posted by a single account on that day:
 .. code-block:: django
 
     {% day_bookmarks my_date account='philgyford' as bookmarks %}
+
+
+Recent Bookmarks
+================
+
+To display the most recently-posted Bookmarks use ``recent_bookmarks``. By default it gets the 10 most recent Bookmarks posted by all Accounts:
+
+.. code-block:: django
+
+    {% load ditto_pinboard %}
+
+    {% recent_bookmarks as bookmarks %}
+
+    {% for bookmark in bookmarks %}
+        <p><a href="{{ bookmark.url }}">{{ bookmark.title }}</a></p>
+    {% endfor %}
+
+The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a ``username`` of ``'philgyford'``.:
+
+.. code-block:: django
+
+    {% recent_bookmarks account='philgyford' limit=5 as bookmarks %}
 
 
 .. _pinboard-management-commands:

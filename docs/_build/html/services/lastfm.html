@@ -96,9 +96,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#annual-scrobble-counts">Annual Scrobble Counts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-scrobbles">Day Scrobbles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#recent-scrobbles">Recent Scrobbles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#top-tracks">Top Tracks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#top-albums">Top Albums</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#top-artists">Top Artists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#top-tracks">Top Tracks</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
@@ -311,6 +311,40 @@ that returns a QuerySet of <code class="docutils literal"><span class="pre">Trac
 </pre></div>
 </div>
 </div>
+<div class="section" id="top-albums">
+<h3>Top Albums<a class="headerlink" href="#top-albums" title="Permalink to this headline">¶</a></h3>
+<p>Get a QuerySet of the most-scrobbled <code class="docutils literal"><span class="pre">Album</span></code> s with the most-scrobbled first. This works in exactly the same way as the <code class="docutils literal"><span class="pre">top_tracks</span></code> template tag, above, with identical arguments. e.g.:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">top_albums</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">album</span> <span class="k">in</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">album.name</span> <span class="cp">}}</span><span class="x">:</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="top-artists">
+<h3>Top Artists<a class="headerlink" href="#top-artists" title="Permalink to this headline">¶</a></h3>
+<p>Get a QuerySet of the most-scrobbled <code class="docutils literal"><span class="pre">Artist</span></code> s with the most-scrobbled first. This works in a similar way to the <code class="docutils literal"><span class="pre">top_tracks</span></code> and <code class="docutils literal"><span class="pre">top_albums</span></code> template tags, above. The only difference is that results cannot be filtered by <code class="docutils literal"><span class="pre">artist</span></code>. e.g.:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">top_artists</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">artist</span> <span class="k">in</span> <span class="nv">artists</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">artist.name</span> <span class="cp">}}</span><span class="x">:</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="top-tracks">
 <h3>Top Tracks<a class="headerlink" href="#top-tracks" title="Permalink to this headline">¶</a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal"><span class="pre">Track</span></code> s with the most-scrobbled first. Can be restricted to: a single <code class="docutils literal"><span class="pre">Account</span></code>; a single day, month or year; tracks by a single <code class="docutils literal"><span class="pre">Artist</span></code>. By default 10 tracks are returned.</p>
@@ -349,40 +383,6 @@ that returns a QuerySet of <code class="docutils literal"><span class="pre">Trac
 </pre></div>
 </div>
 <p>Arguments can be in any order.</p>
-</div>
-<div class="section" id="top-albums">
-<h3>Top Albums<a class="headerlink" href="#top-albums" title="Permalink to this headline">¶</a></h3>
-<p>Get a QuerySet of the most-scrobbled <code class="docutils literal"><span class="pre">Album</span></code> s with the most-scrobbled first. This works in exactly the same way as the <code class="docutils literal"><span class="pre">top_tracks</span></code> template tag, above, with identical arguments. e.g.:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">top_albums</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">album</span> <span class="k">in</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
-<span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">album.name</span> <span class="cp">}}</span><span class="x">:</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
-<span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="top-artists">
-<h3>Top Artists<a class="headerlink" href="#top-artists" title="Permalink to this headline">¶</a></h3>
-<p>Get a QuerySet of the most-scrobbled <code class="docutils literal"><span class="pre">Artist</span></code> s with the most-scrobbled first. This works in a similar way to the <code class="docutils literal"><span class="pre">top_tracks</span></code> and <code class="docutils literal"><span class="pre">top_albums</span></code> template tags, above. The only difference is that results cannot be filtered by <code class="docutils literal"><span class="pre">artist</span></code>. e.g.:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">top_artists</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
-
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">artist</span> <span class="k">in</span> <span class="nv">artists</span> <span class="cp">%}</span><span class="x"></span>
-<span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">artist.name</span> <span class="cp">}}</span><span class="x">:</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
-<span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
-</pre></div>
-</div>
 </div>
 </div>
 <div class="section" id="management-commands">

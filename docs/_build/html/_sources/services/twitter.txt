@@ -103,76 +103,6 @@ Template tags
 
 There are four assigment template tags available for displaying Tweets in your templates.
 
-Recent Tweets
-=============
-
-To display the most recent Tweets posted by any of the non-private Users with an API-credentialled Account. By default the most recent 10 are fetched:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% recent_tweets as tweets %}
-
-    {% for tweet in tweets %}
-        <p>
-            <b>{{ tweet.user.name }} (@{{ tweet.user.screen_name }})</b><br>
-            {{ tweet.text_html|safe }}
-        </p>
-    {% endfor %}
-
-(There's a lot more to displaying Tweets in full; see the included templates for examples.)
-
-The tag can also fetch a different number of Tweets and/or only get Tweets from a single User-with-an-Account. Here we only get the 5 most recent Tweets posted by the User with a ``screen_name`` of ``'philgyford'``:
-
-.. code-block:: django
-
-    {% recent_tweets screen_name='philgyford' limit=5 as tweets %}
-
-Recent Favorites
-================
-
-This works like ``recent_tweets`` except it only fetches Tweets favorited/liked
-by our Users-with-Accounts, which were posted by public Twitter users:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% recent_favorites as favorites %}
-
-Similarly, we can change the number of Tweets returned (10 by default), and only return Tweets favorited by a particular User:
-
-.. code-block:: django
-
-    {% recent_favorites screen_name='philgyford' limit=5 as favorites %}
-
-
-Annual Tweet Counts
-======================
-
-Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% annual_tweet_counts as counts %}
-
-    {% for row in counts %}
-        <p>
-            {{ row.year }}: {{ row.count }}
-        </p>
-    {% endfor %}
-
-Both the ``year`` and ``count`` in each row are integers.
-
-Or we can restrict this to Tweets posted by a single User-with-an-Account:
-
-.. code-block:: django
-
-    {% annual_tweet_counts screen_name='philgyford' as counts %}
-
 
 Annual Favorite Counts
 ======================
@@ -202,22 +132,30 @@ Or we can restrict this to favorites by a single User-with-an-Account:
 NOTE: The date used is the date the Tweets were posted on, not the date on which they were favorited.
 
 
-Day Tweets
-==========
+Annual Tweet Counts
+======================
 
-Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
+Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:
 
 .. code-block:: django
 
     {% load ditto_twitter %}
 
-    {% day_tweets my_date as tweets %}
+    {% annual_tweet_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
 
 Or we can restrict this to Tweets posted by a single User-with-an-Account:
 
 .. code-block:: django
 
-    {% day_tweets my_date screen_name='philgyford' as tweets %}
+    {% annual_tweet_counts screen_name='philgyford' as counts %}
 
 
 Day Favorites
@@ -239,6 +177,70 @@ Again, we can restrict this to Tweets favorited by a single User-with-an-Account
 .. code-block:: django
 
     {% day_favorites my_date screen_name='philgyford' as favorites %}
+
+
+Day Tweets
+==========
+
+Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% day_tweets my_date as tweets %}
+
+Or we can restrict this to Tweets posted by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% day_tweets my_date screen_name='philgyford' as tweets %}
+
+
+Recent Favorites
+================
+
+This works like ``recent_tweets`` except it only fetches Tweets favorited/liked
+by our Users-with-Accounts, which were posted by public Twitter users:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% recent_favorites as favorites %}
+
+Similarly, we can change the number of Tweets returned (10 by default), and only return Tweets favorited by a particular User:
+
+.. code-block:: django
+
+    {% recent_favorites screen_name='philgyford' limit=5 as favorites %}
+
+
+Recent Tweets
+=============
+
+To display the most recent Tweets posted by any of the non-private Users with an API-credentialled Account. By default the most recent 10 are fetched:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% recent_tweets as tweets %}
+
+    {% for tweet in tweets %}
+        <p>
+            <b>{{ tweet.user.name }} (@{{ tweet.user.screen_name }})</b><br>
+            {{ tweet.text_html|safe }}
+        </p>
+    {% endfor %}
+
+(There's a lot more to displaying Tweets in full; see the included templates for examples.)
+
+The tag can also fetch a different number of Tweets and/or only get Tweets from a single User-with-an-Account. Here we only get the 5 most recent Tweets posted by the User with a ``screen_name`` of ``'philgyford'``:
+
+.. code-block:: django
+
+    {% recent_tweets screen_name='philgyford' limit=5 as tweets %}
 
 
 .. _twitter-management-commands:
