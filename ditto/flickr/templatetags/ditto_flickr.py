@@ -85,7 +85,7 @@ def photo_license(n):
 
 
 @register.assignment_tag
-def annual_photo_counts(nsid=None):
+def annual_photo_counts(nsid=None, count_by='post_time'):
     """
     Get the number of public Photos per year.
     Returns a list of dicts, sorted by year, like:
@@ -93,15 +93,25 @@ def annual_photo_counts(nsid=None):
 
     Keyword arguments:
     nsid -- A Flickr user's NSID or None (for Photos by all Users).
+    count_by -- A string, either 'post_time' (default) or 'taken_time'.
     """
+
+    if count_by not in ['post_time', 'taken_time']:
+        raise ValueError("`count_by` must be either 'post_time' or "
+                        "'taken_time', not '%s'." % count_by)
 
     photos = Photo.public_photo_objects
 
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
 
-    return photos.values('post_year')\
+    if count_by == 'taken_time':
+        field = 'taken_year'
+    else:
+        field = 'post_year'
+
+    return photos.values(field)\
                     .annotate(count=Count('id'))\
-                    .values('post_year', 'count')\
-                    .order_by('post_year')
+                    .values(field, 'count')\
+                    .order_by(field)
 
