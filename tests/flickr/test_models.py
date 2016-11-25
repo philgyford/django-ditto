@@ -316,6 +316,12 @@ class PhotoTestCase(TestCase):
         photo = PhotoFactory(post_time=datetime_from_str('2015-01-01 12:00:00'))
         self.assertEqual(photo.post_year, 2015)
 
+    def test_taken_year(self):
+        "The taken_year should be set based on taken_time on save."
+        photo = PhotoFactory(
+                            taken_time=datetime_from_str('2015-01-01 12:00:00'))
+        self.assertEqual(photo.taken_year, 2015)
+
 
 class PhotoUrlsTestCase(TestCase):
     "Parent for testing the URLs of photos and videos."

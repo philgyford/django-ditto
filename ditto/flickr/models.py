@@ -301,6 +301,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     taken_granularity = models.PositiveSmallIntegerField(
                 default=DATE_GRANULARITIES[0][0], choices=DATE_GRANULARITIES)
     taken_unknown = models.BooleanField(default=False)
+    taken_year = models.PositiveSmallIntegerField(
+                                    null=True, blank=True, db_index=True,
+                                    help_text="Set automatically on save")
 
     view_count = models.PositiveIntegerField(default=0,
                 help_text="How many times this had been viewed when fetched")
@@ -433,6 +436,13 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
     class Meta:
         ordering = ('-post_time',)
+
+    def save(self, *args, **kwargs):
+        if self.taken_time:
+            self.taken_year = self.taken_time.year
+        else:
+            self.taken_year = None
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('flickr:photo_detail',

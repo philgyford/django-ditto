@@ -113,8 +113,9 @@ class PhotoAdmin(DittoItemModelAdmin):
         ('Times', {
             'classes': ('collapse',),
             'fields': ('post_time', 'post_year_str',
-                        'last_update_time', 'taken_time', 'taken_granularity',
-                'taken_unknown', )
+                        'last_update_time',
+                        'taken_time', 'taken_year_str', 'taken_granularity',
+                        'taken_unknown', )
         }),
         ('Counts, secrets, server, etc', {
             'classes': ('collapse',),
@@ -148,7 +149,7 @@ class PhotoAdmin(DittoItemModelAdmin):
         }),
     )
     radio_fields = {'media': admin.HORIZONTAL}
-    readonly_fields = ('post_year_str', 'show_image', 'raw',
+    readonly_fields = ('post_year_str', 'taken_year_str', 'show_image', 'raw',
                         'fetch_time', 'time_created', 'time_modified',
                         'sizes_raw', 'exif_raw', )
 
@@ -172,4 +173,9 @@ class PhotoAdmin(DittoItemModelAdmin):
         return '<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_width, instance.small_height)
     show_image.allow_tags = True
     show_image.short_description = 'Small image'
+
+    def taken_year_str(self, instance):
+        "So Admin doesn't add a comma, like '2,016'."
+        return str(instance.taken_year)
+    taken_year_str.short_description = 'Taken year'
 
