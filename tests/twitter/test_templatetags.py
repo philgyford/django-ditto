@@ -168,14 +168,14 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_public_account(self):
-        "Returns only favorited Tweets from the date, favorited by a public Account"
+        "Returns only favorited Tweets from the date, favorited by one public Account"
         tweets = ditto_twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='terry')
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_private_account(self):
-        "Doesn't return Tweets favorited by a public Account"
+        "Doesn't return Tweets favorited by a private Account"
         tweets = ditto_twitter.day_favorites(
                             datetime.date(2015, 3, 18), screen_name='thelma')
         self.assertEqual(0, len(tweets))
@@ -221,4 +221,60 @@ class AnnualTweetCountsTestCase(TestCase):
         self.assertEqual(tweets[0]['count'], 3)
         self.assertEqual(tweets[1]['post_year'], 2016)
         self.assertEqual(tweets[1]['count'], 2)
+
+
+class AnnualFavoriteCountsTestCase(TestCase):
+
+    def setUp(self):
+        self.user_1 = UserFactory(screen_name='terry')
+        self.user_2 = UserFactory(screen_name='bob')
+        self.user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=self.user_1)
+        account_2 = AccountFactory(user=self.user_2)
+        account_3 = AccountFactory(user=self.user_3) # private
+
+        # Public tweets in 2015 and 2016:
+        tweets2015 = TweetFactory.create_batch(3,
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+        tweets2016 = TweetFactory.create_batch(2,
+                            post_time=datetime_from_str('2016-01-01 12:00:00'))
+        # One private tweet in 2015:
+        private_tweet = TweetFactory(
+                            post_time=datetime_from_str('2015-01-01 12:00:00'))
+        private_tweet.user.is_private = True
+        private_tweet.user.save()
+
+        account_1.user.favorites.add(private_tweet)
+        account_1.user.favorites.add(tweets2015[0])
+        account_1.user.favorites.add(tweets2015[1])
+        account_1.user.favorites.add(tweets2015[2])
+        account_1.user.favorites.add(tweets2016[0])
+        account_1.user.favorites.add(tweets2016[1])
+
+        account_2.user.favorites.add(tweets2015[1])
+        account_2.user.favorites.add(tweets2016[1])
+        account_3.user.favorites.add(tweets2015[1]) # private user favoriting
+
+    def test_response(self):
+        tweets = ditto_twitter.annual_favorite_counts()
+        self.assertEqual(len(tweets), 2)
+        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['count'], 4)
+        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['count'], 3)
+
+    def test_response_for_public_account(self):
+        tweets = ditto_twitter.annual_favorite_counts(
+                                        screen_name=self.user_1.screen_name)
+        self.assertEqual(len(tweets), 2)
+        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['count'], 4)
+        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['count'], 3)
+
+    def test_response_for_private_account(self):
+        tweets = ditto_twitter.annual_favorite_counts(
+                                        screen_name=self.user_3.screen_name)
+        self.assertEqual(len(tweets), 0)
+
 

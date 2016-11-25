@@ -121,3 +121,31 @@ def annual_tweet_counts(screen_name=None):
                     .values('post_year', 'count')\
                     .order_by('post_year')
 
+
+@register.assignment_tag
+def annual_favorite_counts(screen_name=None):
+    """
+    Get the number of public Favorites per year.
+    (i.e. the Tweets are from those years, not that they were favorited then.)
+    Returns a list of dicts, sorted by year, like:
+        [ {'year': 2015, 'count': 1234}, {'year': 2016, 'count': 9876} ]
+
+    Keyword arguments:
+    screen_name -- A Twitter user's screen_name. If not supplied, we fetch
+                    all public favorited Tweets.
+    """
+
+    if screen_name is None:
+        tweets = Tweet.public_favorite_objects
+    else:
+        user = User.objects.get(screen_name=screen_name)
+        if user.is_private:
+            tweets = Tweet.objects.none()
+        else:
+            tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
+
+    return tweets.values('post_year')\
+                    .annotate(count=Count('id'))\
+                    .values('post_year', 'count')\
+                    .order_by('post_year')
+
