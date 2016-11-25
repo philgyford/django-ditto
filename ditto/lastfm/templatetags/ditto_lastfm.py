@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.utils.html import format_html
 
 from ..models import Account, Album, Artist, Scrobble, Track
+from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
@@ -317,8 +318,5 @@ def annual_scrobble_counts(account=None):
     if account:
         qs = qs.filter(account=account)
 
-    return qs.values('post_year')\
-            .annotate(count=Count('id'))\
-            .values('post_year', 'count')\
-            .order_by('post_year')
+    return get_annual_item_counts(qs)
 

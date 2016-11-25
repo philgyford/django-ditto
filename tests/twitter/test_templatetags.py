@@ -184,43 +184,53 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
 class AnnualTweetCountsTestCase(TestCase):
 
     def setUp(self):
-        user_1 = UserFactory(screen_name='terry')
-        user_2 = UserFactory(screen_name='bob')
-        user_3 = UserFactory(screen_name='thelma', is_private=True)
-        account_1 = AccountFactory(user=user_1)
-        account_2 = AccountFactory(user=user_2)
-        account_3 = AccountFactory(user=user_3)
+        self.user_1 = UserFactory(screen_name='terry')
+        self.user_2 = UserFactory(screen_name='bob')
+        self.user_3 = UserFactory(screen_name='thelma', is_private=True)
+        account_1 = AccountFactory(user=self.user_1)
+        account_2 = AccountFactory(user=self.user_2)
+        account_3 = AccountFactory(user=self.user_3)
         # Tweets in 2015 and 2016 for user 1:
         TweetFactory.create_batch(3,
                             post_time=datetime_from_str('2015-01-01 12:00:00'),
-                            user=user_1)
+                            user=self.user_1)
         TweetFactory.create_batch(2,
                             post_time=datetime_from_str('2016-01-01 12:00:00'),
-                            user=user_1)
-        # And one for user_2 in 2015:
-        TweetFactory(user=user_2,
+                            user=self.user_1)
+        # And one for self.user_2 in 2015:
+        TweetFactory(user=self.user_2,
                             post_time=datetime_from_str('2015-01-01 12:00:00'))
         # And one tweet in 2015 for the private user 3.
-        tw = TweetFactory(user=user_3, is_private=True,
+        tw = TweetFactory(user=self.user_3, is_private=True,
                             post_time=datetime_from_str('2015-01-01 12:00:00'))
 
     def test_response(self):
         "Returns correct data for all users."
         tweets = ditto_twitter.annual_tweet_counts()
         self.assertEqual(len(tweets), 2)
-        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['year'], 2015)
         self.assertEqual(tweets[0]['count'], 4)
-        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['year'], 2016)
         self.assertEqual(tweets[1]['count'], 2)
 
     def test_response_for_user(self):
         "Returns correct data for one user."
         tweets = ditto_twitter.annual_tweet_counts(screen_name='terry')
         self.assertEqual(len(tweets), 2)
-        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['year'], 2015)
         self.assertEqual(tweets[0]['count'], 3)
-        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['year'], 2016)
         self.assertEqual(tweets[1]['count'], 2)
+
+    def test_empty_years(self):
+        "It should include years for which there are no tweets."
+        # Add a tweet in 2018, leaving a gap for 2017:
+        TweetFactory(post_time=datetime_from_str('2018-01-01 12:00:00'),
+                    user=self.user_1)
+        tweets = ditto_twitter.annual_tweet_counts()
+        self.assertEqual(len(tweets), 4)
+        self.assertEqual(tweets[2]['year'], 2017)
+        self.assertEqual(tweets[2]['count'], 0)
 
 
 class AnnualFavoriteCountsTestCase(TestCase):
@@ -229,7 +239,7 @@ class AnnualFavoriteCountsTestCase(TestCase):
         self.user_1 = UserFactory(screen_name='terry')
         self.user_2 = UserFactory(screen_name='bob')
         self.user_3 = UserFactory(screen_name='thelma', is_private=True)
-        account_1 = AccountFactory(user=self.user_1)
+        self.account_1 = AccountFactory(user=self.user_1)
         account_2 = AccountFactory(user=self.user_2)
         account_3 = AccountFactory(user=self.user_3) # private
 
@@ -244,12 +254,12 @@ class AnnualFavoriteCountsTestCase(TestCase):
         private_tweet.user.is_private = True
         private_tweet.user.save()
 
-        account_1.user.favorites.add(private_tweet)
-        account_1.user.favorites.add(tweets2015[0])
-        account_1.user.favorites.add(tweets2015[1])
-        account_1.user.favorites.add(tweets2015[2])
-        account_1.user.favorites.add(tweets2016[0])
-        account_1.user.favorites.add(tweets2016[1])
+        self.account_1.user.favorites.add(private_tweet)
+        self.account_1.user.favorites.add(tweets2015[0])
+        self.account_1.user.favorites.add(tweets2015[1])
+        self.account_1.user.favorites.add(tweets2015[2])
+        self.account_1.user.favorites.add(tweets2016[0])
+        self.account_1.user.favorites.add(tweets2016[1])
 
         account_2.user.favorites.add(tweets2015[1])
         account_2.user.favorites.add(tweets2016[1])
@@ -258,18 +268,18 @@ class AnnualFavoriteCountsTestCase(TestCase):
     def test_response(self):
         tweets = ditto_twitter.annual_favorite_counts()
         self.assertEqual(len(tweets), 2)
-        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['year'], 2015)
         self.assertEqual(tweets[0]['count'], 4)
-        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['year'], 2016)
         self.assertEqual(tweets[1]['count'], 3)
 
     def test_response_for_public_account(self):
         tweets = ditto_twitter.annual_favorite_counts(
                                         screen_name=self.user_1.screen_name)
         self.assertEqual(len(tweets), 2)
-        self.assertEqual(tweets[0]['post_year'], 2015)
+        self.assertEqual(tweets[0]['year'], 2015)
         self.assertEqual(tweets[0]['count'], 4)
-        self.assertEqual(tweets[1]['post_year'], 2016)
+        self.assertEqual(tweets[1]['year'], 2016)
         self.assertEqual(tweets[1]['count'], 3)
 
     def test_response_for_private_account(self):
@@ -277,4 +287,14 @@ class AnnualFavoriteCountsTestCase(TestCase):
                                         screen_name=self.user_3.screen_name)
         self.assertEqual(len(tweets), 0)
 
+    def test_empty_years(self):
+        "It should include years for which there are no favorited tweets."
+        # Add a favorite tweet in 2018, leaving a gap for 2017:
+        tweet2018 = TweetFactory(
+                            post_time=datetime_from_str('2018-01-01 12:00:00'))
+        self.account_1.user.favorites.add(tweet2018)
+        tweets = ditto_twitter.annual_favorite_counts()
+        self.assertEqual(len(tweets), 4)
+        self.assertEqual(tweets[2]['year'], 2017)
+        self.assertEqual(tweets[2]['count'], 0)
 

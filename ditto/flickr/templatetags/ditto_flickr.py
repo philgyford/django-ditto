@@ -2,11 +2,11 @@ import datetime
 import pytz
 
 from django import template
-from django.db.models import Count
 from django.utils.html import format_html
 
 from ..models import Photo, Photoset, User
 from ...core.templatetags.ditto_core import display_time
+from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
@@ -100,18 +100,15 @@ def annual_photo_counts(nsid=None, count_by='post_time'):
         raise ValueError("`count_by` must be either 'post_time' or "
                         "'taken_time', not '%s'." % count_by)
 
-    photos = Photo.public_photo_objects
+    qs = Photo.public_photo_objects
 
     if nsid is not None:
-        photos = photos.filter(user__nsid=nsid)
+        qs = qs.filter(user__nsid=nsid)
 
     if count_by == 'taken_time':
-        field = 'taken_year'
+        field_name = 'taken_year'
     else:
-        field = 'post_year'
+        field_name = 'post_year'
 
-    return photos.values(field)\
-                    .annotate(count=Count('id'))\
-                    .values(field, 'count')\
-                    .order_by(field)
+    return get_annual_item_counts(qs, field_name)
 

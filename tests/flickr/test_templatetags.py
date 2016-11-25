@@ -120,50 +120,60 @@ class PhotoLicenseTestCase(TestCase):
 class AnnualPhotoCountsPostTimeTestCase(TestCase):
 
     def setUp(self):
-        user_1 = UserFactory(nsid='1234567890@N01')
-        user_2 = UserFactory(nsid='9876543210@N01')
-        AccountFactory(user=user_1)
-        AccountFactory(user=user_2)
+        self.user_1 = UserFactory(nsid='1234567890@N01')
+        self.user_2 = UserFactory(nsid='9876543210@N01')
+        AccountFactory(user=self.user_1)
+        AccountFactory(user=self.user_2)
         # Photos posted in 2015 and 2016 for user 1:
         PhotoFactory.create_batch(3,
                             post_time=datetime_from_str('2015-01-01 12:00:00'),
-                            user=user_1)
+                            user=self.user_1)
         PhotoFactory.create_batch(2,
                             post_time=datetime_from_str('2016-01-01 12:00:00'),
-                            user=user_1)
+                            user=self.user_1)
         # And one for user_2 posted in 2015:
-        PhotoFactory(user=user_2,
+        PhotoFactory(user=self.user_2,
                             post_time=datetime_from_str('2015-01-01 12:00:00'))
         # And one private photo for user_1 posted in 2015:
-        PhotoFactory(user=user_1, is_private=True,
+        PhotoFactory(user=self.user_1, is_private=True,
                             post_time=datetime_from_str('2015-01-01 12:00:00'))
 
     def test_default_response(self):
         "Returns correct data for all users."
         photos = ditto_flickr.annual_photo_counts()
         self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0]['post_year'], 2015)
+        self.assertEqual(photos[0]['year'], 2015)
         self.assertEqual(photos[0]['count'], 4)
-        self.assertEqual(photos[1]['post_year'], 2016)
+        self.assertEqual(photos[1]['year'], 2016)
         self.assertEqual(photos[1]['count'], 2)
 
     def test_count_by_response(self):
         "Returns correct data for all users with count_by='post_time'."
         photos = ditto_flickr.annual_photo_counts(count_by='post_time')
         self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0]['post_year'], 2015)
+        self.assertEqual(photos[0]['year'], 2015)
         self.assertEqual(photos[0]['count'], 4)
-        self.assertEqual(photos[1]['post_year'], 2016)
+        self.assertEqual(photos[1]['year'], 2016)
         self.assertEqual(photos[1]['count'], 2)
 
     def test_response_for_user(self):
         "Returns correct data for one user."
         photos = ditto_flickr.annual_photo_counts(nsid='1234567890@N01')
         self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0]['post_year'], 2015)
+        self.assertEqual(photos[0]['year'], 2015)
         self.assertEqual(photos[0]['count'], 3)
-        self.assertEqual(photos[1]['post_year'], 2016)
+        self.assertEqual(photos[1]['year'], 2016)
         self.assertEqual(photos[1]['count'], 2)
+
+    def test_empty_years(self):
+        "It should include years for which there are no photos."
+        # Add a photo in 2018, leaving a gap for 2017:
+        PhotoFactory(post_time=datetime_from_str('2018-01-01 12:00:00'),
+                            user=self.user_1)
+        photos = ditto_flickr.annual_photo_counts()
+        self.assertEqual(len(photos), 4)
+        self.assertEqual(photos[2]['year'], 2017)
+        self.assertEqual(photos[2]['count'], 0)
 
 
 class AnnualPhotoCountsTakenTimeTestCase(TestCase):
@@ -172,31 +182,31 @@ class AnnualPhotoCountsTakenTimeTestCase(TestCase):
     """
 
     def setUp(self):
-        user_1 = UserFactory(nsid='1234567890@N01')
-        user_2 = UserFactory(nsid='9876543210@N01')
-        AccountFactory(user=user_1)
-        AccountFactory(user=user_2)
+        self.user_1 = UserFactory(nsid='1234567890@N01')
+        self.user_2 = UserFactory(nsid='9876543210@N01')
+        AccountFactory(user=self.user_1)
+        AccountFactory(user=self.user_2)
         # Photos taken in 2015 and 2016 for user 1:
         PhotoFactory.create_batch(3,
                             taken_time=datetime_from_str('2015-01-01 12:00:00'),
-                            user=user_1)
+                            user=self.user_1)
         PhotoFactory.create_batch(2,
                             taken_time=datetime_from_str('2016-01-01 12:00:00'),
-                            user=user_1)
+                            user=self.user_1)
         # And one for user_2 taken in 2015:
-        PhotoFactory(user=user_2,
+        PhotoFactory(user=self.user_2,
                             taken_time=datetime_from_str('2015-01-01 12:00:00'))
         # And one private photo for user_1 taken in 2015:
-        PhotoFactory(user=user_1, is_private=True,
+        PhotoFactory(user=self.user_1, is_private=True,
                             taken_time=datetime_from_str('2015-01-01 12:00:00'))
 
     def test_count_by_response(self):
         "Returns correct data for all users with count_by='taken_time'."
         photos = ditto_flickr.annual_photo_counts(count_by='taken_time')
         self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0]['taken_year'], 2015)
+        self.assertEqual(photos[0]['year'], 2015)
         self.assertEqual(photos[0]['count'], 4)
-        self.assertEqual(photos[1]['taken_year'], 2016)
+        self.assertEqual(photos[1]['year'], 2016)
         self.assertEqual(photos[1]['count'], 2)
 
     def test_response_for_user(self):
@@ -204,8 +214,18 @@ class AnnualPhotoCountsTakenTimeTestCase(TestCase):
         photos = ditto_flickr.annual_photo_counts(nsid='1234567890@N01',
                                                 count_by='taken_time')
         self.assertEqual(len(photos), 2)
-        self.assertEqual(photos[0]['taken_year'], 2015)
+        self.assertEqual(photos[0]['year'], 2015)
         self.assertEqual(photos[0]['count'], 3)
-        self.assertEqual(photos[1]['taken_year'], 2016)
+        self.assertEqual(photos[1]['year'], 2016)
         self.assertEqual(photos[1]['count'], 2)
+
+    def test_empty_years(self):
+        "It should include years for which there are no photos."
+        # Add a photo in 2018, leaving a gap for 2017:
+        PhotoFactory(taken_time=datetime_from_str('2018-01-01 12:00:00'),
+                            user=self.user_1)
+        photos = ditto_flickr.annual_photo_counts(count_by='taken_time')
+        self.assertEqual(len(photos), 4)
+        self.assertEqual(photos[2]['year'], 2017)
+        self.assertEqual(photos[2]['count'], 0)
 

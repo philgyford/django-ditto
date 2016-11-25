@@ -5,6 +5,7 @@ from django import template
 from django.db.models import Count
 
 from ..models import Tweet, User
+from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
@@ -116,10 +117,7 @@ def annual_tweet_counts(screen_name=None):
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
 
-    return tweets.values('post_year')\
-                    .annotate(count=Count('id'))\
-                    .values('post_year', 'count')\
-                    .order_by('post_year')
+    return get_annual_item_counts(tweets)
 
 
 @register.assignment_tag
@@ -144,8 +142,5 @@ def annual_favorite_counts(screen_name=None):
         else:
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
 
-    return tweets.values('post_year')\
-                    .annotate(count=Count('id'))\
-                    .values('post_year', 'count')\
-                    .order_by('post_year')
+    return get_annual_item_counts(tweets)
 

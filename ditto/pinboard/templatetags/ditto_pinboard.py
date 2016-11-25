@@ -5,6 +5,7 @@ from django import template
 from django.db.models import Count
 
 from ..models import Bookmark
+from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
@@ -59,8 +60,5 @@ def annual_bookmark_counts(account=None):
     if account:
         bookmarks = bookmarks.filter(account__username=account)
 
-    return bookmarks.values('post_year')\
-                    .annotate(count=Count('id'))\
-                    .values('post_year', 'count')\
-                    .order_by('post_year')
+    return get_annual_item_counts(bookmarks)
 

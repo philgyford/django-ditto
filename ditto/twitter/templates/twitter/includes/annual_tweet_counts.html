@@ -38,7 +38,7 @@ Expects:
 				<tbody>
 					{% for s in tweets %}
 						<tr>
-							<td>{{ s.post_year|unlocalize }}</td>
+							<td>{{ s.year|unlocalize }}</td>
 							<td class="text-xs-right">{{ s.count }}</td>
 						</tr>
 					{% endfor %}

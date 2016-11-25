@@ -98,17 +98,26 @@ class AnnualBookmarkCountsTestCase(TestCase):
         "Returns correct data for all users."
         bookmarks = ditto_pinboard.annual_bookmark_counts()
         self.assertEqual(len(bookmarks), 2)
-        self.assertEqual(bookmarks[0]['post_year'], 2015)
+        self.assertEqual(bookmarks[0]['year'], 2015)
         self.assertEqual(bookmarks[0]['count'], 4)
-        self.assertEqual(bookmarks[1]['post_year'], 2016)
+        self.assertEqual(bookmarks[1]['year'], 2016)
         self.assertEqual(bookmarks[1]['count'], 2)
 
     def test_response_for_user(self):
         "Returns correct data for one user."
         bookmarks = ditto_pinboard.annual_bookmark_counts(account='terry')
         self.assertEqual(len(bookmarks), 2)
-        self.assertEqual(bookmarks[0]['post_year'], 2015)
+        self.assertEqual(bookmarks[0]['year'], 2015)
         self.assertEqual(bookmarks[0]['count'], 3)
-        self.assertEqual(bookmarks[1]['post_year'], 2016)
+        self.assertEqual(bookmarks[1]['year'], 2016)
         self.assertEqual(bookmarks[1]['count'], 2)
+
+    def test_empty_years(self):
+        "It should include years for which there are no bookmarks."
+        # Add a photo in 2018, leaving a gap for 2017:
+        BookmarkFactory(post_time=datetime_from_str('2018-01-01 12:00:00'))
+        bookmarks = ditto_pinboard.annual_bookmark_counts()
+        self.assertEqual(len(bookmarks), 4)
+        self.assertEqual(bookmarks[2]['year'], 2017)
+        self.assertEqual(bookmarks[2]['count'], 0)
 

@@ -29,7 +29,7 @@ Expects:
 				<tbody>
 					{% for s in photos %}
 						<tr>
-							<td>{{ s.post_year|unlocalize }}</td>
+							<td>{{ s.year|unlocalize }}</td>
 							<td class="text-xs-right">{{ s.count }}</td>
 						</tr>
 					{% endfor %}
