@@ -147,6 +147,61 @@ Similarly, we can change the number of Tweets returned (10 by default), and only
 
     {% recent_favorites screen_name='philgyford' limit=5 as favorites %}
 
+
+Annual Tweet Counts
+======================
+
+Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% annual_tweet_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+Or we can restrict this to Tweets posted by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% annual_tweet_counts screen_name='philgyford' as counts %}
+
+
+Annual Favorite Counts
+======================
+
+Get the number of favorites per year by all or one of the non-private Users-with-Accounts (only counting public Tweets):
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% annual_favorite_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+Or we can restrict this to favorites by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% annual_favorite_counts screen_name='philgyford' as counts %}
+
+NOTE: The date used is the date the Tweets were posted on, not the date on which they were favorited.
+
+
 Day Tweets
 ==========
 
@@ -163,6 +218,7 @@ Or we can restrict this to Tweets posted by a single User-with-an-Account:
 .. code-block:: django
 
     {% day_tweets my_date screen_name='philgyford' as tweets %}
+
 
 Day Favorites
 =============

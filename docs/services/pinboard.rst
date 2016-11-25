@@ -86,6 +86,33 @@ The tag can also fetch a different number of Bookmarks and/or only get Bookmarks
 
     {% recent_bookmarks account='philgyford' limit=5 as bookmarks %}
 
+
+Annual Bookmark Counts
+======================
+
+Get the number of bookmarks per year for all or one Account. This fetches totals for all Accounts:
+
+.. code-block:: django
+
+    {% load ditto_pinboard %}
+
+    {% annual_pinboard_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+To restrict totals to a single Account:
+
+.. code-block:: django
+
+    {% annual_pinboard_counts account='philgyford' as counts %}
+
+
 Day Bookmarks
 =============
 

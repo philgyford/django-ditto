@@ -111,6 +111,44 @@ Template tags
 
 There are three assigment template tags and one simple template tag available for displaying Photos, Photosets and information about a Photo.
 
+Annual Photo Counts
+===================
+
+Get the number of Photos taken or uploaded per year for all or one User-with-Account. This fetches totals for all Users, by time uploaded:
+
+.. code-block:: django
+
+    {% load ditto_flickr %}
+
+    {% annual_photo_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+To count by time taken instead:
+
+.. code-block:: django
+
+    {% annual_photo_counts count_by='taken_time' as counts %}
+
+The alternative ``count_by`` value is equivalent to the default behaviour:
+
+.. code-block:: django
+
+    {% annual_photo_counts count_by='post_time' as counts %}
+
+To restrict totals to a single User-with-Account, include their ``nsid``:
+
+.. code-block:: django
+
+    {% annual_photo_counts nsid='35034346050@N01' count_by='taken_time' as counts %}
+
+
 Recent Photos
 =============
 
@@ -137,6 +175,7 @@ Photos posted by the User with an ``nsid`` of ``'35034346050@N01'``:
 .. code-block:: django
 
     {% recent_photos nsid='35034346050@N01' limit=5 as photos %}
+
 
 Day Photos
 ==========

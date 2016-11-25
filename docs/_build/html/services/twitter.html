@@ -88,6 +88,7 @@
 <p class="caption"><span class="caption-text">Services supported</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="flickr.html">Flickr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lastfm.html">Last.fm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pinboard.html">Pinboard</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Twitter</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-up">Set-up</a></li>
@@ -100,6 +101,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#template-tags">Template tags</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#recent-tweets">Recent Tweets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#recent-favorites">Recent Favorites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annual-tweet-counts">Annual Tweet Counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annual-favorite-counts">Annual Favorite Counts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-tweets">Day Tweets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-favorites">Day Favorites</a></li>
 </ul>
@@ -280,6 +283,47 @@ by our Users-with-Accounts, which were posted by public Twitter users:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_favorites</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="annual-tweet-counts">
+<h3>Annual Tweet Counts<a class="headerlink" href="#annual-tweet-counts" title="Permalink to this headline">¶</a></h3>
+<p>Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">annual_tweet_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
+<p>Or we can restrict this to Tweets posted by a single User-with-an-Account:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_tweet_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="annual-favorite-counts">
+<h3>Annual Favorite Counts<a class="headerlink" href="#annual-favorite-counts" title="Permalink to this headline">¶</a></h3>
+<p>Get the number of favorites per year by all or one of the non-private Users-with-Accounts (only counting public Tweets):</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">annual_favorite_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
+<p>Or we can restrict this to favorites by a single User-with-an-Account:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_favorite_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>NOTE: The date used is the date the Tweets were posted on, not the date on which they were favorited.</p>
 </div>
 <div class="section" id="day-tweets">
 <h3>Day Tweets<a class="headerlink" href="#day-tweets" title="Permalink to this headline">¶</a></h3>

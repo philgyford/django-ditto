@@ -258,7 +258,7 @@ that returns a QuerySet of <code class="docutils literal"><span class="pre">Trac
 <p>There are several assignment template tags for getting common lists of things.</p>
 <div class="section" id="annual-scrobble-counts">
 <h3>Annual Scrobble Counts<a class="headerlink" href="#annual-scrobble-counts" title="Permalink to this headline">¶</a></h3>
-<p>Gt the number of scrobbles per year for all or one <code class="docutils literal"><span class="pre">Account</span></code>. This fetches totals for all <code class="docutils literal"><span class="pre">Account</span></code> s:</p>
+<p>Get the number of scrobbles per year for all or one <code class="docutils literal"><span class="pre">Account</span></code>. This fetches totals for all <code class="docutils literal"><span class="pre">Account</span></code> s:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
@@ -270,11 +270,11 @@ that returns a QuerySet of <code class="docutils literal"><span class="pre">Trac
 <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
+<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
 <p>To restrict totals to a single <code class="docutils literal"><span class="pre">Account</span></code> (assuming <code class="docutils literal"><span class="pre">account</span></code> is an <code class="docutils literal"><span class="pre">Account</span></code> object):</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
-<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
 </div>
 <div class="section" id="day-scrobbles">
 <h3>Day Scrobbles<a class="headerlink" href="#day-scrobbles" title="Permalink to this headline">¶</a></h3>

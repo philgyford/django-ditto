@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="Django Ditto 0.4.0 documentation" href="../index.html"/>
-        <link rel="next" title="Pinboard" href="pinboard.html"/>
+        <link rel="next" title="Last.fm" href="lastfm.html"/>
         <link rel="prev" title="Installation" href="../installation.html"/> 
 
   
@@ -96,6 +96,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#template-tags">Template tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#annual-photo-counts">Annual Photo Counts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#recent-photos">Recent Photos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-photos">Day Photos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#photosets">Photosets</a></li>
@@ -111,6 +112,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="lastfm.html">Last.fm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pinboard.html">Pinboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="twitter.html">Twitter</a></li>
 </ul>
@@ -194,7 +196,7 @@ into your Terminal.</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span>1
 </pre></div>
 </div>
-<p>Now you can download your photos&#8217; data and, optionally, their original image/video files. See <a class="reference internal" href="#flickr-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
+<p>Now you can download your photos&#8217; data and, optionally, their original image/video files. See <a class="reference internal" href="lastfm.html#flickr-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
 </div>
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
@@ -255,6 +257,34 @@ differentiators we want to restrict things by:</p>
 <div class="section" id="template-tags">
 <h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
 <p>There are three assigment template tags and one simple template tag available for displaying Photos, Photosets and information about a Photo.</p>
+<div class="section" id="annual-photo-counts">
+<h3>Annual Photo Counts<a class="headerlink" href="#annual-photo-counts" title="Permalink to this headline">¶</a></h3>
+<p>Get the number of Photos taken or uploaded per year for all or one User-with-Account. This fetches totals for all Users, by time uploaded:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
+<p>To count by time taken instead:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The alternative <code class="docutils literal"><span class="pre">count_by</span></code> value is equivalent to the default behaviour:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>To restrict totals to a single User-with-Account, include their <code class="docutils literal"><span class="pre">nsid</span></code>:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="recent-photos">
 <h3>Recent Photos<a class="headerlink" href="#recent-photos" title="Permalink to this headline">¶</a></h3>
 <p>To display the most recent public Photos posted by any of the Users associated
@@ -435,7 +465,7 @@ Photos posted by the User with an <code class="docutils literal"><span class="pr
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pinboard.html" class="btn btn-neutral float-right" title="Pinboard" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="lastfm.html" class="btn btn-neutral float-right" title="Last.fm" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../installation.html" class="btn btn-neutral" title="Installation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

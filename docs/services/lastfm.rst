@@ -121,7 +121,7 @@ There are several assignment template tags for getting common lists of things.
 Annual Scrobble Counts
 ======================
 
-Gt the number of scrobbles per year for all or one ``Account``. This fetches totals for all ``Account`` s:
+Get the number of scrobbles per year for all or one ``Account``. This fetches totals for all ``Account`` s:
 
 .. code-block:: django
 
@@ -135,13 +135,13 @@ Gt the number of scrobbles per year for all or one ``Account``. This fetches tot
         </p>
     {% endfor %}
 
+Both the ``year`` and ``count`` in each row are integers.
+
 To restrict totals to a single ``Account`` (assuming ``account`` is an ``Account`` object):
 
 .. code-block:: django
 
     {% annual_scrobble_counts account=account as counts %}
-
-Both the ``year`` and ``count`` in each row are integers.
 
 
 Day Scrobbles
