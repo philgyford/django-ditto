@@ -9,7 +9,7 @@ Expects:
 {% endcomment %}
 
 <div class="media-body">
-    <h2 class="h6 media-heading lastfm-scrobble-title">
+    <h2 class="h6 lastfm-scrobble-title">
         <a href="{% url 'lastfm:artist_detail' artist_slug=scrobble.artist.slug %}">
             {{ scrobble.artist.name }}
         </a>
@@ -18,7 +18,7 @@ Expects:
             {{ scrobble.track.name }}
         </a>
     </h2>
-    <p class="m-b-0 text-muted lastfm-scrobble-about">
+    <p class="mb-0 text-muted lastfm-scrobble-about">
         {% if view != 'detail' %}<small>{% endif %}
             {% load ditto_core %}
 

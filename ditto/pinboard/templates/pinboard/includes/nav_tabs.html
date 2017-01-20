@@ -9,7 +9,7 @@ Expects:
 {% endcomment %}
 
 {% with active=active|default_if_none:'bookmarks' %}
-    <ul class="nav nav-tabs m-b-2">
+    <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
             <a class="nav-link{% if active == 'bookmarks' %} active{% endif %}" href="{% spaceless %}
             {% if account %}

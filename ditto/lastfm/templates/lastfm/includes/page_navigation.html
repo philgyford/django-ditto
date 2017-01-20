@@ -11,7 +11,7 @@ Expects:
             pages, instead of the global ones.
 {% endcomment %}
 
-<div class="card">
+<div class="card mb-3">
     <div class="list-group list-group-flush">
         <a href="{% spaceless %}
             {% if account %}
@@ -19,9 +19,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:scrobble_list' %}
             {% endif %}
-        {% endspaceless %}" class="list-group-item {% if 'scrobble_list' in url_name %}active{% else %}list-group-item-action{% endif %}">
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'scrobble_list' in url_name %}active{% endif %}">
             Listens
-            <span class="tag tag-default tag-pill pull-xs-right">
+            <span class="badge badge-pill {% if 'scrobble_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
                 {{ counts.scrobbles }}
             </span>
         </a>
@@ -31,9 +31,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:artist_list' %}
             {% endif %}
-        {% endspaceless %}" class="list-group-item {% if 'artist_list' in url_name %}active{% else %}list-group-item-action{% endif %}">
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'artist_list' in url_name %}active{% endif %}">
             Artists
-            <span class="tag tag-default tag-pill pull-xs-right">
+            <span class="badge badge-pill {% if 'artist_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
                 {{ counts.artists }}
             </span>
         </a>
@@ -43,9 +43,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:album_list' %}
             {% endif %}
-        {% endspaceless %}" class="list-group-item {% if  'album_list' in url_name %}active{% else %}list-group-item-action{% endif %}">
+        {% endspaceless %}" class="justify-content-between list-group-item {% if  'album_list' in url_name %}active{% endif %}">
             Albums
-            <span class="tag tag-default tag-pill pull-xs-right">
+			<span class="badge badge-pill {% if 'album_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
                 {{ counts.albums }}
             </span>
         </a>
@@ -55,9 +55,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:track_list' %}
             {% endif %}
-        {% endspaceless %}" class="list-group-item {% if 'track_list' in url_name %}active{% else %}list-group-item-action{% endif %}">
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'track_list' in url_name %}active{% endif %}">
             Tracks
-            <span class="tag tag-default tag-pill pull-xs-right">
+            <span class="badge badge-pill {% if 'track_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
                 {{ counts.tracks }}
             </span>
         </a>

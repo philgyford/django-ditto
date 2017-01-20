@@ -16,21 +16,21 @@ account -- Optional, an Account, to restrict counts to that Account's scrobbles
 {% endif %}
 
 {% if scrobbles %}
-	<div class="card">
+	<div class="card mb-3">
 		<div class="card-block">
-			<h2 class="h5 card-title">Listens per year</h2>
-			<table class="table table-sm lastfm-scrobbles-annual">
+			<h2 class="h6 card-title">Listens per year</h2>
+			<table class="table table-sm mb-0 lastfm-scrobbles-annual">
 				<thead class="sr-only">
 					<tr>
 						<th>Year</th>
-						<th class="text-xs-right">Listens</th>
+						<th class="text-right">Listens</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for s in scrobbles %}
 						<tr>
 							<td>{{ s.year|unlocalize }}</td>
-							<td class="text-xs-right">{{ s.count }}</td>
+							<td class="text-right">{{ s.count }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

@@ -7,28 +7,26 @@ Expects:
 {% endcomment %}
 
 {% load ditto_core %}
-<div class="row m-b-2">
-    <div class="col-xs-12">
-        <nav class="pull-xs-right">
-            <ul class="nav nav-inline">
-                <li class="nav-item">
-                    Sort:
-                </li>
-                <li class="nav-item">
-                    {% if order == 'uploaded' %}
-                        <strong>Uploaded time</strong>
-                    {% else %}
-                    <a class="nav-link" href="?{% query_string 'order' 'uploaded' %} ">Uploaded time</a>
-                    {% endif %}
-                </li>
-                <li class="nav-item">
-                    {% if order == 'taken' %}
-                        <strong>Taken time</strong>
-                    {% else %}
-                        <a class="nav-link" href="?{% query_string 'order' 'taken' %}">Taken time</a>
-                    {% endif %}
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
+
+<nav>
+	<ul class="nav justify-content-end mb-3">
+		<li class="nav-item">
+			<span class="nav-link">Sort:</span>
+		</li>
+		<li class="nav-item">
+			{% if order == 'uploaded' %}
+				<strong class="nav-link">Uploaded time</strong>
+			{% else %}
+			<a class="nav-link" href="?{% query_string 'order' 'uploaded' %} ">Uploaded time</a>
+			{% endif %}
+		</li>
+		<li class="nav-item">
+			{% if order == 'taken' %}
+				<strong class="nav-link">Taken time</strong>
+			{% else %}
+				<a class="nav-link" href="?{% query_string 'order' 'taken' %}">Taken time</a>
+			{% endif %}
+		</li>
+	</ul>
+</nav>
+

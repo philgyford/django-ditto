@@ -10,20 +10,20 @@ Expects:
     {% load ditto_core %}
 
     {% for row in photoset_list|split_by:3 %}
-        <div class="row m-b-1 flickr-photosets">
+        <div class="row mb-3 flickr-photosets">
             {% for photoset in row %}
                 <div class="col-md-4 flickr-photoset">
                     <h3 class="h6">
                         <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">{{ photoset.title }}</a>
                     </h3>
                     {% if photoset.primary_photo %}
-                        <p class="flickr-photoset-img m-b-0">
+                        <p class="flickr-photoset-img mb-0">
                             <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">
                                 <img src="{{ photoset.primary_photo.large_square_url }}" width="{{ photoset.primary_photo.large_square_width }}" height="{{ photoset.primary_photo.large_square_height }}" alt="" class="img-fluid">
                             </a>
                         </p>
                     {% endif %}
-                    <p class="flickr-photoset-meta m-b-0"><small class="text-muted">
+                    <p class="flickr-photoset-meta mb-0"><small class="text-muted">
                         {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}
                     </small></p>
                 </div>

@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Photo albums
         {% endblock %}
@@ -20,14 +20,14 @@
             {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Flickr' only %}
 
             {% load l10n %}
-            <div class="card">
+            <div class="card mb-3">
                 <ul class="list-group list-group-flush flickr-user-counts">
                     <li class="list-group-item">
                         {{ photoset_list.count|localize }} album{{ photoset_list.count|pluralize }}
                     </li>
                 </ul>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-block">
                     <p class="card-text">
                         <a href="{% url 'flickr:tag_list' %}">The most common tags</a>

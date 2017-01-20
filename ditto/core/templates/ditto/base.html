@@ -15,51 +15,56 @@
     </head>
     <body>
 
-        <nav class="navbar navbar-dark bg-inverse m-b">
+        <nav class="navbar navbar-toggleable-{% block navbar_toggleable_size %}sm{% endblock %} navbar-inverse bg-inverse">
             <div class="container">
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <a class="navbar-brand" href="{% url 'ditto:home' %}">
                     {% block navbar_title %}
                         Ditto
                     {% endblock %}
                 </a>
-                <ul class="nav navbar-nav">
-                    {% block navbar_list_start %}
-                    {% endblock %}
+                <div class="collpase navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        {% block navbar_list_start %}
+                        {% endblock %}
 
-                    {% if enabled_apps %}
-                        {% for app in enabled_apps %}
-                            {% if app == 'flickr' %}
-                                <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'flickr:home' %}">
-                                        Flickr
-                                    </a>
-                                </li>
-                            {% elif app == 'lastfm' %}
-                                <li class="nav-item {% block lastfm_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'lastfm:home' %}">
-                                       Last.fm
-                                    </a>
-                                </li>
-                            {% elif app == 'pinboard' %}
-                                <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'pinboard:home' %}">
-                                        Pinboard
-                                    </a>
-                                </li>
-                            {% elif app == 'twitter' %}
-                                <li class="nav-item {% block twitter_nav_active %}{% endblock %}">
-                                    <a class="nav-link" href="{% url 'twitter:home' %}">
-                                        Twitter
-                                    </a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
+                        {% if enabled_apps %}
+                            {% for app in enabled_apps %}
+                                {% if app == 'flickr' %}
+                                    <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
+                                        <a class="nav-link" href="{% url 'flickr:home' %}">
+                                            Flickr
+                                        </a>
+                                    </li>
+                                {% elif app == 'lastfm' %}
+                                    <li class="nav-item {% block lastfm_nav_active %}{% endblock %}">
+                                        <a class="nav-link" href="{% url 'lastfm:home' %}">
+                                           Last.fm
+                                        </a>
+                                    </li>
+                                {% elif app == 'pinboard' %}
+                                    <li class="nav-item {% block pinboard_nav_active %}{% endblock %}">
+                                        <a class="nav-link" href="{% url 'pinboard:home' %}">
+                                            Pinboard
+                                        </a>
+                                    </li>
+                                {% elif app == 'twitter' %}
+                                    <li class="nav-item {% block twitter_nav_active %}{% endblock %}">
+                                        <a class="nav-link" href="{% url 'twitter:home' %}">
+                                            Twitter
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
 
-                    {% block navbar_list_end %}
-                    {% endblock %}
-                </ul>
-            </div>
+                        {% block navbar_list_end %}
+                        {% endblock %}
+                    </ul>
+                </div> <!-- .collapse.navbar-collapse -->
+            </div> <!-- .container -->
         </nav>
 
         <div class="container">

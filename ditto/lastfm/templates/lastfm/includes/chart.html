@@ -22,7 +22,7 @@ Expects:
         <table class="table table-striped table-sm lastfm-{{ chart_type }}">
             <thead>
                 <tr>
-                    <th class="text-xs-right">Rank</th>
+                    <th class="text-right">Rank</th>
                     <th>
                         {% if chart_type == 'albums' %}
                             Album
@@ -31,13 +31,13 @@ Expects:
                         {% else %}
                             Track
                         {% endif %}</th>
-                    <th class="text-xs-right">Scrobbles</th>
+                    <th class="text-right">Scrobbles</th>
                 </tr>
             </thead>
             <tbody>
                 {% for object in object_list %}
                     <tr>
-                        <td class="text-xs-right">
+                        <td class="text-right">
                             {# So that the chart position will be correct on subsequent pages: #}
                             {% with start=page_obj.start_index|default:1 %}
                                 {{ forloop.counter0|add:start }}
@@ -56,7 +56,7 @@ Expects:
                                 {{ object.name }}
                             </a>
                         </td>
-                        <td class="text-xs-right">
+                        <td class="text-right">
                             {{ object.scrobble_count }}
                         </td>
                     </tr>

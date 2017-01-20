@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             A Tweet by {{ twitter_user.name }}
         {% endblock %}
@@ -28,12 +28,12 @@
                         {% if previous_tweet or next_tweet %}
                             <div class="row nextprev twitter-tweet-nextprev ">
                                 {% if previous_tweet %}
-                                    <div class="col-xs-6 nextprev-prev twitter-tweet-nextprev-prev">
+                                    <div class="col-6 nextprev-prev twitter-tweet-nextprev-prev">
                                         <a href="{% url 'twitter:tweet_detail' screen_name=previous_tweet.user.screen_name twitter_id=previous_tweet.twitter_id %}" title="Previous Tweet">&larr; Previous</a>
                                     </div>
                                 {% endif %}
                                 {% if next_tweet %}
-                                    <div class="col-xs-6 text-xs-right nextprev-next twitter-tweet-nextprev-next">
+                                    <div class="col-6 text-right nextprev-next twitter-tweet-nextprev-next">
                                         <a href="{% url 'twitter:tweet_detail' screen_name=next_tweet.user.screen_name twitter_id=next_tweet.twitter_id %}" title="Next Tweet">Next &rarr;</a>
                                     </div>
                                 {% endif %}
@@ -42,7 +42,7 @@
                     {% endwith %}
                 {% endwith %}
 
-                <div class="media m-t-0 twitter-tweet twitter-tweet-detail">
+                <div class="media mt-0 twitter-tweet twitter-tweet-detail">
                     <hr>
                     {% include 'twitter/includes/tweet.html' with tweet=tweet view='detail' perms=perms only %}
                     <hr>

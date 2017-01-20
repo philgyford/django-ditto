@@ -8,7 +8,7 @@ Expects:
 {% endcomment %}
 
 {% with active=active|default_if_none:'tracks' %}
-    <ul class="nav nav-tabs m-b-2">
+    <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
             <a class="nav-link{% if active == 'tracks' %} active{% endif %}" href="{% url 'lastfm:artist_detail' artist_slug=artist.slug %}">Tracks</a>
         </li>

@@ -25,7 +25,7 @@ Expects:
 
             <ul class="list-unstyled row">
                 {% for media in media_list %}
-                    <li class="col-sm-3 m-b-1">
+                    <li class="col-sm-3 mb-3">
                         <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" class="img-fluid" alt="Photo thumbnail"></a>
                     </li>
                 {% endfor %}
@@ -33,16 +33,16 @@ Expects:
 
         {% else %}
 
-            <ul class="list-unstyled m-b-0">
+            <ul class="list-unstyled mb-0">
                 {% for media in media_list %}
 
-                    <li class="m-b-1">
+                    <li class="mb-3">
                         {% if media.media_type == 'photo' %}
 
                             {% if view == 'detail' %}
                                 <a href="{{ media.large_url }}"><img src="{{ media.medium_url }}" width="{{ media.medium_w|unlocalize }}" height="{{ media.medium_h|unlocalize }}" alt="" class="img-fluid"></a>
                             {% else %}
-                                <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt=""></a>
+                                <a href="{{ tweet.get_absolute_url }}" title="See only this tweet"><img src="{{ media.small_url }}" width="{{ media.small_w|unlocalize }}" height="{{ media.small_h|unlocalize }}" alt="" class="img-fluid"></a>
                             {% endif %}
 
                         {% else %}

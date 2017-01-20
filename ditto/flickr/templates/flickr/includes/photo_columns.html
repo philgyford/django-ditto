@@ -24,7 +24,7 @@ Expects:
                     <h3 class="h6">
                         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
                     </h3>
-                    <p class="flickr-photo-img m-b-0">
+                    <p class="flickr-photo-img mb-0">
                         <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">
                             <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-fluid">
                         </a>

@@ -25,21 +25,21 @@ Expects:
 {% endif %}
 
 {% if tweets %}
-	<div class="card">
+	<div class="card mb-3">
 		<div class="card-block">
-			<h2 class="h5 card-title">{% if type|default_if_none:'tweets' == 'favorites' %}Liked tweets{% else %}Tweets{% endif %} per year</h2>
-			<table class="table table-sm flickr-tweets-annual">
+			<h2 class="h6 card-title">{% if type|default_if_none:'tweets' == 'favorites' %}Liked tweets{% else %}Tweets{% endif %} per year</h2>
+			<table class="table table-sm mb-0 flickr-tweets-annual">
 				<thead class="sr-only">
 					<tr>
 						<th>Year</th>
-						<th class="text-xs-right">Tweets</th>
+						<th class="text-right">Tweets</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for s in tweets %}
 						<tr>
 							<td>{{ s.year|unlocalize }}</td>
-							<td class="text-xs-right">{{ s.count }}</td>
+							<td class="text-right">{{ s.count }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

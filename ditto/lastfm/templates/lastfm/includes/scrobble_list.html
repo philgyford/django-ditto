@@ -20,7 +20,7 @@ Expects:
         <thead class="sr-only">
             <tr>
                 <th>Track</th>
-                <th class="text-xs-right">Time</th>
+                <th class="text-right">Time</th>
             </tr>
         </thead>
         <tbody>
@@ -35,7 +35,7 @@ Expects:
                             {{ scrobble.track.name }}
                         </a>
                     </td>
-                    <td class="text-nowrap text-xs-right">{% display_time scrobble.post_time link_to_day=True %}</td>
+                    <td class="text-nowrap text-right">{% display_time scrobble.post_time link_to_day=True %}</td>
                 </tr>
             {% endfor %}
         </tbody>
