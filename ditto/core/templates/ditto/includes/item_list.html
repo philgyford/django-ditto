@@ -8,28 +8,24 @@ Expects:
 
 {% endcomment %}
 <hr>
-<ul class="list-unstyled flickr-photos twitter-tweets pinboard-bookmarks">
+<div class="flickr-photos twitter-tweets pinboard-bookmarks">
     {% for item in object_list %}
 
         {% if item.ditto_item_name == 'flickr_photo' %}
-            <li class="media mt-0 flickr-photo">
+            <div class="media mt-0 flickr-photo">
                 {% include 'flickr/includes/photo.html' with photo=item only %}
-                <hr>
         {% elif item.ditto_item_name == 'lastfm_scrobble' %}
-            <li class="media mt-0 lastfm-scrobble">
+            <div class="media mt-0 lastfm-scrobble">
                 {% include 'lastfm/includes/scrobble.html' with scrobble=item only %}
-                <hr>
         {% elif item.ditto_item_name == 'pinboard_bookmark' %}
-            <li class="media mt-0 pinboard-bookmark">
+            <div class="media mt-0 pinboard-bookmark">
                 {% include 'pinboard/includes/bookmark.html' with bookmark=item only %}
-                <hr>
         {% elif item.ditto_item_name == 'twitter_tweet' %}
-            <li class="media mt-0 twitter-tweet">
+            <div class="media mt-0 twitter-tweet">
                 {% include 'twitter/includes/tweet.html' with tweet=item only %}
-                <hr>
         {% endif %}
-            </li>
-
+            </div>
+            <hr>
     {% endfor %}
-</ul>
+</div>
 
