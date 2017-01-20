@@ -62,7 +62,7 @@ INSTALLED_APPS = (
     'ditto.twitter',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
