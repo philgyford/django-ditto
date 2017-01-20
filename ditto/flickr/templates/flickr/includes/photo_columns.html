@@ -17,39 +17,38 @@ Expects:
 
     {% load ditto_core %}
 
-    {% for row in photo_list|split_by:3 %}
-        <div class="row flickr-photos flickr-photos-columns">
-            {% for photo in row %}
-                <div class="col-md-4 flickr-photo">
-                    <h3 class="h6">
-                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
-                    </h3>
-                    <p class="flickr-photo-img mb-0">
-                        <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">
-                            <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-fluid">
-                        </a>
-                    </p>
-                    <p class="flickr-photo-meta"><small class="text-muted">
-                        {% if order == 'taken' %}
-                            Taken
-                            {% if view == 'day' %}
-                                {% display_time photo.taken_time link_to_day=False granularity=photo.taken_granularity %}
-                            {% else %}
-                                {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
-                            {% endif %}
+    <div class="d-flex flex-wrap flickr-photos flickr-photos-columns">
+        {% for photo in photo_list %}
+            <div class="flickr-photo col-12 col-sm-6 col-md-4 p-3">
+                <h3 class="h6">
+                    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
+                </h3>
+                <p class="flickr-photo-img mb-0">
+                    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">
+                        <img src="{{ photo.small_url }}" width="{{ photo.small_width }}" height="{{ photo.small_height }}" alt="" class="img-fluid">
+                    </a>
+                </p>
+                <p class="flickr-photo-meta"><small class="text-muted">
+                    {% if order == 'taken' %}
+                        Taken
+                        {% if view == 'day' %}
+                            {% display_time photo.taken_time link_to_day=False granularity=photo.taken_granularity %}
                         {% else %}
-                            Uploaded
-                            {% if view == 'day' %}
-                                {% display_time photo.post_time link_to_day=False granularity=photo.taken_granularity %}
-                            {% else %}
-                                {% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}
-                            {% endif %}
+                            {% display_time photo.taken_time link_to_day=True granularity=photo.taken_granularity %}
                         {% endif %}
-                    </small></p>
-                </div>
-            {% endfor %}
-        </div> <!-- .row.flickr-photos -->
-    {% endfor %}
+                    {% else %}
+                        Uploaded
+                        {% if view == 'day' %}
+                            {% display_time photo.post_time link_to_day=False granularity=photo.taken_granularity %}
+                        {% else %}
+                            {% display_time photo.post_time link_to_day=True granularity=photo.taken_granularity %}
+                        {% endif %}
+                    {% endif %}
+                </small></p>
+            </div> <!-- .flickr-photo -->
+        {% endfor %}
+    </div> <!-- .flickr-photos -->
+
 
     {% if page_obj|default:False %}
         {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}

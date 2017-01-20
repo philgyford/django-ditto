@@ -9,30 +9,27 @@ Expects:
 
     {% load ditto_core %}
 
-    {% for row in photoset_list|split_by:3 %}
-        <div class="row mb-3 flickr-photosets">
-            {% for photoset in row %}
-                <div class="col-md-4 flickr-photoset">
-                    <h3 class="h6">
-                        <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">{{ photoset.title }}</a>
-                    </h3>
-                    {% if photoset.primary_photo %}
-                        <p class="flickr-photoset-img mb-0">
-                            <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">
-                                <img src="{{ photoset.primary_photo.large_square_url }}" width="{{ photoset.primary_photo.large_square_width }}" height="{{ photoset.primary_photo.large_square_height }}" alt="" class="img-fluid">
-                            </a>
-                        </p>
-                    {% endif %}
-                    <p class="flickr-photoset-meta mb-0"><small class="text-muted">
-                        {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}
-                    </small></p>
-                </div>
-            {% endfor %}
-        </div> <!-- .row.flickr-photosets -->
-    {% endfor %}
+    <div class="d-flex flex-wrap flickr-photosets">
+        {% for photoset in photoset_list %}
+            <div class="flickr-photoset col-12 col-sm-6 col-md-4 p-3">
+                <h3 class="h6">
+                    <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">{{ photoset.title }}</a>
+                </h3>
+                {% if photoset.primary_photo %}
+                    <p class="flickr-photoset-img mb-0">
+                        <a href="{% url 'flickr:photoset_detail' nsid=photoset.user.nsid flickr_id=photoset.flickr_id %}">
+                            <img src="{{ photoset.primary_photo.large_square_url }}" width="{{ photoset.primary_photo.large_square_width }}" height="{{ photoset.primary_photo.large_square_height }}" alt="" class="img-fluid">
+                        </a>
+                    </p>
+                {% endif %}
+                <p class="flickr-photoset-meta mb-0"><small class="text-muted">
+                    {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}
+                </small></p>
+            </div> <!-- .flickr-photoset -->
+        {% endfor %}
+    </div> <!-- .flickr-photosets -->
 {% else %}
 
     <p>There are no Albums to show.</p>
 {% endif %}
-
 
