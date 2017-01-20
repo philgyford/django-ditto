@@ -12,16 +12,16 @@ Might need to refactor or copy this for month/year pages?
 
 {% endcomment %}
 <nav class="my-4">
-	<p>
-		{% if previous %}
-			<a href="{% url 'ditto:day_archive' year=previous|date:'Y' month=previous|date:'m' day=previous|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
-				&larr; {{ previous|date:'j M Y' }}
-			</a>
-		{% endif %}
-		{% if next %}
-			<a href="{% url 'ditto:day_archive' year=next|date:'Y' month=next|date:'m' day=next|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
-				{{ next|date:'j M Y' }} &rarr;
-			</a>
-		{% endif %}
-	</p>
+    <p>
+        {% if previous %}
+            <a href="{% url 'ditto:day_archive' year=previous|date:'Y' month=previous|date:'m' day=previous|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
+                &larr; {{ previous|date:'j M Y' }}
+            </a>
+        {% endif %}
+        {% if next %}
+            <a href="{% url 'ditto:day_archive' year=next|date:'Y' month=next|date:'m' day=next|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
+                {{ next|date:'j M Y' }} &rarr;
+            </a>
+        {% endif %}
+    </p>
 </nav>
