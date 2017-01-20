@@ -157,13 +157,13 @@
                             <div class="card-block">
                                 {% if previous_photo %}
                                     <a class="card-link" href="{% url 'flickr:photo_detail' nsid=previous_photo.user.nsid flickr_id=previous_photo.flickr_id %}" title="{{ previous_photo.title }}">
-										&larr; Previous
-									</a>
+                                        &larr; Previous
+                                    </a>
                                 {% endif %}
                                 {% if next_photo %}
                                     <a class="card-link float-right" href="{% url 'flickr:photo_detail' nsid=next_photo.user.nsid flickr_id=next_photo.flickr_id %}" title="{{ next_photo.title }}">
-										Next &rarr;
-									</a>
+                                        Next &rarr;
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
