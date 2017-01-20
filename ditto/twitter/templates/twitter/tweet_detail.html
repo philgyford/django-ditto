@@ -23,30 +23,32 @@
                 <p>This user is private.</p>
             {% else %}
 
-                {% with tweet.get_previous as previous_tweet %}
-                    {% with tweet.get_next as next_tweet %}
-                        {% if previous_tweet or next_tweet %}
-                            <div class="row nextprev twitter-tweet-nextprev ">
-                                {% if previous_tweet %}
-                                    <div class="col-6 nextprev-prev twitter-tweet-nextprev-prev">
-                                        <a href="{% url 'twitter:tweet_detail' screen_name=previous_tweet.user.screen_name twitter_id=previous_tweet.twitter_id %}" title="Previous Tweet">&larr; Previous</a>
-                                    </div>
-                                {% endif %}
-                                {% if next_tweet %}
-                                    <div class="col-6 text-right nextprev-next twitter-tweet-nextprev-next">
-                                        <a href="{% url 'twitter:tweet_detail' screen_name=next_tweet.user.screen_name twitter_id=next_tweet.twitter_id %}" title="Next Tweet">Next &rarr;</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                {% endwith %}
-
+                <hr>
                 <div class="media mt-0 twitter-tweet twitter-tweet-detail">
-                    <hr>
                     {% include 'twitter/includes/tweet.html' with tweet=tweet view='detail' perms=perms only %}
-                    <hr>
                 </div>
+                <hr>
+
+                <nav>
+                    <p>
+                        {% with tweet.get_previous as previous_tweet %}
+                            {% with tweet.get_next as next_tweet %}
+                                {% if previous_tweet or next_tweet %}
+                                    {% if previous_tweet %}
+                                        <a href="{% url 'twitter:tweet_detail' screen_name=previous_tweet.user.screen_name twitter_id=previous_tweet.twitter_id %}" title="Previous Tweet" class="btn btn-outline-primary">
+                                            &larr; Previous
+                                        </a>
+                                    {% endif %}
+                                    {% if next_tweet %}
+                                        <a href="{% url 'twitter:tweet_detail' screen_name=next_tweet.user.screen_name twitter_id=next_tweet.twitter_id %}" title="Next Tweet" class="btn btn-outline-primary float-right">
+                                            Next &rarr;
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    </p>
+                </nav>
 
             {% endif %}
         </div> <!-- .col -->

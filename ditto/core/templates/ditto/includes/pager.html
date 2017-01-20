@@ -11,7 +11,7 @@ ditto_variety_slug -- eg 'tweets' or 'likes'.
 Might need to refactor or copy this for month/year pages?
 
 {% endcomment %}
-<nav class="my-4">
+<nav class="my-4 nextprev">
     <p>
         {% if previous %}
             <a href="{% url 'ditto:day_archive' year=previous|date:'Y' month=previous|date:'m' day=previous|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
@@ -19,9 +19,10 @@ Might need to refactor or copy this for month/year pages?
             </a>
         {% endif %}
         {% if next %}
-            <a href="{% url 'ditto:day_archive' year=next|date:'Y' month=next|date:'m' day=next|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary">
+            <a href="{% url 'ditto:day_archive' year=next|date:'Y' month=next|date:'m' day=next|date:'d' app=ditto_app_slug variety=ditto_variety_slug %}" class="btn btn-outline-primary float-right">
                 {{ next|date:'j M Y' }} &rarr;
             </a>
         {% endif %}
     </p>
 </nav>
+
