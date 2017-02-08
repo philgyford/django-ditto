@@ -39,7 +39,7 @@ setup(
     install_requires=[
         'django-imagekit>=3.3,<3.4',
         'django-sortedm2m>=1.2.2,<1.3',
-        'django-taggit',
+        'django-taggit>=0.22.0,<0.23',
         'flickrapi>=2.2.1,<2.3',
         'pillow>=3.2.0,<3.3',
         'pytz',

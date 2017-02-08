@@ -310,15 +310,13 @@ class PinboardBookmarkTagSlugsTestCase(TestCase):
         self.assertEqual(bookmark.tags.first().slug, '美国')
 
     @override_settings(TAGGIT_CASE_INSENSITIVE=True)
-    def test_similar_tags(self):
-        """Creating tags named 'dog' and 'DOG' creates different slugs.
-        Not sure this is the behaviour we want, but it's how it works.
-        """
+    def test_case_insensitive_tags(self):
+        "Creating tags named 'dog' and 'DOG' should not create different slugs."
         bookmark = BookmarkFactory()
         bookmark.tags.set('dog', 'cat', 'DOG')
         self.assertEqual(
             sorted([tag.slug for tag in bookmark.tags.all()]),
-            ['cat', 'dog', 'dog_1']
+            ['cat', 'dog',]
         )
 
 
