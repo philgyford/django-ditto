@@ -4,7 +4,7 @@ Introduction
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
 
-Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
+Requires Python 3.4 or 3.5, and Django 1.8, 1.9 or 1.10.
 
 
 ****************
