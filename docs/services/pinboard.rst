@@ -75,7 +75,7 @@ Get the number of bookmarks per year for all or one Account. This fetches totals
 
     {% load ditto_pinboard %}
 
-    {% annual_pinboard_counts as counts %}
+    {% annual_bookmark_counts as counts %}
 
     {% for row in counts %}
         <p>
@@ -89,7 +89,7 @@ To restrict totals to a single Account:
 
 .. code-block:: django
 
-    {% annual_pinboard_counts account='philgyford' as counts %}
+    {% annual_bookmark_counts account='philgyford' as counts %}
 
 
 Day Bookmarks

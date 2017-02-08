@@ -210,7 +210,7 @@
 <p>Get the number of bookmarks per year for all or one Account. This fetches totals for all Accounts:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
 
-<span class="cp">{%</span> <span class="k">annual_pinboard_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">    &lt;p&gt;</span>
@@ -221,7 +221,7 @@
 </div>
 <p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
 <p>To restrict totals to a single Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_pinboard_counts</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
