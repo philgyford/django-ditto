@@ -1,0 +1,75 @@
+{% comment %}
+A chart of Tracks or Albums.
+
+Expects:
+
+* object_list - A QuerySet of either Tracks, Albums or Artists.
+* chart_type - Either 'tracks' (default), 'albums' or 'artists'.
+* include_artist - Optional, boolean (True is default.)
+                   For Tracks and Albums, this will include the Artist.
+* page_obj - Optional, a DiggPaginator instance of False (default).
+* request - Optional, required if page_obj is used. The request object.
+{% endcomment %}
+
+{% with chart_type=chart_type|default_if_none:'tracks' %}
+
+    {% if object_list|length > 0 %}
+
+        {% if page_obj|default:False and page_obj.number > 1 %}
+            {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+        {% endif %}
+
+        <table class="table table-striped table-sm lastfm-{{ chart_type }}">
+            <thead>
+                <tr>
+                    <th class="text-right">Rank</th>
+                    <th>
+                        {% if chart_type == 'albums' %}
+                            Album
+                        {% elif chart_type == 'artists' %}
+                            Artist
+                        {% else %}
+                            Track
+                        {% endif %}</th>
+                    <th class="text-right">Scrobbles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td class="text-right">
+                            {# So that the chart position will be correct on subsequent pages: #}
+                            {% with start=page_obj.start_index|default:1 %}
+                                {{ forloop.counter0|add:start }}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            {% if chart_type != 'artists' %}
+                                {% if include_artist|default_if_none:True %}
+                                    <a href="{{ object.artist.get_absolute_url }}">
+                                        {{ object.artist }}
+                                    </a>
+                                    –	
+                                {% endif %}
+                            {% endif %}
+                            <a href="{{ object.get_absolute_url }}">
+                                {{ object.name }}
+                            </a>
+                        </td>
+                        <td class="text-right">
+                            {{ object.scrobble_count }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj|default:False %}
+            {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+        {% endif %}
+
+    {% else %}
+        <p>There are no {% if chart_type == 'albums' %}albums{% elif chart_type == 'artists' %}artists{% else %}tracks{% endif %} to show.</p>
+    {% endif %}
+
+{% endwith %}

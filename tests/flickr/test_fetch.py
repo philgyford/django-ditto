@@ -3,6 +3,7 @@ import json
 import pytz
 import responses
 import urllib
+from six.moves.urllib.parse import parse_qs
 
 from django.test import TestCase
 
@@ -51,6 +52,16 @@ class FlickrFetchTestCase(TestCase):
         'photosets.getPhotos':      'photosets_getphotos.json',
     }
 
+    def setUp(self):
+        super(FlickrFetchTestCase, self).setUp()
+        self.mock = responses.RequestsMock(assert_all_requests_are_fired=True)
+        self.mock.start()
+
+    def tearDown(self):
+        self.mock.stop()
+        self.mock.reset()
+        super(FlickrFetchTestCase, self).tearDown()
+
     def load_raw_fixture(self, method):
         """Makes the JSON response to a call to the API.
         method -- Method name used in self.flickr_fixtures.
@@ -67,47 +78,71 @@ class FlickrFetchTestCase(TestCase):
         list or dict, not plain text."""
         return json.loads(self.load_raw_fixture(method))
 
-    def add_flickr_response(self, body, status=200, querystring={}, match_querystring=True):
-        """Add a generic Flickr API response.
-
-        Keyword arguments:
-        body -- The JSON string representing the body of the response.
-        status -- Int, HTTP response status.
-        querystring -- eg {}
-        match_querystring -- You probably want this to be True if you've set
-                             a querystring.
+    def expect(self, params=None, body='', status=200,
+                content_type='application/json; charset=utf-8',
+                method='POST', match_querystring=True):
+        """Mocks an expected HTTP query with Responses.
+        Mostly copied from https://github.com/sybrenstuvel/flickrapi/blob/master/tests/test_flickrapi.py
         """
-        url = 'https://api.flickr.com/services/rest/'
+        urlbase = 'https://api.flickr.com/services/rest/'
 
-        if len(querystring):
+        param_test_callback = None
+        url = urlbase
 
-            # I *think* we'll need these for all Flickr queries:
-            querystring['nojsoncallback'] = '1'
-            querystring['format'] = 'json'
+        if params:
+            # Parameters we'll always want:
+            params.setdefault('format', 'json')
+            params.setdefault('nojsoncallback', '1')
 
-            qs = '&'.join(
-                    "%s=%s" % (key, urllib.parse.quote_plus(querystring[key]))
-                                                for key in querystring.keys())
-            url = '%s?%s' % (url, qs)
+        if method == 'GET':
+            # The parameters should be on the URL.
+            qp = quote_plus
+            qs = '&'.join('%s=%s' % (
+                            qp(key), qp(six.text_type(value).encode('utf-8'))
+                        )
+                          for key, value in sorted(params.items())
+                        )
+            if qs:
+                url = '%s?%s' % (urlbase, qs)
 
-        responses.add(
-            responses.POST,
-            url,
-            status=status,
-            match_querystring=match_querystring,
-            body=body,
-            content_type='application/json; charset=utf-8'
-        )
+            self.mock.add(method=method, url=url,
+                          body=body, status=status,
+                          content_type=content_type,
+                          match_querystring=match_querystring)
+        else:
+            # The parameters should be in the request body, not on the URL.
+            if params is not None:
+                expect_params = {key.encode('utf8'): [value.encode('utf8')]
+                                 for key, value in params.items()}
 
-    def add_response(self, method, body=None, querystring={}):
+            def param_test_callback(request):
+                # This callback can only handle x-www-form-urlencoded requests.
+                self.assertEqual('application/x-www-form-urlencoded',
+                                 request.headers['Content-Type'].decode('utf8'))
+                actual_params = parse_qs(request.body)
+                if params is None:
+                    self.assertFalse(actual_params)
+                else:
+                    self.assertEqual(actual_params, expect_params)
+
+                headers = {'Content-Type': 'application/json; charset=utf-8'}
+                return (status, headers, body)
+
+            self.mock.add_callback(method=method, url=url,
+                                   callback=param_test_callback,
+                                   content_type=content_type,
+                                   match_querystring=match_querystring)
+
+    def expect_response(self, method, body=None, params=None):
         """Add a specific API response - useful for 99% of cases.
         method - API method name, like 'people.getInfo'.
         body -- Text body for the response. Otherwise, our standard fixture for
                     that method is used.
-        querystring -- Optional keys/values for the querystring. Individual
+        params -- Optional keys/values for the request. Individual
                         items will override the defaults for each method below.
         """
-        querystrings = {
+        # Our default test params for each Flickr API method:
+        method_params = {
             'people.getInfo':       {'user_id': '35034346050@N01', },
             'people.getPhotos':     {'user_id': '35034346050@N01',
                                     'min_upload_date': '946684800',
@@ -128,12 +163,15 @@ class FlickrFetchTestCase(TestCase):
         if body is None:
             body = self.load_raw_fixture(method)
 
-        qs = querystrings[method]
-        qs['method'] = 'flickr.'+method
+        if params is None:
+            params = {}
 
-        # Override or add to the defaults if other options are supplied.
-        for k, v in querystring.items():
-            qs[k] = v
+        # Use the method's default params unless we've specified otherwise:
+        for k, v in method_params[method].items():
+            params.setdefault(k, v)
 
-        self.add_flickr_response(querystring=qs, body=body)
+        # Add the param specifying the API method:
+        params.setdefault('method', 'flickr.{}'.format(method))
+
+        self.expect(params=params, body=body)
 

@@ -1,0 +1,52 @@
+{% comment %}
+The sidebar used on Track Detail pages.
+
+Expects:
+
+track -- A Track object.
+perms -- The Django permissions object.
+{% endcomment %}
+
+{% load ditto_core %}
+
+<div class="card card-block mb-3">
+    <p class="card-text">
+        {% with track.get_scrobble_count as scrobble_count %}
+            {{ track.name }} has been scrobbled {{ scrobble_count }} time{{ scrobble_count|pluralize }}
+        {% endwith %}
+    </p>
+</div>
+
+{{ track.content_type }}
+<div class="card card-block mb-3">
+    <p class="card-text">
+        {% with track.get_most_recent_scrobble as scrobble %}
+            {% if scrobble %}
+                {{ track.name }} was most recently scrobbled by
+                <a href="{{ scrobble.account.get_absolute_url }}">
+                    {{ scrobble.account.realname }}
+                </a>
+                at {% display_time scrobble.post_time link_to_day=True %}
+            {% endif %}
+        {% endwith %}
+    </p>
+</div>
+
+<div class="card mb-3">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a href="{{ track.permalink }}">At Last.fm</a>
+        </li>
+        {% if track.musicbrainz_url %}
+            <li class="list-group-item">
+                <a href="{{ track.musicbrainz_url }}">At MusicBrainz</a>
+            </li>
+        {% endif %}
+        {% if perms.lastfm.can_change_track %}
+            <li class="list-group-item">
+                <a href="{% url 'admin:lastfm_track_change' track.id %}" title="Edit this track in the Django Admin">Edit</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+

@@ -40,14 +40,12 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         # Load that saved tweet from the DB:
         return Tweet.objects.get(twitter_id=300)
 
-
-    @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_saves_correct_tweet_data(self):
         tweet = self.make_tweet()
 
         #And check it's all there:
         self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
-        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
+        self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.latitude, Decimal('40.057016'))
         self.assertEqual(tweet.longitude, Decimal('-75.143103'))

@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     'sortedm2m',
     'ditto.core',
     'ditto.flickr',
+    'ditto.lastfm',
     'ditto.pinboard',
     'ditto.twitter',
 )

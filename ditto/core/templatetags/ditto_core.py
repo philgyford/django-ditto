@@ -122,15 +122,3 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
                 'visible': visible_time
             })
 
-
-@register.filter
-def split_by(items, n):
-    """Splits a list into chunks of n items."""
-
-    def make_chunks(items, n):
-        """Yield successive n-sized chunks from items."""
-        for i in range(0, len(items), n):
-            yield items[i:i+n]
-
-    return list(make_chunks(items, n))
-

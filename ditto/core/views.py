@@ -21,6 +21,9 @@ from .paginator import DiggPaginator
 if ditto_apps.is_installed('flickr'):
     from ..flickr.models import Photo
 
+if ditto_apps.is_installed('lastfm'):
+    from ..lastfm.models import Scrobble
+
 if ditto_apps.is_installed('pinboard'):
     from ..pinboard.models import Bookmark
 
@@ -115,7 +118,7 @@ class DittoAppsMixin:
                         'slug': 'photos',
                         'name': 'photo-uploaded',
                         'context_object_name': 'flickr_photo_list',
-                        'queryset': Photo.public_objects.all(),
+                        'queryset': Photo.public_objects.all().prefetch_related('user'),
                     },
                     {
                         # A bit cheeky as a slug, but seems to work:
@@ -123,7 +126,21 @@ class DittoAppsMixin:
                         'name': 'photo-taken',
                         'date_field': 'taken_time',
                         'context_object_name': 'flickr_photo_list',
-                        'queryset': Photo.public_objects.all(),
+                        'queryset': Photo.public_objects.all().prefetch_related('user'),
+                    },
+                ],
+            })
+
+        if 'lastfm' in enabled_apps:
+            self.apps.append({
+                'slug': 'lastfm',
+                'name': 'lastfm',
+                'varieties': [
+                    {
+                        'slug': 'listens',
+                        'name': 'scrobble',
+                        'context_object_name': 'lastfm_scrobble_list',
+                        'queryset': Scrobble.objects.all().prefetch_related('artist', 'track'),
                     },
                 ],
             })
@@ -137,7 +154,7 @@ class DittoAppsMixin:
                         'slug': 'bookmarks',
                         'name': 'bookmark',
                         'context_object_name': 'pinboard_bookmark_list',
-                        'queryset': Bookmark.public_objects.all(),
+                        'queryset': Bookmark.public_objects.all().prefetch_related('account'),
                     },
                 ],
             })
@@ -151,13 +168,13 @@ class DittoAppsMixin:
                         'slug': 'tweets',
                         'name': 'tweet',
                         'context_object_name': 'twitter_tweet_list',
-                        'queryset': Tweet.public_tweet_objects.all().select_related(),
+                        'queryset': Tweet.public_tweet_objects.all().prefetch_related('user'),
                     },
                     {
                         'slug': 'likes',
                         'name': 'favorite',
                         'context_object_name': 'twitter_favorite_list',
-                        'queryset': Tweet.public_favorite_objects.all().select_related(),
+                        'queryset': Tweet.public_favorite_objects.all().prefetch_related('user'),
                     },
                 ],
             })
@@ -340,49 +357,47 @@ class DittoAppsMixin:
 class HomeView(DittoAppsMixin, TemplateView):
     template_name = 'ditto/home.html'
 
-    # Set to True to include photos sorted by taken date:
-    include_flickr_photos_by_taken_date = False
+    # How many things do we list on the page?
+    items_to_list = 30
 
-    # Set to True to include Favorited Tweets:
-    include_twitter_favorites = False
+    # What we want to display:
+    app_varieties_to_display = [
+        ('flickr', 'photo-uploaded'),
+        ('pinboard', 'bookmark'),
+        ('twitter', 'tweet'),
 
+        # Things we could display, but are currently hidden:
+
+        # Otherwise we'll get two sets of photos, sorted by upload or taken:
+        #('flickr', 'photo-taken'),
+
+        # No easy way to tell in the template whether a tweet is posted
+        # or favorited, so remove the favorites:
+        #('twitter', 'favorite'),
+
+        # These are liable to swamp out all other things:
+        #('lastfm', 'scrobble'),
+    ]
+
+    # Hacky.
     # Set to True to include Tweets that are replies:
     include_twitter_replies = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # How many items do we want to list?
-        items_to_list = 20
-
-        app_varieties = self.get_app_varieties()
-
-        # A bit hacky. Remove querysets we don't want.
-        try:
-            if self.include_flickr_photos_by_taken_date == False:
-                # Otherwise we'll get two sets of photos, sorted by upload or taken:
-                app_varieties.remove(('flickr', 'photo-taken'))
-
-            if self.include_twitter_favorites == False:
-                # No easy way to tell in the template whether a tweet is posted
-                # or favorited, so remove the favorites:
-                app_varieties.remove(('twitter', 'favorite'))
-        except ValueError:
-            pass
-
         # Put all querysets for available apps in this list:
         querysets = []
 
-        for app_name, variety_name in app_varieties:
+        for app_name, variety_name in self.get_app_varieties_to_display():
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
 
             if self.include_twitter_replies == False:
-                # More hackiness.
                 # Don't want to include Tweets that are replies on the home page.
                 if app_name == 'twitter' and variety_name == 'tweet':
                     qs = qs.filter(in_reply_to_screen_name__exact='')
 
-            querysets.append( qs[:items_to_list] )
+            querysets.append( qs[:self.items_to_list] )
 
         # Aggregate the individual items from all querysets into one list,
         # sorted by post_time descending.
@@ -390,9 +405,23 @@ class HomeView(DittoAppsMixin, TemplateView):
             chain(*querysets),
             key=attrgetter('post_time'),
             reverse=True
-        )[:items_to_list]
+        )[:self.items_to_list]
 
         return context
+
+    def get_app_varieties_to_display(self):
+        """
+        Get the union of self.app_varieties and the varieties that are
+        actually installed.
+        """
+        available_app_varieties = self.get_app_varieties()
+        to_display = []
+
+        for app_variety in self.app_varieties_to_display:
+            if app_variety in available_app_varieties:
+                to_display.append(app_variety)
+
+        return to_display
 
 
 class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
@@ -493,9 +522,9 @@ class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
                 '%s__lt' % date_field: until,
             })
             paginate_by = self.get_paginate_by(qs)
-            if not allow_future:
-                now = timezone.now() if self.uses_datetime_field else timezone_today()
-                qs = qs.filter(**{'%s__lte' % date_field: now})
+            #if not allow_future:
+                #now = timezone.now() if self.uses_datetime_field else timezone_today()
+                #qs = qs.filter(**{'%s__lte' % date_field: now})
             if not allow_empty:
                 # When pagination is enabled, it's better to do a cheap query
                 # than to load the unpaginated queryset in memory.

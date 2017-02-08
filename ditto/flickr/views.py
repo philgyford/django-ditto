@@ -63,10 +63,19 @@ class HomeView(PhotosOrderMixin, PaginatedListView):
         context['account_list'] = Account.objects.all()
         return context
 
+    def get_queryset(self):
+        """
+        Adding the prefetch_related() to self.queryset caused some tests to
+        fail for some reason.
+        """
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('user')
+
+
 
 class PhotosetListView(ListView):
     template_name = 'flickr/photoset_list.html'
-    model = Photoset
+    queryset = Photoset.objects.all().prefetch_related('primary_photo', 'user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,7 +84,7 @@ class PhotosetListView(ListView):
         return context
 
 
-class UserDetailMixin(SingleObjectMixin):
+class SingleUserMixin(SingleObjectMixin):
     """Used for views that need data about a User based on nsid in
     the URL, and its Account if it has one.
     """
@@ -96,7 +105,7 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class UserDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     """A single Flickr User and its Photos.
     The user might have an Account associated with it, or might not.
     """
@@ -107,7 +116,7 @@ class UserDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
     def get_queryset(self):
         "All public Photos from this Account."
         queryset = super().get_queryset()
-        return queryset.filter(user=self.object).select_related()
+        return queryset.filter(user=self.object).prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -151,12 +160,17 @@ class TagListView(ListView):
     def get_queryset(self):
         return Photo.tags.most_common()[:100]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account_list'] = Account.objects.all()
+        return context
+
 
 class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
     "All Photos with a certain tag from all Accounts"
     template_name = 'flickr/tag_detail.html'
     allow_empty = False
-    queryset = Photo.public_objects
+    queryset = Photo.public_objects.prefetch_related('user')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Tag.objects.all())
@@ -175,11 +189,11 @@ class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
         return queryset.filter(tags__slug__in=[self.object.slug])
 
 
-class UserTagDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class UserTagDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
     template_name = 'flickr/user_tag_detail.html'
     allow_empty = False
-    queryset = Photo.public_objects
+    queryset = Photo.public_objects.prefetch_related('user')
 
     def get(self, request, *args, **kwargs):
         self.tag_object = self.get_tag_object()
@@ -206,9 +220,9 @@ class UserTagDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
                                     tags__slug__in=[self.kwargs['tag_slug']])
 
 
-class UserPhotosetListView(UserDetailMixin, ListView):
+class UserPhotosetListView(SingleUserMixin, ListView):
     template_name = 'flickr/user_photoset_list.html'
-    model = Photoset
+    queryset = Photoset.objects.all().prefetch_related('primary_photo', 'user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -221,7 +235,7 @@ class UserPhotosetListView(UserDetailMixin, ListView):
         return queryset.filter(user=self.object)
 
 
-class PhotosetDetailView(PhotosOrderMixin, UserDetailMixin, PaginatedListView):
+class PhotosetDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     template_name = 'flickr/photoset_detail.html'
 
     def get_context_data(self, **kwargs):

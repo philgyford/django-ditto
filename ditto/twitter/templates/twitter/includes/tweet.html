@@ -8,11 +8,9 @@ Expects:
 {% endcomment %}
 
 {% if tweet %}
-    <div class="media-left">
-        <img class="media-object twitter-tweet-avatar" src="{{ tweet.user.avatar_url }}" alt="{{ tweet.user.screen_name }}’s avatar" width="48" height="48">
-    </div>
+    <img class="d-flex mr-3 twitter-tweet-avatar" src="{{ tweet.user.avatar_url }}" alt="{{ tweet.user.screen_name }}’s avatar" width="48" height="48">
     <div class="media-body">
-        <p class="{% if not tweet.get_retweeted_tweet %}m-b-0 {% endif %}twitter-tweet-about">
+        <p class="{% if not tweet.get_retweeted_tweet %}mb-0 {% endif %}twitter-tweet-about">
             <a href="{% url 'twitter:user_detail' screen_name=tweet.user.screen_name %}" title="More Tweets by this person">
                 <strong class="twitter-tweet-name">{{ tweet.user.name }}</strong>
                 <small class="twitter-tweet-screenname">{{ tweet.user }}</small>
@@ -56,12 +54,12 @@ Expects:
 
         {% else %}
 
-            <p class="{% if tweet.media_count == 0 %}m-b-0{% endif %}{% if view == 'detail' %} lead{% endif %} twitter-tweet-text">
+            <p class="{% if tweet.media_count == 0 %}mb-0{% endif %}{% if view == 'detail' %} lead{% endif %} twitter-tweet-text">
                 {{ tweet.text_html|safe }}
             </p>
 
             {% if tweet.get_quoted_tweet %}
-                <div class="media twitter-tweet-quoted">
+                <div class="media mt-3 twitter-tweet-quoted">
                     {% include 'twitter/includes/tweet.html' with tweet=tweet.get_quoted_tweet view=view perms=perms only %}
                 </div>
             {% endif %}
@@ -71,7 +69,7 @@ Expects:
             {% endif %}
 
             {% if tweet.place %}
-                <p class="m-b-0 text-muted twitter-tweet-place">
+                <p class="mb-0 text-muted twitter-tweet-place">
                     <small>
                         {% if tweet.latitude %}
                             <a href="https://maps.google.com/maps/place/{{ tweet.latitude }},{{ tweet.longitude }}/@{{ tweet.latitude }},{{ tweet.longitude }},14z" title="See on Google Maps">{{ tweet.place }}</a>
@@ -83,7 +81,7 @@ Expects:
             {% endif %}
 
             {% if view == 'detail' %}
-                <p class="m-b-0 text-muted twitter-tweet-meta"><small>
+                <p class="mb-0 text-muted twitter-tweet-meta"><small>
                     {{ tweet.retweet_count }} Retweet{{ tweet.retweet_count|pluralize }}
                     • {{ tweet.favorite_count }} Like{{ tweet.favorite_count|pluralize }}
                     • As of {% display_time tweet.fetch_time %}

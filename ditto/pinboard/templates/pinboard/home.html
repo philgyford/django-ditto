@@ -7,7 +7,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Pinboard bookmarks
         {% endblock %}
@@ -15,15 +15,26 @@
 
     <div class="row">
         <div class="col-md-3">
-            {% include 'pinboard/includes/account_list.html' with account_list=account_list count=page_obj.paginator.count list_type='recent' only %}
+            {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Pinboard' only %}
 
-            <div class="card">
+            {% load l10n %}
+            <div class="card mb-3">
+                <ul class="list-group list-group-flush flickr-user-counts">
+                    <li class="list-group-item">
+                        {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card mb-3">
                 <div class="card-block">
                     <p class="card-text">
                         <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
                     </p>
                 </div>
             </div>
+
+            {% include 'pinboard/includes/annual_bookmark_counts.html' only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

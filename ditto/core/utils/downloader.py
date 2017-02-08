@@ -36,7 +36,7 @@ class FileDownloader(object):
         try:
             # From http://stackoverflow.com/a/13137873/250962
             r = requests.get(url, stream=True)
-            if r.status_code == requests.codes.ok:
+            if r.status_code == 200:
                 try:
                     if r.headers['Content-Type'] in acceptable_content_types:
                         # Where we'll temporarily save the file:

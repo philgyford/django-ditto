@@ -230,6 +230,7 @@ class PinboardViewTests(TestCase):
         bookmark_2 = BookmarkFactory()
         bookmark_2.tags.set('fish', 'cod')
         response = self.client.get(reverse('pinboard:tag_list'))
+        self.assertIn('account_list', response.context)
         self.assertIn('tag_list', response.context)
         self.assertEqual(len(response.context['tag_list']), 3)
 

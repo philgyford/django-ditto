@@ -11,7 +11,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             {{ photoset.title }}
         {% endblock %}
@@ -19,17 +19,17 @@
 
     <div class="row">
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-block">
-                    <h2 class="h6 card-title">
-                        An album by <a href="{% url 'flickr:user_detail' nsid=photoset.user.nsid %}">{{ photoset.user.name }}</a>
-                    </h2>
-                    {% if photoset.description %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    An album by <a href="{% url 'flickr:user_detail' nsid=photoset.user.nsid %}">{{ photoset.user.name }}</a>
+                </div>
+                {% if photoset.description %}
+                    <div class="card-block">
                         <p class="card-text">
                             {{ photoset.description|safe }}
                         </p>
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         {% include 'flickr/includes/photoset_counts.html' with photoset=photoset only %}

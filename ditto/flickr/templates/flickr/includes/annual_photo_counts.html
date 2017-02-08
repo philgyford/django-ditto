@@ -1,0 +1,41 @@
+{% comment %}
+Displays a table of number of Photos per year.
+
+Expects:
+
+* user -- Optional, a single Flickr User object, to restrict counts to that.
+{% endcomment %}
+
+{% load ditto_flickr %}
+{% load l10n %}
+
+{% if user %}
+	{% annual_photo_counts nsid=user.nsid as photos %}
+{% else %}
+	{% annual_photo_counts as photos %}
+{% endif %}
+
+{% if photos %}
+	<div class="card mb-3">
+		<div class="card-block">
+			<h2 class="h6 card-title">Posted per year</h2>
+			<table class="table table-sm mb-0 flickr-photos-annual">
+				<thead class="sr-only">
+					<tr>
+						<th>Year</th>
+						<th class="text-right">Photos</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in photos %}
+						<tr>
+							<td>{{ s.year|unlocalize }}</td>
+							<td class="text-right">{{ s.count }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endif %}
+

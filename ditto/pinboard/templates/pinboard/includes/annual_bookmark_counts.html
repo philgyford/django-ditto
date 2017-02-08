@@ -1,0 +1,41 @@
+{% comment %}
+Displays a table of number of Bookmarks per year.
+
+Expects:
+
+* account -- Optional, a single Account object, to restrict counts to that.
+{% endcomment %}
+
+{% load ditto_pinboard %}
+{% load l10n %}
+
+{% if account %}
+	{% annual_bookmark_counts account=account.username as bookmarks %}
+{% else %}
+	{% annual_bookmark_counts as bookmarks %}
+{% endif %}
+
+{% if bookmarks %}
+	<div class="card mb-3">
+		<div class="card-block">
+			<h2 class="h6 card-title">Bookmarks per year</h2>
+			<table class="table table-sm mb-0 pinboard-bookmarks-annual">
+				<thead class="sr-only">
+					<tr>
+						<th>Year</th>
+						<th class="text-right">Bookmarks</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in bookmarks %}
+						<tr>
+							<td>{{ s.year|unlocalize }}</td>
+							<td class="text-right">{{ s.count }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endif %}
+

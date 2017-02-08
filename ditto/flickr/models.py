@@ -11,7 +11,6 @@ from taggit.models import TaggedItemBase
 from . import app_settings
 from . import imagegenerators
 from . import managers
-from ..core.utils import truncate_string
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 
@@ -302,6 +301,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     taken_granularity = models.PositiveSmallIntegerField(
                 default=DATE_GRANULARITIES[0][0], choices=DATE_GRANULARITIES)
     taken_unknown = models.BooleanField(default=False)
+    taken_year = models.PositiveSmallIntegerField(
+                                    null=True, blank=True, db_index=True,
+                                    help_text="Set automatically on save")
 
     view_count = models.PositiveIntegerField(default=0,
                 help_text="How many times this had been viewed when fetched")
@@ -435,14 +437,16 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     class Meta:
         ordering = ('-post_time',)
 
+    def save(self, *args, **kwargs):
+        if self.taken_time:
+            self.taken_year = self.taken_time.year
+        else:
+            self.taken_year = None
+        super().save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse('flickr:photo_detail',
                 kwargs={'nsid': self.user.nsid, 'flickr_id': self.flickr_id})
-
-    def summary_source(self):
-        """Make the summary that's created when the Photo is saved."""
-        return truncate_string(self.description,
-                strip_html=True, chars=255, truncate='…', at_word_boundary=True)
 
     def get_next_public_by_post_time(self):
         "The next public Photo by this User, ordered by post_time."
@@ -647,6 +651,10 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     def _raise_attr_error(self, obj, attr):
         msg = "'{0}' object has no attribute '{1}'"
         raise AttributeError(msg.format(obj, attr))
+
+    def _summary_source(self):
+        "Used to make the `summary` property."
+        return self.description
 
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):

@@ -1,0 +1,66 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item active">{{ account.realname }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="my-4">
+        {% block title %}
+            {{ account.realname }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts account=account only %}
+
+            {% include 'lastfm/includes/annual_scrobble_counts.html' with account=account only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% load ditto_lastfm %}
+
+            <h2>
+                <a href="{% url 'lastfm:user_scrobble_list' username=account.username %}">Recent listens</a>
+            </h2>
+
+            {% recent_scrobbles account=account limit=10 as scrobbles %}
+
+            {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobbles only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:user_artist_list' username=account.username %}">Top artists</a>
+            </h2>
+
+            {% top_artists account=account limit=10 as artists %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='artists' object_list=artists only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:user_album_list' username=account.username %}">Top albums</a>
+            </h2>
+
+            {% top_albums account=account limit=10 as albums %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='albums' object_list=albums only %}
+
+
+            <h2>
+                <a href="{% url 'lastfm:user_track_list' username=account.username %}">Top tracks</a>
+            </h2>
+
+            {% top_tracks account=account limit=10 as tracks %}
+
+            {% include 'lastfm/includes/chart.html' with chart_type='tracks' object_list=tracks only %}
+
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

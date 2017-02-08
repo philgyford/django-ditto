@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Pinboard bookmark by {{ bookmark.account.username }}
         {% endblock %}
@@ -17,30 +17,34 @@
 
     <div class="row">
         <div class="col-md-9">
-            {% with bookmark.get_previous as previous_bookmark %}
-                {% with bookmark.get_next as next_bookmark %}
-                    {% if previous_bookmark or next_bookmark %}
-                        <div class="row nextprev pinboard-bookmark-nextprev ">
-                            {% if previous_bookmark %}
-                                <div class="col-xs-6 nextprev-prev pinboard-bookmark-nextprev-prev">
-                                    <a href="{% url 'pinboard:bookmark_detail' username=previous_bookmark.account.username hash=previous_bookmark.url_hash %}" title="Previous bookmark">&larr; Previous</a>
-                                </div>
-                            {% endif %}
-                            {% if next_bookmark %}
-                                <div class="col-xs-6 text-xs-right nextprev-next twitter-bookmark-nextprev-next">
-                                    <a href="{% url 'pinboard:bookmark_detail' username=next_bookmark.account.username hash=next_bookmark.url_hash %}" title="Next bookmark">Next &rarr;</a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% endwith %}
-            {% endwith %}
 
-            <div class="media m-t-0 pinboard-bookmark pinboard-bookmark-detail">
-                <hr>
+            <hr>
+            <div class="media mt-0 pinboard-bookmark pinboard-bookmark-detail">
                 {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view='detail' perms=perms only %}
-                <hr>
             </div>
+            <hr>
+
+            <nav>
+                <p>
+                    {% with bookmark.get_previous as previous_bookmark %}
+                        {% with bookmark.get_next as next_bookmark %}
+                            {% if previous_bookmark or next_bookmark %}
+                                {% if previous_bookmark %}
+                                    <a href="{% url 'pinboard:bookmark_detail' username=previous_bookmark.account.username hash=previous_bookmark.url_hash %}" title="Previous bookmark" class="btn btn-outline-primary">
+                                        &larr; Previous
+                                    </a>
+                                {% endif %}
+                                {% if next_bookmark %}
+                                    <a href="{% url 'pinboard:bookmark_detail' username=next_bookmark.account.username hash=next_bookmark.url_hash %}" title="Next bookmark" class="btn btn-outline-primary float-right">
+                                        Next &rarr;
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endwith %}
+                </p>
+            </nav>
+
         </div> <!-- .col -->
 
         <div class="col-md-3">

@@ -17,6 +17,7 @@ Pinboard, and displaying them on your Django site.
    :caption: Services supported
 
    services/flickr
+   services/lastfm
    services/pinboard
    services/twitter
 

@@ -1,0 +1,23 @@
+{% comment %}
+Display a list of the accounts we're showing photos for.
+
+Expects:
+* account_list - All the accounts we're showing photos/tweets/etc for.
+* service_name - e.g. 'Pinboard' or 'Twitter.'
+{% endcomment %}
+
+<div class="card mb-3">
+    <h2 class="card-header h6">
+        {{ service_name }} account{{ account_list|pluralize }}
+    </h2>
+    <ul class="list-group list-group-flush">
+        {% for account in account_list %}
+            <li class="list-group-item">
+                <a href="{{ account.get_absolute_url }}">
+                    {{ account }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+

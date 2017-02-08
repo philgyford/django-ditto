@@ -103,6 +103,119 @@ Template tags
 
 There are four assigment template tags available for displaying Tweets in your templates.
 
+
+Annual Favorite Counts
+======================
+
+Get the number of favorites per year by all or one of the non-private Users-with-Accounts (only counting public Tweets):
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% annual_favorite_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+Or we can restrict this to favorites by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% annual_favorite_counts screen_name='philgyford' as counts %}
+
+NOTE: The date used is the date the Tweets were posted on, not the date on which they were favorited.
+
+
+Annual Tweet Counts
+======================
+
+Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% annual_tweet_counts as counts %}
+
+    {% for row in counts %}
+        <p>
+            {{ row.year }}: {{ row.count }}
+        </p>
+    {% endfor %}
+
+Both the ``year`` and ``count`` in each row are integers.
+
+Or we can restrict this to Tweets posted by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% annual_tweet_counts screen_name='philgyford' as counts %}
+
+
+Day Favorites
+=============
+
+Use this to fetch Tweets posted on a particular day by non-private Users, which
+have been favorited/liked by any of the Users-with-Accounts. Again, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% day_favorites my_date as favorites %}
+
+NOTE: The date is the date the Tweets were posted on, not the date on which they were favorited.
+
+Again, we can restrict this to Tweets favorited by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% day_favorites my_date screen_name='philgyford' as favorites %}
+
+
+Day Tweets
+==========
+
+Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% day_tweets my_date as tweets %}
+
+Or we can restrict this to Tweets posted by a single User-with-an-Account:
+
+.. code-block:: django
+
+    {% day_tweets my_date screen_name='philgyford' as tweets %}
+
+
+Recent Favorites
+================
+
+This works like ``recent_tweets`` except it only fetches Tweets favorited/liked
+by our Users-with-Accounts, which were posted by public Twitter users:
+
+.. code-block:: django
+
+    {% load ditto_twitter %}
+
+    {% recent_favorites as favorites %}
+
+Similarly, we can change the number of Tweets returned (10 by default), and only return Tweets favorited by a particular User:
+
+.. code-block:: django
+
+    {% recent_favorites screen_name='philgyford' limit=5 as favorites %}
+
+
 Recent Tweets
 =============
 
@@ -128,61 +241,6 @@ The tag can also fetch a different number of Tweets and/or only get Tweets from 
 .. code-block:: django
 
     {% recent_tweets screen_name='philgyford' limit=5 as tweets %}
-
-Recent Favorites
-================
-
-This works like ``recent_tweets`` except it only fetches Tweets favorited/liked
-by our Users-with-Accounts, which were posted by public Twitter users:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% recent_favorites as favorites %}
-
-Similarly, we can change the number of Tweets returned (10 by default), and only return Tweets favorited by a particular User:
-
-.. code-block:: django
-
-    {% recent_favorites screen_name='philgyford' limit=5 as favorites %}
-
-Day Tweets
-==========
-
-Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% day_tweets my_date as tweets %}
-
-Or we can restrict this to Tweets posted by a single User-with-an-Account:
-
-.. code-block:: django
-
-    {% day_tweets my_date screen_name='philgyford' as tweets %}
-
-Day Favorites
-=============
-
-Use this to fetch Tweets posted on a particular day by non-private Users, which
-have been favorited/liked by any of the Users-with-Accounts. Again, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
-
-.. code-block:: django
-
-    {% load ditto_twitter %}
-
-    {% day_favorites my_date as favorites %}
-
-NOTE: The date is the date the Tweets were posted on, not the date on which they were favorited.
-
-Again, we can restrict this to Tweets favorited by a single User-with-an-Account:
-
-.. code-block:: django
-
-    {% day_favorites my_date screen_name='philgyford' as favorites %}
 
 
 .. _twitter-management-commands:

@@ -1,0 +1,50 @@
+{% comment %}
+Display a table of scrobbles from a QuerySet.
+
+Expects:
+* scrobble_list - QuerySet of Scrobble objects.
+* page_obj - Optional, a DiggPaginator instance of False (default).
+* request - Optional, required if page_obj is used. The request object.
+{% endcomment %}
+
+
+{% if scrobble_list|length > 0 %}
+
+    {% if page_obj|default:False and page_obj.number > 1 %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+    {% endif %}
+
+    {% load ditto_core %}
+
+    <table class="table table-striped table-sm lastfm-scrobbles">
+        <thead class="sr-only">
+            <tr>
+                <th>Track</th>
+                <th class="text-right">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for scrobble in scrobble_list %}
+                <tr class="lastfm-scrobble">
+                    <td>
+                        <a href="{% url 'lastfm:artist_detail' artist_slug=scrobble.artist.slug %}">
+                            {{ scrobble.artist.name }}
+                        </a>
+                        –
+                        <a href="{% url 'lastfm:track_detail' artist_slug=scrobble.artist.slug track_slug=scrobble.track.slug %}">
+                            {{ scrobble.track.name }}
+                        </a>
+                    </td>
+                    <td class="text-nowrap text-right">{% display_time scrobble.post_time link_to_day=True %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj|default:False %}
+        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+    {% endif %}
+
+{% else %}
+    <p>There are no listens to show.</p>
+{% endif %}

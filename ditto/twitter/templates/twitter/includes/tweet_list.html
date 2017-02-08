@@ -16,14 +16,14 @@ Expects:
         {% endif %}
 
         <hr>
-        <ul class="media-list twitter-tweets">
+        <div class="twitter-tweets">
             {% for tweet in tweet_list %}
-                <li class="media m-t-0 twitter-tweet">
+                <div class="media twitter-tweet">
                     {% include 'twitter/includes/tweet.html' with tweet=tweet perms=perms view=view only %}
-                    <hr>
-                </li>
+                </div>
+                <hr>
             {% endfor %}
-        </ul>
+        </div>
 
         {% if page_obj|default:False %}
             {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}

@@ -10,7 +10,7 @@ May specifically have:
 
 {% if flickr_photo_list and flickr_photo_list|length > 0 %}
 
-    <h2 class="m-b-2">
+    <h2 class="mb-4">
         <a href="{% url 'flickr:home' %}">
             Flickr photos
             {% if order == 'taken' %}
@@ -22,6 +22,16 @@ May specifically have:
     </h2>
 
     {% include 'flickr/includes/photo_columns.html' with order=order photo_list=flickr_photo_list view=view %}
+
+{% endif %}
+
+{% if lastfm_scrobble_list and lastfm_scrobble_list|length > 0 %}
+
+    <h2>
+        <a href="{% url 'lastfm:home' %}">Last.fm scrobbles</a>
+    </h2>
+
+    {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=lastfm_scrobble_list view=view %}
 
 {% endif %}
 

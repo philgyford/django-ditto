@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Pinboard “to read” by {{ account.username }}
         {% endblock %}
@@ -18,7 +18,7 @@
 
     <div class="row">
         <div class="col-md-3">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-block">
                     {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to&nbsp;read”
                 </div>
@@ -30,6 +30,8 @@
                     </ul>
                 {% endif %}
             </div>
+
+            {% include 'pinboard/includes/annual_bookmark_counts.html' with account=account only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

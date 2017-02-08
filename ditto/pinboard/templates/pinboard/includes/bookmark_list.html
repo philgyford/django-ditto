@@ -14,14 +14,14 @@ Expects:
     {% endif %}
 
     <hr>
-    <ul class="media-list pinboard-bookmarks">
+    <div class="pinboard-bookmarks">
         {% for bookmark in bookmark_list %}
-            <li class="media m-t-0 pinboard-bookmark">
+            <div class="media pinboard-bookmark">
                 {% include 'pinboard/includes/bookmark.html' with bookmark=bookmark view=view perms=perms only %}
-                <hr>
-            </li>
+            </div>
+            <hr>
         {% endfor %}
-    </ul>
+    </div>
 
     {% if page_obj|default:False %}
         {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}

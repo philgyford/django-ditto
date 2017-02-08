@@ -3,6 +3,7 @@ from django.db import models
 from django.forms.models import model_to_dict
 
 from .managers import PublicItemManager
+from .utils import truncate_string
 
 
 class TimeStampedModelMixin(models.Model):
@@ -80,21 +81,24 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # Should be overridden for child classes.
     # eg, 'flickr_photo', 'twitter_tweet', etc.
     # Used in templates.
-    ditto_item_name = 'ditto_item'
+    ditto_item_name = 'set__ditto_item_name__in_child_class'
 
     title = models.CharField(blank=True, max_length=255)
     permalink = models.URLField(blank=True,
                     help_text="URL of the item on the service's website.")
     # Ensures that all children have a common short piece of text for display:
     summary = models.CharField(blank=True, max_length=255,
-        help_text="eg, Initial text of a blog post, start of the description of a photo, all of a Tweet's text, etc. No HTML.")
+        help_text="eg, Brief summary or excerpt of item's text content. No linebreaks or HTML.")
     is_private = models.BooleanField(default=False,
         help_text="If true, this item will not be shown on public-facing pages.")
     fetch_time = models.DateTimeField(null=True, blank=True,
                         help_text="The time the item's data was last fetched.")
 
-    post_time = models.DateTimeField(null=True, blank=True,
+    post_time = models.DateTimeField(null=True, blank=True, db_index=True,
         help_text="The time the item was originally posted/created on its service.")
+    post_year = models.PositiveSmallIntegerField(
+                                    null=True, blank=True, db_index=True,
+                                    help_text="Set automatically on save")
 
     # Obviously not relevant to some items, like Bookmarks.
     latitude = models.DecimalField(null=True, blank=True,
@@ -117,4 +121,32 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.summary = self._make_summary()
+        if self.post_time:
+            self.post_year = self.post_time.year
+        else:
+            self.post_year = None
+        super().save(*args, **kwargs)
+
+    def _summary_source(self):
+        """
+        Child classes can return a string that's used to make the truncated,
+        HTML-free `summary`.
+        e.g.:
+            return self.description
+        """
+        return ''
+
+    def _make_summary(self):
+        """
+        Returns the string to be used for the `summary` property.
+        """
+        return truncate_string(self._summary_source(),
+                                strip_html=True,
+                                chars=255,
+                                truncate='…',
+                                at_word_boundary=True).replace('\n', ' ')\
+                                                      .replace('\r', ' ')
 

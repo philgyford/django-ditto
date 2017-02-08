@@ -20,6 +20,7 @@ class Apps(object):
         "A list of all possible Ditto apps that could be installed/enabled."
         return [
                 'flickr',
+                'lastfm',
                 'pinboard',
                 'twitter',
                ]

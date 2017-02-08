@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Photo albums by {{ user.name }}
         {% endblock %}
@@ -19,6 +19,8 @@
     <div class="row">
         <div class="col-md-3">
             {% include 'flickr/includes/user.html' with user=flickr_user account=account perms=perms only %}
+
+            {% include 'flickr/includes/annual_photo_counts.html' with user=flickr_user only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

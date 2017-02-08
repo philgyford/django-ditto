@@ -12,7 +12,7 @@ Expects:
 
 <div class="card twitter-user">
     <div class="card-block">
-        <h4 class="card-title m-b-0 twitter-user-name">
+        <h4 class="card-title mb-0 twitter-user-name">
             {{ user.name }}
             <small class="text-muted twitter-user-screenname">{{ user }}</small>
         </h4>
@@ -39,19 +39,16 @@ Expects:
 
 <div class="card twitter-user">
     <ul class="list-group list-group-flush twitter-user-counts">
-        <li class="list-group-item">{{ user.statuses_count|localize }} Tweet{{ user.statuses_count|pluralize }}</li>
-        <li class="list-group-item">{{ user.favorites_count|localize }} Like{{ user.favorites_count|pluralize }}</li>
-        <li class="list-group-item">{{ user.followers_count|localize }} Follower{{ user.followers_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.statuses_count|localize }} tweet{{ user.statuses_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.favorites_count|localize }} like{{ user.favorites_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.followers_count|localize }} follower{{ user.followers_count|pluralize }}</li>
         <li class="list-group-item">Following {{ user.friends_count|localize }}</li>
-        <li class="list-group-item">On {{ user.listed_count|localize }} List{{ user.listed_count|pluralize }}</li>
+        <li class="list-group-item">On {{ user.listed_count|localize }} list{{ user.listed_count|pluralize }}</li>
+        {% load ditto_core %}
+        <li class="list-group-item">
+            <small class="text-muted">
+                As of {% display_time user.fetch_time %}
+            </small>
+        </li>
     </ul>
-</div>
-
-<div class="card twitter-user">
-    <div class="card-block">
-        <p class="card-text text-muted">
-            {% load ditto_core %}
-            <small>As of {% display_time user.fetch_time %}</small>
-        </p>
-    </div>
 </div>

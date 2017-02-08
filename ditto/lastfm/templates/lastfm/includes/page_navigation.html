@@ -1,0 +1,66 @@
+{% comment %}
+Shows the links to the main Last.fm pages, for the sidebar.
+Also used for links to a single Account's pages.
+
+Expects:
+* request -- The Request object.
+* url_name -- The name of the current page, as described in the URL conf.
+* counts -- A dict of numbers for each of 'albums', 'artists', 'scrobbles' and
+            'tracks'.
+* account -- Optional, an Account object. If present, we link to that Account's
+            pages, instead of the global ones.
+{% endcomment %}
+
+<div class="card mb-3">
+    <div class="list-group list-group-flush">
+        <a href="{% spaceless %}
+            {% if account %}
+                {% url 'lastfm:user_scrobble_list' username=account.username %}
+            {% else %}
+                {% url 'lastfm:scrobble_list' %}
+            {% endif %}
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'scrobble_list' in url_name %}active{% endif %}">
+            Listens
+            <span class="badge badge-pill {% if 'scrobble_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+                {{ counts.scrobbles }}
+            </span>
+        </a>
+        <a href="{% spaceless %}
+            {% if account %}
+                {% url 'lastfm:user_artist_list' username=account.username %}
+            {% else %}
+                {% url 'lastfm:artist_list' %}
+            {% endif %}
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'artist_list' in url_name %}active{% endif %}">
+            Artists
+            <span class="badge badge-pill {% if 'artist_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+                {{ counts.artists }}
+            </span>
+        </a>
+        <a href="{% spaceless %}
+            {% if account %}
+                {% url 'lastfm:user_album_list' username=account.username %}
+            {% else %}
+                {% url 'lastfm:album_list' %}
+            {% endif %}
+        {% endspaceless %}" class="justify-content-between list-group-item {% if  'album_list' in url_name %}active{% endif %}">
+            Albums
+			<span class="badge badge-pill {% if 'album_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+                {{ counts.albums }}
+            </span>
+        </a>
+        <a href="{% spaceless %}
+            {% if account %}
+                {% url 'lastfm:user_track_list' username=account.username %}
+            {% else %}
+                {% url 'lastfm:track_list' %}
+            {% endif %}
+        {% endspaceless %}" class="justify-content-between list-group-item {% if 'track_list' in url_name %}active{% endif %}">
+            Tracks
+            <span class="badge badge-pill {% if 'track_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+                {{ counts.tracks }}
+            </span>
+        </a>
+    </div>
+</div>
+

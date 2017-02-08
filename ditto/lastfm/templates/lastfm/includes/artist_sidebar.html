@@ -1,0 +1,54 @@
+{% comment %}
+The sidebar used on Artist pages.
+
+Expects:
+
+artist -- An Artist object.
+perms -- The Django permissions object.
+{% endcomment %}
+
+{% load ditto_core %}
+
+<div class="card card-block mb-3">
+    <p class="card-text">
+        {% with artist.get_scrobble_count as scrobble_count %}
+            {{ artist.name }} has been scrobbled {{ scrobble_count }} time{{ scrobble_count|pluralize }}
+        {% endwith %}
+    </p>
+</div>
+
+<div class="card card-block mb-3">
+    <p class="card-text">
+        {% with artist.get_most_recent_scrobble as scrobble %}
+            {% if scrobble %}
+                <a href="{{ scrobble.track.get_absolute_url }}">
+                    {{ scrobble.track.name }}
+                </a>
+                is the most recently scrobbled {{ artist.name }} track, by
+                <a href="{{ scrobble.account.get_absolute_url }}">
+                    {{ scrobble.account.realname }}
+                </a>
+                at {% display_time scrobble.post_time link_to_day=True %}
+            {% endif %}
+        {% endwith %}
+    </p>
+</div>
+
+<div class="card mb-3">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a href="{{ artist.permalink }}">At Last.fm</a>
+        </li>
+        {% if artist.musicbrainz_url %}
+            <li class="list-group-item">
+                <a href="{{ artist.musicbrainz_url }}">At MusicBrainz</a>
+            </li>
+        {% endif %}
+        {% if perms.lastfm.can_change_artist %}
+            <li class="list-group-item">
+                <a href="{% url 'admin:lastfm_artist_change' artist.id %}" title="Edit this artist in the Django Admin">Edit</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+

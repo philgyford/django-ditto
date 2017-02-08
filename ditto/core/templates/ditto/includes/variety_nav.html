@@ -16,34 +16,41 @@ And one of:
 
 {% endcomment %}
 
+
 <div class="list-group">
     {% for variety in variety_counts %}
         {% if variety.count == 0 or variety.is_active %}
             <span
         {% else %}
-            <a href="
+            <a href="{% spaceless %}
                 {% if day %}
                     {% url 'ditto:day_archive' year=day|date:'Y' month=day|date:'m' day=day|date:'d' app=variety.app_slug variety=variety.variety_slug %}
                 {% endif %}
-            "
+           {% endspaceless %}"
         {% endif %}
-        class="list-group-item{% if variety.is_active %} active{% endif %}">
-            <span class="label label-default label-pill pull-xs-right">{{ variety.count }}</span>
-            {% if variety.app_name == 'pinboard' %}
-                Pinboard bookmarks
-            {% elif variety.app_name == 'flickr' %}
-                {% if variety.variety_name == 'photo-taken' %}
-                    Flickr photos (taken)
-                {% else %}
-                    Flickr photos (uploaded)
-                {% endif %}
-            {% elif variety.app_name == 'twitter' %}
-                {% if variety.variety_name == 'favorite' %}
-                    Twitter likes
-                {% else %}
-                    Twitter tweets
-                {% endif %}
-            {% endif %}
+		   class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 %} text-muted{% endif %}">
+			{% if variety.app_name == 'lastfm' %}
+				Last.fm scrobbles
+			{% elif variety.app_name == 'pinboard' %}
+				Pinboard bookmarks
+			{% elif variety.app_name == 'flickr' %}
+				{% if variety.variety_name == 'photo-taken' %}
+					Flickr photos (taken)
+				{% else %}
+					Flickr photos (uploaded)
+				{% endif %}
+			{% elif variety.app_name == 'twitter' %}
+				{% if variety.variety_name == 'favorite' %}
+					Twitter likes
+				{% else %}
+					Twitter tweets
+				{% endif %}
+			{% endif %}
+			{% if variety.count > 0 %}
+			<span class="badge badge-pill {% if variety.is_active %}badge-primary{% else %}badge-default{% endif %}">
+					{{ variety.count }}
+				</span>
+			{% endif %}
         {% if variety.count == 0 or variety.is_active %}
             </span>
         {% else %}

@@ -4,7 +4,7 @@ Introduction
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
 
-Requires Python 3.4 or 3.5, and Django 1.8 or 1.9.
+Requires Python 3.4 or 3.5, and Django 1.8, 1.9 or 1.10.
 
 
 ****************
@@ -18,6 +18,8 @@ Currently, Ditto can copy these things from these services:
     - Photosets
     - Original image and video files
     - Users
+- `Last.fm <https://www.last.fm/>`_
+    - Scrobbles (Artist, Track and Album)
 - `Pinboard <https://pinboard.in/>`_
     - Bookmarks
 - `Twitter <https://twitter.com/>`_
@@ -47,7 +49,7 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4 <http://v4-alpha.getbootstrap.com>`_)
+- Templates (that use `Bootstrap 4 (Alpha 6) <http://v4-alpha.getbootstrap.com>`_)
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
 
 You could use the whole lot to create a minimal site that displays your Tweets,

@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             Pinboard bookmarks by {{ account.username }}
         {% endblock %}
@@ -17,6 +17,8 @@
     <div class="row">
         <div class="col-md-3">
             {% include 'pinboard/includes/account.html' with account=account perms=perms only %}
+
+            {% include 'pinboard/includes/annual_bookmark_counts.html' with account=account only %}
         </div> <!-- .col -->
 
         <div class="col-md-9">

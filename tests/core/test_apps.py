@@ -11,34 +11,39 @@ class DittoAppsTestCase(TestCase):
 
     def test_all(self):
         all_apps = ditto_apps.all()
-        self.assertEqual(3, len(all_apps))
+        self.assertEqual(4, len(all_apps))
         self.assertEqual(all_apps[0], 'flickr')
-        self.assertEqual(all_apps[1], 'pinboard')
-        self.assertEqual(all_apps[2], 'twitter')
+        self.assertEqual(all_apps[1], 'lastfm')
+        self.assertEqual(all_apps[2], 'pinboard')
+        self.assertEqual(all_apps[3], 'twitter')
 
     @patch.object(Apps, 'all')
     def test_installed(self, patched_all):
         # all() will return an app that is not installed:
-        patched_all.return_value = ['flickr', 'pinboard', 'twitter', 'NOPE',]
+        patched_all.return_value = [
+                        'flickr', 'lastfm', 'pinboard', 'twitter', 'NOPE',]
 
         # So 'NOPE' shouldn't be returned here:
         installed_apps = ditto_apps.installed()
-        self.assertEqual(3, len(installed_apps))
+        self.assertEqual(4, len(installed_apps))
         self.assertEqual(installed_apps[0], 'flickr')
-        self.assertEqual(installed_apps[1], 'pinboard')
-        self.assertEqual(installed_apps[2], 'twitter')
+        self.assertEqual(installed_apps[1], 'lastfm')
+        self.assertEqual(installed_apps[2], 'pinboard')
+        self.assertEqual(installed_apps[3], 'twitter')
 
     @patch.object(Apps, 'all')
     def test_enabled(self, patched_all):
         # all() will return an app that is not installed:
-        patched_all.return_value = ['flickr', 'pinboard', 'twitter', 'NOPE',]
+        patched_all.return_value = [
+                        'flickr', 'lastfm', 'pinboard', 'twitter', 'NOPE',]
 
         # So 'NOPE' shouldn't be returned here:
         enabled_apps = ditto_apps.enabled()
-        self.assertEqual(3, len(enabled_apps))
+        self.assertEqual(4, len(enabled_apps))
         self.assertEqual(enabled_apps[0], 'flickr')
-        self.assertEqual(enabled_apps[1], 'pinboard')
-        self.assertEqual(enabled_apps[2], 'twitter')
+        self.assertEqual(enabled_apps[1], 'lastfm')
+        self.assertEqual(enabled_apps[2], 'pinboard')
+        self.assertEqual(enabled_apps[3], 'twitter')
 
     def test_is_installed(self):
         self.assertTrue(ditto_apps.is_installed('pinboard'))

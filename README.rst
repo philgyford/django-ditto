@@ -25,6 +25,8 @@ Currently, Ditto can copy these things from these services:
     - Photosets
     - Original image and video files
     - Users
+- `Last.fm <https://www.last.fm/>`_
+    - Scrobbles (Artist, Track and Album)
 - `Pinboard <https://pinboard.in/>`_
     - Bookmarks
 - `Twitter <https://twitter.com/>`_
@@ -39,5 +41,6 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4 (Alpha 4) <http://v4-alpha.getbootstrap.com>`_)
+- Templates (that use `Bootstrap 4 (Alpha 6) <http://v4-alpha.getbootstrap.com>`_, CSS only (no JavaScript))
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
+

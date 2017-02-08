@@ -1,0 +1,51 @@
+{% comment %}
+The sidebar used on Album Detail pages.
+
+Expects:
+
+album -- An Album object.
+perms -- The Django permissions object.
+{% endcomment %}
+
+{% load ditto_core %}
+
+<div class="card card-block mb-3">
+    <p class="card-text">
+        {% with album.get_scrobble_count as scrobble_count %}
+            {{ album.name }} has been scrobbled {{ scrobble_count }} time{{ scrobble_count|pluralize }}
+        {% endwith %}
+    </p>
+</div>
+
+{% with album.get_most_recent_scrobble as scrobble %}
+    {% if scrobble %}
+        <div class="card card-block mb-3">
+            <p class="card-text">
+                {{ album.name }} was most recently scrobbled by
+                <a href="{{ scrobble.account.get_absolute_url }}">
+                    {{ scrobble.account.realname }}
+                </a>
+                at {% display_time scrobble.post_time link_to_day=True %}
+            </p>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="card mb-3">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a href="{{ album.permalink }}">At Last.fm</a>
+        </li>
+        {% if album.musicbrainz_url %}
+            <li class="list-group-item">
+                <a href="{{ album.musicbrainz_url }}">At MusicBrainz</a>
+            </li>
+        {% endif %}
+        {% if perms.lastfm.can_change_album %}
+            <li class="list-group-item">
+                <a href="{% url 'admin:lastfm_album_change' album.id %}" title="Edit this album in the Django Admin">Edit</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+

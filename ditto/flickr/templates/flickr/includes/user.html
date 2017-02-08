@@ -11,9 +11,9 @@ Expects:
 
 {% load l10n %}
 
-<div class="card flickr-user">
+<div class="card mb-3 flickr-user">
     <div class="card-block">
-        <img src="{{ user.avatar_url }}" class="pull-left m-r-1" alt="user icon" width="48" height="48">
+        <img src="{{ user.avatar_url }}" class="float-left mr-2" alt="user icon" width="48" height="48">
         <strong>{{ user.name }}</strong>
     </div>
     <ul class="list-group list-group-flush flickr-user-about">
@@ -34,19 +34,10 @@ Expects:
     </ul>
 </div>
 
-<div class="card flickr-user">
+<div class="card mb-3 flickr-user">
     <ul class="list-group list-group-flush flickr-user-counts">
-        <li class="list-group-item">{{ user.photos_count|localize }} Photo{{ user.photos_count|pluralize }}</li>
-        <li class="list-group-item">{{ user.photos_views|localize }} View{{ user.photos_views|pluralize }}</li>
+        <li class="list-group-item">{{ user.photos_count|localize }} photo{{ user.photos_count|pluralize }}</li>
+        <li class="list-group-item">{{ user.photos_views|localize }} view{{ user.photos_views|pluralize }}</li>
     </ul>
-</div>
-
-<div class="card flickr-user">
-    <div class="card-block">
-        <p class="card-text text-muted">
-            {% load ditto_core %}
-            <small>As of {% display_time user.fetch_time %}</small>
-        </p>
-    </div>
 </div>
 

@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.core.templatetags.ditto_core import display_time, split_by,\
+from ditto.core.templatetags.ditto_core import display_time,\
         query_string, width_height
 from ditto.core.utils import datetime_now
 
@@ -160,25 +160,5 @@ class DisplayTimeTestCase(TestCase):
         self.assertEqual(
             display_time(datetime_now(), granularity=4, case='capfirst'),
             '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
-        )
-
-class SplitByTestCase(TestCase):
-
-    def test_returns_fewer_lists(self):
-        "If there are fewer items than the split number"
-        self.assertEqual(
-            split_by([1,2,3,4], 6),
-            [[1,2,3,4,],]
-        )
-
-    def test_returns_correct_number_of_lists(self):
-        self.assertEqual(
-            split_by(list(range(1,11)), 3),
-            [
-                [1, 2, 3,],
-                [4, 5, 6,],
-                [7, 8, 9,],
-                [10,]
-            ]
         )
 

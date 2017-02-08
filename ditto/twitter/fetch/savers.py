@@ -272,11 +272,11 @@ class TweetSaver(SaveUtilsMixin, object):
             text = tweet['full_text']
             frm = tweet['display_text_range'][0]
             to = tweet['display_text_range'][1]
-            summary = text[frm:to]
+            title = text[frm:to]
         else:
             # Older 'classic' format tweet data.
             text = tweet['text']
-            summary = text
+            title = text
 
         defaults = {
             'fetch_time':       fetch_time,
@@ -286,8 +286,7 @@ class TweetSaver(SaveUtilsMixin, object):
             'post_time':        created_at,
             'permalink':        'https://twitter.com/%s/status/%s' % (
                                                 user.screen_name, tweet['id']),
-            'title':            summary.replace('\n', ' ').replace('\r', ' '),
-            'summary':          summary,
+            'title':            title.replace('\n', ' ').replace('\r', ' '),
             'text':             text,
             'twitter_id':       tweet['id'],
             'source':           tweet['source']

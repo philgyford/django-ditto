@@ -25,7 +25,7 @@ class SingleAccountMixin(SingleObjectMixin):
 class HomeView(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
     template_name = 'pinboard/home.html'
-    queryset = Bookmark.public_objects.all()
+    queryset = Bookmark.public_objects.all().prefetch_related('account')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -35,7 +35,7 @@ class HomeView(PaginatedListView):
 
 class ToreadListView(PaginatedListView):
     template_name = 'pinboard/toread_list.html'
-    queryset = Bookmark.public_toread_objects.all()
+    queryset = Bookmark.public_toread_objects.all().prefetch_related('account')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +54,8 @@ class AccountDetailView(SingleAccountMixin, PaginatedListView):
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this account."
-        return Bookmark.public_objects.filter(account=self.object)
+        return Bookmark.public_objects.filter(account=self.object)\
+                                                .prefetch_related('account')
 
 
 class AccountToreadView(SingleAccountMixin, PaginatedListView):
@@ -68,7 +69,8 @@ class AccountToreadView(SingleAccountMixin, PaginatedListView):
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this account."
-        return Bookmark.public_toread_objects.filter(account=self.object)
+        return Bookmark.public_toread_objects.filter(account=self.object)\
+                                                .prefetch_related('account')
 
 
 class BookmarkDetailView(DetailView):
@@ -86,6 +88,11 @@ class TagListView(ListView):
 
     def get_queryset(self):
         return Bookmark.tags.most_common()[:100]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account_list'] = Account.objects.all()
+        return context
 
 
 class TagDetailView(SingleObjectMixin, PaginatedListView):
@@ -106,7 +113,9 @@ class TagDetailView(SingleObjectMixin, PaginatedListView):
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this tag."
-        return Bookmark.public_objects.filter(tags__slug__in=[self.object.slug])
+        return Bookmark.public_objects\
+                                .filter(tags__slug__in=[self.object.slug])\
+                                .prefetch_related('account')
 
 
 class AccountTagDetailView(SingleAccountMixin, PaginatedListView):

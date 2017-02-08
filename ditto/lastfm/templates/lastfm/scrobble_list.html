@@ -1,0 +1,30 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item active">Listens</li>
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="my-4">
+        {% block title %}
+            Listens
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Last.fm' only %}
+
+            {% include 'lastfm/includes/page_navigation.html' with request=request url_name=url_name counts=counts only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% include 'lastfm/includes/scrobble_list.html' with scrobble_list=scrobble_list page_obj=page_obj request=request only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

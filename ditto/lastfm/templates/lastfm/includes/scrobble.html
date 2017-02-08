@@ -1,0 +1,36 @@
+{% comment %}
+This is only used for the rare occasions we want to include a Scrobble as a
+"media" item, rather than a table. Possibly only on the overall home page
+(core/templates/ditto/includes/item_list.html).
+Doesn't get used in the lastfm app itself.
+
+Expects:
+* scrobble -- A Scrobble object.
+{% endcomment %}
+
+<div class="media-body">
+    <h2 class="h6 lastfm-scrobble-title">
+        <a href="{% url 'lastfm:artist_detail' artist_slug=scrobble.artist.slug %}">
+            {{ scrobble.artist.name }}
+        </a>
+        –
+        <a href="{% url 'lastfm:track_detail' artist_slug=scrobble.artist.slug track_slug=scrobble.track.slug %}">
+            {{ scrobble.track.name }}
+        </a>
+    </h2>
+    <p class="mb-0 text-muted lastfm-scrobble-about">
+        {% if view != 'detail' %}<small>{% endif %}
+            {% load ditto_core %}
+
+            Scrobbled at
+            {% if view == 'day' %}
+                {% display_time scrobble.post_time link_to_day=False %}
+            {% else %}
+                {% display_time scrobble.post_time link_to_day=True %}
+            {% endif %}
+            {% if perms.lastfm.can_change_scrobble %}
+                • <a href="{% url 'admin:lastfm_scrobble_change' scrobble.id %}">Edit</a>
+            {% endif %}
+        {% if view != 'detail' %}</small>{% endif %}
+    </p>
+</div>

@@ -1,0 +1,45 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_list' %}">Artists</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_detail' artist_slug=track.artist.slug %}">{{ track.artist.name|truncatewords:5 }}</a></li>
+    <li class="breadcrumb-item active">{{ track.name|truncatewords:5 }}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% load ditto_core %}
+
+    <h1 class="my-4">
+        <a href="{% url 'lastfm:artist_detail' artist_slug=track.artist.slug %}">
+            {{ track.artist }}
+        </a><br>
+        {% block title %}
+            {{ track.name }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9 lastfm-track">
+
+            {% with track.albums as album_list %}
+
+                <p>This track appears on {% if album_list|length == 1 %}this album{% else %}these albums{% endif %}:</p>
+
+                {% include 'lastfm/includes/chart.html' with object_list=album_list chart_type='albums' include_artist=False only %}
+
+            {% endwith %}
+
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+
+            {% include 'lastfm/includes/track_sidebar.html' with track=track perms=perms only %}
+
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+

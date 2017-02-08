@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             {{ day|date:'l, j F Y' }}
         {% endblock %}
@@ -34,6 +34,8 @@
                     There are no
                     {% if ditto_app_name == 'flickr' %}
                         Flickr photos
+                    {% elif ditto_app_name == 'lastfm' %}
+                        Last.fm scrobbles
                     {% elif ditto_app_name == 'pinboard' %}
                         Pinboard bookmarks
                     {% elif ditto_app_name == 'twitter' %}

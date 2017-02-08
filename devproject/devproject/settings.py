@@ -57,11 +57,12 @@ INSTALLED_APPS = (
     'taggit',
     'ditto.core',
     'ditto.flickr',
+    'ditto.lastfm',
     'ditto.pinboard',
     'ditto.twitter',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -1,0 +1,20 @@
+{% comment %}
+The Artist Overview / Tracks / Albums tabs.
+
+Expects:
+
+* active - Optional. String. 'tracks' (default) or 'albums'.
+* artist - The Artist object.
+{% endcomment %}
+
+{% with active=active|default_if_none:'tracks' %}
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'tracks' %} active{% endif %}" href="{% url 'lastfm:artist_detail' artist_slug=artist.slug %}">Tracks</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{% if active == 'albums' %} active{% endif %}" href="{% url 'lastfm:artist_albums' artist_slug=artist.slug %}">Albums</a>
+        </li>
+    </ul>
+{% endwith %}
+

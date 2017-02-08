@@ -1,0 +1,41 @@
+{% comment %}
+Displays a table of number of Scrobbles per year.
+
+Expects:
+
+account -- Optional, an Account, to restrict counts to that Account's scrobbles
+{% endcomment %}
+
+{% load ditto_lastfm %}
+{% load l10n %}
+
+{% if account %}
+	{% annual_scrobble_counts account=account as scrobbles %}
+{% else %}
+	{% annual_scrobble_counts as scrobbles %}
+{% endif %}
+
+{% if scrobbles %}
+	<div class="card mb-3">
+		<div class="card-block">
+			<h2 class="h6 card-title">Listens per year</h2>
+			<table class="table table-sm mb-0 lastfm-scrobbles-annual">
+				<thead class="sr-only">
+					<tr>
+						<th>Year</th>
+						<th class="text-right">Listens</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in scrobbles %}
+						<tr>
+							<td>{{ s.year|unlocalize }}</td>
+							<td class="text-right">{{ s.count }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endif %}
+

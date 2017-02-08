@@ -6,7 +6,9 @@ from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from ditto.core.utils import datetime_from_str
 from ditto.flickr import factories as flickrfactories
+from ditto.lastfm import factories as lastfmfactories
 from ditto.pinboard import factories as pinboardfactories
 from ditto.twitter import factories as twitterfactories
 
@@ -26,6 +28,8 @@ class DittoViewTests(TestCase):
                                                 user=flickr_accounts[0].user)
         photos_2 = flickrfactories.PhotoFactory.create_batch(2,
                                                 user=flickr_accounts[1].user)
+
+        scrobbles = lastfmfactories.ScrobbleFactory.create_batch(2)
 
         pinboard_accounts = pinboardfactories.AccountFactory.create_batch(2)
         bookmarks_1 = pinboardfactories.BookmarkFactory.create_batch(
@@ -89,6 +93,7 @@ class DittoViewTests(TestCase):
             # Fake it so it looks like ditto.flickr isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': False,
+                'ditto.lastfm': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': True,
                 # Without this Django 1.10 throws an error for some reason:
@@ -97,12 +102,28 @@ class DittoViewTests(TestCase):
             response = self.client.get(reverse('ditto:home'))
             self.assertFalse('flickr_photo_list' in response.context)
 
+    def test_home_no_lastfm(self):
+        "Shouldn't try to get scrobbles if lastfm app isn't installed"
+        with patch.object(apps, 'is_installed') as mock_method:
+            # Fake it so it looks like ditto.pinboard isn't installed:
+            mock_method.side_effect = lambda x: {
+                'ditto.flickr': True,
+                'ditto.lastfm': False,
+                'ditto.pinboard': True,
+                'ditto.twitter': True,
+                # Without this Django 1.10 throws an error for some reason:
+                'django.contrib.staticfiles': True,
+            }[x]
+            response = self.client.get(reverse('ditto:home'))
+            self.assertFalse('lastfm_scrobble_list' in response.context)
+
     def test_home_no_pinboard(self):
         "Shouldn't try to get bookmarks if pinboard app isn't installed"
         with patch.object(apps, 'is_installed') as mock_method:
             # Fake it so it looks like ditto.pinboard isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': True,
+                'ditto.lastfm': True,
                 'ditto.pinboard': False,
                 'ditto.twitter': True,
                 # Without this Django 1.10 throws an error for some reason:
@@ -117,6 +138,7 @@ class DittoViewTests(TestCase):
             # Fake it so it looks like ditto.twitter isn't installed:
             mock_method.side_effect = lambda x: {
                 'ditto.flickr': True,
+                'ditto.lastfm': True,
                 'ditto.pinboard': True,
                 'ditto.twitter': False,
                 # Without this Django 1.10 throws an error for some reason:
@@ -175,9 +197,7 @@ class DittoViewTests(TestCase):
 class DittoDayArchiveTestCase(TestCase):
 
     def setUp(self):
-        self.today = datetime.datetime.strptime(
-                    '2015-11-10 12:00:00', '%Y-%m-%d %H:%M:%S'
-                ).replace(tzinfo=pytz.utc)
+        self.today = datetime_from_str('2015-11-10 12:00:00')
         self.tomorrow = self.today + datetime.timedelta(days=1)
         self.yesterday = self.today - datetime.timedelta(days=1)
 
@@ -186,6 +206,11 @@ class DittoDayArchiveTestCase(TestCase):
                                     post_time=self.today, user=fl_account.user)
         self.photo_2 = flickrfactories.PhotoFactory(
                                 post_time=self.tomorrow, user=fl_account.user)
+
+        self.scrobble_1 = lastfmfactories.ScrobbleFactory(
+                                                        post_time=self.today)
+        self.scrobble_2 = lastfmfactories.ScrobbleFactory(
+                                                    post_time=self.tomorrow)
 
         self.bookmark_1 = pinboardfactories.BookmarkFactory(
                                                         post_time=self.today)
@@ -220,6 +245,10 @@ class DittoDayArchiveTestCase(TestCase):
 
     def test_success_flickr_photos(self):
         response = self.client.get(self.make_url('flickr', 'photos'))
+        self.assertEquals(response.status_code, 200)
+
+    def test_success_lastfm(self):
+        response = self.client.get(self.make_url('lastfm', 'listens'))
         self.assertEquals(response.status_code, 200)
 
     def test_success_pinboard(self):
@@ -272,6 +301,13 @@ class DittoDayArchiveTestCase(TestCase):
         self.assertEqual(1, len(response.context['flickr_photo_list']))
         self.assertEqual(response.context['flickr_photo_list'][0].pk,
                                                             self.photo_2.pk)
+
+    def test_day_context_lastfm_scrobbles(self):
+        response = self.client.get(self.make_url('lastfm', 'listens'))
+        self.assertTrue('lastfm_scrobble_list' in response.context)
+        self.assertEqual(1, len(response.context['lastfm_scrobble_list']))
+        self.assertEqual(response.context['lastfm_scrobble_list'][0].pk,
+                                                            self.scrobble_1.pk)
 
     def test_day_context_pinboard_bookmarks(self):
         response = self.client.get(self.make_url('pinboard', 'bookmarks'))

@@ -214,3 +214,7 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         """
         return set(self.tags.slugs()) == set(slugs)
 
+    def _summary_source(self):
+        "Used to make the `summary` property."
+        return self.description
+

@@ -18,7 +18,7 @@ class HomeView(PaginatedListView):
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
         # Use select_related to fetch user details too. Could be nasty...
-        return Tweet.public_tweet_objects.all().select_related()
+        return Tweet.public_tweet_objects.all().prefetch_related('user')
 
 
 class FavoriteListView(PaginatedListView):
@@ -31,10 +31,10 @@ class FavoriteListView(PaginatedListView):
 
     def get_queryset(self):
         "Get Tweets by all of the Accounts that have Users."
-        return Tweet.public_favorite_objects.all().select_related()
+        return Tweet.public_favorite_objects.all().prefetch_related('user')
 
 
-class UserDetailMixin(SingleObjectMixin):
+class SingleUserMixin(SingleObjectMixin):
     """Used for views that need data about a User based on screen_name in
     the URL, and its Account if it has one.
     """
@@ -56,7 +56,7 @@ class UserDetailMixin(SingleObjectMixin):
         return context
 
 
-class UserDetailView(UserDetailMixin, PaginatedListView):
+class UserDetailView(SingleUserMixin, PaginatedListView):
     """A single Twitter User and its Tweets.
     The user might have an Account associated with it, or might not.
     """
@@ -64,7 +64,8 @@ class UserDetailView(UserDetailMixin, PaginatedListView):
 
     def get_queryset(self):
         "All public tweets from this Account."
-        return Tweet.public_objects.filter(user=self.object).select_related()
+        return Tweet.public_objects.filter(user=self.object)\
+                                                    .prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,14 +73,15 @@ class UserDetailView(UserDetailMixin, PaginatedListView):
         return context
 
 
-class AccountFavoriteListView(UserDetailMixin, PaginatedListView):
+class AccountFavoriteListView(SingleUserMixin, PaginatedListView):
     "A single Twitter User associated with an Account, and its Favorites."
     template_name = 'twitter/account_favorite_list.html'
 
     def get_queryset(self):
         "All public favorites from this Account."
         return Tweet.public_favorite_objects.filter(
-                        favoriting_users__in=[self.object]).select_related()
+                        favoriting_users__in=[self.object])\
+                                                    .prefetch_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

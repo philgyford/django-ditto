@@ -8,27 +8,35 @@
 
 {% block content %}
 
-    <h1 class="m-y-2">
+    <h1 class="my-4">
         {% block title %}
             The most common Flickr tags
         {% endblock %}
     </h1>
 
-    {% if tag_list|length == 0 %}
-        <p>There are no tags in use.</p>
-    {% else %}
-        {% load l10n %}
-        <ol>
-            {% for tag in tag_list %}
-                <li>
-                    <a href="{% url 'flickr:tag_detail' slug=tag.slug %}">
-                        {{ tag.name }}
-                    </a>
-                    <small>({{ tag.num_times|localize }})</small>
-                </li>
-            {% endfor %}
-        </ol>
-    {% endif %}
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'ditto/includes/account_list.html' with account_list=account_list service_name='Flickr' only %}
+        </div> <!-- .col -->
+
+        <div class="col-md-9">
+            {% if tag_list|length == 0 %}
+                <p>There are no tags in use.</p>
+            {% else %}
+                {% load l10n %}
+                <ol>
+                    {% for tag in tag_list %}
+                        <li>
+                            <a href="{% url 'flickr:tag_detail' slug=tag.slug %}">
+                                {{ tag.name }}
+                            </a>
+                            <small>({{ tag.num_times|localize }})</small>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
 
 {% endblock content %}
 

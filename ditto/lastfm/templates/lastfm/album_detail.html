@@ -1,0 +1,49 @@
+{% extends 'lastfm/base.html' %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'ditto:home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:home' %}">Last.fm</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_list' %}">Artists</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_detail' artist_slug=album.artist.slug %}">{{ album.artist.name|truncatewords:5 }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lastfm:artist_albums' artist_slug=album.artist.slug %}">Albums</a></li>
+    <li class="breadcrumb-item active">{{ album.name|truncatewords:5 }}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% load ditto_core %}
+
+    <h1 class="my-4">
+        <a href="{% url 'lastfm:artist_detail' artist_slug=album.artist.slug %}">
+            {{ album.artist }}
+        </a><br>
+        {% block title %}
+            {{ album.name }}
+        {% endblock %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9 lastfm-track">
+
+            {% if album.tracks|length == 0 %}
+                <p>This album has no tracks.</p>
+
+            {% else %}
+                {% with album.tracks as track_list %}
+
+                    <p>This album has {% if track_list|length == 1 %}this track{% else %}these tracks{% endif %}:</p>
+
+                    {% include 'lastfm/includes/chart.html' with object_list=track_list chart_type='track' include_artist=False only %}
+
+                {% endwith %}
+            {% endif %}
+
+        </div> <!-- .col -->
+
+        <div class="col-md-3">
+            {% include 'lastfm/includes/album_sidebar.html' with album=album perms=perms only %}
+        </div> <!-- .col -->
+    </div> <!-- .row -->
+
+{% endblock content %}
+
