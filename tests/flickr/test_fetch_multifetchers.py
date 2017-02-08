@@ -21,6 +21,9 @@ class MultiAccountFetcherTestCase(FlickrFetchTestCase):
         self.account_2 = AccountFactory(api_key='3456', api_secret='7654',
                                     user=UserFactory(nsid='98765432101@N01') )
 
+    def tearDown(self):
+        pass
+
     def test_inherits_from_multi_account_fetcher(self):
         self.assertTrue(
             issubclass(RecentPhotosMultiAccountFetcher, MultiAccountFetcher)

@@ -40,7 +40,7 @@ setup(
         'django-imagekit>=3.3,<3.4',
         'django-sortedm2m>=1.2.2,<1.3',
         'django-taggit',
-        'flickrapi',
+        'flickrapi>=2.2.1,<2.3',
         'pillow>=3.2.0,<3.3',
         'pytz',
         'twitter-text-python',
