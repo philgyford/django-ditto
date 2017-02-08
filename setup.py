@@ -74,5 +74,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
-    keywords='ditto twitter flickr pinboard',
+    keywords='ditto twitter flickr pinboard last.fm',
 )
