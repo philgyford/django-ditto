@@ -400,6 +400,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         self.add_recent_tracks_response()
         results = self.fetcher.fetch(fetch_type='all')
         scrobble = Scrobble.objects.get(artist__slug='lou+reed')
+        self.assertEqual(scrobble.title, 'Lou Reed – Make Up')
         self.assertEqual(scrobble.account, self.account)
         self.assertEqual(scrobble.track.slug, 'make+up')
         self.assertEqual(scrobble.album.slug, 'transformer')

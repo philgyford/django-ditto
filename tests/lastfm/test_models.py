@@ -273,6 +273,14 @@ class ScrobbleTestCase(TestCase):
                             post_time=datetime_from_str('2016-04-07 12:00:00'))
         self.assertEqual(scrobble.summary, '2016-04-07 12:00')
 
+    def test_long_titles(self):
+        "If artist + track is longer than 255 characters, it gets truncated."
+        a = ArtistFactory(name='Drew Danburry')
+        t = TrackFactory(artist=a, name="Jerry Spinelli and Patricia Polacco or Every Moment of Every Day We Are Faced With the Decision as to Whether We Will Continue Doing What We Are Doing or Choose a Different Way to Do Things. This, Essentially, Means That It Is Also Our Fault When...")
+        scrobble = ScrobbleFactory(artist=a, track=t)
+        self.maxDiff = None # To show the full diff.
+        self.assertEqual(scrobble.title, "Drew Danburry – Jerry Spinelli and Patricia Polacco or Every Moment of Every Day We Are Faced With the Decision as to Whether We Will Continue Doing What We Are Doing or Choose a Different Way to Do Things. This, Essentially, Means That It Is Also Our…")
+
 
 class TrackTestCase(TestCase):
 

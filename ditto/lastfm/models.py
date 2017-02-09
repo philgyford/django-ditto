@@ -3,6 +3,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ..core.utils import truncate_string
 from . import managers
 
 
@@ -253,7 +254,12 @@ class Scrobble(DittoItemModel, models.Model):
         ordering = ['-post_time']
 
     def save(self, *args, **kwargs):
-        self.title = '%s – %s' % (self.track.artist.name, self.track.name)
+        self.title = truncate_string(
+            '{} – {}'.format(self.track.artist.name, self.track.name),
+            chars=255,
+            truncate='…',
+            at_word_boundary=True
+        )
         super().save(*args, **kwargs)
 
     def _summary_source(self):
