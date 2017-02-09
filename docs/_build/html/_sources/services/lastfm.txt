@@ -281,7 +281,7 @@ Example of fetching only 5 tracks by a single ``Artist``, scrobbled by a single 
 Arguments can be in any order.
 
 
-.. _flickr-management-commands:
+.. _lastfm-management-commands:
 
 *******************
 Management commands
