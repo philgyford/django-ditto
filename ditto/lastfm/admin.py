@@ -42,7 +42,7 @@ class ArtistAdmin(admin.ModelAdmin):
 @admin.register(Track)
 class TrackAdmin(admin.ModelAdmin):
     list_display = ('name', 'artist', 'mbid', 'time_created',)
-    search_fields = ('name', 'artist', 'mbid',)
+    search_fields = ('name', 'artist__name', 'mbid',)
 
     fieldsets = (
         (None, {
@@ -60,7 +60,7 @@ class TrackAdmin(admin.ModelAdmin):
 @admin.register(Album)
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ('name', 'artist', 'mbid', 'time_created',)
-    search_fields = ('name', 'artist',)
+    search_fields = ('name', 'artist__name',)
 
     fieldsets = (
         (None, {
