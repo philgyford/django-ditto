@@ -37,6 +37,12 @@ class PaginatedListView(ListView):
     paginate_by = 50
     page_kwarg = 'p'
 
+    # See ditto.core.paginator for what these mean:
+    paginator_body = 5 
+    paginator_margin = 2 
+    paginator_padding = 2
+    paginator_tail = 2
+
     def __init__(self, **kwargs):
         return super().__init__(**kwargs)
 
@@ -55,8 +61,15 @@ class PaginatedListView(ListView):
         it without copying all of this...
         """
         paginator = self.get_paginator(
-            queryset, page_size, orphans=self.get_paginate_orphans(),
-            allow_empty_first_page=self.get_allow_empty())
+            queryset,
+            page_size,
+            orphans = self.get_paginate_orphans(),
+            allow_empty_first_page = self.get_allow_empty(),
+            body    = self.paginator_body,
+            margin  = self.paginator_margin,
+            padding = self.paginator_padding,
+            tail    = self.paginator_tail,
+        )
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
