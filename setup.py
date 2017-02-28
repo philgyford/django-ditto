@@ -52,6 +52,7 @@ setup(
         'factory-boy>=2.8.1,<2.9',
         'freezegun>=0.3.8,<0.4',
         'responses>=0.5.1,<0.6',
+        'coverage',
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
