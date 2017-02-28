@@ -44,7 +44,7 @@ To run a specific test, add its path after ``--``, eg:
 
 Running the tests in all environments will generate coverage output. There will
 also be an ``htmlcov/`` directory containing an HTML report. You can also
-generaet these reports without running all the other tests:
+generate these reports without running all the other tests:
 
 .. code-block:: shell
 
