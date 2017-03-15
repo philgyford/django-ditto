@@ -54,7 +54,6 @@ setup(
         'responses>=0.5.1,<0.6',
         'coverage',
     ],
-    test_suite='runtests.runtests',
     include_package_data=True,
     license=get_license(),
     description='A Django app to copy stuff from your accounts on Flickr, Last.fm, Pinboard and Twitter.',
