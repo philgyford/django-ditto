@@ -32,6 +32,24 @@ def get_author():
 def get_author_email():
     return get_entity('ditto', 'author_email')
 
+# Do `python setup.py tag` to tag with the current version number.
+if sys.argv[-1] == 'tag':
+    os.system("git tag -a %s -m 'version %s'" % (get_version(), get_version()))
+    os.system("git push --tags")
+    sys.exit()
+
+# Do `python setup.py publish` to send current version to PyPI.
+if sys.argv[-1] == 'publish':
+    os.system("python setup.py sdist upload -r pypi")
+    # os.system("python setup.py bdist_wheel upload")
+    sys.exit()
+
+# Do `python setup.py testpublish` to send current version to Test PyPI.
+if sys.argv[-1] == 'testpublish':
+    os.system("python setup.py sdist upload -r pypitest")
+    # os.system("python setup.py bdist_wheel upload")
+    sys.exit()
+
 setup(
     name='django-ditto',
     version=get_version(),
