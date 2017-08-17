@@ -12,6 +12,8 @@ A collection of Django apps for copying things from third-party sites and servic
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
+`See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/master/tests>`_
+
 Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
     $ pip install django-ditto

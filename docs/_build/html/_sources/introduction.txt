@@ -6,6 +6,8 @@ A collection of Django apps for copying things from third-party sites and servic
 
 Requires Python 3.4 or 3.5, and Django 1.8, 1.9 or 1.10.
 
+`See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/master/tests>`_
+
 
 ****************
 Services covered
