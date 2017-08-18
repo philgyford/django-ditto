@@ -28,7 +28,7 @@ And one of:
                 {% endif %}
            {% endspaceless %}"
         {% endif %}
-		   class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 %} text-muted{% endif %}">
+		   class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 and not variety.is_active %} text-muted{% endif %}">
 			{% if variety.app_name == 'lastfm' %}
 				Last.fm scrobbles
 			{% elif variety.app_name == 'pinboard' %}
