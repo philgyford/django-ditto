@@ -28,29 +28,29 @@ And one of:
                 {% endif %}
            {% endspaceless %}"
         {% endif %}
-		   class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 and not variety.is_active %} text-muted{% endif %}">
-			{% if variety.app_name == 'lastfm' %}
-				Last.fm scrobbles
-			{% elif variety.app_name == 'pinboard' %}
-				Pinboard bookmarks
-			{% elif variety.app_name == 'flickr' %}
-				{% if variety.variety_name == 'photo-taken' %}
-					Flickr photos (taken)
-				{% else %}
-					Flickr photos (uploaded)
-				{% endif %}
-			{% elif variety.app_name == 'twitter' %}
-				{% if variety.variety_name == 'favorite' %}
-					Twitter likes
-				{% else %}
-					Twitter tweets
-				{% endif %}
-			{% endif %}
-			{% if variety.count > 0 %}
-			<span class="badge badge-pill {% if variety.is_active %}badge-primary{% else %}badge-default{% endif %}">
-					{{ variety.count }}
-				</span>
-			{% endif %}
+           class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 and not variety.is_active %} text-muted{% endif %}">
+            {% if variety.app_name == 'lastfm' %}
+                Last.fm scrobbles
+            {% elif variety.app_name == 'pinboard' %}
+                Pinboard bookmarks
+            {% elif variety.app_name == 'flickr' %}
+                {% if variety.variety_name == 'photo-taken' %}
+                    Flickr photos (taken)
+                {% else %}
+                    Flickr photos (uploaded)
+                {% endif %}
+            {% elif variety.app_name == 'twitter' %}
+                {% if variety.variety_name == 'favorite' %}
+                    Twitter likes
+                {% else %}
+                    Twitter tweets
+                {% endif %}
+            {% endif %}
+            {% if variety.count > 0 %}
+            <span class="badge badge-pill {% if variety.is_active %}badge-primary{% else %}badge-default{% endif %}">
+                    {{ variety.count }}
+                </span>
+            {% endif %}
         {% if variety.count == 0 or variety.is_active %}
             </span>
         {% else %}
