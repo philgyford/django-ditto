@@ -8,6 +8,8 @@
 {% endblock %}
 
 {% block content %}
+    {% load ditto_core %}
+    {% current_url_name as url_name %}
 
     <h1 class="my-4">
         <a href="{% url 'lastfm:user_detail' username=account.username %}">
