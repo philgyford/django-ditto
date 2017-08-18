@@ -2,16 +2,16 @@ language: python
 python:
   - "3.4"
   - "3.5"
+  - "3.6"
 # This, with tox-travis, and our tox.ini, will test on these Django versions
 # across all our specified python versions:
 env:
-  - DJANGO=1.8
-  - DJANGO=1.9
   - DJANGO=1.10
+  - DJANGO=1.11
 matrix:
   include:
     # This will also run the coverage test only on this python version:
-    - python: "3.5"
+    - python: "3.6"
       env: TOXENV="coverage"
 # command to install dependencies
 install:
