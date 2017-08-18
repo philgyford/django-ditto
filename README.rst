@@ -8,7 +8,7 @@
 .. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
   :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
 
-A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4, 3.5 or 3.6, and Django from v1.8 to v1.11.
+A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4, 3.5 or 3.6, and Django 1.10 or 1.11.
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
