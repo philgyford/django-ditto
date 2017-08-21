@@ -1,15 +1,14 @@
-include .travis.yml
 include LICENSE
 include README.rst
 include runtests.py
 include tox.ini
-include devproject/manage.py
-include devproject/requirements.txt
-recursive-include devproject/devproject *.py
 recursive-include ditto *.html *.py *.sh
-recursive-include ditto/core/static *.png *.jpg *.css
-recursive-include docs *
-recursive-include tests *.py
+recursive-include ditto/core/static *.css *.jpg *.js *.png
+
+recursive-exclude devproject *
+recursive-exclude docs *
+recursive-exclude screenshots *
+recursive-exclude tests *
 
 recursive-exclude * *.pyc *.pyo *.sw* *.sv* *.un~ *.DS_Store
 
