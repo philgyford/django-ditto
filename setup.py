@@ -61,6 +61,7 @@ setup(
         'django-taggit>=0.22.0,<0.30',
         'flickrapi>=2.3,<2.4',
         'pillow>=4.2.1,<4.3',
+        'pytz',
         'twitter-text-python',
         'twython>=3.5.0,<3.6',
     ],
