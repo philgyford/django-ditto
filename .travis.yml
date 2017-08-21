@@ -10,7 +10,6 @@ addons:
       - deadsnakes
     packages:
       - python3.5
-      - python3.6
 # This, with tox-travis, and our tox.ini, will test on these Django versions
 # across all our specified python versions:
 env:
