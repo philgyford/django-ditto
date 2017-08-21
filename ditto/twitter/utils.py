@@ -66,6 +66,11 @@ def htmlify_tweet(json_data):
     if 'full_text' in json_data:
         json_data['text'] = json_data['full_text']
 
+    # Some Tweets (eg from a downloaded archive) don't have entities['symbols']
+    # which Twython.html_for_tweet() currently expects.
+    if 'entities' in json_data and 'symbols' not in json_data['entities']:
+        json_data['entities']['symbols'] = []
+
     # This does most of the work for us:
     # https://twython.readthedocs.org/en/latest/usage/special_functions.html#html-for-tweet
     html = Twython.html_for_tweet(
@@ -84,10 +89,11 @@ def htmlify_tweet(json_data):
     symbols_count = len(ents['symbols']) if 'symbols' in ents else 0
     user_mentions_count = len(ents['user_mentions']) if 'user_mentions' in ents else 0
 
-    # Replace the class Twython adds with rel="external".
+    # Replace the classes Twython adds with rel="external".
     html = html.replace('class="twython-hashtag"', 'rel="external"')
     html = html.replace('class="twython-mention"', 'rel="external"')
     html = html.replace('class="twython-media"', 'rel="external"')
+    html = html.replace('class="twython-symbol"', 'rel="external"')
 
     # Twython uses the t.co URLs in the anchor tags.
     # We want to replace those with the full original URLs.
@@ -107,15 +113,6 @@ def htmlify_tweet(json_data):
             html = html.replace('<a href="%s" rel="external">%s</a>' % \
                                         (item['url'], item['display_url']),
                                 '')
-
-    # Twython doesn't do symbols, so:
-    # (Pending https://github.com/ryanmcgrath/twython/pull/415 )
-    if symbols_count > 0:
-        # Just using the regex here:
-        # https://blog.twitter.com/2013/symbols-entities-for-tweets
-        html = re.sub(r'\$([a-zA-Z]{1,6}(?:[._][a-zA-Z]{1,2})?)\b',
-                    r'<a href="https://twitter.com/search?q=%24\1" rel="external">$\1</a>',
-                    html)
 
     if (urls_count + media_count + hashtags_count + symbols_count + user_mentions_count) == 0:
         # Older Tweets might contain links but have no 'urls'/'media' entities.
