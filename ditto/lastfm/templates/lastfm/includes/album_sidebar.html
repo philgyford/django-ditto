@@ -9,7 +9,7 @@ perms -- The Django permissions object.
 
 {% load ditto_core %}
 
-<div class="card card-block mb-3">
+<div class="card card-body mb-3">
     <p class="card-text">
         {% with album.get_scrobble_count as scrobble_count %}
             {{ album.name }} has been scrobbled {{ scrobble_count }} time{{ scrobble_count|pluralize }}
@@ -19,7 +19,7 @@ perms -- The Django permissions object.
 
 {% with album.get_most_recent_scrobble as scrobble %}
     {% if scrobble %}
-        <div class="card card-block mb-3">
+        <div class="card card-body mb-3">
             <p class="card-text">
                 {{ album.name }} was most recently scrobbled by
                 <a href="{{ scrobble.account.get_absolute_url }}">

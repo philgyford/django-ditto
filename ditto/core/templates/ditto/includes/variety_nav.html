@@ -28,7 +28,7 @@ And one of:
                 {% endif %}
            {% endspaceless %}"
         {% endif %}
-           class="list-group-item justify-content-between{% if variety.is_active %} active{% endif %}{% if variety.count == 0 and not variety.is_active %} text-muted{% endif %}">
+           class="list-group-item d-flex justify-content-between align-items-center{% if variety.is_active %} active{% endif %}{% if variety.count == 0 and not variety.is_active %} text-muted{% endif %}">
             {% if variety.app_name == 'lastfm' %}
                 Last.fm scrobbles
             {% elif variety.app_name == 'pinboard' %}
@@ -47,7 +47,7 @@ And one of:
                 {% endif %}
             {% endif %}
             {% if variety.count > 0 %}
-            <span class="badge badge-pill {% if variety.is_active %}badge-primary{% else %}badge-default{% endif %}">
+            <span class="badge badge-pill {% if variety.is_active %}badge-light{% else %}badge-dark{% endif %}">
                     {{ variety.count }}
                 </span>
             {% endif %}

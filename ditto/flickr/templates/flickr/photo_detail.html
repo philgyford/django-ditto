@@ -144,7 +144,7 @@
 
         <div class="col-md-3">
             <div class="card mb-3 flickr-user">
-                <div class="card-block">
+                <div class="card-body">
                     <a href="{{ photo.user.get_absolute_url }}"><img src="{{ photo.user.avatar_url }}" class="float-left mr-2" alt="user icon" width="48" height="48"></a>
                     <a href="{{ photo.user.get_absolute_url }}"><strong>{{ photo.user.name }}</strong></a>
                 </div>
@@ -154,7 +154,7 @@
                 {% with photo.get_next as next_photo %}
                     {% if previous_photo or next_photo %}
                         <div class="card mb-3">
-                            <div class="card-block">
+                            <div class="card-body">
                                 {% if previous_photo %}
                                     <a class="card-link" href="{% url 'flickr:photo_detail' nsid=previous_photo.user.nsid flickr_id=previous_photo.flickr_id %}" title="{{ previous_photo.title }}">
                                         &larr; Previous
@@ -173,7 +173,7 @@
 
             {% if photo.photosets|length > 0 %}
                 <div class="card mb-3 photo-photosets">
-                    <div class="card-block">
+                    <div class="card-body">
                         <h4 class="h6 card-title">Albums</h4>
                     </div>
                     <ul class="list-group list-group-flush">

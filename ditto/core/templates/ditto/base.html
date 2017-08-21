@@ -16,15 +16,18 @@
     <body>
 
         {% block navbar %}
-            <nav class="navbar navbar-toggleable navbar-inverse bg-inverse">
+            <nav class="navbar navbar-expand navbar-dark bg-dark">
                 <div class="container">
                     <a class="navbar-brand" href="{% url 'ditto:home' %}">
                         {% block navbar_title %}
                             Ditto
                         {% endblock %}
                     </a>
-                    <div id="navbar-content">
-                        <ul class="navbar-nav mr-auto">
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+                    <div class="collapse navbar-collapse" id="navbar-content">
+                        <ul class="navbar-nav">
                             {% block navbar_list_start %}
                             {% endblock %}
 
@@ -61,7 +64,7 @@
                             {% block navbar_list_end %}
                             {% endblock %}
                         </ul>
-                    </div> <!-- .collapse.navbar-collapse -->
+                    </div> <!-- .navbar -->
                 </div> <!-- .container -->
             </nav>
         {% endblock navbar %}

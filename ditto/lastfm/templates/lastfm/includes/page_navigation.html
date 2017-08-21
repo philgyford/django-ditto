@@ -19,9 +19,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:scrobble_list' %}
             {% endif %}
-        {% endspaceless %}" class="justify-content-between list-group-item {% if 'scrobble_list' in url_name %}active{% endif %}">
+        {% endspaceless %}" class="list-group-item d-flex justify-content-between align-items-center {% if 'scrobble_list' in url_name %}active{% endif %}">
             Listens
-            <span class="badge badge-pill {% if 'scrobble_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+            <span class="badge badge-pill {% if 'scrobble_list' in url_name %}badge-light{% else %}badge-dark{% endif %}">
                 {{ counts.scrobbles }}
             </span>
         </a>
@@ -31,9 +31,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:artist_list' %}
             {% endif %}
-        {% endspaceless %}" class="justify-content-between list-group-item {% if 'artist_list' in url_name %}active{% endif %}">
+        {% endspaceless %}" class="list-group-item d-flex justify-content-between align-items-center {% if 'artist_list' in url_name %}active{% endif %}">
             Artists
-            <span class="badge badge-pill {% if 'artist_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+            <span class="badge badge-pill {% if 'artist_list' in url_name %}badge-light{% else %}badge-dark{% endif %}">
                 {{ counts.artists }}
             </span>
         </a>
@@ -43,9 +43,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:album_list' %}
             {% endif %}
-        {% endspaceless %}" class="justify-content-between list-group-item {% if  'album_list' in url_name %}active{% endif %}">
+        {% endspaceless %}" class="list-group-item d-flex justify-content-between align-items-center {% if  'album_list' in url_name %}active{% endif %}">
             Albums
-			<span class="badge badge-pill {% if 'album_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+			<span class="badge badge-pill {% if 'album_list' in url_name %}badge-light{% else %}badge-dark{% endif %}">
                 {{ counts.albums }}
             </span>
         </a>
@@ -55,9 +55,9 @@ Expects:
             {% else %}
                 {% url 'lastfm:track_list' %}
             {% endif %}
-        {% endspaceless %}" class="justify-content-between list-group-item {% if 'track_list' in url_name %}active{% endif %}">
+        {% endspaceless %}" class="list-group-item d-flex justify-content-between align-items-center {% if 'track_list' in url_name %}active{% endif %}">
             Tracks
-            <span class="badge badge-pill {% if 'track_list' in url_name %}badge-primary{% else %}badge-default{% endif %}">
+            <span class="badge badge-pill {% if 'track_list' in url_name %}badge-light{% else %}badge-dark{% endif %}">
                 {{ counts.tracks }}
             </span>
         </a>

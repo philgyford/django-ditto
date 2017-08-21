@@ -26,7 +26,7 @@ Expects:
 
 {% if tweets %}
 	<div class="card mb-3">
-		<div class="card-block">
+		<div class="card-body">
 			<h2 class="h6 card-title">{% if type|default_if_none:'tweets' == 'favorites' %}Liked tweets{% else %}Tweets{% endif %} per year</h2>
 			<table class="table table-sm mb-0 flickr-tweets-annual">
 				<thead class="sr-only">

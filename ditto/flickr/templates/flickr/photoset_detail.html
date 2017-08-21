@@ -24,7 +24,7 @@
                     An album by <a href="{% url 'flickr:user_detail' nsid=photoset.user.nsid %}">{{ photoset.user.name }}</a>
                 </div>
                 {% if photoset.description %}
-                    <div class="card-block">
+                    <div class="card-body">
                         <p class="card-text">
                             {{ photoset.description|safe }}
                         </p>
