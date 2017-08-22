@@ -68,6 +68,7 @@ def htmlify_tweet(json_data):
 
     # Some Tweets (eg from a downloaded archive) don't have entities['symbols']
     # which Twython.html_for_tweet() currently expects.
+    # Not needed once github.com/ryanmcgrath/twython/pull/451 is in Twython.
     if 'entities' in json_data and 'symbols' not in json_data['entities']:
         json_data['entities']['symbols'] = []
 
