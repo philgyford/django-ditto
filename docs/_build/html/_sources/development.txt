@@ -89,6 +89,8 @@ Set version number in `ditto/__init__.py`.
 
 Rebuild documentation (which includes the version number).
 
+Ensure `CHANGES.rst` is up-to-date for new version.
+
 Commit changes to git.
 
 Add a version tag:
