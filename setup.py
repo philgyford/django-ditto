@@ -1,6 +1,7 @@
 import codecs
 import os
 import re
+import sys
 from setuptools import setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
@@ -32,28 +33,46 @@ def get_author():
 def get_author_email():
     return get_entity('ditto', 'author_email')
 
+# Do `python setup.py tag` to tag with the current version number.
+if sys.argv[-1] == 'tag':
+    os.system("git tag -a %s -m 'version %s'" % (get_version(), get_version()))
+    os.system("git push --tags")
+    sys.exit()
+
+# Do `python setup.py publish` to send current version to PyPI.
+if sys.argv[-1] == 'publish':
+    os.system("python setup.py sdist upload -r pypi")
+    # os.system("python setup.py bdist_wheel upload")
+    sys.exit()
+
+# Do `python setup.py testpublish` to send current version to Test PyPI.
+if sys.argv[-1] == 'testpublish':
+    os.system("python setup.py sdist upload -r pypitest")
+    # os.system("python setup.py bdist_wheel upload")
+    sys.exit()
+
 setup(
     name='django-ditto',
     version=get_version(),
     packages=['ditto'],
     install_requires=[
-        'django-imagekit>=3.3,<3.4',
-        'django-sortedm2m>=1.2.2,<1.3',
+        'django-imagekit>=4.0,<4.1',
+        'django-sortedm2m>=1.5.0,<1.6',
         'django-taggit>=0.22.0,<0.30',
-        'flickrapi>=2.2.1,<2.3',
-        'pillow>=3.2.0,<3.3',
+        'flickrapi>=2.3,<2.4',
+        'pillow>=4.2.1,<4.3',
         'pytz',
         'twitter-text-python',
-        'twython>=3.4.0,<3.5',
+        'twython>=3.5.0,<3.6',
     ],
     dependency_links=[
     ],
     tests_require=[
-        'factory-boy>=2.8.1,<2.9',
-        'freezegun>=0.3.8,<0.4',
-        'responses>=0.5.1,<0.6',
+        'factory-boy>=2.9.2,<2.10',
+        'freezegun>=0.3.9,<0.4',
+        'responses>=0.7.0,<0.8',
+        'coverage',
     ],
-    test_suite='runtests.runtests',
     include_package_data=True,
     license=get_license(),
     description='A Django app to copy stuff from your accounts on Flickr, Last.fm, Pinboard and Twitter.',
@@ -71,6 +90,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],

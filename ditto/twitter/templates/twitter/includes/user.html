@@ -10,8 +10,8 @@ Expects:
 
 {% load l10n %}
 
-<div class="card twitter-user">
-    <div class="card-block">
+<div class="card mb-3 twitter-user">
+    <div class="card-body">
         <h4 class="card-title mb-0 twitter-user-name">
             {{ user.name }}
             <small class="text-muted twitter-user-screenname">{{ user }}</small>
@@ -37,7 +37,7 @@ Expects:
     </ul>
 </div>
 
-<div class="card twitter-user">
+<div class="card mb-3 twitter-user">
     <ul class="list-group list-group-flush twitter-user-counts">
         <li class="list-group-item">{{ user.statuses_count|localize }} tweet{{ user.statuses_count|pluralize }}</li>
         <li class="list-group-item">{{ user.favorites_count|localize }} like{{ user.favorites_count|pluralize }}</li>

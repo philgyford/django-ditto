@@ -3,6 +3,7 @@ from django.apps import apps, AppConfig
 
 
 class DittoCoreConfig(AppConfig):
+    label = 'ditto_core'
     name = 'ditto.core'
     verbose_name = "Ditto Core"
 

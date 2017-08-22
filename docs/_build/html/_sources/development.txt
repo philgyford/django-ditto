@@ -40,11 +40,11 @@ To run a specific test, add its path after ``--``, eg:
 
 .. code-block:: shell
 
-    $ tox -e py35-django19 -- tests.ditto.tests.test_views.DittoViewTests.test_home_templates
+    $ tox -e py35-django19 -- tests.flickr.test_views.HomeViewTests.test_home_templates
 
 Running the tests in all environments will generate coverage output. There will
 also be an ``htmlcov/`` directory containing an HTML report. You can also
-generaet these reports without running all the other tests:
+generate these reports without running all the other tests:
 
 .. code-block:: shell
 
@@ -88,6 +88,8 @@ Packaging
 Set version number in `ditto/__init__.py`.
 
 Rebuild documentation (which includes the version number).
+
+Ensure `CHANGES.rst` is up-to-date for new version.
 
 Commit changes to git.
 

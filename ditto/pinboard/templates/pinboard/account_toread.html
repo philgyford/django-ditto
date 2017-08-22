@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-md-3">
             <div class="card mb-3">
-                <div class="card-block">
+                <div class="card-body">
                     {{ page_obj.paginator.count|localize }} bookmark{{ page_obj.paginator.count|pluralize }} marked “to&nbsp;read”
                 </div>
                 {% if account.is_active %}

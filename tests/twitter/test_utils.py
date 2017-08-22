@@ -71,6 +71,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
             'Some symbols: <a href="https://twitter.com/search?q=%24AAPL" rel="external">$AAPL</a> and <a href="https://twitter.com/search?q=%24PEP" rel="external">$PEP</a> and $ANOTHER and <a href="https://twitter.com/search?q=%24A" rel="external">$A</a>.'
         )
 
+
 class HtmlifyTweetTestCase(HtmlifyTestCase):
 
     api_fixture = 'tweet_with_entities.json'

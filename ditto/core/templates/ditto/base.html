@@ -7,7 +7,10 @@
         <title>{% block head_title %}{% block title %}{% endblock %} ({% block head_site_title %}Ditto{% endblock %}){% endblock %}</title>
 
         {% load static %}
-        <link rel="stylesheet" href="{% static "bootstrap.min.css" %}">
+
+        {% block bootstrap_css %}
+            <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+        {% endblock %}
 
         {% block head_extra %}
             {# Use this if you need to more to the <head> of every page. #}
@@ -16,15 +19,18 @@
     <body>
 
         {% block navbar %}
-            <nav class="navbar navbar-toggleable navbar-inverse bg-inverse">
+            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
                 <div class="container">
                     <a class="navbar-brand" href="{% url 'ditto:home' %}">
                         {% block navbar_title %}
                             Ditto
                         {% endblock %}
                     </a>
-                    <div id="navbar-content">
-                        <ul class="navbar-nav mr-auto">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbar-content">
+                        <ul class="navbar-nav">
                             {% block navbar_list_start %}
                             {% endblock %}
 
@@ -61,7 +67,7 @@
                             {% block navbar_list_end %}
                             {% endblock %}
                         </ul>
-                    </div> <!-- .collapse.navbar-collapse -->
+                    </div> <!-- .navbar -->
                 </div> <!-- .container -->
             </nav>
         {% endblock navbar %}
@@ -83,6 +89,16 @@
 
     {% block footer %}
         {# Use this if you need to add a visible footer to every page. #}
+    {% endblock %}
+
+    {% block jquery_js %}
+        <script src="{% static "js/jquery-3.2.1.slim.min.js" %}"></script>
+    {% endblock %}
+
+    {% block bootstrap_js %}
+        <script src="{% static "js/popper.min.js" %}"></script>
+        <script src="{% static "js/bootstrap/util.js" %}"></script>
+        <script src="{% static "js/bootstrap/collapse.js" %}"></script>
     {% endblock %}
 
     {% block foot_extra %}

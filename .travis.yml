@@ -1,18 +1,32 @@
 language: python
-python: 3.5
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
+# Needed to install python 3.5 for reasons which escape me:
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
+# This, with tox-travis, and our tox.ini, will test on these Django versions
+# across all our specified python versions:
 env:
-  - TOX_ENV=py34-django18
-  - TOX_ENV=py34-django19
-  - TOX_ENV=py35-django18
-  - TOX_ENV=py35-django19
-  - TOX_ENV=coverage
+  - DJANGO=1.10
+  - DJANGO=1.11
+matrix:
+  include:
+    # This will also run the coverage test only on this python version:
+    - python: "3.6"
+      env: TOXENV="coverage"
 # command to install dependencies
 install:
-  - pip install tox coverage coveralls
+  - pip install tox tox-travis coverage coveralls
 # command to run tests
 script:
-  - tox -e $TOX_ENV
+  - tox
 after_success:
-  - bash ditto/scripts/coveralls.sh
+  - coveralls
 # containers
 sudo: false
