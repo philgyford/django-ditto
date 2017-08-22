@@ -1,10 +1,10 @@
 Changelog (Django Ditto)
 ========================
 
-0.5.1
+0.5.2
 -----
 
-- Fix URL in README
+- Fix screenshots URL in README and documentation.
 
 
 0.5.0
