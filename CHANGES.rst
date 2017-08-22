@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.5.1
+-----
+
+- Fix URL in README
+
+
 0.5.0
 -----
 
