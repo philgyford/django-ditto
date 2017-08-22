@@ -100,11 +100,11 @@ Add a version tag:
     $ git tag -a v0.2.6 -m "My message"
     $ git push origin --tags
 
-Then, I think:
+Then:
 
 .. code-block:: shell
 
-    $ python setup.py sdist upload
+    $ python setup.py publish
 
 Maybe just to have the README update on pypi::
 
