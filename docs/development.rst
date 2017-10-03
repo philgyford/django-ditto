@@ -97,8 +97,7 @@ Add a version tag:
 
 .. code-block:: shell
 
-    $ git tag -a v0.2.6 -m "My message"
-    $ git push origin --tags
+    $ python setup.py tag
 
 Then:
 
