@@ -7,9 +7,27 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
-from ditto.core.templatetags.ditto_core import display_time,\
+from ditto.core.apps import Apps
+from ditto.core.templatetags.ditto_core import get_enabled_apps, display_time,\
         query_string, width_height
 from ditto.core.utils import datetime_now
+
+
+class GetEnabledAppsTestCase(TestCase):
+
+    @patch.object(Apps, 'all')
+    def test_enabled(self, patched_all):
+        # all() will return an app that is not installed:
+        patched_all.return_value = [
+                        'flickr', 'lastfm', 'pinboard', 'twitter', 'NOPE',]
+
+        # So 'NOPE' shouldn't be returned here:
+        enabled_apps = get_enabled_apps()
+        self.assertEqual(4, len(enabled_apps))
+        self.assertEqual(enabled_apps[0], 'flickr')
+        self.assertEqual(enabled_apps[1], 'lastfm')
+        self.assertEqual(enabled_apps[2], 'pinboard')
+        self.assertEqual(enabled_apps[3], 'twitter')
 
 
 class QueryStringTestCase(TestCase):

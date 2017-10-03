@@ -1,12 +1,11 @@
 <!DOCTYPE html>
+{% load static ditto_core %}
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>{% block head_title %}{% block title %}{% endblock %} ({% block head_site_title %}Ditto{% endblock %}){% endblock %}</title>
-
-        {% load static %}
 
         {% block bootstrap_css %}
             <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
@@ -34,7 +33,9 @@
                             {% block navbar_list_start %}
                             {% endblock %}
 
-                            {% if enabled_apps %}
+                            {% get_enabled_apps as enabled_apps %}
+
+                            {% if enabled_apps|length > 0 %}
                                 {% for app in enabled_apps %}
                                     {% if app == 'flickr' %}
                                         <li class="nav-item {% block flickr_nav_active %}{% endblock %}">
@@ -73,10 +74,6 @@
         {% endblock navbar %}
 
         <div class="container">
-
-            {% if not enabled_apps %}
-                <p class="text-warning">Add <code>ditto.core.context_processors.ditto</code> to <code>context_processors</code> in your settings.</p>
-            {% endif %}
 
             <ol class="breadcrumb">
                 {% block breadcrumbs %}{% endblock %}

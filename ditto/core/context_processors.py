@@ -1,9 +1,13 @@
-from .apps import ditto_apps
-from ..flickr import app_settings
+import warnings
 
 
 def ditto(request):
-    return {
-        'enabled_apps': ditto_apps.enabled()
-    }
+    """
+    Deprecated.
+    """
+    warnings.warn(
+        "The ditto context_processor is no longer used.",
+        DeprecationWarning
+    )
+    return {}
 

@@ -4,8 +4,20 @@ from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.html import format_html
 
+from ..apps import ditto_apps
+
 
 register = template.Library()
+
+
+@register.simple_tag
+def get_enabled_apps():
+    """
+    Returns a list of strings indicating which Ditto apps are enabled.
+    e.g.
+        ['flickr', 'twitter',]
+    """
+    return ditto_apps.enabled()
 
 
 @register.simple_tag(takes_context=True)
