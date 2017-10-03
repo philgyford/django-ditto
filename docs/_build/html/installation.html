@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Django Ditto 0.5.1 documentation</title>
+  <title>Installation &mdash; Django Ditto 0.5.2 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.5.1 documentation" href="index.html"/>
+    <link rel="top" title="Django Ditto 0.5.2 documentation" href="index.html"/>
         <link rel="next" title="Flickr" href="services/flickr.html"/>
         <link rel="prev" title="Introduction" href="introduction.html"/> 
 
@@ -87,7 +87,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#pillow">Pillow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-django-ditto">Install django-ditto</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-installed-apps">Add to INSTALLED_APPS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#add-to-context-processors">Add to context processors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-urls-py">Add to urls.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#settings">Settings</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#other-optional-settings">Other optional settings</a></li>
@@ -209,23 +208,6 @@ images:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="add-to-context-processors">
-<h2>Add to context processors<a class="headerlink" href="#add-to-context-processors" title="Permalink to this headline">¶</a></h2>
-<p>Add the project&#8217;s context processor in your settings:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span>
-        <span class="o">...</span>
-        <span class="s1">&#39;OPTIONS&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;context_processors&#39;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="c1"># other context processors listed here.</span>
-                <span class="s1">&#39;ditto.core.context_processors.ditto&#39;</span><span class="p">,</span>
-            <span class="p">]</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">]</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="add-to-urls-py">
 <h2>Add to urls.py<a class="headerlink" href="#add-to-urls-py" title="Permalink to this headline">¶</a></h2>
 <p>To use Ditto&#8217;s supplied views you can include each app&#8217;s URLs in your project&#8217;s own <code class="docutils literal"><span class="pre">urls.py</span></code>. Note that each app requires the correct namespace (<code class="docutils literal"><span class="pre">flickr</span></code>, <code class="docutils literal"><span class="pre">lastfm</span></code>, <code class="docutils literal"><span class="pre">pinboard</span></code> or <code class="docutils literal"><span class="pre">twitter</span></code>), eg:</p>
@@ -315,7 +297,7 @@ images:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.1',
+            VERSION:'0.5.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

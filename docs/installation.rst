@@ -62,25 +62,6 @@ images::
     )
 
 
-*************************
-Add to context processors
-*************************
-
-Add the project's context processor in your settings::
-
-    TEMPLATES = [
-        {
-            ...
-            'OPTIONS': {
-                'context_processors': [
-                    # other context processors listed here.
-                    'ditto.core.context_processors.ditto',
-                ]
-            }
-        }
-    ]
-
-
 **************
 Add to urls.py
 **************
