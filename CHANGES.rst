@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.6.1
+-----
+
+- Fix bug when importing Flickr photos and there's already a tag with a
+  different ``slug`` but the same ``name``.
+
 
 0.6.0
 -----
