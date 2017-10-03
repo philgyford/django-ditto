@@ -19,7 +19,7 @@ class AccountAdmin(admin.ModelAdmin):
         }),
         ('API', {
             'fields': ('api_token',),
-            'description': 'Your API Token can be found at <a href="From https://pinboard.in/settings/password ">pinboard.in/settings/password</a>'}),
+            'description': 'Your API Token can be found at <a href="https://pinboard.in/settings/password">pinboard.in/settings/password</a>'}),
         ('Data', {
             'fields': ('time_created', 'time_modified',)
         }),
