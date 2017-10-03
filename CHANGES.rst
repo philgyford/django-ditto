@@ -1,6 +1,15 @@
 Changelog (Django Ditto)
 ========================
 
+
+0.6.0
+-----
+
+- The ditto context_processor is no longer required, and now does nothing.
+
+- Replaced its ``enabled_apps`` with a ``get_enabled_apps`` template tag.
+
+
 0.5.2
 -----
 
@@ -16,14 +25,14 @@ Changelog (Django Ditto)
 
 - Test it works in Django 1.11 #185
 
-- Label the `core` app as `ditto_core` #186
+- Label the ``core`` app as ``ditto_core`` #186
 
 - Upgrade dependencies #188
 
-- Removed `current_url_name` from context processor and made it a template tag
+- Removed ``current_url_name`` from context processor and made it a template tag
   #184
 
-- Moved Bootsrap CSS into a `css` directory #182
+- Moved Bootsrap CSS into a ``css`` directory #182
 
 - Change 'scrobbles' to 'listens' on day archive #181
 
