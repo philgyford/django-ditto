@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Flickr &mdash; Django Ditto 0.6.0 documentation</title>
+  <title>Flickr &mdash; Django Ditto 0.6.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.6.0 documentation" href="../index.html"/>
+    <link rel="top" title="Django Ditto 0.6.1 documentation" href="../index.html"/>
         <link rel="next" title="Last.fm" href="lastfm.html"/>
         <link rel="prev" title="Installation" href="../installation.html"/> 
 
@@ -173,7 +173,7 @@
 <p>You can fetch, store and display data about all your Photos and Photosets (Albums) for one or more <a class="reference external" href="https://flickr.com/">Flickr</a> Accounts. By default the included models and templates will link to the photo files on flickr.com, but you can also download the original files to store locally. These can then be used to generate images in all other sizes, to be served locally.  See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
 <div class="section" id="set-up">
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
-<p>In the Django admin, create a new <code class="docutils literal"><span class="pre">Account</span></code> in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a></p>
+<p>In the Django admin, create a new <code class="docutils literal"><span class="pre">Account</span></code> in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a> (you can ignore the User for the moment).</p>
 <p>By default this will only allow the fetching of fully public photos. To fetch all photos your Flickr account can access, you&#8217;ll need to do this:</p>
 <ol class="arabic">
 <li><p class="first">Enter your API key and secret in the indicated place in the file
@@ -192,7 +192,7 @@ in order to authorize your Flickr account. You&#8217;ll then get a code to paste
 into your Terminal.</p>
 </li>
 </ol>
-<p>Finally, for each of those Accounts, note its ID from the Django admin, and run the following management command to fetch information about its associated Flickr <code class="docutils literal"><span class="pre">User</span></code> (replacing <code class="docutils literal"><span class="pre">1</span></code> with your <code class="docutils literal"><span class="pre">Account</span></code>&#8216;s Django ID, if different):</p>
+<p>Finally, back in the Django Admin note the ID of the <code class="docutils literal"><span class="pre">Account</span></code> you created. e.g. if the Django Admin&#8217;s URL is something like <code class="docutils literal"><span class="pre">/admin/flickr/account/1/change/</span></code> then the ID is <code class="docutils literal"><span class="pre">1</span></code>. Run the following management command to fetch information about the <code class="docutils literal"><span class="pre">Account</span></code>&#8216;s associated Flickr <code class="docutils literal"><span class="pre">User</span></code> (replacing <code class="docutils literal"><span class="pre">1</span></code> with your <code class="docutils literal"><span class="pre">Account</span></code>&#8216;s Django ID, if different):</p>
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span>1
 </pre></div>
 </div>
@@ -499,7 +499,7 @@ Photos posted by the User with an <code class="docutils literal"><span class="pr
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.6.0',
+            VERSION:'0.6.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -83,8 +83,6 @@ To use Ditto's supplied views you can include each app's URLs in your project's 
         url(r'ditto/', include('ditto.core.urls', namespace='ditto')),
     ]
 
-**NOTE:** The ``include`` module needs to be imported from ``django.conf.urls``.
-
 Change the URL include paths (eg, ``r'^ditto/pinboard/'`` as appropriate) to suit your project. See the ``urls.py`` in the ``devproject/`` project for a full example.
 
 
