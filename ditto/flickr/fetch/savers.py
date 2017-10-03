@@ -2,6 +2,8 @@ import datetime
 import json
 import pytz
 
+from django.db.utils import IntegrityError
+
 from taggit.models import Tag
 
 from . import FetchError
@@ -280,9 +282,16 @@ class PhotoSaver(SaveUtilsMixin, object):
             if tag['id'] not in local_flickr_ids:
 
                 # This tag isn't currently on the photo, so add it.
-                tag_obj, tag_created = Tag.objects.get_or_create(
-                    slug=tag['_content'], defaults={ 'name':tag['raw'] }
-                )
+                try:
+                    tag_obj, tag_created = Tag.objects.get_or_create(
+                        slug=tag['_content'], defaults={ 'name':tag['raw'] }
+                    )
+                except IntegrityError:
+                    # It's possible for there to be a tag with a different
+                    # slug but the same name, which would cause an
+                    # IntegrityError.
+                    # In which case, just fetch the existing Tag by slug:
+                    tag_obj = Tag.objects.get(slug=tag['_content'])
 
                 # Who created this tag?
                 if tag['author'] == photo_obj.user.nsid:
