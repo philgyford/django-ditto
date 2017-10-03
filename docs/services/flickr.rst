@@ -9,7 +9,7 @@ You can fetch, store and display data about all your Photos and Photosets (Album
 Set-up
 ******
 
-In the Django admin, create a new ``Account`` in the Flickr app, and add your Flickr API key and secret from https://www.flickr.com/services/apps/create/apply/
+In the Django admin, create a new ``Account`` in the Flickr app, and add your Flickr API key and secret from https://www.flickr.com/services/apps/create/apply/ (you can ignore the User for the moment).
 
 By default this will only allow the fetching of fully public photos. To fetch all photos your Flickr account can access, you'll need to do this:
 
@@ -27,7 +27,7 @@ By default this will only allow the fetching of fully public photos. To fetch al
    in order to authorize your Flickr account. You'll then get a code to paste
    into your Terminal.
 
-Finally, for each of those Accounts, note its ID from the Django admin, and run the following management command to fetch information about its associated Flickr ``User`` (replacing ``1`` with your ``Account``'s Django ID, if different):
+Finally, back in the Django Admin note the ID of the ``Account`` you created. e.g. if the Django Admin's URL is something like ``/admin/flickr/account/1/change/`` then the ID is ``1``. Run the following management command to fetch information about the ``Account``'s associated Flickr ``User`` (replacing ``1`` with your ``Account``'s Django ID, if different):
 
 .. code-block:: shell
 

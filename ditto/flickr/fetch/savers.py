@@ -290,8 +290,8 @@ class PhotoSaver(SaveUtilsMixin, object):
                     # It's possible for there to be a tag with a different
                     # slug but the same name, which would cause an
                     # IntegrityError.
-                    # In which case, just fetch the existing Tag by slug:
-                    tag_obj = Tag.objects.get(slug=tag['_content'])
+                    # In which case, just fetch the existing Tag by name:
+                    tag_obj = Tag.objects.get(name=tag['raw'])
 
                 # Who created this tag?
                 if tag['author'] == photo_obj.user.nsid:
