@@ -121,3 +121,61 @@ class AnnualBookmarkCountsTestCase(TestCase):
         self.assertEqual(bookmarks[2]['year'], 2017)
         self.assertEqual(bookmarks[2]['count'], 0)
 
+
+class PopularBookmarkTagsTestCase(TestCase):
+
+    def test_tags(self):
+        "Contains the correct data"
+        bookmark_1 = BookmarkFactory()
+        bookmark_1.tags.set('fish', 'carp')
+        bookmark_2 = BookmarkFactory()
+        bookmark_2.tags.set('fish', 'cod')
+        tags = ditto_pinboard.popular_bookmark_tags()
+        self.assertEqual(len(tags), 3)
+        self.assertEqual(tags[0].name, 'fish')
+        self.assertEqual(tags[0].num_times, 2)
+        self.assertEqual(tags[1].name, 'carp')
+        self.assertEqual(tags[1].num_times, 1)
+        self.assertEqual(tags[2].name, 'cod')
+        self.assertEqual(tags[2].num_times, 1)
+
+    def test_tags_privacy_bookmarks(self):
+        "Doesn't display tags from private bookmarks"
+        bookmark_1 = BookmarkFactory(is_private=True)
+        bookmark_1.tags.set('fish', 'carp')
+        bookmark_2 = BookmarkFactory(is_private=False)
+        bookmark_2.tags.set('fish', 'cod')
+        tags = ditto_pinboard.popular_bookmark_tags()
+        self.assertEqual(len(tags), 2)
+        self.assertEqual(tags[0].name, 'fish')
+        self.assertEqual(tags[0].num_times, 1)
+        self.assertEqual(tags[1].name, 'cod')
+        self.assertEqual(tags[1].num_times, 1)
+
+    def test_tags_privacy_tags(self):
+        "Doesn't display private .tags"
+        bookmark = BookmarkFactory()
+        bookmark.tags.set('ispublic', '.notpublic', 'alsopublic')
+        tags = ditto_pinboard.popular_bookmark_tags()
+        self.assertEqual(len(tags), 2)
+        # Tags are ordered by popularity, so can't be sure
+        # which is 'alsopublic' and which is 'ispublic':
+        tag_names = [tag.name for tag in tags]
+        self.assertIn('alsopublic', tag_names)
+        self.assertIn('ispublic', tag_names)
+
+    def test_tags_num_default(self):
+        "It should return 10 tags by default"
+        bookmark = BookmarkFactory()
+        bookmark.tags.set(
+                    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11')
+        tags = ditto_pinboard.popular_bookmark_tags()
+        self.assertEqual(len(tags), 10)
+
+    def test_tags_num_custom(self):
+        "It should return `num` tags"
+        bookmark = BookmarkFactory()
+        bookmark.tags.set('1', '2', '3', '4', '5')
+        tags = ditto_pinboard.popular_bookmark_tags(num=3)
+        self.assertEqual(len(tags), 3)
+

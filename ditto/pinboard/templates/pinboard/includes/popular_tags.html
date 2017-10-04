@@ -1,0 +1,27 @@
+{% comment %}
+Displays a list of the most popular tags.
+{% endcomment %}
+
+{% load ditto_pinboard %}
+{% load l10n %}
+
+{% popular_bookmark_tags num=10 as tag_list %}
+
+{% if tag_list %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h6 card-title">The most common tags</h2>
+            <ol>
+                {% for tag in tag_list %}
+                    <li>
+                        <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">{{ tag.name }}</a>
+                        <small>({{ tag.num_times|localize }})</small>
+                    </li>
+                {% endfor %}
+            </ol>
+            <p class="mb-0"><a href="{% url 'pinboard:tag_list' %}">More…</a></p>
+        </div>
+    </div>
+{% endif %}
+
+

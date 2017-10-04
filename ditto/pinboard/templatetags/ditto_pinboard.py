@@ -45,6 +45,7 @@ def day_bookmarks(date, account=None):
     bookmarks = bookmarks.prefetch_related('account')
     return bookmarks
 
+
 @register.assignment_tag
 def annual_bookmark_counts(account=None):
     """
@@ -61,4 +62,9 @@ def annual_bookmark_counts(account=None):
         bookmarks = bookmarks.filter(account__username=account)
 
     return get_annual_item_counts(bookmarks)
+
+
+@register.assignment_tag
+def popular_bookmark_tags(num=10):
+    return Bookmark.tags.most_common()[:num]
 

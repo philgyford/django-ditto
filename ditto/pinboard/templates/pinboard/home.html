@@ -26,15 +26,10 @@
                 </ul>
             </div>
 
-            <div class="card mb-3">
-                <div class="card-body">
-                    <p class="card-text">
-                        <a href="{% url 'pinboard:tag_list' %}">The most common tags</a>
-                    </p>
-                </div>
-            </div>
+            {% include 'pinboard/includes/popular_tags.html' only %}
 
             {% include 'pinboard/includes/annual_bookmark_counts.html' only %}
+
         </div> <!-- .col -->
 
         <div class="col-md-9">
