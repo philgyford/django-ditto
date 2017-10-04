@@ -164,7 +164,7 @@ class PopularBookmarkTagsTestCase(TestCase):
         self.assertIn('alsopublic', tag_names)
         self.assertIn('ispublic', tag_names)
 
-    def test_tags_num_default(self):
+    def test_tags_limit_default(self):
         "It should return 10 tags by default"
         bookmark = BookmarkFactory()
         bookmark.tags.set(
@@ -172,10 +172,10 @@ class PopularBookmarkTagsTestCase(TestCase):
         tags = ditto_pinboard.popular_bookmark_tags()
         self.assertEqual(len(tags), 10)
 
-    def test_tags_num_custom(self):
-        "It should return `num` tags"
+    def test_tags_limit_custom(self):
+        "It should return `limit` tags"
         bookmark = BookmarkFactory()
         bookmark.tags.set('1', '2', '3', '4', '5')
-        tags = ditto_pinboard.popular_bookmark_tags(num=3)
+        tags = ditto_pinboard.popular_bookmark_tags(limit=3)
         self.assertEqual(len(tags), 3)
 

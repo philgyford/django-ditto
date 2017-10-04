@@ -5,7 +5,7 @@ Displays a list of the most popular tags.
 {% load ditto_pinboard %}
 {% load l10n %}
 
-{% popular_bookmark_tags num=10 as tag_list %}
+{% popular_bookmark_tags limit=10 as tag_list %}
 
 {% if tag_list %}
     <div class="card mb-3">

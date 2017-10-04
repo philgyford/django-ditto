@@ -65,6 +65,6 @@ def annual_bookmark_counts(account=None):
 
 
 @register.assignment_tag
-def popular_bookmark_tags(num=10):
-    return Bookmark.tags.most_common()[:num]
+def popular_bookmark_tags(limit=10):
+    return Bookmark.tags.most_common()[:limit]
 
