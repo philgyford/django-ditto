@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pinboard &mdash; Django Ditto 0.6.1 documentation</title>
+  <title>Pinboard &mdash; Django Ditto 0.6.2 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.6.1 documentation" href="../index.html"/>
+    <link rel="top" title="Django Ditto 0.6.2 documentation" href="../index.html"/>
         <link rel="next" title="Twitter" href="twitter.html"/>
         <link rel="prev" title="Last.fm" href="lastfm.html"/> 
 
@@ -97,6 +97,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#annual-bookmark-counts">Annual Bookmark Counts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#day-bookmarks">Day Bookmarks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#recent-bookmarks">Recent Bookmarks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#popular-bookmark-tags">Popular Bookmark Tags</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#management-commands">Management commands</a><ul>
@@ -261,6 +262,30 @@ In this example, <code class="docutils literal"><span class="pre">my_date</span>
 </pre></div>
 </div>
 </div>
+<div class="section" id="popular-bookmark-tags">
+<h3>Popular Bookmark Tags<a class="headerlink" href="#popular-bookmark-tags" title="Permalink to this headline">¶</a></h3>
+<p>To display the most common public Tags on public Bookmarks use
+<code class="docutils literal"><span class="pre">popular_bookmark_tags</span></code>. By default it gets the 10 Tags used most across all
+Accounts.</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">tag</span> <span class="k">in</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    &lt;p&gt;</span>
+<span class="x">        &lt;a href=&quot;</span><span class="cp">{%</span> <span class="k">url</span> <span class="s1">&#39;pinboard:tag_detail&#39;</span> <span class="nv">slug</span><span class="o">=</span><span class="nv">tag.slug</span> <span class="cp">%}</span><span class="x">&quot;&gt;</span>
+<span class="x">            </span><span class="cp">{{</span> <span class="nv">tag.name</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        &lt;/a&gt;</span>
+<span class="x">        (</span><span class="cp">{{</span> <span class="nv">tag.num_times</span> <span class="cp">}}</span><span class="x">)</span>
+<span class="x">    &lt;/p&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The tag can also fetch a different number of Tags. Here we only get the 5 most popular Tags.:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="management-commands">
 <span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h2>
@@ -335,7 +360,7 @@ of a particular bookmark you&#8217;ve alread fetched):</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.6.1',
+            VERSION:'0.6.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

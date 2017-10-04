@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.6.2
+-----
+
+- Added the ``popular_bookmark_tags`` template tag to the ``pinboard`` app.
+
+
 0.6.1
 -----
 

@@ -138,6 +138,35 @@ The tag can also fetch a different number of Bookmarks and/or only get Bookmarks
     {% recent_bookmarks account='philgyford' limit=5 as bookmarks %}
 
 
+Popular Bookmark Tags
+=====================
+
+To display the most common public Tags on public Bookmarks use
+``popular_bookmark_tags``. By default it gets the 10 Tags used most across all
+Accounts.
+
+.. code-block:: django
+
+    {% load ditto_pinboard %}
+
+    {% popular_bookmark_tags as tags %}
+
+    {% for tag in tags %}
+        <p>
+            <a href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
+                {{ tag.name }}
+            </a>
+            ({{ tag.num_times }})
+        </p>
+    {% endfor %}
+
+The tag can also fetch a different number of Tags. Here we only get the 5 most popular Tags.:
+
+.. code-block:: django
+
+    {% popular_bookmark_tags limit=5 as tags %}
+
+
 .. _pinboard-management-commands:
 
 *******************
