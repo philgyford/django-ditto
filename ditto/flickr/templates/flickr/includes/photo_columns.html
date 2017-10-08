@@ -2,7 +2,6 @@
 Displaying a queryset of Photos in columns, with pagination.
 
 Expects:
- * request, the request object.
  * photo_list, a queryset of Photos.
  * perms - The Django perms object.
  * page_obj - Optional, a DiggPaginator instance or False (default).
@@ -12,7 +11,7 @@ Expects:
 
 {% if photo_list|length > 0 %}
     {% if page_obj|default:False and page_obj.number > 1 %}
-        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 
     {% load ditto_core %}
@@ -51,7 +50,7 @@ Expects:
 
 
     {% if page_obj|default:False %}
-        {% include 'ditto/includes/pagination.html' with request=request page_obj=page_obj only %}
+        {% include 'ditto/includes/pagination.html' with page_obj=page_obj only %}
     {% endif %}
 {% else %}
 
