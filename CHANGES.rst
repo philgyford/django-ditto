@@ -1,6 +1,13 @@
 Changelog (Django Ditto)
 ========================
 
+0.6.3
+-----
+
+- The Last.fm template tags for the top albums, artists and tracks can now
+  display the top list for a week, as well as day, month and year.
+
+
 0.6.2
 -----
 
