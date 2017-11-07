@@ -280,7 +280,7 @@ Get a QuerySet of the most-scrobbled ``Artist`` s with the most-scrobbled first.
 
     {% load ditto_lastfm %}
 
-    {% top_artists account=account date=my_date period='month' limit=5 as albums %}
+    {% top_artists account=account date=my_date period='month' limit=5 as artists %}
 
     {% for artist in artists %}
         <p>
