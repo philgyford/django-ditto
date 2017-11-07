@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Django Ditto 0.6.2 documentation</title>
+  <title>Installation &mdash; Django Ditto 0.6.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.6.2 documentation" href="index.html"/>
+    <link rel="top" title="Django Ditto 0.6.3 documentation" href="index.html"/>
         <link rel="next" title="Flickr" href="services/flickr.html"/>
         <link rel="prev" title="Introduction" href="introduction.html"/> 
 
@@ -238,8 +238,14 @@ images:</p>
 
 <span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
 <span class="n">DITTO_TWITTER_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">DITTO_WEEK_START</span> <span class="o">=</span> <span class="mi">0</span>
 </pre></div>
 </div>
+<p>The last setting is currently only used in the Last.fm template tags, to
+generate list of most listened-to albums, artists and tracks, but might be
+used for other Ditto apps in future. It specifies which day a week starts on.
+The default is the integer <code class="docutils literal"><span class="pre">0</span></code>, which is Monday. Sunday would be <code class="docutils literal"><span class="pre">6</span></code>.</p>
 <div class="section" id="other-optional-settings">
 <h3>Other optional settings<a class="headerlink" href="#other-optional-settings" title="Permalink to this headline">¶</a></h3>
 <p>To have large numbers formatted nicely in the included templates, ensure these are in your <code class="docutils literal"><span class="pre">settings.py</span></code>:</p>
@@ -296,7 +302,7 @@ images:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6.2',
+            VERSION:'0.6.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

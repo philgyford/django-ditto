@@ -189,6 +189,68 @@ To restrict scrobbles to a single ``Account`` (assuming ``account`` is an ``Acco
     {% recent_scrobbles account=account limit=30 as scrobbles %}
 
 
+Top Tracks
+==========
+
+Get a QuerySet of the most-scrobbled ``Track`` s with the most-scrobbled first. Can be restricted to: a single ``Account``; a single day, week, month or year; tracks by a single ``Artist``. By default 10 tracks are returned.
+
+.. code-block:: django
+
+    {% load ditto_lastfm %}
+
+    {% top_tracks as tracks %}
+
+    {% for track in tracks %}
+        <p>
+            {{ forloop.counter }}.
+            {{ track.artist.name }} - {{ track.name }}:
+            {{ track.scrobble_count }}
+        </p>
+    {% endfor %}
+
+Examples of fetching for a single day, month or year, assuming ``my_date`` is either a ``datetime.datetime`` or a ``datetime.date``:
+
+.. code-block:: django
+
+    {% top_tracks date=my_date period='day' as tracks %}
+
+    {% top_tracks date=my_date period='week' as tracks %}
+
+    {% top_tracks date=my_date period='month' as tracks %}
+
+    {% top_tracks date=my_date period='year' as tracks %}
+
+For month and year, the calendar month/year around the date is used. e.g. if the supplied date was ``2016-03-24`` then ``period='month'`` would produce a chart for March 2016, and ``period='year'`` would produce a chart for all of 2016.
+
+For week, the default behaviour is the week starting on the Monday before (or on) the supplied date. If you would like weeks to start on a different date then use the ``DITTO_WEEK_START`` setting in your project's settings file. e.g. to have weeks start on a Sunday you would use:
+
+.. code-block:: django
+
+    DITTO_WEEK_START = 6
+
+Monday (the default) is ``0``, Tuesday is ``1``, etc.
+
+Example of only fetching tracks by a single artist, assuming ``artist`` is an ``Artist`` object:
+
+.. code-block:: django
+
+    {% top_tracks artist=artist as tracks %}
+
+Example of only fetching tracks scrobbled by a single ``Account``:
+
+.. code-block:: django
+
+    {% top_tracks account=account as tracks %}
+
+Example of fetching only 5 tracks by a single ``Artist``, scrobbled by a single ``Account``, during a single month:
+
+.. code-block:: django
+
+    {% top_tracks artist=artist account=account date=my_date period='month' limit=5 as tracks %}
+
+Arguments can be in any order.
+
+
 Top Albums
 ==========
 
@@ -227,58 +289,6 @@ Get a QuerySet of the most-scrobbled ``Artist`` s with the most-scrobbled first.
             {{ album.scrobble_count }}
         </p>
     {% endfor %}
-
-
-Top Tracks
-==========
-
-Get a QuerySet of the most-scrobbled ``Track`` s with the most-scrobbled first. Can be restricted to: a single ``Account``; a single day, month or year; tracks by a single ``Artist``. By default 10 tracks are returned.
-
-.. code-block:: django
-
-    {% load ditto_lastfm %}
-
-    {% top_tracks as tracks %}
-
-    {% for track in tracks %}
-        <p>
-            {{ forloop.counter }}.
-            {{ track.artist.name }} - {{ track.name }}:
-            {{ track.scrobble_count }}
-        </p>
-    {% endfor %}
-
-Examples of fetching for a single day, month or year, assuming ``my_date`` is either a ``datetime.datetime`` or a ``datetime.date``:
-
-.. code-block:: django
-
-    {% top_tracks date=my_date period='day' as tracks %}
-
-    {% top_tracks date=my_date period='month' as tracks %}
-
-    {% top_tracks date=my_date period='year' as tracks %}
-
-For month and year, the calendar month/year around the date is used. e.g. if the supplied date was ``2016-03-24`` then ``period='month'`` would produce a chart for March 2016, and ``period='year'`` would produce a chart for all of 2016.
-
-Example of only fetching tracks by a single artist, assuming ``artist`` is an ``Artist`` object:
-
-.. code-block:: django
-
-    {% top_tracks artist=artist as tracks %}
-
-Example of only fetching tracks scrobbled by a single ``Account``:
-
-.. code-block:: django
-
-    {% top_tracks account=account as tracks %}
-
-Example of fetching only 5 tracks by a single ``Artist``, scrobbled by a single ``Account``, during a single month:
-
-.. code-block:: django
-
-    {% top_tracks artist=artist account=account date=my_date period='month' limit=5 as tracks %}
-
-Arguments can be in any order.
 
 
 .. _lastfm-management-commands:
