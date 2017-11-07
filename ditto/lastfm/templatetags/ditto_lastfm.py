@@ -3,6 +3,7 @@ import datetime
 import pytz
 
 from django import template
+from django.conf import settings
 from django.db.models import Count
 from django.utils.html import format_html
 
@@ -36,43 +37,70 @@ def check_top_kwargs(**kwargs):
         raise TypeError('`date` must be a datetime or date, '
                         'not a %s' % type(date))
 
-    if period not in ['day', 'month', 'year']:
-        raise TypeError('`period` must be one of "day", "month" or "year", '
-                        'not %s' % type(period))
+    if period not in ['day', 'week', 'month', 'year']:
+        raise TypeError(
+                '`period` must be one of "day", "week", "month" or "year", '
+                'not %s' % type(period))
 
 
-def get_post_times(date, period):
+def get_period_times(date, period):
     """
     Makes the min_post_time and max_post_time for restricting top_albums(),
     top_artists() or top_tracks() to a particular time period.
 
     Arguments:
     date -- A datetime or date.
-    period -- String, 'day', 'month' or 'year'.
+    period -- String, 'day', 'week', 'month' or 'year'.
     """
+    # First create start/end datetimes with the correct times:
     if isinstance(date, datetime.datetime):
-        min_post_time = date.replace(hour=0, minute=0, second=0)
-        max_post_time = date.replace(
+        min_time = date.replace(hour=0, minute=0, second=0)
+        max_time = date.replace(
                             hour=23, minute=59, second=59, microsecond=999999)
     else:
         # `date` is a datetime.date
-        min_post_time = datetime.datetime.combine(
-                                            date, datetime.datetime.min.time()).replace(tzinfo=pytz.utc)
-        max_post_time = datetime.datetime.combine(
-                                            date, datetime.datetime.max.time()).replace(tzinfo=pytz.utc)
+        min_time = datetime.datetime.combine(
+                    date, datetime.datetime.min.time()).replace(tzinfo=pytz.utc)
+        max_time = datetime.datetime.combine(
+                    date, datetime.datetime.max.time()).replace(tzinfo=pytz.utc)
 
-    if period == 'month':
-        min_post_time = min_post_time.replace(day=1)
+    if period == 'week':
+        # Default, Monday:
+        start_day = 0 
+
+        if hasattr(settings, 'DITTO_WEEK_START'):
+            if isinstance(settings.DITTO_WEEK_START, int) \
+                and settings.DITTO_WEEK_START >= 0 \
+                and settings.DITTO_WEEK_START <= 6:
+                start_day = settings.DITTO_WEEK_START
+            else:
+                raise ValueError(
+                    'The DITTO_WEEK_START setting should be an int from 0 to 6')
+
+        # Which day is `date` on?
+        day_of_week = min_time.weekday()
+        start_offset = datetime.timedelta(start_day - day_of_week)
+
+        if start_day > day_of_week:
+            # e.g. Week starts on a Sunday, so in previous week.
+            start_offset -= datetime.timedelta(weeks=1)
+
+        min_time = min_time + start_offset
+        max_time = min_time + datetime.timedelta(weeks=1) \
+                                      - datetime.timedelta(microseconds=1)
+        
+    elif period == 'month':
+        min_time = min_time.replace(day=1)
         # Last day of month:
         end_day = calendar.monthrange(
-                                max_post_time.year, max_post_time.month)[1]
-        max_post_time = max_post_time.replace(day=end_day)
+                                max_time.year, max_time.month)[1]
+        max_time = max_time.replace(day=end_day)
 
     elif period == 'year':
-        min_post_time = min_post_time.replace(month=1, day=1)
-        max_post_time = max_post_time.replace(month=12, day=31)
+        min_time = min_time.replace(month=1, day=1)
+        max_time = max_time.replace(month=12, day=31)
 
-    return min_post_time, max_post_time
+    return min_time, max_time
 
 
 @register.assignment_tag
@@ -85,14 +113,14 @@ def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
 
     By default gets all Albums.
     Restrict to a day, month or year by supplying a `date` within that
-    day/month/year AND the `period` of 'day', 'month' or 'year'.
+    day/week/month/year AND the `period` of 'day', 'week', 'month' or 'year'.
 
     Keyword arguments:
     account -- An Account object or None (for Scrobbles by all Accounts).
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Albums.
     date -- A datetime or date, for getting Albums from a single time period.
-    period -- A String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'week', 'month', or 'year'.
     """
 
     check_top_kwargs(**{
@@ -115,7 +143,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
         qs_kwargs['artist'] = artist
 
     if date and period:
-        min_post_time, max_post_time = get_post_times(date, period)
+        min_post_time, max_post_time = get_period_times(date, period)
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 
@@ -136,13 +164,13 @@ def top_artists(account=None, limit=10, date=None, period='day'):
 
     By default gets all Artists.
     Restrict to a day, month or year by supplying a `date` within that
-    day/month/year AND the `period` of 'day', 'month' or 'year'.
+    day/week/month/year AND the `period` of 'day', 'week', 'month' or 'year'.
 
     Keyword arguments:
     account -- An Account object or None (for Scrobbles by all Accounts).
     limit -- Maximum number to fetch. Default is 10. 'all' for all Artists.
     date -- A datetime or date, for getting Artists from a single time period.
-    period -- A String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'week', 'month', or 'year'.
     """
     check_top_kwargs(**{
         'account': account,
@@ -157,7 +185,7 @@ def top_artists(account=None, limit=10, date=None, period='day'):
         qs_kwargs['account'] = account
 
     if date and period:
-        min_post_time, max_post_time = get_post_times(date, period)
+        min_post_time, max_post_time = get_period_times(date, period)
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 
@@ -181,7 +209,7 @@ def top_tracks(account=None, album=None, artist=None, limit=10, date=None, perio
 
     By default gets all Tracks.
     Restrict to a day, month or year by supplying a `date` within that
-    day/month/year AND the `period` of 'day', 'month' or 'year'.
+    day/week/month/year AND the `period` of 'day', 'week', 'month' or 'year'.
 
     Keyword arguments:
     account -- An Account object or None (for Scrobbles by all Accounts).
@@ -189,7 +217,7 @@ def top_tracks(account=None, album=None, artist=None, limit=10, date=None, perio
     artist -- An Artist object or None.
     limit -- Maximum number to fetch. Default is 10. 'all' for all Tracks.
     date -- A datetime or date, for getting Tracks from a single time period.
-    period -- A String: 'day', 'month', or 'year'.
+    period -- A String: 'day', 'week', 'month', or 'year'.
     """
 
     check_top_kwargs(**{
@@ -219,7 +247,7 @@ def top_tracks(account=None, album=None, artist=None, limit=10, date=None, perio
         qs_kwargs['artist'] = artist
 
     if date and period:
-        min_post_time, max_post_time = get_post_times(date, period)
+        min_post_time, max_post_time = get_period_times(date, period)
         qs_kwargs['min_post_time'] = min_post_time
         qs_kwargs['max_post_time'] = max_post_time
 

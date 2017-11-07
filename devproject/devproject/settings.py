@@ -159,3 +159,6 @@ INTERNAL_IPS = ['127.0.0.1', '::1',]
 
 DITTO_FLICKR_USE_LOCAL_MEDIA = False
 
+# 0=Monday (default), 6=Sunday:
+DITTO_WEEK_START = 0
+
