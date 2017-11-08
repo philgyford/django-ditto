@@ -29,7 +29,7 @@ def recent_photos(nsid=None, limit=10):
     return photos[:limit]
 
 @register.assignment_tag
-def day_photos(date, nsid=None):
+def day_photos(date, nsid=None, time='post_time'):
     """Returns a QuerySet of public Photos posted on a specific date.
 
     Arguments:
@@ -38,14 +38,26 @@ def day_photos(date, nsid=None):
     Keyword arguments:
     nsid -- A Flickr user's NSID. If not supplied, we fetch
                     Photos for all Flickr users that have Accounts.
+    time -- A string, either 'post_time' (default) or 'taken_time'.
     """
+    if time not in ['post_time', 'taken_time']:
+        raise ValueError("`time` must be either 'post_time' or "
+                        "'taken_time', not '%s'." % time)
+
     start = datetime.datetime.combine(date, datetime.time.min).replace(
                                                             tzinfo=pytz.utc)
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
-    photos = Photo.public_photo_objects.filter(post_time__range=[start, end])
+    photos = Photo.public_photo_objects
+    
+    if time == 'taken_time':
+        photos = photos.filter(taken_time__range=[start, end])
+    else:
+        photos = photos.filter(post_time__range=[start, end])
+
     if nsid is not None:
         photos = photos.filter(user__nsid=nsid)
+
     photos = photos.prefetch_related('user')
     return photos
 

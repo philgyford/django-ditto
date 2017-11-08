@@ -77,10 +77,14 @@ class TemplatetagsDayPhotosTestCase(TestCase):
         self.photos_1 = PhotoFactory.create_batch(2, user=user_1)
         self.photos_2 = PhotoFactory.create_batch(3, user=user_2)
 
+        taken_time = datetime.datetime(2014, 3, 18, 12, 0, 0).replace(
+                                                            tzinfo=pytz.utc)
         post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(
                                                             tzinfo=pytz.utc)
+        self.photos_1[0].taken_time = taken_time
         self.photos_1[0].post_time = post_time
         self.photos_1[0].save()
+        self.photos_2[1].taken_time = taken_time + datetime.timedelta(hours=1)
         self.photos_2[1].post_time = post_time + datetime.timedelta(hours=1)
         self.photos_2[1].save()
 
@@ -98,6 +102,16 @@ class TemplatetagsDayPhotosTestCase(TestCase):
         "Returns only Photos from the day if it's the chosen account"
         photos = ditto_flickr.day_photos(
                             datetime.date(2015, 3, 18), nsid='1234567890@N01')
+        self.assertEqual(1, len(photos))
+        self.assertEqual(photos[0].pk, self.photos_1[0].pk)
+
+    def test_day_photos_invalid_time(self):
+        with self.assertRaises(ValueError):
+            ditto_flickr.day_photos(datetime.date(2015, 3, 18), time='asdf')
+
+    def test_day_photos_taken_time(self):
+        photos = ditto_flickr.day_photos(
+            datetime.date(2014, 3, 18), nsid='1234567890@N01', time='taken_time')
         self.assertEqual(1, len(photos))
         self.assertEqual(photos[0].pk, self.photos_1[0].pk)
 
