@@ -1,7 +1,9 @@
 .coverage
+.pypirc
 devproject/db.sqlite3
 devproject/media
 devproject/static
 dist
 django_ditto.egg-info
 htmlcov
+build/

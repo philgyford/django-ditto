@@ -41,11 +41,12 @@ if sys.argv[-1] == 'tag':
 
 # Do `python setup.py publish` to send current version to PyPI.
 if sys.argv[-1] == 'publish':
-    os.system("python setup.py sdist upload -r pypi")
-    # os.system("python setup.py bdist_wheel upload")
+    os.system("python setup.py sdist")
+    os.system("twine upload --config-file=.pypirc dist/*")
     sys.exit()
 
 # Do `python setup.py testpublish` to send current version to Test PyPI.
+# OUT OF DATE
 if sys.argv[-1] == 'testpublish':
     os.system("python setup.py sdist upload -r pypitest")
     # os.system("python setup.py bdist_wheel upload")
