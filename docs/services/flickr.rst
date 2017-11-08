@@ -153,7 +153,7 @@ To restrict totals to a single User-with-Account, include their ``nsid``:
 Day Photos
 ==========
 
-Gets public Photos posted on a particular day by any of the Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
+Gets public Photos posted or taken on a particular day by any of the Users-with-Accounts. In this example, ``my_date`` is a `datetime.datetime.date <https://docs.python.org/3.5/library/datetime.html#datetime.date>`_ type:
 
 .. code-block:: django
 
@@ -161,11 +161,20 @@ Gets public Photos posted on a particular day by any of the Users-with-Accounts.
 
     {% day_photos my_date as photos %}
 
+By default this will return photos posted on the date. To specify whether it
+uses ``post_time`` or ``taken_time`` use the ``time`` parameter:
+
+.. code-block:: django
+
+    {% day_photos my_date time='post_time' as photos %}
+
+    {% day_photos my_date time='taken_time' as photos %}
+
 Or we can restrict this to Photos posted by a single User-with-an-Account:
 
 .. code-block:: django
 
-    {% day_photos my_date nsid='35034346050@N01' as photos %}
+    {% day_photos my_date time='post_time' nsid='35034346050@N01' as photos %}
 
 
 Photosets

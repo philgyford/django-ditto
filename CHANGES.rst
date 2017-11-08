@@ -1,6 +1,13 @@
 Changelog (Django Ditto)
 ========================
 
+0.6.4
+-----
+
+- The Flickr ``day_photos`` template tag can now fetch photos taken on
+  a particular day, as well as posted on a day.
+
+
 0.6.3
 -----
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Flickr &mdash; Django Ditto 0.6.3 documentation</title>
+  <title>Flickr &mdash; Django Ditto 0.6.4 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Django Ditto 0.6.3 documentation" href="../index.html"/>
+    <link rel="top" title="Django Ditto 0.6.4 documentation" href="../index.html"/>
         <link rel="next" title="Last.fm" href="lastfm.html"/>
         <link rel="prev" title="Installation" href="../installation.html"/> 
 
@@ -287,14 +287,21 @@ differentiators we want to restrict things by:</p>
 </div>
 <div class="section" id="day-photos">
 <h3>Day Photos<a class="headerlink" href="#day-photos" title="Permalink to this headline">¶</a></h3>
-<p>Gets public Photos posted on a particular day by any of the Users-with-Accounts. In this example, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
+<p>Gets public Photos posted or taken on a particular day by any of the Users-with-Accounts. In this example, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
+<p>By default this will return photos posted on the date. To specify whether it
+uses <code class="docutils literal"><span class="pre">post_time</span></code> or <code class="docutils literal"><span class="pre">taken_time</span></code> use the <code class="docutils literal"><span class="pre">time</span></code> parameter:</p>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+
+<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
 <p>Or we can restrict this to Photos posted by a single User-with-an-Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
@@ -499,7 +506,7 @@ Photos posted by the User with an <code class="docutils literal"><span class="pr
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.6.3',
+            VERSION:'0.6.4',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
