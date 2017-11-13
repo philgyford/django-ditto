@@ -578,7 +578,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
     screen_name = models.CharField(null=False, blank=False, max_length=20,
         help_text="Username, eg, 'samuelpepys'")
-    name = models.CharField(null=False, blank=False, max_length=30,
+    name = models.CharField(null=False, blank=False, max_length=50,
         help_text="eg, 'Samuel Pepys'")
     url = models.URLField(null=False, blank=True, default='', max_length=255,
         help_text="A URL provided by the user as part of their profile")
