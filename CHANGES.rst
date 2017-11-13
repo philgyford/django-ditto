@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.6.5
+-----
+
+- Increase the maximum length of a Twitter User's display name to 50 characters.
+
+
 0.6.4
 -----
 
