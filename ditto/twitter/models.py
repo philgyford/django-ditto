@@ -1,7 +1,11 @@
 # coding: utf-8
 import os
 
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    # For Django 1.8
+    from django.core.urlresolvers import reverse
 from django.db import models
 from django.templatetags.static import static
 
@@ -405,7 +409,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    user = models.ForeignKey('User')
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
 
     text = models.TextField(null=False, blank=False)
     text_html = models.TextField(null=False, blank=True,
