@@ -1,6 +1,10 @@
 # coding: utf-8
 from django.db import models
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    # For Django 1.8
+    from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 
 from imagekit.cachefiles import ImageCacheFile
@@ -67,9 +71,9 @@ class TaggedPhoto(TaggedItemBase):
     """
     flickr_id = models.CharField(max_length=200, verbose_name="Flickr ID",
                                             help_text="The tag's ID on Flickr")
-    author = models.ForeignKey('User')
+    author = models.ForeignKey('User', on_delete=models.CASCADE)
     machine_tag = models.BooleanField(default=False)
-    content_object = models.ForeignKey('Photo',
+    content_object = models.ForeignKey('Photo', on_delete=models.CASCADE,
                                 related_name="%(app_label)s_%(class)s_items")
 
     class Meta:
@@ -273,7 +277,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    user = models.ForeignKey('User')
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
 
     flickr_id = models.BigIntegerField(unique=True, db_index=True,
                                     help_text="ID of this photo on Flickr.")
@@ -658,11 +662,11 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
 
 
 class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
-    user = models.ForeignKey('User')
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
     flickr_id = models.BigIntegerField(null=False, blank=False, unique=True,
                                                                 db_index=True)
-    primary_photo = models.ForeignKey('Photo', null=True,
-                                            related_name='primary_photosets')
+    primary_photo = models.ForeignKey('Photo', on_delete=models.SET_NULL,
+                                null=True, related_name='primary_photosets')
     title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=False, blank=True,
                                                 help_text="Can contain HTML")
