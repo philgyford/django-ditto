@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(help_text=b"The 'extended' text description.", blank=True)),
                 ('to_read', models.BooleanField(default=False)),
                 ('shared', models.BooleanField(default=True)),
-                ('account', models.ForeignKey(to='pinboard.Account')),
+                ('account', models.ForeignKey(to='pinboard.Account', on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,

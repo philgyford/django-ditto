@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tweet',
             name='user',
-            field=models.ForeignKey(to='twitter.User'),
+            field=models.ForeignKey(to='twitter.User', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='account',

@@ -156,17 +156,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='taggedphoto',
             name='author',
-            field=models.ForeignKey(to='flickr.User'),
+            field=models.ForeignKey(to='flickr.User', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='taggedphoto',
             name='content_object',
-            field=models.ForeignKey(to='flickr.Photo', related_name='flickr_taggedphoto_items'),
+            field=models.ForeignKey(to='flickr.Photo', related_name='flickr_taggedphoto_items', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='taggedphoto',
             name='tag',
-            field=models.ForeignKey(to='taggit.Tag', related_name='flickr_taggedphoto_items'),
+            field=models.ForeignKey(to='taggit.Tag', related_name='flickr_taggedphoto_items',  on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='photo',
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='photo',
             name='user',
-            field=models.ForeignKey(to='flickr.User'),
+            field=models.ForeignKey(to='flickr.User',  on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='account',

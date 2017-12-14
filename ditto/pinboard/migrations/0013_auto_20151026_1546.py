@@ -33,8 +33,8 @@ class Migration(migrations.Migration):
                 ('object_id', models.IntegerField(verbose_name='Object id', db_index=True)),
                 ('time_created', models.DateTimeField(help_text='The time this item was created in the database.', auto_now_add=True)),
                 ('time_modified', models.DateTimeField(help_text='The time this item was last saved to the database.', auto_now=True)),
-                ('content_type', models.ForeignKey(related_name='pinboard_taggedbookmark_tagged_items', to='contenttypes.ContentType', verbose_name='Content type')),
-                ('tag', models.ForeignKey(related_name='pinboard_taggedbookmark_items', to='pinboard.BookmarkTag')),
+                ('content_type', models.ForeignKey(related_name='pinboard_taggedbookmark_tagged_items', to='contenttypes.ContentType', verbose_name='Content type', on_delete=models.CASCADE)),
+                ('tag', models.ForeignKey(related_name='pinboard_taggedbookmark_items', to='pinboard.BookmarkTag', on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,

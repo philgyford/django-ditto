@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('webm_url', models.URLField(blank=True, null=True, verbose_name='WebM URL')),
                 ('aspect_ratio', models.CharField(help_text='eg, "4:3" or "16:9"', max_length=5)),
                 ('duration', models.PositiveIntegerField(help_text='In milliseconds', blank=True, null=True)),
-                ('tweet', models.ForeignKey(to='twitter.Tweet')),
+                ('tweet', models.ForeignKey(to='twitter.Tweet', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['time_created'],

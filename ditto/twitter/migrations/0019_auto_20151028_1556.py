@@ -47,6 +47,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='photo',
             name='tweet',
-            field=models.ForeignKey(to='twitter.Tweet'),
+            field=models.ForeignKey(to='twitter.Tweet', on_delete=models.CASCADE),
         ),
     ]
