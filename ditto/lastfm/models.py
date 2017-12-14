@@ -1,6 +1,10 @@
 # coding: utf-8
 from django.db import models
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    # For Django 1.8
+    from django.core.urlresolvers import reverse
 
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 from ..core.utils import truncate_string
@@ -80,7 +84,8 @@ class Album(TimeStampedModelMixin, models.Model):
             help_text="Lowercase")
     original_slug = models.TextField(null=False, blank=False,
             help_text="As used on Last.fm. Mixed case.")
-    artist = models.ForeignKey('Artist', related_name='albums')
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
+                                                        related_name='albums')
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
@@ -240,12 +245,15 @@ class Scrobble(DittoItemModel, models.Model):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    account = models.ForeignKey('Account', related_name='scrobbles')
+    account = models.ForeignKey('Account', on_delete=models.CASCADE,
+                                                    related_name='scrobbles')
 
-    artist = models.ForeignKey('Artist', related_name='scrobbles')
-    track = models.ForeignKey('Track', related_name='scrobbles')
-    album = models.ForeignKey('Album', related_name='scrobbles',
-                                                        blank=True, null=True)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
+                                                    related_name='scrobbles')
+    track = models.ForeignKey('Track', on_delete=models.CASCADE,
+                                                    related_name='scrobbles')
+    album = models.ForeignKey('Album', on_delete=models.SET_NULL,
+                            related_name='scrobbles', blank=True, null=True)
 
     def __str__(self):
         return '%s (%s)' % (self.title, self.post_time)
@@ -282,7 +290,8 @@ class Track(TimeStampedModelMixin, models.Model):
             help_text="Lowercase")
     original_slug = models.TextField(null=False, blank=False,
             help_text="As used on Last.fm. Mixed case.")
-    artist = models.ForeignKey('Artist', related_name='tracks')
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
+                                                        related_name='tracks')
     mbid = models.CharField(null=False, blank=True, max_length=36,
             verbose_name="MBID",
             help_text="MusicBrainz Identifier")
