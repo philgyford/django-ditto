@@ -115,7 +115,7 @@ class BookmarkTag(TimeStampedModelMixin, TagBase):
 
 
 class TaggedBookmark(TimeStampedModelMixin, GenericTaggedItemBase):
-    tag = models.ForeignKey(BookmarkTag,
+    tag = models.ForeignKey(BookmarkTag, on_delete=models.CASCADE,
                             related_name="%(app_label)s_%(class)s_items")
 
 
@@ -135,7 +135,8 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    account = models.ForeignKey(Account, null=False, blank=False)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE,
+                                                    null=False, blank=False)
 
     # `url` in the Pinboard API:
     url = models.TextField(null=False, blank=False,
