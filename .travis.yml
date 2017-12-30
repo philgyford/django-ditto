@@ -13,8 +13,8 @@ addons:
 # This, with tox-travis, and our tox.ini, will test on these Django versions
 # across all our specified python versions:
 env:
-  - DJANGO=1.10
   - DJANGO=1.11
+  - DJANGO=2.0
 matrix:
   include:
     # This will also run the coverage test only on this python version:
