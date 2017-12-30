@@ -74,16 +74,24 @@ To use Ditto's supplied views you can include each app's URLs in your project's 
     urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
 
-        url(r'^flickr/', include('ditto.flickr.urls', namespace='flickr')),
-        url(r'^lastfm/', include('ditto.lastfm.urls', namespace='lastfm')),
-        url(r'^pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
-        url(r'^twitter/', include('ditto.twitter.urls', namespace='twitter')),
+        url(r'^flickr/', include('ditto.flickr.urls')),
+        url(r'^lastfm/', include('ditto.lastfm.urls')),
+        url(r'^pinboard/', include('ditto.pinboard.urls')),
+        url(r'^twitter/', include('ditto.twitter.urls')),
 
         # To include the overall, aggregated views:
-        url(r'ditto/', include('ditto.core.urls', namespace='ditto')),
+        url(r'ditto/', include('ditto.core.urls')),
     ]
 
 Change the URL include paths (eg, ``r'^ditto/pinboard/'`` as appropriate) to suit your project. See the ``urls.py`` in the ``devproject/`` project for a full example.
+
+Each app's URL conf is included under an appropriate ``app_name``:
+
+* ``flickr``
+* ``lastfm``
+* ``pinboard``
+* ``twitter``
+* ``ditto`` (The Ditto Core URLs)
 
 
 ********

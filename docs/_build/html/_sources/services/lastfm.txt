@@ -115,7 +115,7 @@ Some more examples (``d1`` and ``d2`` are both ``datetime.datetime`` s)::
 Template tags
 *************
 
-There are several assignment template tags for getting common lists of things.
+There are several template tags for getting common lists of things.
 
 
 Annual Scrobble Counts

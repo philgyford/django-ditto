@@ -63,7 +63,7 @@ Of course, these can all be filtered as usual. So, to display public 'To read' B
 Template tags
 *************
 
-There are two assignment template tags available for displaying Bookmarks in your templates.
+There are two template tags available for displaying Bookmarks in your templates.
 
 
 Annual Bookmark Counts

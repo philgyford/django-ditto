@@ -217,17 +217,25 @@ images:</p>
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
 
-    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^flickr/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.flickr.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;flickr&#39;</span><span class="p">)),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^lastfm/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.lastfm.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;lastfm&#39;</span><span class="p">)),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^pinboard/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.pinboard.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;pinboard&#39;</span><span class="p">)),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^twitter/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.twitter.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;twitter&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^flickr/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.flickr.urls&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^lastfm/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.lastfm.urls&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^pinboard/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.pinboard.urls&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;^twitter/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.twitter.urls&#39;</span><span class="p">)),</span>
 
     <span class="c1"># To include the overall, aggregated views:</span>
-    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;ditto/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.core.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;ditto&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s1">r&#39;ditto/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;ditto.core.urls&#39;</span><span class="p">)),</span>
 <span class="p">]</span>
 </pre></div>
 </div>
 <p>Change the URL include paths (eg, <code class="docutils literal"><span class="pre">r'^ditto/pinboard/'</span></code> as appropriate) to suit your project. See the <code class="docutils literal"><span class="pre">urls.py</span></code> in the <code class="docutils literal"><span class="pre">devproject/</span></code> project for a full example.</p>
+<p>Each app&#8217;s URL conf is included under an appropriate <code class="docutils literal"><span class="pre">app_name</span></code>:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">flickr</span></code></li>
+<li><code class="docutils literal"><span class="pre">lastfm</span></code></li>
+<li><code class="docutils literal"><span class="pre">pinboard</span></code></li>
+<li><code class="docutils literal"><span class="pre">twitter</span></code></li>
+<li><code class="docutils literal"><span class="pre">ditto</span></code> (The Ditto Core URLs)</li>
+</ul>
 </div>
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
