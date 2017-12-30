@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     url(r'^flickr/', include('ditto.flickr.urls', namespace='flickr')),
     url(r'^lastfm/', include('ditto.lastfm.urls', namespace='lastfm')),
