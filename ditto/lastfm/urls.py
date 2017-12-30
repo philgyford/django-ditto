@@ -3,6 +3,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'lastfm'
+
+
 # The pattern for matching an Album/Artist/Track slug:
 slug_chars = '[\w.,:;=@&+%()$!°’~-]+'
 

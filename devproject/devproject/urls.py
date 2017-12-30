@@ -5,11 +5,11 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^flickr/', include('ditto.flickr.urls', namespace='flickr')),
-    url(r'^lastfm/', include('ditto.lastfm.urls', namespace='lastfm')),
-    url(r'^pinboard/', include('ditto.pinboard.urls', namespace='pinboard')),
-    url(r'^twitter/', include('ditto.twitter.urls', namespace='twitter')),
-    url(r'', include('ditto.core.urls', namespace='ditto')),
+    url(r'^flickr/', include('ditto.flickr.urls')),
+    url(r'^lastfm/', include('ditto.lastfm.urls')),
+    url(r'^pinboard/', include('ditto.pinboard.urls')),
+    url(r'^twitter/', include('ditto.twitter.urls')),
+    url(r'', include('ditto.core.urls')),
 ]
 
 
