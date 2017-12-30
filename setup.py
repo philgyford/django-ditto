@@ -59,9 +59,9 @@ setup(
     install_requires=[
         'django-imagekit>=4.0,<4.1',
         'django-sortedm2m>=1.5.0,<1.6',
-        'django-taggit>=0.22.0,<0.30',
+        'django-taggit>=0.22.2,<0.30',
         'flickrapi>=2.3,<2.4',
-        'pillow>=4.2.1,<4.3',
+        'pillow>=4.3.0,<4.4',
         'pytz',
         'twitter-text-python',
         'twython>=3.6.0,<3.7',
@@ -69,9 +69,9 @@ setup(
     dependency_links=[
     ],
     tests_require=[
-        'factory-boy>=2.9.2,<2.10',
+        'factory-boy>=2.9.2,<3.0',
         'freezegun>=0.3.9,<0.4',
-        'responses>=0.7.0,<0.8',
+        'responses>=0.8.1,<0.9',
         'coverage',
     ],
     include_package_data=True,
