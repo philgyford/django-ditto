@@ -4,7 +4,7 @@ try:
     from django.urls import reverse
 except ImportError:
     # For Django 1.8
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 from ..core.utils import truncate_string

@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytz
 
 from django.apps import apps
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str

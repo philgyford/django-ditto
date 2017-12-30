@@ -5,7 +5,7 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.http import Http404
 from django.shortcuts import redirect

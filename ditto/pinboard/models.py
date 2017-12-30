@@ -33,7 +33,7 @@ class Account(TimeStampedModelMixin, models.Model):
         ordering = ['username']
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         return reverse('pinboard:account_detail', kwargs={'username': self.username})
 
     @property
@@ -182,7 +182,7 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         return reverse('pinboard:bookmark_detail',
             kwargs={'username': self.account.username, 'hash': self.url_hash})
 

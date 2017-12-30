@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from ditto.flickr.factories import AccountFactory, PhotoFactory,\
