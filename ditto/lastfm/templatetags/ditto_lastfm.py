@@ -103,7 +103,7 @@ def get_period_times(date, period):
     return min_time, max_time
 
 
-@register.assignment_tag
+@register.simple_tag
 def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
     """Returns a QuerySet of most-scrobbled Albums, with the most-scrobbled
     first.
@@ -155,7 +155,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period='day'):
     return qs
 
 
-@register.assignment_tag
+@register.simple_tag
 def top_artists(account=None, limit=10, date=None, period='day'):
     """Returns a QuerySet of the most-scrobbled Artists, with the
     most-scrobbled first.
@@ -197,7 +197,7 @@ def top_artists(account=None, limit=10, date=None, period='day'):
     return qs
 
 
-@register.assignment_tag
+@register.simple_tag
 def top_tracks(account=None, album=None, artist=None, limit=10, date=None, period='day'):
     """
     Returns a QuerySet of most-scrobbled Tracks, with the most-scrobbled
@@ -259,7 +259,7 @@ def top_tracks(account=None, album=None, artist=None, limit=10, date=None, perio
     return qs
 
 
-@register.assignment_tag
+@register.simple_tag
 def recent_scrobbles(account=None, limit=10):
     """Returns a QuerySet of the most recent Scrobbles by all Accounts, or one,
     most recent first.
@@ -283,7 +283,7 @@ def recent_scrobbles(account=None, limit=10):
                             .prefetch_related('artist', 'track')[:limit]
 
 
-@register.assignment_tag
+@register.simple_tag
 def day_scrobbles(date, account=None):
     """
     Returns a QuerySet of all Scrobbles from a particular day, in ascending
@@ -326,7 +326,7 @@ def day_scrobbles(date, account=None):
                                     .order_by('post_time')
 
 
-@register.assignment_tag
+@register.simple_tag
 def annual_scrobble_counts(account=None):
     """
     Get the number of Scrobbles per year.

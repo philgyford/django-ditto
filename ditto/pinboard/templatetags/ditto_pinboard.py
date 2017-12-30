@@ -10,7 +10,7 @@ from ...core.utils import get_annual_item_counts
 
 register = template.Library()
 
-@register.assignment_tag
+@register.simple_tag
 def recent_bookmarks(account=None, limit=10):
     """Returns a QuerySet of recent public Bookmarks, in reverse-chronological
     order.
@@ -25,7 +25,7 @@ def recent_bookmarks(account=None, limit=10):
     bookmarks = bookmarks.prefetch_related('account')
     return bookmarks[:limit]
 
-@register.assignment_tag
+@register.simple_tag
 def day_bookmarks(date, account=None):
     """Returns a QuerySet of public Bookmarks posted on a specific date.
 
@@ -46,7 +46,7 @@ def day_bookmarks(date, account=None):
     return bookmarks
 
 
-@register.assignment_tag
+@register.simple_tag
 def annual_bookmark_counts(account=None):
     """
     Get the number of public Bookmarks per year.
@@ -64,7 +64,7 @@ def annual_bookmark_counts(account=None):
     return get_annual_item_counts(bookmarks)
 
 
-@register.assignment_tag
+@register.simple_tag
 def popular_bookmark_tags(limit=10):
     return Bookmark.tags.most_common()[:limit]
 

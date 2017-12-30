@@ -10,7 +10,7 @@ from ...core.utils import get_annual_item_counts
 
 register = template.Library()
 
-@register.assignment_tag
+@register.simple_tag
 def recent_tweets(screen_name=None, limit=10):
     """Returns a QuerySet of recent public Tweets, in reverse-chronological
     order.
@@ -25,7 +25,7 @@ def recent_tweets(screen_name=None, limit=10):
         tweets = tweets.filter(user__screen_name=screen_name)
     return tweets.prefetch_related('user')[:limit]
 
-@register.assignment_tag
+@register.simple_tag
 def recent_favorites(screen_name=None, limit=10):
     """Returns a QuerySet of recent Tweets favorited by the Account associated
     with the Twitter User with screen_name.
@@ -45,7 +45,7 @@ def recent_favorites(screen_name=None, limit=10):
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
     return tweets.prefetch_related('user')[:limit]
 
-@register.assignment_tag
+@register.simple_tag
 def day_tweets(date, screen_name=None):
     """Returns a QuerySet of Tweets posted on a specific date by public
     Accounts.
@@ -67,7 +67,7 @@ def day_tweets(date, screen_name=None):
     tweets = tweets.prefetch_related('user')
     return tweets
 
-@register.assignment_tag
+@register.simple_tag
 def day_favorites(date, screen_name=None):
     """Returns a QuerySet of Tweets posted on a specific date that have been
     favorited by public Accounts.
@@ -100,7 +100,7 @@ def day_favorites(date, screen_name=None):
     return tweets
 
 
-@register.assignment_tag
+@register.simple_tag
 def annual_tweet_counts(screen_name=None):
     """
     Get the number of public Tweets per year.
@@ -120,7 +120,7 @@ def annual_tweet_counts(screen_name=None):
     return get_annual_item_counts(tweets)
 
 
-@register.assignment_tag
+@register.simple_tag
 def annual_favorite_counts(screen_name=None):
     """
     Get the number of public Favorites per year.

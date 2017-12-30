@@ -12,7 +12,7 @@ from ...core.utils import get_annual_item_counts
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def recent_photos(nsid=None, limit=10):
     """Returns a QuerySet of recent public Photos, in reverse-chronological
     order.
@@ -28,7 +28,7 @@ def recent_photos(nsid=None, limit=10):
     photos = photos.prefetch_related('user')
     return photos[:limit]
 
-@register.assignment_tag
+@register.simple_tag
 def day_photos(date, nsid=None, time='post_time'):
     """Returns a QuerySet of public Photos posted on a specific date.
 
@@ -49,7 +49,7 @@ def day_photos(date, nsid=None, time='post_time'):
     end   = datetime.datetime.combine(date, datetime.time.max).replace(
                                                             tzinfo=pytz.utc)
     photos = Photo.public_photo_objects
-    
+
     if time == 'taken_time':
         photos = photos.filter(taken_time__range=[start, end])
     else:
@@ -61,7 +61,7 @@ def day_photos(date, nsid=None, time='post_time'):
     photos = photos.prefetch_related('user')
     return photos
 
-@register.assignment_tag
+@register.simple_tag
 def photosets(nsid=None, limit=10):
     """Returns a QuerySet of recent Photosets.
 
@@ -96,7 +96,7 @@ def photo_license(n):
         return '[missing]'
 
 
-@register.assignment_tag
+@register.simple_tag
 def annual_photo_counts(nsid=None, count_by='post_time'):
     """
     Get the number of public Photos per year.
