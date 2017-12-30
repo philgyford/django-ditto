@@ -30,3 +30,4 @@ after_success:
   - coveralls
 # containers
 sudo: false
+cache: pip
