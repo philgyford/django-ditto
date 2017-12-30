@@ -1,6 +1,14 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.0
+-----
+
+- Add support Django 2.0; drop support for Django 1.10.
+
+- Upgrade Bootstrap from v4 beta 1 to v4 beta 3.
+
+
 0.6.5
 -----
 
