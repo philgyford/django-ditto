@@ -1,33 +1,29 @@
 language: python
 python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
-# Needed to install python 3.5 for reasons which escape me:
+- '3.4'
+- '3.5'
+- '3.6'
 addons:
   apt:
     sources:
-      - deadsnakes
+    - deadsnakes
     packages:
-      - python3.5
-# This, with tox-travis, and our tox.ini, will test on these Django versions
-# across all our specified python versions:
+    - python3.5
 env:
-  - DJANGO=1.11
-  - DJANGO=2.0
+- DJANGO=1.11
+- DJANGO=2.0
 matrix:
   include:
-    # This will also run the coverage test only on this python version:
-    - python: "3.6"
-      env: TOXENV="coverage"
-# command to install dependencies
+  - python: '3.6'
+    env: TOXENV="coverage"
 install:
-  - pip install tox tox-travis coverage coveralls
-# command to run tests
+- pip install tox tox-travis coverage coveralls
 script:
-  - tox
+- tox
 after_success:
-  - coveralls
-# containers
+- coveralls
 sudo: false
 cache: pip
+notifications:
+  slack:
+    secure: loOVkhkqtVEDxdP4qTgGjCQDzzzIEZ0OjQOgYZEiTp+Qmds8W3ZeTkAh5apDSdwRPGaEfTDrOgr3Yg/4z+zOkRCyI4q2ca4y7dFiDzXy3tfP8puHBFS0sYMvuNolhTVdPtqXW7bv10xQ5970TcP1zBVbmrRt/VVQ/3zqU8SCKQpWJbN/BrkrGK6VHJ3c+CZhM6hQwsFUyx/D5+CfKf6HvigPbauwdICyTh4zLqKu/r8j0bStvIeSWe8zc5mb2Q5i/SBfVat4KFV2fBxEMO+yYuuRhJ+2hJMRGfteJM6Q4M/coAW16z+ro97omryfKHEMlK8jD/Oa+LiQLKuxfScj7yJKF69I8OdwYnJeQd9AgnBflNWw/4MsVIBgAEJEHnbwdCGVFz/4B/VyQQIjEKiBmZZ1rB/FGQiBQe5zQEia+BDPPgp3Bq+A8LjJtwLconI0k814HtLcx1QpY7Ebugqi08V1kaOYjbMrAp5efj0XcCXr00qIv/nBdMQtecfQekX//OozD00KS6KyWyj9Vxlea25s57JRKV4e7QYGKZzTz/BvzmTxLWysglnkLECmeLc69HTPgHDnRWD4TA0MXUm6bzyc8nVeZhmm6iwmaEQitgBb1IsQi24bYz93pzd4ym0NRdpr2uz/LI5qMhMkI3xjg8L0CrRJanUu/qjp/P479w4=
