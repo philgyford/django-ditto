@@ -150,6 +150,9 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+# 0=Sunday (default), 1=Monday, etc:
+FIRST_DAY_OF_WEEK = 0
+
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ['127.0.0.1', '::1',]
@@ -159,6 +162,4 @@ INTERNAL_IPS = ['127.0.0.1', '::1',]
 
 DITTO_FLICKR_USE_LOCAL_MEDIA = False
 
-# 0=Monday (default), 6=Sunday:
-DITTO_WEEK_START = 0
 

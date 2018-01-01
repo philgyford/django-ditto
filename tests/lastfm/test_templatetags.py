@@ -93,8 +93,27 @@ class TopAlbumsTestCase(TestCase):
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0].scrobble_count, 2)
 
-    def test_for_week_default_start(self):
-        "Should return only albums from the requested week (default Monday start)."
+    @override_settings(FIRST_DAY_OF_WEEK=0)
+    def test_for_week_sunday_start(self):
+        "Should return only albums from the requested week (Sunday start)."
+        # 2 scrobble in this week:
+        # 2017-09-03 is a Sunday
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2017-09-03 12:00:00'))
+        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
+                        post_time=datetime_from_str('2017-09-09 12:00:00'))
+        # 1 scrobble in this week:
+        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
+                        post_time=datetime_from_str('2017-09-10 12:00:00'))
+
+        albums = ditto_lastfm.top_albums(period='week',
+                        date=datetime_from_str('2017-09-07 00:00:00'))
+        self.assertEqual(len(albums), 1)
+        self.assertEqual(albums[0].scrobble_count, 2)
+
+    @override_settings(FIRST_DAY_OF_WEEK=1)
+    def test_for_week_monday_start(self):
+        "Should return only albums from the requested week (Monday start)."
         # 2 scrobbles in this week:
         # 2017-09-04 is a Monday
         ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
@@ -109,30 +128,6 @@ class TopAlbumsTestCase(TestCase):
                         date=datetime_from_str('2017-09-07 00:00:00'))
         self.assertEqual(len(albums), 1)
         self.assertEqual(albums[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START=6)
-    def test_for_week_settings_start(self):
-        "Should return only albums from the requested week (Sunday start)."
-        # 2 scrobble in this week:
-        # 2017-09-03 is a Sunday 
-        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
-                        post_time=datetime_from_str('2017-09-03 12:00:00'))
-        ScrobbleFactory(track=self.tracks[1], album=self.albums[1],
-                        post_time=datetime_from_str('2017-09-09 12:00:00'))
-        # 1 scrobble in this week:
-        ScrobbleFactory(track=self.tracks[2], album=self.albums[2],
-                        post_time=datetime_from_str('2017-09-10 12:00:00'))
-
-        albums = ditto_lastfm.top_albums(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
-        self.assertEqual(len(albums), 1)
-        self.assertEqual(albums[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START='asdf')
-    def test_for_invalid_week_start(self):
-        with self.assertRaises(ValueError):
-            albums = ditto_lastfm.top_albums(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
 
     def test_for_month(self):
         "Should return only albums from the requested month."
@@ -275,8 +270,27 @@ class TopArtistsTestCase(TestCase):
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 2)
 
-    def test_for_week_default_start(self):
-        "Should return only artists from the requested week (default Monday start)."
+    @override_settings(FIRST_DAY_OF_WEEK=0)
+    def test_for_week_sunday_start(self):
+        "Should return only artists from the requested week (Sunday start)."
+        # 2 scrobbles on this day:
+        # 2017-09-03 is a Sunday
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2017-09-03 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
+                        post_time=datetime_from_str('2017-09-09 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
+                        post_time=datetime_from_str('2017-09-10 12:00:00'))
+
+        artists = ditto_lastfm.top_artists(period='week',
+                        date=datetime_from_str('2017-09-07 00:00:00'))
+        self.assertEqual(len(artists), 1)
+        self.assertEqual(artists[0].scrobble_count, 2)
+
+    @override_settings(FIRST_DAY_OF_WEEK=1)
+    def test_for_week_monday_start(self):
+        "Should return only artists from the requested week (Monday start)."
         # 2 scrobbles on this day:
         # 2017-09-04 is a Monday
         ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
@@ -291,30 +305,6 @@ class TopArtistsTestCase(TestCase):
                         date=datetime_from_str('2017-09-07 00:00:00'))
         self.assertEqual(len(artists), 1)
         self.assertEqual(artists[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START=6)
-    def test_for_week_settings_start(self):
-        "Should return only artists from the requested week (Sunday start)."
-        # 2 scrobbles on this day:
-        # 2017-09-03 is a Monday
-        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
-                        post_time=datetime_from_str('2017-09-03 00:00:00'))
-        ScrobbleFactory(track=self.tracks[1], artist=self.artists[1],
-                        post_time=datetime_from_str('2017-09-09 23:59:59'))
-        # 1 scrobble on this day:
-        ScrobbleFactory(track=self.tracks[2], artist=self.artists[2],
-                        post_time=datetime_from_str('2017-09-10 12:00:00'))
-
-        artists = ditto_lastfm.top_artists(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
-        self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START=10)
-    def test_for_invalid_week_start(self):
-        with self.assertRaises(ValueError):
-            albums = ditto_lastfm.top_artists(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
 
     def test_for_month(self):
         "Should return only tracks from the requested month."
@@ -479,8 +469,27 @@ class TopTracksTestCase(TestCase):
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].scrobble_count, 2)
 
-    def test_for_week_default_start(self):
-        "Should return only tracks from the requested week (default Monday start)."
+    @override_settings(FIRST_DAY_OF_WEEK=0)
+    def test_for_week_sunday_start(self):
+        "Should return only tracks from the requested week (Sunday start)."
+        # 2 scrobbles on this day:
+        # 2017-09-03 is a Sunday
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2017-09-03 00:00:00'))
+        ScrobbleFactory(track=self.tracks[1],
+                        post_time=datetime_from_str('2017-09-09 23:59:59'))
+        # 1 scrobble on this day:
+        ScrobbleFactory(track=self.tracks[2],
+                        post_time=datetime_from_str('2017-09-10 12:00:00'))
+
+        tracks = ditto_lastfm.top_tracks(period='week',
+                        date=datetime_from_str('2017-09-07 00:00:00'))
+        self.assertEqual(len(tracks), 1)
+        self.assertEqual(tracks[0].scrobble_count, 2)
+
+    @override_settings(FIRST_DAY_OF_WEEK=1)
+    def test_for_week_monday_start(self):
+        "Should return only tracks from the requested week (Monday start)."
         # 2 scrobbles on this day:
         # 2017-09-04 is a Monday
         ScrobbleFactory(track=self.tracks[1],
@@ -495,30 +504,6 @@ class TopTracksTestCase(TestCase):
                         date=datetime_from_str('2017-09-07 00:00:00'))
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START=6)
-    def test_for_week_settings_start(self):
-        "Should return only tracks from the requested week (Sunday start)."
-        # 2 scrobbles on this day:
-        # 2017-09-03 is a Monday
-        ScrobbleFactory(track=self.tracks[1],
-                        post_time=datetime_from_str('2017-09-03 00:00:00'))
-        ScrobbleFactory(track=self.tracks[1],
-                        post_time=datetime_from_str('2017-09-09 23:59:59'))
-        # 1 scrobble on this day:
-        ScrobbleFactory(track=self.tracks[2],
-                        post_time=datetime_from_str('2017-09-10 12:00:00'))
-
-        tracks = ditto_lastfm.top_tracks(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
-        self.assertEqual(len(tracks), 1)
-        self.assertEqual(tracks[0].scrobble_count, 2)
-
-    @override_settings(DITTO_WEEK_START=None)
-    def test_for_invalid_week_start(self):
-        with self.assertRaises(ValueError):
-            albums = ditto_lastfm.top_tracks(period='week',
-                        date=datetime_from_str('2017-09-07 00:00:00'))
 
     def test_for_month(self):
         "Should return only tracks from the requested month."

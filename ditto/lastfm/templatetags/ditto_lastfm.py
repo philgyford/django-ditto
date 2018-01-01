@@ -65,30 +65,22 @@ def get_period_times(date, period):
                     date, datetime.datetime.max.time()).replace(tzinfo=pytz.utc)
 
     if period == 'week':
-        # Default, Monday:
-        start_day = 0 
+        # Default is Sunday (0):
+        # https://docs.djangoproject.com/en/2.0/ref/settings/#first-day-of-week
+        start_day = settings.FIRST_DAY_OF_WEEK
 
-        if hasattr(settings, 'DITTO_WEEK_START'):
-            if isinstance(settings.DITTO_WEEK_START, int) \
-                and settings.DITTO_WEEK_START >= 0 \
-                and settings.DITTO_WEEK_START <= 6:
-                start_day = settings.DITTO_WEEK_START
-            else:
-                raise ValueError(
-                    'The DITTO_WEEK_START setting should be an int from 0 to 6')
-
-        # Which day is `date` on?
+        # Which day is `date` on? (0 is Monday here)
         day_of_week = min_time.weekday()
-        start_offset = datetime.timedelta(start_day - day_of_week)
 
-        if start_day > day_of_week:
-            # e.g. Week starts on a Sunday, so in previous week.
-            start_offset -= datetime.timedelta(weeks=1)
+        start_offset = datetime.timedelta(start_day - day_of_week - 1)
+
+        if start_offset == -7:
+            start_offset = 0
 
         min_time = min_time + start_offset
         max_time = min_time + datetime.timedelta(weeks=1) \
                                       - datetime.timedelta(microseconds=1)
-        
+
     elif period == 'month':
         min_time = min_time.replace(day=1)
         # Last day of month:
