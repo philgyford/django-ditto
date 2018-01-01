@@ -1,6 +1,14 @@
 Changelog (Django Ditto)
 ========================
 
+
+0.7.1
+-----
+
+- For Last.fm template tags, rely on the ``FIRST_DAY_OF_WEEK`` Django setting,
+  instead of the now unused ``DITTO_WEEK_START`` setting.
+
+
 0.7.0
 -----
 
