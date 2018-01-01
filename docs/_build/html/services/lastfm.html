@@ -338,11 +338,7 @@ that returns a QuerySet of <code class="docutils literal"><span class="pre">Trac
 </pre></div>
 </div>
 <p>For month and year, the calendar month/year around the date is used. e.g. if the supplied date was <code class="docutils literal"><span class="pre">2016-03-24</span></code> then <code class="docutils literal"><span class="pre">period='month'</span></code> would produce a chart for March 2016, and <code class="docutils literal"><span class="pre">period='year'</span></code> would produce a chart for all of 2016.</p>
-<p>For week, the default behaviour is the week starting on the Monday before (or on) the supplied date. If you would like weeks to start on a different date then use the <code class="docutils literal"><span class="pre">DITTO_WEEK_START</span></code> setting in your project&#8217;s settings file. e.g. to have weeks start on a Sunday you would use:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="x">DITTO_WEEK_START = 6</span>
-</pre></div>
-</div>
-<p>Monday (the default) is <code class="docutils literal"><span class="pre">0</span></code>, Tuesday is <code class="docutils literal"><span class="pre">1</span></code>, etc.</p>
+<p>For week, it uses the Django setting <code class="docutils literal"><span class="pre">FIRST_DAY_OF_WEEK</span></code>, default being <code class="docutils literal"><span class="pre">0</span></code> (Sunday).</p>
 <p>Example of only fetching tracks by a single artist, assuming <code class="docutils literal"><span class="pre">artist</span></code> is an <code class="docutils literal"><span class="pre">Artist</span></code> object:</p>
 <div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>

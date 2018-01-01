@@ -222,13 +222,7 @@ Examples of fetching for a single day, month or year, assuming ``my_date`` is ei
 
 For month and year, the calendar month/year around the date is used. e.g. if the supplied date was ``2016-03-24`` then ``period='month'`` would produce a chart for March 2016, and ``period='year'`` would produce a chart for all of 2016.
 
-For week, the default behaviour is the week starting on the Monday before (or on) the supplied date. If you would like weeks to start on a different date then use the ``DITTO_WEEK_START`` setting in your project's settings file. e.g. to have weeks start on a Sunday you would use:
-
-.. code-block:: django
-
-    DITTO_WEEK_START = 6
-
-Monday (the default) is ``0``, Tuesday is ``1``, etc.
+For week, it uses the Django setting ``FIRST_DAY_OF_WEEK``, default being ``0`` (Sunday).
 
 Example of only fetching tracks by a single artist, assuming ``artist`` is an ``Artist`` object:
 

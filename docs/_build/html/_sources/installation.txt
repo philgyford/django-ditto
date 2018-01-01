@@ -107,13 +107,6 @@ Some of the apps have optional settings which can be put in your project's ``set
     DITTO_TWITTER_DIR_BASE = 'twitter'
     DITTO_TWITTER_USE_LOCAL_MEDIA = False
 
-    DITTO_WEEK_START = 0
-
-The last setting is currently only used in the Last.fm template tags, to
-generate list of most listened-to albums, artists and tracks, but might be
-used for other Ditto apps in future. It specifies which day a week starts on.
-The default is the integer ``0``, which is Monday. Sunday would be ``6``.
-
 
 Other optional settings
 =======================

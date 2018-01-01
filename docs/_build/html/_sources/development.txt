@@ -105,8 +105,3 @@ Then:
 
     $ python setup.py publish
 
-Maybe just to have the README update on pypi::
-
-    $ python setup.py register
-
-
