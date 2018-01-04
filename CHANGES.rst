@@ -1,6 +1,11 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.2
+-----
+
+- Add missing migrations for Flickr and Last.fm.
+
 
 0.7.1
 -----
