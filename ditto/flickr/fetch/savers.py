@@ -389,7 +389,7 @@ class PhotosetSaver(SaveUtilsMixin, object):
                     pass
 
             # Sets/updates the SortedManyToMany field of the photoset's photos:
-            photoset_obj.photos = photos
+            photoset_obj.photos.set(photos)
 
         return photoset_obj
 
