@@ -1,6 +1,18 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.3
+-----
+
+- Handles tweets longer than 255 characters without Postgres complaining (SQLite
+  quietly carried on).
+
+- Fetches extended tweet data when fetching recent tweets.
+
+- Temporarily requires manual inclusion of a specific version of Twython in your
+  project's pip requirements (see README or docs).
+
+
 0.7.2
 -----
 
