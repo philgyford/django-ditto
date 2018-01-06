@@ -19,6 +19,14 @@ Ditto can be installed using `pip <https://pip.pypa.io/en/stable/>`_:
 
     $ pip install django-ditto
 
+You will curently also need to add this to your project's pip requirements (e.g.
+in a ``requirements.txt`` file)::
+
+    -e git://github.com/ryanmcgrath/twython.git@354e31b914bfcd496c68f401df21f220977e5d5b#egg=twython
+
+This is because we need a version of Twython that is not currently on pypi; this
+should be fixed in a future release.
+
 
 *********************
 Add to INSTALLED_APPS

@@ -167,6 +167,13 @@
 <div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install django-ditto
 </pre></div>
 </div>
+<p>You will curently also need to add this to your project&#8217;s pip requirements (e.g.
+in a <code class="docutils literal"><span class="pre">requirements.txt</span></code> file):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">e</span> <span class="n">git</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ryanmcgrath</span><span class="o">/</span><span class="n">twython</span><span class="o">.</span><span class="n">git</span><span class="nd">@354e31b914bfcd496c68f401df21f220977e5d5b</span><span class="c1">#egg=twython</span>
+</pre></div>
+</div>
+<p>This is because we need a version of Twython that is not currently on pypi; this
+should be fixed in a future release.</p>
 </div>
 <div class="section" id="add-to-installed-apps">
 <h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Permalink to this headline">¶</a></h2>
