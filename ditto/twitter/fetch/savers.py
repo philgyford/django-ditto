@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.files import File
 
 from ..models import Media, Tweet, User
+from ...core.utils import truncate_string
 from ...core.utils.downloader import DownloadException, filedownloader
 
 # Classes that take JSON data from the Twitter API and create or update
@@ -277,6 +278,10 @@ class TweetSaver(SaveUtilsMixin, object):
             # Older 'classic' format tweet data.
             text = tweet['text']
             title = text
+
+        # titles can only be 255 characters
+        title = truncate_string(title, strip_html=True, chars=255,
+                                truncate=u'…', at_word_boundary=True)
 
         defaults = {
             'fetch_time':       fetch_time,

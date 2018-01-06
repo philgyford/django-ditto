@@ -245,6 +245,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.account_1.last_recent_id = 10
         self.account_1.save()
         qs = {'user_id': self.account_1.user.twitter_id,
+                'tweet_mode': 'extended',
                 'include_rts': 'true', 'count': 200, 'since_id': 10}
         self.add_response(body=self.make_response_body(),
                             querystring=qs, match_querystring=True)
@@ -258,6 +259,7 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
     def test_fetches_multiple_pages_for_count(self):
         "Fetches subsequent pages until enough counted tweets are returned."
         qs = {'user_id': self.account_1.user.twitter_id,
+                'tweet_mode': 'extended',
                                         'include_rts': 'true', 'count': 200}
         # Return "[{id:999}, {id:998}, {id:997},...]" and patch _save_results()
         # as we're only interested in how many times we ask for more results.

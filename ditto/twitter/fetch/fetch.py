@@ -377,6 +377,7 @@ class FetchTweetsRecent(FetchNewTweets):
         # the API call:
         self.results = self.api.get_user_timeline(
                                 user_id=self.account.user.twitter_id,
+                                tweet_mode="extended",
                                 include_rts=True,
                                 count=self._tweets_to_fetch_in_query(),
                                 max_id=self.max_id,

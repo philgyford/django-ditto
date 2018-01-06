@@ -44,7 +44,7 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         tweet = self.make_tweet()
 
         #And check it's all there:
-        self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you!  Both my ears owe you a drink.")
+        self.assertEqual(tweet.title, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
         self.assertEqual(tweet.summary, "@flaneur ooh, very exciting, thank you! Both my ears owe you a drink.")
         self.assertEqual(tweet.text, "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.")
         self.assertEqual(tweet.latitude, Decimal('40.057016'))
@@ -79,6 +79,14 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         tweet = self.make_tweet(is_private=True)
 
         self.assertTrue(tweet.is_private)
+
+    def test_saves_280_character_tweets_correctly(self):
+        "It should save the full text but truncate title and summary to 255 characters."
+        self.api_fixture = 'tweets_280_characters.json'
+        tweet = self.make_tweet()
+        self.assertEqual(tweet.text, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it finished. That is annoying.')
+        self.assertEqual(tweet.title, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it…')
+        self.assertEqual(tweet.summary, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it…')
 
     def test_saves_user(self):
         "Saving a Tweet should also save its user."
