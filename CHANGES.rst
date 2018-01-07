@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.4
+-----
+
+- Temporarily use a different specific version of Twython (see README or docs).
+
+
 0.7.3
 -----
 
