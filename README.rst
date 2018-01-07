@@ -20,9 +20,9 @@ Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
 NOTE: It will install `Pillow <http://pillow.readthedocs.io/en/latest/>`_, among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
 
-NOTE 2: Currently (2018-01-06) requires your pip requirements to include this::
+NOTE 2: Currently (2018-01-07) requires your pip requirements to include this::
 
-    -e git://github.com/ryanmcgrath/twython.git@354e31b914bfcd496c68f401df21f220977e5d5b#egg=twython
+    -e git://github.com/philgyford/twython.git@2cfdaaf6e44ced237edc493147c16a38a60926eb#egg=twython
     
 Because we need a version of Twython that's not yet on pypi.
 

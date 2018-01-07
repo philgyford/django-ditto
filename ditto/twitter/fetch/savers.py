@@ -271,6 +271,7 @@ class TweetSaver(SaveUtilsMixin, object):
             # For new (2016) 'extended' format tweet data.
             # https://dev.twitter.com/overview/api/upcoming-changes-to-tweets
             text = tweet['full_text']
+            # Cuts off any @usernames at the start and a trailing URL at the end:
             frm = tweet['display_text_range'][0]
             to = tweet['display_text_range'][1]
             title = text[frm:to]

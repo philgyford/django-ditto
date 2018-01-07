@@ -82,11 +82,17 @@ class TweetSaverTestCase(FetchTwitterTestCase):
 
     def test_saves_280_character_tweets_correctly(self):
         "It should save the full text but truncate title and summary to 255 characters."
+        self.maxDiff = 3000
         self.api_fixture = 'tweets_280_characters.json'
         tweet = self.make_tweet()
-        self.assertEqual(tweet.text, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it finished. That is annoying.')
-        self.assertEqual(tweet.title, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it…')
-        self.assertEqual(tweet.summary, 'This is a test 280 character tweet so we can check things still work. Hello to all you fans of tests out there! I hope you’re having a good day and that everything you do runs smoothly and doesn’t unexpectedly break just when you really want to get it…')
+
+        self.assertEqual(tweet.text, '@BarclaysUKHelp Thanks Jonny. I tried online chat at the time and they said the form doesn’t work on iOS Safari. It’d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at @TSB instead - their form worked.')
+
+        self.assertEqual(tweet.text_html, '<span class="twython-tweet-prefix"><a href="https://twitter.com/BarclaysUKHelp" rel="external">@BarclaysUKHelp</a> </span>Thanks Jonny. I tried online chat at the time and they said the form doesn’t work on iOS Safari. It’d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at <a href="https://twitter.com/TSB" rel="external">@TSB</a> instead - their form worked.')
+
+        self.assertEqual(tweet.title, 'Thanks Jonny. I tried online chat at the time and they said the form doesn’t work on iOS Safari. It’d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at @TSB instead - their form…')
+
+        self.assertEqual(tweet.summary, 'Thanks Jonny. I tried online chat at the time and they said the form doesn’t work on iOS Safari. It’d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at @TSB instead - their form…')
 
     def test_saves_user(self):
         "Saving a Tweet should also save its user."

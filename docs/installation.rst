@@ -22,7 +22,7 @@ Ditto can be installed using `pip <https://pip.pypa.io/en/stable/>`_:
 You will curently also need to add this to your project's pip requirements (e.g.
 in a ``requirements.txt`` file)::
 
-    -e git://github.com/ryanmcgrath/twython.git@354e31b914bfcd496c68f401df21f220977e5d5b#egg=twython
+    -e git://github.com/philgyford/twython.git@2cfdaaf6e44ced237edc493147c16a38a60926eb#egg=twython
 
 This is because we need a version of Twython that is not currently on pypi; this
 should be fixed in a future release.
