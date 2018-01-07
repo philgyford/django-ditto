@@ -420,7 +420,9 @@ class FetchTweetsFavorite(FetchNewTweets):
                                 user_id=self.account.user.twitter_id,
                                 count=self._tweets_to_fetch_in_query(),
                                 max_id=self.max_id,
-                                since_id=self._since_id())
+                                since_id=self._since_id(),
+                                tweet_mode='extended',
+                                include_entities=True)
 
     def _post_fetch(self):
         """Set the last_favorite_id of our Account to the most recent Tweet we

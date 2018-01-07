@@ -433,6 +433,7 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         self.account_1.last_favorite_id = 10
         self.account_1.save()
         qs = {'user_id': self.account_1.user.twitter_id,
+                'tweet_mode': 'extended', 'include_entities': 'true',
                                                 'count': 200, 'since_id': 10}
         self.add_response(body=self.make_response_body(),
                             querystring=qs, match_querystring=True)
@@ -445,7 +446,8 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
     @responses.activate
     def test_fetches_multiple_pages_for_count(self):
         "Fetches subsequent pages until enough counted tweets are returned."
-        qs = {'user_id': self.account_1.user.twitter_id, 'count': 200}
+        qs = {'user_id': self.account_1.user.twitter_id, 'count': 200,
+                'tweet_mode': 'extended', 'include_entities': 'true',}
         # Return "[{id:999}, {id:998}, {id:997},...]" and patch _save_results()
         # as we're only interested in how many times we ask for more results.
         body = json.dumps([{'id':x} for x in reversed(range(800,1000))])
