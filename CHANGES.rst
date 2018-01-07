@@ -1,6 +1,13 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.5
+-----
+
+- Fix display of images (Twitter avatars and images, Flickr avatars and images)
+  in the Django Admin pages.
+
+
 0.7.4
 -----
 
