@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import TextInput
+from django.utils.safestring import mark_safe
 
 from ..core.admin import DittoItemModelAdmin
 from .models import Account, Photo, Photoset, User
@@ -64,8 +65,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('realname', 'username',)
 
     def show_avatar(self, instance):
-        return '<img src="%s" width="24" height="24" />' % (instance.avatar_url)
-    show_avatar.allow_tags = True
+        return mark_safe('<img src="%s" width="24" height="24" />' % (instance.avatar_url))
     show_avatar.short_description = ''
 
 
@@ -165,13 +165,11 @@ class PhotoAdmin(DittoItemModelAdmin):
     raw_id_fields = ('user',)
 
     def show_thumb(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.thumbnail_url, instance.thumbnail_width, instance.thumbnail_height)
-    show_thumb.allow_tags = True
+        return mark_safe('<img src="%s" width="%s" height="%s" />' % (instance.thumbnail_url, instance.thumbnail_width, instance.thumbnail_height))
     show_thumb.short_description = 'Thumbnail'
 
     def show_image(self, instance):
-        return '<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_width, instance.small_height)
-    show_image.allow_tags = True
+        return mark_safe('<img src="%s" width="%s" height="%s" />' % (instance.small_url, instance.small_width, instance.small_height))
     show_image.short_description = 'Small image'
 
     def taken_year_str(self, instance):

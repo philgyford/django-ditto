@@ -4,6 +4,9 @@ Changelog (Django Ditto)
 0.7.4
 -----
 
+- When fetching Twitter favorites, fetches the extended version of the tweets
+  and includes entities.
+
 - Temporarily use a different specific version of Twython (see README or docs).
 
 

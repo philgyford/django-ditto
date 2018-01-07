@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
+from django.utils.safestring import mark_safe
 
 from ..core.admin import DittoItemModelAdmin
 from .models import Account, Media, Tweet, User
@@ -78,25 +79,24 @@ class MediaAdmin(admin.ModelAdmin):
     exclude = ('tweets',)
 
     def show_thumb(self, instance):
-        return '<img src="%(url)s" width="%(w)s" height="%(h)s" />' %\
+        return mark_safe('<img src="%(url)s" width="%(w)s" height="%(h)s" />' %\
                 {
                     'url':  instance.thumbnail_url,
                     'w':    instance.thumbnail_w,
                     'h':    instance.thumbnail_h,
-                }
-    show_thumb.allow_tags = True
+                })
     show_thumb.short_description = ''
 
     def show_image(self, instance):
         if instance.media_type == 'photo':
-            return '<img src="%(url)s" width="%(w)s" height="%(h)" />' %\
+            html = '<img src="%(url)s" width="%(w)s" height="%(h)" />' %\
                 {
                     'url':  instance.small_url,
                     'w':    instance.small_w,
                     'h':    instance.small_h,
                 }
         else:
-            return '<video width="%(w)s" height="%(h)s" poster="%(img)s" controls preload="metadata"><source src="%(video)s" type="%(mime)s"></video>' %\
+            html = '<video width="%(w)s" height="%(h)s" poster="%(img)s" controls preload="metadata"><source src="%(video)s" type="%(mime)s"></video>' %\
                 {
                     'w':        instance.small_w,
                     'h':        instance.small_h,
@@ -104,7 +104,7 @@ class MediaAdmin(admin.ModelAdmin):
                     'video':    instance.video_url,
                     'mime':     instance.video_mime_type,
                 }
-    show_image.allow_tags = True
+        return mark_safe(html)
     show_image.short_description = 'Image'
 
 
@@ -197,6 +197,5 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ('description_html' ,'raw', 'fetch_time', 'time_created', 'time_modified',)
 
     def show_avatar(self, instance):
-        return '<img src="%s" width="24" height="24" />' % (instance.avatar_url)
-    show_avatar.allow_tags = True
+        return mark_safe('<img src="%s" width="24" height="24" />' % (instance.avatar_url))
     show_avatar.short_description = ''
