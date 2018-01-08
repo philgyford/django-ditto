@@ -1,6 +1,13 @@
 Changelog (Django Ditto)
 ========================
 
+0.7.6
+-----
+
+- Fix an error when fetching a Flickr user's data if they didn't have 'location'
+  or 'timezone' data set.
+
+
 0.7.5
 -----
 
@@ -116,4 +123,3 @@ Changelog (Django Ditto)
 - Moved Bootsrap CSS into a ``css`` directory #182
 
 - Change 'scrobbles' to 'listens' on day archive #181
-
