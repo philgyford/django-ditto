@@ -79,7 +79,6 @@ class UserSaver(SaveUtilsMixin, object):
             'iconfarm':     user['iconfarm'],
             'username':     user['username']['_content'],
             'realname':     user['realname']['_content'],
-            'location':     user['location']['_content'],
             'description':  user['description']['_content'],
             'photos_url':   user['photosurl']['_content'],
             'profile_url':  user['profileurl']['_content'],
@@ -88,8 +87,13 @@ class UserSaver(SaveUtilsMixin, object):
                                 user['photos']['firstdate']['_content']),
             'photos_first_date_taken': self._api_datetime_to_datetime(
                                 user['photos']['firstdatetaken']['_content']),
-            'timezone_id':  user['timezone']['timezone_id'],
         }
+
+        # 'location' and 'timezone' were missing for at least one user fetched:
+        if 'location' in user:
+            defaults['location'] = user['location']['_content']
+        if 'timezone' in user:
+            defaults['timezone_id'] = user['timezone']['timezone_id']
 
         if 'views' in user['photos']:
             # I think this might only be returned for the Account's own user.
@@ -392,4 +396,3 @@ class PhotosetSaver(SaveUtilsMixin, object):
             photoset_obj.photos.set(photos)
 
         return photoset_obj
-
