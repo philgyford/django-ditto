@@ -422,13 +422,13 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         # If NSID is '35034346050@N01'
         # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
         return '/'.join([
-            app_settings.DITTO_FLICKR_DIR_BASE,
+            app_settings.FLICKR_DIR_BASE,
             nsid[-4:-2],
             nsid[-2:],
             self.user.nsid.replace('@',''),
             'photos',
             str(self.taken_time.date().strftime(
-                                app_settings.DITTO_FLICKR_DIR_PHOTOS_FORMAT)),
+                                app_settings.FLICKR_DIR_PHOTOS_FORMAT)),
             filename
         ])
 
@@ -539,7 +539,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         """
         URL of the original image file on Flickr.com.
         Usually we'd use self.original_url but if we have
-        DITTO_FLICKR_USE_LOCAL_MEDIA as True, then we still need to be able
+        FLICKR_USE_LOCAL_MEDIA as True, then we still need to be able
         to get the remote original file URL somehow. So use this.
         """
         return self._remote_image_url('original')
@@ -558,7 +558,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         See https://www.flickr.com/services/api/misc.urls.html
         size -- One of the keys from self.PHOTO_SIZES.
         """
-        if app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA:
+        if app_settings.FLICKR_USE_LOCAL_MEDIA:
             return self._local_image_url(size)
         else:
             return self._remote_image_url(size)
@@ -609,7 +609,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         #"""One day, if we work out how to translate our downloaded original
         #video files into something usable on the web in different sizes, then
         #we can have _video_url() call this if
-        #app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA is False.
+        #app_settings.FLICKR_USE_LOCAL_MEDIA is False.
         #"""
         #pass
 
@@ -758,7 +758,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         # If NSID is '35034346050@N01'
         # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
         return '/'.join([
-            app_settings.DITTO_FLICKR_DIR_BASE,
+            app_settings.FLICKR_DIR_BASE,
             nsid[-4:-2],
             nsid[-2:],
             self.nsid.replace('@',''),
@@ -805,4 +805,3 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
                                     (self.iconfarm, self.iconserver, self.nsid)
         else:
             return 'https://www.flickr.com/images/buddyicon.gif'
-

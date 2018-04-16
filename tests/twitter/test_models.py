@@ -239,11 +239,11 @@ class PhotoLocalTestCase(TestCase):
     def setUp(self):
         "Set the value of this setting that's used in ditto.twitter.models."
         super().setUp()
-        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+        self.default_use_local = app_settings.TWITTER_USE_LOCAL_MEDIA
+        app_settings.TWITTER_USE_LOCAL_MEDIA = True
 
     def tearDown(self):
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+        app_settings.TWITTER_USE_LOCAL_MEDIA = self.default_use_local
 
     def test_size_urls(self):
         url = 'http://www.example.org/image.jpg'
@@ -319,11 +319,11 @@ class VideoLocalTestCase(TestCase):
     def setUp(self):
         "Set the value of this setting that's used in ditto.twitter.models."
         super().setUp()
-        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+        self.default_use_local = app_settings.TWITTER_USE_LOCAL_MEDIA
+        app_settings.TWITTER_USE_LOCAL_MEDIA = True
 
     def tearDown(self):
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+        app_settings.TWITTER_USE_LOCAL_MEDIA = self.default_use_local
 
     def test_video_url_xmpeg(self):
         "Will be same as remote URL."
@@ -363,11 +363,11 @@ class AnimatedGifLocalTestCase(TestCase):
     def setUp(self):
         "Set the value of this setting that's used in ditto.twitter.models."
         super().setUp()
-        self.default_use_local = app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = True
+        self.default_use_local = app_settings.TWITTER_USE_LOCAL_MEDIA
+        app_settings.TWITTER_USE_LOCAL_MEDIA = True
 
     def tearDown(self):
-        app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA = self.default_use_local
+        app_settings.TWITTER_USE_LOCAL_MEDIA = self.default_use_local
 
     def test_video_url_mp4(self):
         gif = AnimatedGifFactory(mp4_url='https://example.org/test.mp4')
@@ -747,4 +747,3 @@ class UserTestCase(TestCase):
     def test_get_absolute_url(self):
         user = UserFactory(screen_name='bob')
         self.assertEqual(user.get_absolute_url(), '/twitter/bob/')
-

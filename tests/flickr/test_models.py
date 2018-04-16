@@ -414,8 +414,8 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     def setUp(self):
         "Set the value of this setting that's used in ditto.flickr.models."
         super().setUp()
-        self.default_use_local = app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA
-        app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA = True
+        self.default_use_local = app_settings.FLICKR_USE_LOCAL_MEDIA
+        app_settings.FLICKR_USE_LOCAL_MEDIA = True
 
         self.photo = PhotoFactory(
                             user=UserFactory(nsid='123456@N01'),
@@ -424,7 +424,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
                             ).replace(tzinfo=pytz.utc))
 
     def tearDown(self):
-        app_settings.DITTO_FLICKR_USE_LOCAL_MEDIA = self.default_use_local
+        app_settings.FLICKR_USE_LOCAL_MEDIA = self.default_use_local
 
     def test_original_url(self):
         filename = os.path.basename(self.photo.original_file.name)
@@ -532,4 +532,3 @@ class PhotoNextPrevTestCase(TestCase):
 
     def test_previous_none(self):
         self.assertIsNone(self.photo_1.get_previous())
-

@@ -174,7 +174,7 @@ class Media(TimeStampedModelMixin, models.Model):
         # If filename is '12345678.jpg':
         # 'twitter/media/56/78/12345678.jpg'
         return '/'.join([
-            app_settings.DITTO_TWITTER_DIR_BASE,
+            app_settings.TWITTER_DIR_BASE,
             'media',
             name[-4:-2],
             name[-2:],
@@ -285,7 +285,7 @@ class Media(TimeStampedModelMixin, models.Model):
         Helper for the self.*_url() property methods.
         size -- one of 'large', 'medium', 'small', or 'thumbnail'.
         """
-        if app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA:
+        if app_settings.TWITTER_USE_LOCAL_MEDIA:
             return self._local_image_url(size)
         else:
             return self._remote_image_url(size)
@@ -327,7 +327,7 @@ class Media(TimeStampedModelMixin, models.Model):
         Returns None or a tuple of type and 'remote'/'local',
         eg: ('xmpeg', 'remote') or ('mp4', 'local')
         """
-        if app_settings.DITTO_TWITTER_USE_LOCAL_MEDIA:
+        if app_settings.TWITTER_USE_LOCAL_MEDIA:
             return self._local_video_type()
         else:
             return self._remote_video_type()
@@ -644,7 +644,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
         # 'twitter/avatars':
         start = '/'.join([
-            app_settings.DITTO_TWITTER_DIR_BASE,
+            app_settings.TWITTER_DIR_BASE,
             'avatars'
         ])
         # '/78/12345678/avatar_name.jpg':
@@ -720,4 +720,3 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     @property
     def favorites_count(self):
         return self.favourites_count
-
