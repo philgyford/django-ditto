@@ -100,7 +100,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
 
     elif granularity == 4:
         visible_time = 'sometime in %s' % dt.strftime(
-                                    app_settings.CORE_DATE_MONTH_YEAR_FORMAT)
+                                    app_settings.CORE_DATE_YEAR_MONTH_FORMAT)
         stamp = dt.strftime('%Y-%m')
 
     else:
@@ -112,6 +112,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
         # The date and time formats for display:
         d_fmt = app_settings.CORE_DATE_FORMAT
         t_fmt = app_settings.CORE_TIME_FORMAT
+        dt_fmt = app_settings.CORE_DATE_TIME_FORMAT
 
         if link_to_day:
             url = reverse('ditto:day_archive', kwargs={
@@ -120,13 +121,17 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
                         'day':      dt.strftime('%d'),
                     })
 
-            visible_time = '%(time)s on <a href="%(url)s" title="All items from this day">%(date)s</a>' % {
-                    'time': dt.strftime(t_fmt),
-                    'url': url,
-                    'date': dt.strftime(d_fmt),
-                }
+            # Replace the [date] token with the date format wrapped in <a> tag:
+            dt_fmt = dt_fmt.replace('[date]',
+                '<a href="{}" title="All items from this day">{}</a>'.format(url, d_fmt))
         else:
-            visible_time = dt.strftime(t_fmt + ' on ' + d_fmt)
+            dt_fmt = dt_fmt.replace('[date]', d_fmt)
+
+        # Replace the [time] token with the time format:
+        dt_fmt = dt_fmt.replace('[time]', t_fmt)
+
+        # Create the text/html to display in the template:
+        visible_time = dt.strftime(dt_fmt)
 
     if case == 'lower':
         visible_time = visible_time.lower()
