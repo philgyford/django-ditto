@@ -20,10 +20,10 @@ Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
 NOTE: It will install `Pillow <http://pillow.readthedocs.io/en/latest/>`_, among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
 
-NOTE 2: Currently (2018-01-07) requires your pip requirements to include this::
+NOTE 2: Currently (2018-04-16) requires your pip requirements to include this::
 
-    -e git://github.com/philgyford/twython.git@2cfdaaf6e44ced237edc493147c16a38a60926eb#egg=twython
-    
+    -e git://github.com/ryanmcgrath/twython.git@677849aa756e99a820cd7c8e53ccdf0433839519#egg=twython
+
 Because we need a version of Twython that's not yet on pypi.
 
 
@@ -52,4 +52,3 @@ The Ditto apps provide:
 - Views and URLs
 - Templates (that use `Bootstrap 4 (Beta 3) <http://v4-alpha.getbootstrap.com>`_, CSS only (no JavaScript))
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
-
