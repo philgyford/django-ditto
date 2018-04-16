@@ -8,7 +8,7 @@
 .. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
   :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
 
-A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4, 3.5 or 3.6, and Django 1.11 or 2.0.
+A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.4, 3.5 or 3.6, and Django 1.11.x or 2.0.x.
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
@@ -50,5 +50,5 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4 (Beta 3) <http://v4-alpha.getbootstrap.com>`_, CSS only (no JavaScript))
+- Templates (that use `Bootstrap 4.1 <https://getbootstrap.com>`_, CSS only (no JavaScript))
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
