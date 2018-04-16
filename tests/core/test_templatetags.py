@@ -11,6 +11,7 @@ from ditto.core.apps import Apps
 from ditto.core.templatetags.ditto_core import get_enabled_apps, display_time,\
         query_string, width_height
 from ditto.core.utils import datetime_now
+from . import override_app_settings
 
 
 class GetEnabledAppsTestCase(TestCase):
@@ -109,7 +110,7 @@ class DisplayTimeTestCase(TestCase):
     def test_returns_time_with_no_link(self):
         self.assertEqual(
             display_time(datetime_now()),
-            '<time datetime="2015-08-14 13:34:56">13:34 on 14&nbsp;Aug&nbsp;2015</time>'
+            '<time datetime="2015-08-14 13:34:56">13:34 on 14 Aug 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -118,14 +119,14 @@ class DisplayTimeTestCase(TestCase):
         reverse.return_value = '/2015/08/14/'
         self.assertEqual(
             display_time(datetime_now(), True),
-            '<time datetime="2015-08-14 13:34:56">13:34 on <a href="/2015/08/14/" title="All items from this day">14&nbsp;Aug&nbsp;2015</a></time>'
+            '<time datetime="2015-08-14 13:34:56">13:34 on <a href="/2015/08/14/" title="All items from this day">14 Aug 2015</a></time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
     def test_granularity_4_no_link(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=4),
-            '<time datetime="2015-08">sometime in Aug&nbsp;2015</time>'
+            '<time datetime="2015-08">sometime in Aug 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -147,7 +148,7 @@ class DisplayTimeTestCase(TestCase):
         "Doesn't actually have a link as there's no exact day."
         self.assertEqual(
             display_time(datetime_now(), link_to_day=True, granularity=4),
-            '<time datetime="2015-08">sometime in Aug&nbsp;2015</time>'
+            '<time datetime="2015-08">sometime in Aug 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
@@ -170,13 +171,48 @@ class DisplayTimeTestCase(TestCase):
     def test_case_lower(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=4, case='lower'),
-            '<time datetime="2015-08">sometime in aug&nbsp;2015</time>'
+            '<time datetime="2015-08">sometime in aug 2015</time>'
         )
 
     @freeze_time("2015-08-14 13:34:56")
     def test_case_capfirst(self):
         self.assertEqual(
             display_time(datetime_now(), granularity=4, case='capfirst'),
-            '<time datetime="2015-08">Sometime in Aug&nbsp;2015</time>'
+            '<time datetime="2015-08">Sometime in Aug 2015</time>'
         )
 
+    # Repeating some of those above, but with custom settings.
+
+    @override_app_settings(CORE_TIME_FORMAT='%-I.%M %p')
+    @override_app_settings(CORE_DATE_FORMAT='%B %d, %Y')
+    @freeze_time("2015-08-14 13:34:56")
+    def test_returns_time_with_no_link_custom_date_time(self):
+
+        self.assertEqual(
+            display_time(datetime_now()),
+            '<time datetime="2015-08-14 13:34:56">1.34 PM on August 14, 2015</time>'
+        )
+
+    @override_app_settings(CORE_DATE_MONTH_YEAR_FORMAT='%B %Y')
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_4_no_link_custom_date(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=4),
+            '<time datetime="2015-08">sometime in August 2015</time>'
+        )
+
+    @override_app_settings(CORE_DATE_YEAR_FORMAT="'%y")
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_6_no_link_custom_date(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=6),
+            """<time datetime="2015">sometime in '15</time>"""
+        )
+
+    @override_app_settings(CORE_DATE_YEAR_FORMAT="'%y")
+    @freeze_time("2015-08-14 13:34:56")
+    def test_granularity_8_no_link_custom_date(self):
+        self.assertEqual(
+            display_time(datetime_now(), granularity=8),
+            """<time datetime="2015">circa '15</time>"""
+        )

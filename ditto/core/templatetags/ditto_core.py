@@ -5,6 +5,7 @@ from django.http import QueryDict
 from django.utils.html import format_html
 
 from ..apps import ditto_apps
+from .. import app_settings
 
 
 register = template.Library()
@@ -88,15 +89,18 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
     """
 
     if granularity == 8:
-        visible_time = 'circa %s' % dt.strftime('%Y')
+        visible_time = 'circa %s' % dt.strftime(
+                                    app_settings.CORE_DATE_YEAR_FORMAT)
         stamp = dt.strftime('%Y')
 
     elif granularity == 6:
-        visible_time = 'sometime in %s' % dt.strftime('%Y')
+        visible_time = 'sometime in %s' % dt.strftime(
+                                    app_settings.CORE_DATE_YEAR_FORMAT)
         stamp = dt.strftime('%Y')
 
     elif granularity == 4:
-        visible_time = 'sometime in %s' % dt.strftime('%b&nbsp;%Y')
+        visible_time = 'sometime in %s' % dt.strftime(
+                                    app_settings.CORE_DATE_MONTH_YEAR_FORMAT)
         stamp = dt.strftime('%Y-%m')
 
     else:
@@ -106,8 +110,8 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
         stamp = dt.strftime('%Y-%m-%d %H:%M:%S')
 
         # The date and time formats for display:
-        d_fmt = '%-d&nbsp;%b&nbsp;%Y'
-        t_fmt = '%H:%M'
+        d_fmt = app_settings.CORE_DATE_FORMAT
+        t_fmt = app_settings.CORE_TIME_FORMAT
 
         if link_to_day:
             url = reverse('ditto:day_archive', kwargs={
