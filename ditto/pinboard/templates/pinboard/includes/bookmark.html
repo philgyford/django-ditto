@@ -21,7 +21,7 @@ Expects:
         <ul class="{% if view != 'detail' %}mb-0 {% endif %}list-inline pinboard-bookmark-tags">
             {% for tag in bookmark.tags.all %}
                 <li class="list-inline-item pinboard-bookmark-tag">
-                    <a class="label label-pill label-primary" href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
+                    <a class="badge badge-pill badge-primary" href="{% url 'pinboard:tag_detail' slug=tag.slug %}">
                         {% if view != 'detail' %}
                             <small>{{ tag.name }}</small>
                         {% else %}
@@ -54,4 +54,3 @@ Expects:
         {% if view != 'detail' %}</small>{% endif %}
     </p>
 </div> <!-- .media-body -->
-
