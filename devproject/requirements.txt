@@ -1,4 +1,3 @@
-Django==2.0.1
+Django==2.0.4
 django-debug-toolbar==1.9.1
 -e git://github.com/ryanmcgrath/twython.git@354e31b914bfcd496c68f401df21f220977e5d5b#egg=twython
-
