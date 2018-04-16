@@ -193,7 +193,7 @@ class DisplayTimeTestCase(TestCase):
             '<time datetime="2015-08-14 13:34:56">1.34 PM on August 14, 2015</time>'
         )
 
-    @override_app_settings(CORE_DATE_MONTH_YEAR_FORMAT='%B %Y')
+    @override_app_settings(CORE_DATE_YEAR_MONTH_FORMAT='%B %Y')
     @freeze_time("2015-08-14 13:34:56")
     def test_granularity_4_no_link_custom_date(self):
         self.assertEqual(

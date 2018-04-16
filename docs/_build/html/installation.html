@@ -89,6 +89,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#add-to-installed-apps">Add to INSTALLED_APPS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-to-urls-py">Add to urls.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#settings">Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core-settings">Core settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-specific-settings">Service-specific settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-optional-settings">Other optional settings</a></li>
 </ul>
 </li>
@@ -246,7 +248,30 @@ images:</p>
 </div>
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
-<p>Some of the apps have optional settings which can be put in your project&#8217;s <code class="docutils literal"><span class="pre">settings.py</span></code>. They&#8217;re described in detail in each service&#8217;s documentation. This is the complete list with their default values:</p>
+<p>There are some optional settings that can be placed in your project&#8217;s <code class="docutils literal"><span class="pre">settings.py</span></code>.</p>
+<div class="section" id="core-settings">
+<h3>Core settings<a class="headerlink" href="#core-settings" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">ditto.core</span></code> app has some optional settings for customing the formats used to display dates and times in the default templates (and the <code class="docutils literal"><span class="pre">ditto_core.display_time()</span></code> template tag). The formats are those used for <a class="reference external" href="http://strftime.org">strftime</a>. Here they are, with their default values:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># e.g. &quot;07:34&quot;</span>
+<span class="n">DITTO_CORE_TIME_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%H:%M&#39;</span>
+
+<span class="c1"># e.g. &quot;8 Apr 2018&quot;</span>
+<span class="n">DITTO_CORE_DATE_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%-d</span><span class="s1"> %b %Y&#39;</span>
+
+<span class="c1"># Used when only a year is displayed.</span>
+<span class="c1"># e.g. &quot;2018&quot;</span>
+<span class="n">DITTO_CORE_DATE_YEAR_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%Y&#39;</span>
+
+<span class="c1"># Used when only a month and year are displayed.</span>
+<span class="c1"># e.g. &quot;Apr 2018&quot;</span>
+<span class="n">DITTO_CORE_DATE_YEAR_MONTH_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%b %Y&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="service-specific-settings">
+<h3>Service-specific settings<a class="headerlink" href="#service-specific-settings" title="Permalink to this headline">¶</a></h3>
+<p>In addition, some of the other apps have their own optional settings. They&#8217;re described in detail in each service&#8217;s documentation.</p>
+<p>This is the complete list of service-specific settings with their default values:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_FLICKR_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;flickr&#39;</span>
 <span class="n">DITTO_FLICKR_DIR_PHOTOS_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">&#39;</span>
 <span class="n">DITTO_FLICKR_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">False</span>
@@ -254,6 +279,7 @@ images:</p>
 <span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
 <span class="n">DITTO_TWITTER_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">False</span>
 </pre></div>
+</div>
 </div>
 <div class="section" id="other-optional-settings">
 <h3>Other optional settings<a class="headerlink" href="#other-optional-settings" title="Permalink to this headline">¶</a></h3>

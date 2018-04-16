@@ -15,4 +15,4 @@ CORE_DATE_FORMAT = getattr(settings, 'DITTO_CORE_DATE_FORMAT', '%-d %b %Y')
 CORE_DATE_YEAR_FORMAT = getattr(settings, 'DITTO_CORE_DATE_YEAR_FORMAT', '%Y')
 
 # e.g. "Apr 2018"
-CORE_DATE_MONTH_YEAR_FORMAT = getattr(settings, 'DITTO_CORE_DATE_MONTH_YEAR_FORMAT', '%b %Y')
+CORE_DATE_YEAR_MONTH FORMAT = getattr(settings, 'DITTO_CORE_DATE_YEAR_MONTH_FORMAT', '%b %Y')

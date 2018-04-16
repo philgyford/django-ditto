@@ -106,7 +106,34 @@ Each app's URL conf is included under an appropriate ``app_name``:
 Settings
 ********
 
-Some of the apps have optional settings which can be put in your project's ``settings.py``. They're described in detail in each service's documentation. This is the complete list with their default values::
+There are some optional settings that can be placed in your project's ``settings.py``.
+
+Core settings
+=============
+
+The ``ditto.core`` app has some optional settings for customing the formats used to display dates and times in the default templates (and the ``ditto_core.display_time()`` template tag). The formats are those used for `strftime <http://strftime.org>`_. Here they are, with their default values::
+
+    # e.g. "07:34"
+    DITTO_CORE_TIME_FORMAT = '%H:%M'
+
+    # e.g. "8 Apr 2018"
+    DITTO_CORE_DATE_FORMAT = '%-d %b %Y'
+
+    # Used when only a year is displayed.
+    # e.g. "2018"
+    DITTO_CORE_DATE_YEAR_FORMAT = '%Y'
+
+    # Used when only a month and year are displayed.
+    # e.g. "Apr 2018"
+    DITTO_CORE_DATE_YEAR_MONTH_FORMAT = '%b %Y'
+
+
+Service-specific settings
+=========================
+
+In addition, some of the other apps have their own optional settings. They're described in detail in each service's documentation.
+
+This is the complete list of service-specific settings with their default values::
 
     DITTO_FLICKR_DIR_BASE = 'flickr'
     DITTO_FLICKR_DIR_PHOTOS_FORMAT = '%Y/%m/%d'
