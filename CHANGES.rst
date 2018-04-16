@@ -1,6 +1,16 @@
 Changelog (Django Ditto)
 ========================
 
+0.8.0
+-----
+
+- Upgrade Bootstrap from v4-beta-3 to v4.1.
+
+- Add optional settings for the date and time formats used in default templates.
+
+- Upgraded Twython (and added a migration) to fix formatting of some Tweets.
+
+
 0.7.6
 -----
 
