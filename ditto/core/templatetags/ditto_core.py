@@ -112,7 +112,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
         # The date and time formats for display:
         d_fmt = app_settings.CORE_DATE_FORMAT
         t_fmt = app_settings.CORE_TIME_FORMAT
-        dt_fmt = app_settings.CORE_DATE_TIME_FORMAT
+        dt_fmt = app_settings.CORE_DATETIME_FORMAT
 
         if link_to_day:
             url = reverse('ditto:day_archive', kwargs={

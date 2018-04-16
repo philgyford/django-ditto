@@ -119,6 +119,12 @@ The ``ditto.core`` app has some optional settings for customing the formats used
     # e.g. "8 Apr 2018"
     DITTO_CORE_DATE_FORMAT = '%-d %b %Y'
 
+    # Used when both a time and a date are displayed.
+    # The [time] and [date] tokens are replaced with the formats from the
+    # two settings above.
+    # e.g. "07:34 on 8 Apr 2018"
+    DITTO_CORE_DATETIME_FORMAT = '[time] on [date]'
+
     # Used when only a year is displayed.
     # e.g. "2018"
     DITTO_CORE_DATE_YEAR_FORMAT = '%Y'

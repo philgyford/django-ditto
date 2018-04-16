@@ -12,8 +12,8 @@ CORE_TIME_FORMAT = getattr(settings, 'DITTO_CORE_TIME_FORMAT', '%H:%M')
 CORE_DATE_FORMAT = getattr(settings, 'DITTO_CORE_DATE_FORMAT', '%-d %b %Y')
 
 # e.g. "07:34 on 8 Apr 2018"
-CORE_DATE_TIME_FORMAT = getattr(
-                settings, 'DITTO_CORE_DATE_TIME_FORMAT', '[time] on [date]')
+CORE_DATETIME_FORMAT = getattr(
+                settings, 'DITTO_CORE_DATETIME_FORMAT', '[time] on [date]')
 
 # e.g. "2018"
 CORE_DATE_YEAR_FORMAT = getattr(settings, 'DITTO_CORE_DATE_YEAR_FORMAT', '%Y')
