@@ -1,6 +1,15 @@
 Changelog (Django Ditto)
 ========================
 
+0.8.1
+-----
+
+- Upgrade Twython requirement to 3.7.0 from custom version.
+
+- Upgrade Django used in devproject from 2.0.4 to 2.0.5.
+
+- Upgrade Bootstrap from v4.1.0 to v4.1.1.
+
 0.8.0
 -----
 
