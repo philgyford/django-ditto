@@ -20,13 +20,6 @@ Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
 NOTE: It will install `Pillow <http://pillow.readthedocs.io/en/latest/>`_, among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
 
-NOTE 2: Currently (2018-04-16) requires your pip requirements to include this::
-
-    -e git://github.com/ryanmcgrath/twython.git@677849aa756e99a820cd7c8e53ccdf0433839519#egg=twython
-
-Because we need a version of Twython that's not yet on pypi.
-
-
 Currently, Ditto can copy these things from these services:
 
 - `Flickr <https://flickr.com/>`_

@@ -64,7 +64,7 @@ setup(
         'pillow>=4.3.0,<4.4',
         'pytz',
         'twitter-text-python',
-        'twython>=3.6.0,<3.7',
+        'twython>=3.7.0,<3.8',
     ],
     dependency_links=[
     ],
