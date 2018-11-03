@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -22,25 +24,21 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="Django Ditto 0.8.1 documentation" href="../index.html"/>
-        <link rel="next" title="Development" href="../development.html"/>
-        <link rel="prev" title="Pinboard" href="pinboard.html"/> 
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Development" href="../development.html" />
+    <link rel="prev" title="Pinboard" href="pinboard.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -81,7 +79,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 </ul>
@@ -139,34 +140,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">Django Ditto</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django Ditto</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
-      
-    <li>Twitter</li>
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Twitter</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../_sources/services/twitter.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../_sources/services/twitter.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -177,71 +198,71 @@
 <p>You can fetch, store and display data about your own Tweets and Liked Tweets for one or more <a class="reference external" href="https://twitter.com/">Twitter</a> accounts. By default the included models and templates will link to image and video files at Twitter, but you can also download the original files to store locally. These can then be used to serve different sizes of images locally. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
 <div class="section" id="set-up">
 <h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h2>
-<p>Go to <a class="reference external" href="https://apps.twitter.com/">https://apps.twitter.com/</a> and create a new Application for your Twitter account. You can leave the &#8216;Callback URL&#8217; field empty.</p>
-<p>When viewing the Application Settings, click &#8216;manage keys and access tokens&#8217;.</p>
-<p>On the next screen click the &#8216;Create my access token&#8217; button.</p>
-<p>Now, go to the Django admin, and add a new <code class="docutils literal"><span class="pre">Account</span></code> in the Twitter app. Copy the Consumer Key, Consumer Secret, Access Token and Access Token Secret from Twitter into the Django admin (ignore the other fields), and save the account. A new <code class="docutils literal"><span class="pre">User</span></code> object will be created, reflecting the Twitter user your API credentials are associated with.</p>
-<p>Once this is done you&#8217;ll need to import a downloaded archive of Tweets, and/or fetch Tweets from the Twitter API. See <a class="reference internal" href="#twitter-management-commands"><span class="std std-ref">Management commands</span></a> below.</p>
+<p>Go to <a class="reference external" href="https://apps.twitter.com/">https://apps.twitter.com/</a> and create a new Application for your Twitter account. You can leave the ‘Callback URL’ field empty.</p>
+<p>When viewing the Application Settings, click ‘manage keys and access tokens’.</p>
+<p>On the next screen click the ‘Create my access token’ button.</p>
+<p>Now, go to the Django admin, and add a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Twitter app. Copy the Consumer Key, Consumer Secret, Access Token and Access Token Secret from Twitter into the Django admin (ignore the other fields), and save the account. A new <code class="docutils literal notranslate"><span class="pre">User</span></code> object will be created, reflecting the Twitter user your API credentials are associated with.</p>
+<p>Once this is done you’ll need to import a downloaded archive of Tweets, and/or fetch Tweets from the Twitter API. See <a class="reference internal" href="#twitter-management-commands"><span class="std std-ref">Management commands</span></a> below.</p>
 </div>
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
-<p>The models available in <code class="docutils literal"><span class="pre">ditto.twitter.models</span></code> are:</p>
+<p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.twitter.models</span></code> are:</p>
 <dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">Account</span></code></dt>
-<dd>Representing a Twitter account that has API credentials and that we fetch Tweets and/or Likes for. It has a one-to-one relationship with a <code class="docutils literal"><span class="pre">User</span></code> model.</dd>
-<dt><code class="docutils literal"><span class="pre">Media</span></code></dt>
-<dd>A photo, video or Animated GIF that was attached to one or more Tweets. Its <code class="docutils literal"><span class="pre">media_type</span></code> property differentiates between <code class="docutils literal"><span class="pre">'photo'</span></code>, <code class="docutils literal"><span class="pre">'video'</span></code> and <code class="docutils literal"><span class="pre">'animated_gif'</span></code>. (Yes, the plural model name is a bit confusing, sorry.) The files for photos and animated GIFs can be fetched from Twitter and used locally, although this isn&#8217;t the default. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet</span></code></dt>
-<dd>A Tweet. It may have been posted by one of the Users with an <code class="docutils literal"><span class="pre">Account</span></code> that we fetch Twets for. Or it might have been posted by a different <code class="docutils literal"><span class="pre">User</span></code> and favorited/liked by one of the Users with an <code class="docutils literal"><span class="pre">Account</span></code>.</dd>
-<dt><code class="docutils literal"><span class="pre">User</span></code></dt>
-<dd>A Twitter user. Every time a Tweet is fetched a new <code class="docutils literal"><span class="pre">User</span></code> object is created/updated for the person who posted it. One or more of these Users will have an associated <code class="docutils literal"><span class="pre">Account</span></code>, as these are the user(s) we fetch data for.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt>
+<dd>Representing a Twitter account that has API credentials and that we fetch Tweets and/or Likes for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Media</span></code></dt>
+<dd>A photo, video or Animated GIF that was attached to one or more Tweets. Its <code class="docutils literal notranslate"><span class="pre">media_type</span></code> property differentiates between <code class="docutils literal notranslate"><span class="pre">'photo'</span></code>, <code class="docutils literal notranslate"><span class="pre">'video'</span></code> and <code class="docutils literal notranslate"><span class="pre">'animated_gif'</span></code>. (Yes, the plural model name is a bit confusing, sorry.) The files for photos and animated GIFs can be fetched from Twitter and used locally, although this isn’t the default. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet</span></code></dt>
+<dd>A Tweet. It may have been posted by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code> that we fetch Twets for. Or it might have been posted by a different <code class="docutils literal notranslate"><span class="pre">User</span></code> and favorited/liked by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">User</span></code></dt>
+<dd>A Twitter user. Every time a Tweet is fetched a new <code class="docutils literal notranslate"><span class="pre">User</span></code> object is created/updated for the person who posted it. One or more of these Users will have an associated <code class="docutils literal notranslate"><span class="pre">Account</span></code>, as these are the user(s) we fetch data for.</dd>
 </dl>
-<p>So, you will end up with many <code class="docutils literal"><span class="pre">User</span></code> objects in the system. But only one (or a few) will be associated with <code class="docutils literal"><span class="pre">Account</span></code> objects &#8211; these are the Users for which you fetch Tweets or favorited/liked Tweets.</p>
+<p>So, you will end up with many <code class="docutils literal notranslate"><span class="pre">User</span></code> objects in the system. But only one (or a few) will be associated with <code class="docutils literal notranslate"><span class="pre">Account</span></code> objects – these are the Users for which you fetch Tweets or favorited/liked Tweets.</p>
 </div>
 <div class="section" id="managers">
 <h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="media">
 <h3>Media<a class="headerlink" href="#media" title="Permalink to this headline">¶</a></h3>
-<p>For <code class="docutils literal"><span class="pre">Media</span></code> objects there is only the standard manager available:</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects there is only the standard manager available:</p>
 <dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">Media.objects.all()</span></code></dt>
-<dd>Fetches all <code class="docutils literal"><span class="pre">Media</span></code> objects, attached to Tweets by anyone, whether public or private.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Media.objects.all()</span></code></dt>
+<dd>Fetches all <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects, attached to Tweets by anyone, whether public or private.</dd>
 </dl>
-<p>There is no concept in Twitter of a &#8216;private&#8217; photo or video. The same photo
+<p>There is no concept in Twitter of a ‘private’ photo or video. The same photo
 could be posted by different public and private Twitter users. Exercise caution
-when displaying <code class="docutils literal"><span class="pre">Media</span></code> objects to public webpages.</p>
+when displaying <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects to public webpages.</p>
 </div>
 <div class="section" id="tweet">
 <h3>Tweet<a class="headerlink" href="#tweet" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">Tweet</span></code> models have several managers. There are two main differentiators we want to restrict things by:</p>
+<p><code class="docutils literal notranslate"><span class="pre">Tweet</span></code> models have several managers. There are two main differentiators we want to restrict things by:</p>
 <ul class="simple">
 <li><strong>Public vs private:</strong> Whether a Tweet was posted by a public or private Twitter user.</li>
-<li><strong>Posted Tweet vs Favorited Tweet:</strong> Sometimes we&#8217;ll want to only fetch Tweets posted by one of the Users with an API-credentialed Account. Sometimes we&#8217;ll want to only fetch Tweets those Accounts have favorited/liked. Sometimes we&#8217;ll want to fetch ALL Tweets, whether posted or favorited.</li>
+<li><strong>Posted Tweet vs Favorited Tweet:</strong> Sometimes we’ll want to only fetch Tweets posted by one of the Users with an API-credentialed Account. Sometimes we’ll want to only fetch Tweets those Accounts have favorited/liked. Sometimes we’ll want to fetch ALL Tweets, whether posted or favorited.</li>
 </ul>
-<p>On public-facing web pages you should only use the managers starting <code class="docutils literal"><span class="pre">Tweet.public_</span></code> as these will filter out all Tweets posted by private Twitter users.</p>
+<p>On public-facing web pages you should only use the managers starting <code class="docutils literal notranslate"><span class="pre">Tweet.public_</span></code> as these will filter out all Tweets posted by private Twitter users.</p>
 <dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">Tweet.objects.all()</span></code></dt>
-<dd>The default manager fetches <em>all</em> Tweets in the system, posted by all Users, whether they&#8217;re public or private, and whether posted by an Account&#8217;s User or favorited by them.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet.public_objects.all()</span></code></dt>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.objects.all()</span></code></dt>
+<dd>The default manager fetches <em>all</em> Tweets in the system, posted by all Users, whether they’re public or private, and whether posted by an Account’s User or favorited by them.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_objects.all()</span></code></dt>
 <dd>Only gets Tweets posted by any Users who are not private. This includes Tweets that have simply been favorited/liked by one of your Accounts.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet.tweet_objects.all()</span></code></dt>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.tweet_objects.all()</span></code></dt>
 <dd>Only gets Tweets posted by a User with an Account, not favorited by them.  And from both public and private Users.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet.public_tweet_objects.all()</span></code></dt>
-<dd>Only gets Tweets posted by a User with an Account, not favorited by them, but only for Users who aren&#8217;t private. For use on public pages.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet.favorite_objects.all()</span></code></dt>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_tweet_objects.all()</span></code></dt>
+<dd>Only gets Tweets posted by a User with an Account, not favorited by them, but only for Users who aren’t private. For use on public pages.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.favorite_objects.all()</span></code></dt>
 <dd>Only gets Tweets favorited by a User with an Account, whether those Tweets are posted by public or private Users.</dd>
-<dt><code class="docutils literal"><span class="pre">Tweet.public_favorite_objects.all()</span></code></dt>
-<dd>Only gets Tweets favorited by a User with an Account, and only Tweets posted by Users who aren&#8217;t private.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_favorite_objects.all()</span></code></dt>
+<dd>Only gets Tweets favorited by a User with an Account, and only Tweets posted by Users who aren’t private.</dd>
 </dl>
-<p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Tweets posted by a particular <code class="docutils literal"><span class="pre">User</span></code>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.twitter.models</span> <span class="k">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Tweet</span>
+<p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Tweets posted by a particular <code class="docutils literal notranslate"><span class="pre">User</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.twitter.models</span> <span class="k">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Tweet</span>
 
 <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span><span class="p">)</span>
 <span class="n">tweets</span> <span class="o">=</span> <span class="n">Tweet</span><span class="o">.</span><span class="n">public_tweet_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And to get public Tweets that user has favorited:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">favorites</span> <span class="o">=</span> <span class="n">Tweet</span><span class="o">.</span><span class="n">public_favorite_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">favorites</span> <span class="o">=</span> <span class="n">Tweet</span><span class="o">.</span><span class="n">public_favorite_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -252,7 +273,7 @@ when displaying <code class="docutils literal"><span class="pre">Media</span></c
 <div class="section" id="annual-favorite-counts">
 <h3>Annual Favorite Counts<a class="headerlink" href="#annual-favorite-counts" title="Permalink to this headline">¶</a></h3>
 <p>Get the number of favorites per year by all or one of the non-private Users-with-Accounts (only counting public Tweets):</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">annual_favorite_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -263,9 +284,9 @@ when displaying <code class="docutils literal"><span class="pre">Media</span></c
 <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
-<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
+<p>Both the <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code> in each row are integers.</p>
 <p>Or we can restrict this to favorites by a single User-with-an-Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_favorite_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_favorite_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 <p>NOTE: The date used is the date the Tweets were posted on, not the date on which they were favorited.</p>
@@ -273,7 +294,7 @@ when displaying <code class="docutils literal"><span class="pre">Media</span></c
 <div class="section" id="annual-tweet-counts">
 <h3>Annual Tweet Counts<a class="headerlink" href="#annual-tweet-counts" title="Permalink to this headline">¶</a></h3>
 <p>Get the number of Tweets per year by all or one of the non-private Users-with-Accounts:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">annual_tweet_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -284,58 +305,58 @@ when displaying <code class="docutils literal"><span class="pre">Media</span></c
 <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
-<p>Both the <code class="docutils literal"><span class="pre">year</span></code> and <code class="docutils literal"><span class="pre">count</span></code> in each row are integers.</p>
+<p>Both the <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code> in each row are integers.</p>
 <p>Or we can restrict this to Tweets posted by a single User-with-an-Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_tweet_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_tweet_counts</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="day-favorites">
 <h3>Day Favorites<a class="headerlink" href="#day-favorites" title="Permalink to this headline">¶</a></h3>
 <p>Use this to fetch Tweets posted on a particular day by non-private Users, which
-have been favorited/liked by any of the Users-with-Accounts. Again, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+have been favorited/liked by any of the Users-with-Accounts. Again, <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">day_favorites</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 <p>NOTE: The date is the date the Tweets were posted on, not the date on which they were favorited.</p>
 <p>Again, we can restrict this to Tweets favorited by a single User-with-an-Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_favorites</span> <span class="nv">my_date</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_favorites</span> <span class="nv">my_date</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="day-tweets">
 <h3>Day Tweets<a class="headerlink" href="#day-tweets" title="Permalink to this headline">¶</a></h3>
-<p>Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, <code class="docutils literal"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+<p>Gets Tweets posted on a particular day by any of the non-private Users-with-Accounts. In this example, <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">day_tweets</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 <p>Or we can restrict this to Tweets posted by a single User-with-an-Account:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_tweets</span> <span class="nv">my_date</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_tweets</span> <span class="nv">my_date</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="recent-favorites">
 <h3>Recent Favorites<a class="headerlink" href="#recent-favorites" title="Permalink to this headline">¶</a></h3>
-<p>This works like <code class="docutils literal"><span class="pre">recent_tweets</span></code> except it only fetches Tweets favorited/liked
+<p>This works like <code class="docutils literal notranslate"><span class="pre">recent_tweets</span></code> except it only fetches Tweets favorited/liked
 by our Users-with-Accounts, which were posted by public Twitter users:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">recent_favorites</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 <p>Similarly, we can change the number of Tweets returned (10 by default), and only return Tweets favorited by a particular User:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_favorites</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_favorites</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">favorites</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="recent-tweets">
 <h3>Recent Tweets<a class="headerlink" href="#recent-tweets" title="Permalink to this headline">¶</a></h3>
 <p>To display the most recent Tweets posted by any of the non-private Users with an API-credentialled Account. By default the most recent 10 are fetched:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_twitter</span> <span class="cp">%}</span><span class="x"></span>
 
 <span class="cp">{%</span> <span class="k">recent_tweets</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -347,9 +368,9 @@ by our Users-with-Accounts, which were posted by public Twitter users:</p>
 <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
-<p>(There&#8217;s a lot more to displaying Tweets in full; see the included templates for examples.)</p>
-<p>The tag can also fetch a different number of Tweets and/or only get Tweets from a single User-with-an-Account. Here we only get the 5 most recent Tweets posted by the User with a <code class="docutils literal"><span class="pre">screen_name</span></code> of <code class="docutils literal"><span class="pre">'philgyford'</span></code>:</p>
-<div class="highlight-django"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_tweets</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
+<p>(There’s a lot more to displaying Tweets in full; see the included templates for examples.)</p>
+<p>The tag can also fetch a different number of Tweets and/or only get Tweets from a single User-with-an-Account. Here we only get the 5 most recent Tweets posted by the User with a <code class="docutils literal notranslate"><span class="pre">screen_name</span></code> of <code class="docutils literal notranslate"><span class="pre">'philgyford'</span></code>:</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_tweets</span> <span class="nv">screen_name</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tweets</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
 </div>
 </div>
@@ -358,143 +379,144 @@ by our Users-with-Accounts, which were posted by public Twitter users:</p>
 <span id="twitter-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="import-tweets">
 <h3>Import Tweets<a class="headerlink" href="#import-tweets" title="Permalink to this headline">¶</a></h3>
-<p>If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at <a class="reference external" href="https://twitter.com/settings/account">https://twitter.com/settings/account</a> . When you&#8217;ve downloaded it, do:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py import_twitter_tweets --path<span class="o">=</span>/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
+<p>If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at <a class="reference external" href="https://twitter.com/settings/account">https://twitter.com/settings/account</a> . When you’ve downloaded it, do:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py import_twitter_tweets --path<span class="o">=</span>/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
 </pre></div>
 </div>
-<p>using the correct path to the directory you&#8217;ve downloaded and unzipped (in this case, the unzipped directory is <code class="docutils literal"><span class="pre">12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66</span></code>). This will import all of the Tweets found in the archive.</p>
+<p>using the correct path to the directory you’ve downloaded and unzipped (in this case, the unzipped directory is <code class="docutils literal notranslate"><span class="pre">12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66</span></code>). This will import all of the Tweets found in the archive.</p>
 </div>
 <div class="section" id="update-tweets">
 <h3>Update Tweets<a class="headerlink" href="#update-tweets" title="Permalink to this headline">¶</a></h3>
-<p>If you&#8217;ve imported your Tweets (above), you won&#8217;t yet have complete data about each one. To fully-populate those Tweets you should run this (replacing <code class="docutils literal"><span class="pre">philgyford</span></code> with your Twitter screen name):</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_tweets --account<span class="o">=</span>philgyford
+<p>If you’ve imported your Tweets (above), you won’t yet have complete data about each one. To fully-populate those Tweets you should run this (replacing <code class="docutils literal notranslate"><span class="pre">philgyford</span></code> with your Twitter screen name):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_tweets --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
-<p>This will fetch data for up to 6,000 Tweets. If you have more than that in your archive, run it every 15 minutes to avoid rate limiting, until you&#8217;ve fetched all of the Tweets. This command will fetch data for the least-recently fetched. It&#8217;s worth running every so often in the future, to fetch the latest data (such as Retweet and Like counts).</p>
+<p>This will fetch data for up to 6,000 Tweets. If you have more than that in your archive, run it every 15 minutes to avoid rate limiting, until you’ve fetched all of the Tweets. This command will fetch data for the least-recently fetched. It’s worth running every so often in the future, to fetch the latest data (such as Retweet and Like counts).</p>
 </div>
 <div class="section" id="fetch-tweets">
 <h3>Fetch Tweets<a class="headerlink" href="#fetch-tweets" title="Permalink to this headline">¶</a></h3>
-<p>Periodically you&#8217;ll want to fetch the latest Tweets. This will fetch only those Tweets posted since you last fetched any:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
+<p>Periodically you’ll want to fetch the latest Tweets. This will fetch only those Tweets posted since you last fetched any:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
 </pre></div>
 </div>
 <p>You might also, or instead, want to fetch more than that. Here we fetch the most recent 200:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span>200
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --account<span class="o">=</span>philgyford --recent<span class="o">=</span><span class="m">200</span>
 </pre></div>
 </div>
-<p>This would update data such as the Retweet and Like counts for all of the 200 fetched Tweets, even if they&#8217;re older than your last fetch. It&#8217;s fine to fetch data about Tweets you&#8217;ve already fetched; their data will be updated.</p>
-<p>If you have more than one Twitter Account in Ditto, the above commands can be run across all of them by omitting the <code class="docutils literal"><span class="pre">--account</span></code> option. eg:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --recent<span class="o">=</span>new
+<p>This would update data such as the Retweet and Like counts for all of the 200 fetched Tweets, even if they’re older than your last fetch. It’s fine to fetch data about Tweets you’ve already fetched; their data will be updated.</p>
+<p>If you have more than one Twitter Account in Ditto, the above commands can be run across all of them by omitting the <code class="docutils literal notranslate"><span class="pre">--account</span></code> option. eg:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_tweets --recent<span class="o">=</span>new
 </pre></div>
 </div>
 </div>
 <div class="section" id="fetch-favorites">
 <h3>Fetch Favorites<a class="headerlink" href="#fetch-favorites" title="Permalink to this headline">¶</a></h3>
 <p>To fetch recent Tweets that all your Accounts have favorited/liked, run one of these:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span>new
-$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span>200
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span>new
+$ ./manage.py fetch_twitter_favorites --recent<span class="o">=</span><span class="m">200</span>
 </pre></div>
 </div>
 <p>Or restrict to Tweets favorited/liked by a single Account:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
-$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span>200
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span>new
+$ ./manage.py fetch_twitter_favorites --account<span class="o">=</span>philgyford --recent<span class="o">=</span><span class="m">200</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="update-users">
 <h3>Update Users<a class="headerlink" href="#update-users" title="Permalink to this headline">¶</a></h3>
-<p>When a Tweet of any kind is fetched, its User data is also stored, and the User&#8217;s profile photo (avatar) is downloaded and stored in your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory. You can optionally set the <code class="docutils literal"><span class="pre">DITTO_TWITTER_DIR_BASE</span></code> setting to change the location. The default is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
+<p>When a Tweet of any kind is fetched, its User data is also stored, and the User’s profile photo (avatar) is downloaded and stored in your project’s <code class="docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code> directory. You can optionally set the <code class="docutils literal notranslate"><span class="pre">DITTO_TWITTER_DIR_BASE</span></code> setting to change the location. The default is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
 </pre></div>
 </div>
-<p>If your <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with a Twitter ID <code class="docutils literal"><span class="pre">12345678</span></code> to something like this:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/avatars/56/78/12345678/my_avatar.jpg
+<p>If your <code class="docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code> was set to <code class="docutils literal notranslate"><span class="pre">/var/www/example.com/media/</span></code> then the above setting would save the profile image for the user with a Twitter ID <code class="docutils literal notranslate"><span class="pre">12345678</span></code> to something like this:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/avatars/56/78/12345678/my_avatar.jpg
 </pre></div>
 </div>
 <p>You may periodically want to update the stored data about all the Twitter users stored in Ditto. (quantity of Tweets, descriptions, etc). Do it like this:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_users --account<span class="o">=</span>philgyford
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py update_twitter_users --account<span class="o">=</span>philgyford
 </pre></div>
 </div>
-<p>This requires an <code class="docutils literal"><span class="pre">account</span></code> as the data is fetched from that Twitter user&#8217;s point of view, when it comes to privacy etc.</p>
+<p>This requires an <code class="docutils literal notranslate"><span class="pre">account</span></code> as the data is fetched from that Twitter user’s point of view, when it comes to privacy etc.</p>
 </div>
 <div class="section" id="fetch-files-media">
 <h3>Fetch Files (Media)<a class="headerlink" href="#fetch-files-media" title="Permalink to this headline">¶</a></h3>
-<p>Fetching Tweets (whether your own or your favorites/likes) fetches all the data <em>about</em> them, but does not fetch any media files uploaded with them. There&#8217;s a separate command for fetching images and the MP4 video files created from animated GIFs. (There&#8217;s no way to fetch the videos, or original GIF files.)</p>
+<p>Fetching Tweets (whether your own or your favorites/likes) fetches all the data <em>about</em> them, but does not fetch any media files uploaded with them. There’s a separate command for fetching images and the MP4 video files created from animated GIFs. (There’s no way to fetch the videos, or original GIF files.)</p>
 <p>You <em>must</em> first download the Tweet data (above), and then you can fetch the files for all those Tweets:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files
 </pre></div>
 </div>
-<p>This will fetch the files for all Tweets whose files haven&#8217;t already been fetched. So, the first time, it&#8217;s <em>all</em> the Tweets&#8217; files, which can take a while.</p>
-<p>If you want to force a re-fetching of all files, whether they&#8217;ve already been downloaded or not:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files --all
+<p>This will fetch the files for all Tweets whose files haven’t already been fetched. So, the first time, it’s <em>all</em> the Tweets’ files, which can take a while.</p>
+<p>If you want to force a re-fetching of all files, whether they’ve already been downloaded or not:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_files --all
 </pre></div>
 </div>
-<p>Each image/MP4 is associated with the relevant Tweet(s) and saved within your project&#8217;s <code class="docutils literal"><span class="pre">MEDIA_ROOT</span></code> directory, as defined in <code class="docutils literal"><span class="pre">settings.py</span></code>. There&#8217;s one optional setting to customise the directory in which the files are saved. Its default value is as shown here:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
+<p>Each image/MP4 is associated with the relevant Tweet(s) and saved within your project’s <code class="docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code> directory, as defined in <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>. There’s one optional setting to customise the directory in which the files are saved. Its default value is as shown here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;twitter&#39;</span>
 </pre></div>
 </div>
 <p>Files are organised into separate directories according to the final characters
 of their file names (so as not to have too many in one directory). eg, an image
 might be saved in:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.png
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/var/www/example.com/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.png
 </pre></div>
 </div>
 <p>Every uploaded image, animated GIF and video should have a single image.  Animated GIFs will also have an MP4 file.</p>
-<p>Once you&#8217;ve downloaded the original files, you can use these to generate all the different sizes of image required for your site, instead of linking direct to the image files on Twitter. To do this, ensure <code class="docutils literal"><span class="pre">imagekit</span></code> is in your <code class="docutils literal"><span class="pre">INSTALLED_APPS</span></code> setting:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+<p>Once you’ve downloaded the original files, you can use these to generate all the different sizes of image required for your site, instead of linking direct to the image files on Twitter. To do this, ensure <code class="docutils literal notranslate"><span class="pre">imagekit</span></code> is in your <code class="docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code> setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># ...</span>
     <span class="s1">&#39;imagekit&#39;</span><span class="p">,</span>
     <span class="c1"># ...</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>And add this to your <cite>settings.py</cite> (its default value is <code class="docutils literal"><span class="pre">False</span></code>):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">True</span>
+<p>And add this to your <cite>settings.py</cite> (its default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DITTO_TWITTER_USE_LOCAL_MEDIA</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
 </div>
-<p>Any requests in your templates for the URLs of photo files of any size will now use resized versions of your downloaded original files, generated by Imagekit.  The first time you load a page (especially if it lists many images) it will be slow, but the images are cached (in a <code class="docutils literal"><span class="pre">CACHE</span></code> directory in your media folder).</p>
-<p>For example, before changing this setting, the URL of small image (<code class="docutils literal"><span class="pre">Media.small_url</span></code>) would be something like this:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>https://pbs.twimg.com/media/CjuCDVLXIAALhYz.jpg:small
+<p>Any requests in your templates for the URLs of photo files of any size will now use resized versions of your downloaded original files, generated by Imagekit.  The first time you load a page (especially if it lists many images) it will be slow, but the images are cached (in a <code class="docutils literal notranslate"><span class="pre">CACHE</span></code> directory in your media folder).</p>
+<p>For example, before changing this setting, the URL of small image (<code class="docutils literal notranslate"><span class="pre">Media.small_url</span></code>) would be something like this:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>https://pbs.twimg.com/media/CjuCDVLXIAALhYz.jpg:small
 </pre></div>
 </div>
 <p>After choosing to use local photos, it would be something like this:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>/media/CACHE/images/twitter/media/Lh/Yz/CjuCDVLXIAALhYz/5a726ea25d3bbd1b35b21b8b61b98c4c.jpg
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/media/CACHE/images/twitter/media/Lh/Yz/CjuCDVLXIAALhYz/5a726ea25d3bbd1b35b21b8b61b98c4c.jpg
 </pre></div>
 </div>
-<p>If you change your mind you can switch back to using the images hosted on Twitter by removing the <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> setting or changing it to <code class="docutils literal"><span class="pre">False</span></code>.</p>
-<p>Animated GIFs are converted into MP4 videos when first uploaded to Twitter.  Ditto downloads and uses these in a similar way to images. ie, by default the <code class="docutils literal"><span class="pre">video_url</span></code> property of a <code class="docutils literal"><span class="pre">Media</span></code> object that&#8217;s an Animated GIF would be like:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>https://pbs.twimg.com/tweet_video/CRXEfBEWUAA6Tay.mp4
+<p>If you change your mind you can switch back to using the images hosted on Twitter by removing the <code class="docutils literal notranslate"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> setting or changing it to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>Animated GIFs are converted into MP4 videos when first uploaded to Twitter.  Ditto downloads and uses these in a similar way to images. ie, by default the <code class="docutils literal notranslate"><span class="pre">video_url</span></code> property of a <code class="docutils literal notranslate"><span class="pre">Media</span></code> object that’s an Animated GIF would be like:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>https://pbs.twimg.com/tweet_video/CRXEfBEWUAA6Tay.mp4
 </pre></div>
 </div>
-<p>If it&#8217;s been downloaded and <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> is <code class="docutils literal"><span class="pre">True</span></code> then
-calling <code class="docutils literal"><span class="pre">video_url</span></code> would return a URL like:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.mp4
+<p>If it’s been downloaded and <code class="docutils literal notranslate"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then
+calling <code class="docutils literal notranslate"><span class="pre">video_url</span></code> would return a URL like:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/media/twitter/media/6T/ay/CRXEfBEWUAA6Tay.mp4
 </pre></div>
 </div>
-<p>However, there&#8217;s no way to download actual videos that were uploaded to Twitter, and so Ditto will always try to use videos hosted on Twitter, no matter what the value of <code class="docutils literal"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code>.</p>
+<p>However, there’s no way to download actual videos that were uploaded to Twitter, and so Ditto will always try to use videos hosted on Twitter, no matter what the value of <code class="docutils literal notranslate"><span class="pre">DITTO_TWITTER_USE_LOCAL_MEDIA</span></code>.</p>
 </div>
 <div class="section" id="fetch-accounts">
 <h3>Fetch Accounts<a class="headerlink" href="#fetch-accounts" title="Permalink to this headline">¶</a></h3>
-<p><strong>Deprecated:</strong> This only needs to be used whenever a new <code class="docutils literal"><span class="pre">Account</span></code> is added to the system.  It fetches the <code class="docutils literal"><span class="pre">User</span></code> data for each <code class="docutils literal"><span class="pre">Account</span></code> that has API credentials, and associates the two objects.</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
+<p><strong>Deprecated:</strong> This only needs to be used whenever a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> is added to the system.  It fetches the <code class="docutils literal notranslate"><span class="pre">User</span></code> data for each <code class="docutils literal notranslate"><span class="pre">Account</span></code> that has API credentials, and associates the two objects.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_twitter_accounts
 </pre></div>
 </div>
-<p>I don&#8217;t think this is needed now.</p>
+<p>I don’t think this is needed now.</p>
 </div>
 </div>
 </div>
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../development.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../development.html" class="btn btn-neutral float-right" title="Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pinboard.html" class="btn btn-neutral" title="Pinboard" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pinboard.html" class="btn btn-neutral" title="Pinboard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -503,11 +525,11 @@ calling <code class="docutils literal"><span class="pre">video_url</span></code>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Phil Gyford.
+        &copy; Copyright 2016, Phil Gyford
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -522,34 +544,24 @@ calling <code class="docutils literal"><span class="pre">video_url</span></code>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.8.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

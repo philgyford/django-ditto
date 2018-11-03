@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -22,24 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="Django Ditto 0.8.1 documentation" href="index.html"/>
-        <link rel="prev" title="Twitter" href="services/twitter.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Twitter" href="services/twitter.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -80,7 +78,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
@@ -119,34 +120,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Django Ditto</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Django Ditto</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Development</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Development</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/development.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/development.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -154,36 +175,38 @@
             
   <div class="section" id="development">
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
-<p>There&#8217;s a basic Django project in <code class="docutils literal"><span class="pre">devproject/</span></code> to make it easier to work on
-the app. This might be enough to get things up and running:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install -r devproject/requirements.txt
-$ python setup.py develop
-$ ./devproject/manage.py runserver
+<p>There’s a basic Django project in <code class="docutils literal notranslate"><span class="pre">devproject/</span></code> to make it easier to work on
+the app. This might be enough to get things up and running (assumes pipenv is
+installed):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> devproject
+$ pipenv install
+$ pipenv run ./manage.py migrate
+$ pipenv run ./manage.py runserver
 </pre></div>
 </div>
 <div class="section" id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
 <p>Run tests with tox. Install it with:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ pip install tox
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install tox
 </pre></div>
 </div>
-<p>You&#8217;ll need to have all versions of python available that are tested against (see <code class="docutils literal"><span class="pre">tox.ini</span></code>). This might mean deactivating a virtualenv if you&#8217;re using one with <code class="docutils literal"><span class="pre">devproject/</span></code>. Then run all tests in all environments like:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox
+<p>You’ll need to have all versions of python available that are tested against (see <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code>). This might mean deactivating a virtualenv if you’re using one with <code class="docutils literal notranslate"><span class="pre">devproject/</span></code>. Then run all tests in all environments like:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox
 </pre></div>
 </div>
 <p>To run tests in only one environment, specify it. In this case, Python 3.5 and
 Django 1.9:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e py35-django19
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py35-django19
 </pre></div>
 </div>
-<p>To run a specific test, add its path after <code class="docutils literal"><span class="pre">--</span></code>, eg:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.flickr.test_views.HomeViewTests.test_home_templates
+<p>To run a specific test, add its path after <code class="docutils literal notranslate"><span class="pre">--</span></code>, eg:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.flickr.test_views.HomeViewTests.test_home_templates
 </pre></div>
 </div>
 <p>Running the tests in all environments will generate coverage output. There will
-also be an <code class="docutils literal"><span class="pre">htmlcov/</span></code> directory containing an HTML report. You can also
+also be an <code class="docutils literal notranslate"><span class="pre">htmlcov/</span></code> directory containing an HTML report. You can also
 generate these reports without running all the other tests:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ tox -e coverage
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e coverage
 </pre></div>
 </div>
 </div>
@@ -192,21 +215,27 @@ generate these reports without running all the other tests:</p>
 <div class="section" id="coverage">
 <h3>Coverage<a class="headerlink" href="#coverage" title="Permalink to this headline">¶</a></h3>
 <p>Using coverage.py to check test coverage:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ coverage run --source<span class="o">=</span><span class="s1">&#39;.&#39;</span> ./manage.py <span class="nb">test</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ coverage run --source<span class="o">=</span><span class="s1">&#39;.&#39;</span> ./manage.py <span class="nb">test</span>
 $ coverage report
 </pre></div>
 </div>
 <p>Instead of the in-terminal report, get an HTML version:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ coverage html
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ coverage html
 $ open -a <span class="s2">&quot;Google Chrome&quot;</span> htmlcov/index.html
 </pre></div>
 </div>
 </div>
 <div class="section" id="documentation">
 <h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
-<p>Build the documentation:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
-$ make html
+<p>You’ll need <a class="reference external" href="http://www.sphinx-doc.org/en/master/">sphinx</a> installed. You
+could do this using pipenv and the Pipfiles:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
+$ pipenv install
+</pre></div>
+</div>
+<p>Build the documentation (assuming usage of pipenv):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
+$ pipenv run make html
 </pre></div>
 </div>
 </div>
@@ -217,11 +246,11 @@ $ make html
 <p>Ensure <cite>CHANGES.rst</cite> is up-to-date for new version.</p>
 <p>Commit changes to git.</p>
 <p>Add a version tag:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ python setup.py tag
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py tag
 </pre></div>
 </div>
 <p>Then:</p>
-<div class="highlight-shell"><div class="highlight"><pre><span></span>$ python setup.py publish
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py publish
 </pre></div>
 </div>
 </div>
@@ -230,13 +259,14 @@ $ make html
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="services/twitter.html" class="btn btn-neutral" title="Twitter" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="services/twitter.html" class="btn btn-neutral" title="Twitter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -245,11 +275,11 @@ $ make html
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Phil Gyford.
+        &copy; Copyright 2016, Phil Gyford
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -264,34 +294,24 @@ $ make html
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

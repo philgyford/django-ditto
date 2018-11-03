@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -22,25 +24,21 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="Django Ditto 0.8.1 documentation" href="index.html"/>
-        <link rel="next" title="Installation" href="installation.html"/>
-        <link rel="prev" title="Django Ditto: Documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Django Ditto: Documentation" href="index.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -81,7 +79,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#services-covered">Services covered</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-ditto-includes">What Ditto includes</a></li>
@@ -115,34 +116,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Django Ditto</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Django Ditto</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Introduction</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/introduction.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -150,16 +171,16 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn&#8217;t make sense, <a class="reference external" href="mailto:phil&#37;&#52;&#48;gyford&#46;com">email Phil Gyford</a> and I&#8217;ll try and clarify it.</p>
+<p>A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn’t make sense, <a class="reference external" href="mailto:phil&#37;&#52;&#48;gyford&#46;com">email Phil Gyford</a> and I’ll try and clarify it.</p>
 <p>Requires Python 3.4, 3.5 or 3.6, and Django 1.11.x or 2.0.x.</p>
 <p><a class="reference external" href="https://github.com/philgyford/django-ditto/tree/master/screenshots">See screenshots of a site using the supplied templates.</a></p>
 <div class="section" id="services-covered">
 <h2>Services covered<a class="headerlink" href="#services-covered" title="Permalink to this headline">¶</a></h2>
 <p>Currently, Ditto can copy these things from these services:</p>
-<ul>
+<ul class="simple">
 <li><dl class="first docutils">
 <dt><a class="reference external" href="https://flickr.com/">Flickr</a></dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Photos</li>
 <li>Photosets</li>
 <li>Original image and video files</li>
@@ -170,7 +191,7 @@
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference external" href="https://www.last.fm/">Last.fm</a></dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Scrobbles (Artist, Track and Album)</li>
 </ul>
 </dd>
@@ -178,7 +199,7 @@
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference external" href="https://pinboard.in/">Pinboard</a></dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Bookmarks</li>
 </ul>
 </dd>
@@ -186,7 +207,7 @@
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference external" href="https://twitter.com/">Twitter</a></dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Tweets</li>
 <li>Favorites/Likes</li>
 <li>Images and Animated GIFs (but not videos)</li>
@@ -199,7 +220,7 @@
 <p>It can save these things for one or more account on each service.</p>
 <p>See possible future services, and overall progress, in <a class="reference external" href="https://github.com/philgyford/django-ditto/issues/23">this issue</a>.</p>
 <p>Public and private Photos, Bookmarks and Tweets are saved, but only public ones are used in the included Views, Templates and Template tags; non-public data are only visible in the Django admin.</p>
-<p>Ditto does not <em>sync</em> data &#8211; it&#8217;s a one-way fetch of data <em>from</em> the service <em>to</em> Ditto. You can repeatedly fetch the same Photos, Tweets, etc and their data will be overwritten in Ditto. You could do a single fetch of all your data as a snapshot/archive. And/or, after that, keep fetching the latest items to keep it up-to-date.</p>
+<p>Ditto does not <em>sync</em> data – it’s a one-way fetch of data <em>from</em> the service <em>to</em> Ditto. You can repeatedly fetch the same Photos, Tweets, etc and their data will be overwritten in Ditto. You could do a single fetch of all your data as a snapshot/archive. And/or, after that, keep fetching the latest items to keep it up-to-date.</p>
 <p>For each item fetched, the original JSON data is saved on its object.</p>
 </div>
 <div class="section" id="what-ditto-includes">
@@ -214,7 +235,7 @@
 <li>Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)</li>
 </ul>
 <p>You could use the whole lot to create a minimal site that displays your Tweets,
-photos, etc – see the <code class="docutils literal"><span class="pre">devproject/</span></code> for a bare-bones example.</p>
+photos, etc – see the <code class="docutils literal notranslate"><span class="pre">devproject/</span></code> for a bare-bones example.</p>
 <p>Or you might want to use the management commands, Models and Admin to fetch and
 store your data, but use that data in your own Views and Templates, maybe using
 the Template tags. Or some other combination.</p>
@@ -223,15 +244,16 @@ the Template tags. Or some other combination.</p>
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Django Ditto: Documentation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Django Ditto: Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -240,11 +262,11 @@ the Template tags. Or some other combination.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Phil Gyford.
+        &copy; Copyright 2016, Phil Gyford
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -259,34 +281,24 @@ the Template tags. Or some other combination.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
