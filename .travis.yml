@@ -26,9 +26,6 @@ install:
 script:
   - tox
 
-after_success:
-  - coveralls
-
 notifications:
   email:
     false
