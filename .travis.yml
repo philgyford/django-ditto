@@ -1,30 +1,37 @@
 language: python
-python:
-- '3.4'
-- '3.5'
-- '3.6'
-addons:
-  apt:
-    sources:
-    - deadsnakes
-    packages:
-    - python3.5
-env:
-- DJANGO=1.11
-- DJANGO=2.0
-- DJANGO=2.1
+    
+cache: pip
+
+sudo: false
+
 matrix:
+  fast_finish: true
   include:
+    - { python: "2.7", env: DJANGO=1.11 }
+
+    - { python: "3.4", env: DJANGO=1.11 }
+    - { python: "3.4", env: DJANGO=2.0 }
+
+    - { python: "3.5", env: DJANGO=1.11 }
+    - { python: "3.5", env: DJANGO=2.0 }
+    - { python: "3.5", env: DJANGO=2.1 }
+
+    - { python: "3.6", env: DJANGO=1.11 }
+    - { python: "3.6", env: DJANGO=2.0 }
+    - { python: "3.6", env: DJANGO=2.1 }
+
   - python: '3.6'
     env: TOXENV="coverage"
+
 install:
 - pip install tox tox-travis coverage coveralls
+
 script:
 - tox
+
 after_success:
 - coveralls
-sudo: false
-cache: pip
+
 notifications:
   email:
     false
