@@ -1,5 +1,5 @@
 language: python
-    
+
 cache: pip
 
 sudo: false
@@ -24,13 +24,14 @@ matrix:
     env: TOXENV="coverage"
 
 install:
-- pip install tox tox-travis coverage coveralls
+  - pip install tox tox-venv tox-travis
 
 script:
-- tox
+  - tox
 
 after_success:
-- coveralls
+  - pip install coverage coveralls
+  - coveralls
 
 notifications:
   email:
