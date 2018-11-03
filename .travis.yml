@@ -20,18 +20,16 @@ matrix:
     - { python: "3.6", env: DJANGO=2.0 }
     - { python: "3.6", env: DJANGO=2.1 }
 
-  - python: '3.6'
-    env: TOXENV="coverage"
+    - python: '3.6'
+      env: TOXENV="coverage"
+      script:
+        - coveralls
 
 install:
   - pip install tox tox-venv tox-travis
 
 script:
   - tox
-
-after_success:
-  - pip install coverage coveralls
-  - coveralls
 
 notifications:
   email:
