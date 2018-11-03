@@ -1,6 +1,14 @@
 Changelog (Django Ditto)
 ========================
 
+0.9.0
+-----
+
+- Add support for Django 2.1 (no code changes required).
+
+- Change to use pipenv, instead of pip, for devproject requirements.
+
+
 0.8.1
 -----
 
@@ -9,6 +17,7 @@ Changelog (Django Ditto)
 - Upgrade Django used in devproject from 2.0.4 to 2.0.5.
 
 - Upgrade Bootstrap from v4.1.0 to v4.1.1.
+
 
 0.8.0
 -----
