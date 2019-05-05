@@ -28,7 +28,6 @@
   "id_str":"300",
   "user":{  
     "follow_request_sent":false,
-    "profile_sidebar_border_color":"FFFFFF",
     "protected":false,
     "entities":{  
       "description":{  
@@ -70,7 +69,6 @@
         ]
       }
     },
-    "profile_image_url":"http://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
     "default_profile":false,
     "friends_count":307,
     "default_profile_image":false,
@@ -81,17 +79,8 @@
     "time_zone":"London",
     "url":"https://t.co/FsYzXrATit",
     "verified":false,
-    "profile_sidebar_fill_color":"EEEEEE",
-    "profile_background_image_url":"http://abs.twimg.com/images/themes/theme1/bg.png",
     "following":false,
-    "profile_background_image_url_https":"https://abs.twimg.com/images/themes/theme1/bg.png",
-    "profile_use_background_image":false,
-    "is_translation_enabled":false,
-    "has_extended_profile":false,
     "statuses_count":17349,
-    "profile_link_color":"0000FF",
-    "profile_text_color":"000000",
-    "profile_background_color":"C0C0C0",
     "contributors_enabled":false,
     "description":"Good. Good to Firm in places. \u2022 https://t.co/vufrsP6u6g \u2022 https://t.co/TzoCKRNgGd \u2022 https://t.co/1DoEsF7KVT \u2022 https://t.co/bQl9hW8fa1",
     "notifications":false,
@@ -101,11 +90,8 @@
     "name":"Phil Gyford",
     "location":"London, UK",
     "is_translator":false,
-    "geo_enabled":true,
     "utc_offset":3600,
-    "favourites_count":1566,
-    "profile_background_tile":false,
-    "lang":"en"
+    "favourites_count":1566
   },
   "favorited":false,
   "geo":null,
@@ -134,7 +120,6 @@
     "id_str":"714528026650869760",
     "user":{  
       "follow_request_sent":false,
-      "profile_sidebar_border_color":"000000",
       "protected":false,
       "entities":{  
         "description":{  
@@ -151,7 +136,6 @@
           ]
         }
       },
-      "profile_image_url":"http://pbs.twimg.com/profile_images/651697969423622144/RxQydNzS_normal.jpg",
       "default_profile":false,
       "profile_banner_url":"https://pbs.twimg.com/profile_banners/13124/1451650452",
       "friends_count":509,
@@ -163,17 +147,8 @@
       "time_zone":"London",
       "url":"https://t.co/zeQdVnL4vK",
       "verified":false,
-      "profile_sidebar_fill_color":"7896A0",
-      "profile_background_image_url":"http://pbs.twimg.com/profile_background_images/3111592/vegas.jpg",
       "following":true,
-      "profile_background_image_url_https":"https://pbs.twimg.com/profile_background_images/3111592/vegas.jpg",
-      "profile_use_background_image":true,
-      "is_translation_enabled":false,
-      "has_extended_profile":true,
       "statuses_count":9301,
-      "profile_link_color":"CA0300",
-      "profile_text_color":"303030",
-      "profile_background_color":"7896A0",
       "contributors_enabled":false,
       "description":"Mozhe shitou guo he. See also @intrcnnctd and @5point9billion. Wannabe bookshop proprietor: @machinesupply",
       "notifications":true,
@@ -183,11 +158,8 @@
       "name":"Matt Webb",
       "location":"London O London",
       "is_translator":false,
-      "geo_enabled":false,
       "utc_offset":3600,
-      "favourites_count":4266,
-      "profile_background_tile":false,
-      "lang":"en"
+      "favourites_count":4266
     },
     "favorited":false,
     "geo":null,

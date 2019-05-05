@@ -12,35 +12,27 @@
   "user":{
     "friends_count":18,
     "is_translator":false,
-    "profile_use_background_image":true,
     "profile_image_url_https":"https://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
     "followers_count":8,
     "id":2030131,
-    "profile_sidebar_fill_color":"E0FF92",
     "id_str":"2030131",
     "contributors_enabled":false,
     "screen_name":"philgyfordtest",
     "name":"Phil Gyford Test",
-    "lang":"en",
     "location":"",
     "url":null,
-    "profile_sidebar_border_color":"000000",
     "utc_offset":3600,
     "favourites_count":0,
     "follow_request_sent":false,
     "protected":false,
-    "geo_enabled":true,
-    "profile_image_url":"http://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
     "following":true,
     "profile_background_image_url_https":"https://abs.twimg.com/images/themes/theme1/bg.png",
     "description":"",
     "notifications":false,
     "default_profile":false,
     "statuses_count":442,
-    "has_extended_profile":false,
     "listed_count":0,
     "created_at":"Fri Mar 23 16:56:52 +0000 2007",
-    "profile_background_image_url":"http://abs.twimg.com/images/themes/theme1/bg.png",
     "entities":{
       "description":{
         "urls":[
@@ -48,14 +40,9 @@
         ]
       }
     },
-    "profile_link_color":"0000FF",
-    "profile_text_color":"000000",
-    "profile_background_color":"9AE4E8",
     "default_profile_image":true,
     "verified":false,
-    "is_translation_enabled":false,
-    "time_zone":"London",
-    "profile_background_tile":false
+    "time_zone":"London"
   },
   "retweeted":false,
   "retweet_count":0,

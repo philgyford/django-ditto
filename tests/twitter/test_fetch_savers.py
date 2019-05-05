@@ -306,7 +306,6 @@ class UserSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(user.description, 'Good. Good to Firm in places.')
         self.assertEqual(user.location, 'London, UK')
         self.assertEqual(user.time_zone, 'London')
-        self.assertEqual(user.profile_image_url_https, 'https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg')
         self.assertEqual(user.favourites_count, 1389)
         self.assertEqual(user.followers_count, 2435)
         self.assertEqual(user.friends_count, 309)

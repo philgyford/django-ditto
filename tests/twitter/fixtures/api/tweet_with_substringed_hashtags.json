@@ -92,7 +92,6 @@
   "id_str":"701787062249385984",
   "user":{  
     "follow_request_sent":false,
-    "profile_sidebar_border_color":"FFFFFF",
     "protected":false,
     "entities":{  
       "description":{  
@@ -149,7 +148,6 @@
         ]
       }
     },
-    "profile_image_url":"http://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
     "default_profile":false,
     "friends_count":307,
     "default_profile_image":false,
@@ -160,17 +158,8 @@
     "time_zone":"London",
     "url":"https://t.co/FsYzXrATit",
     "verified":false,
-    "profile_sidebar_fill_color":"EEEEEE",
-    "profile_background_image_url":"http://abs.twimg.com/images/themes/theme1/bg.png",
     "following":false,
-    "profile_background_image_url_https":"https://abs.twimg.com/images/themes/theme1/bg.png",
-    "profile_use_background_image":false,
-    "is_translation_enabled":false,
-    "has_extended_profile":false,
     "statuses_count":17349,
-    "profile_link_color":"0000FF",
-    "profile_text_color":"000000",
-    "profile_background_color":"C0C0C0",
     "contributors_enabled":false,
     "description":"Good. Good to Firm in places. \u2022 https://t.co/vufrsP6u6g \u2022 https://t.co/TzoCKRNgGd \u2022 https://t.co/1DoEsF7KVT \u2022 https://t.co/bQl9hW8fa1",
     "notifications":false,
@@ -180,11 +169,8 @@
     "name":"Phil Gyford",
     "location":"London, UK",
     "is_translator":false,
-    "geo_enabled":true,
     "utc_offset":3600,
-    "favourites_count":1566,
-    "profile_background_tile":false,
-    "lang":"en"
+    "favourites_count":1566
   },
   "favorited":false,
   "geo":null,
