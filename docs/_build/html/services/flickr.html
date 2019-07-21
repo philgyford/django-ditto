@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Flickr &mdash; Django Ditto 0.9.0 documentation</title>
+  <title>Flickr &mdash; Django Ditto 0.10.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Last.fm" href="lastfm.html" />
     <link rel="prev" title="Installation" href="../installation.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                0.9
+                0.10
               </div>
             
           
@@ -197,21 +199,19 @@
 <p>In the Django admin, create a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a> (you can ignore the User for the moment).</p>
 <p>By default this will only allow the fetching of fully public photos. To fetch all photos your Flickr account can access, you’ll need to do this:</p>
 <ol class="arabic">
-<li><p class="first">Enter your API key and secret in the indicated place in the file
+<li><p>Enter your API key and secret in the indicated place in the file
 <code class="docutils literal notranslate"><span class="pre">ditto/scripts/flickr_authorize.py</span></code>. (If you’ve installed Ditto using pip,
-it might be easier to <a class="reference external" href="https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py">download the script from GitHub</a>.)</p>
-</li>
-<li><p class="first">Run the script on the command line (if you downloaded the file, change the path to wherever the script is):</p>
+it might be easier to <a class="reference external" href="https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py">download the script from GitHub</a>.)</p></li>
+<li><p>Run the script on the command line (if you downloaded the file, change the path to wherever the script is):</p>
 <blockquote>
 <div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python ditto/scripts/flickr_authorize.py
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">Follow the instructions. You should get a URL to paste into a web browser,
+<li><p>Follow the instructions. You should get a URL to paste into a web browser,
 in order to authorize your Flickr account. You’ll then get a code to paste
-into your Terminal.</p>
-</li>
+into your Terminal.</p></li>
 </ol>
 <p>Finally, back in the Django Admin note the ID of the <code class="docutils literal notranslate"><span class="pre">Account</span></code> you created. e.g. if the Django Admin’s URL is something like <code class="docutils literal notranslate"><span class="pre">/admin/flickr/account/1/change/</span></code> then the ID is <code class="docutils literal notranslate"><span class="pre">1</span></code>. Run the following management command to fetch information about the <code class="docutils literal notranslate"><span class="pre">Account</span></code>’s associated Flickr <code class="docutils literal notranslate"><span class="pre">User</span></code> (replacing <code class="docutils literal notranslate"><span class="pre">1</span></code> with your <code class="docutils literal notranslate"><span class="pre">Account</span></code>’s Django ID, if different):</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span><span class="m">1</span>
@@ -222,17 +222,17 @@ into your Terminal.</p>
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.flickr.models</span></code> are:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt>
-<dd>Representing a Flickr account that has API credentials and that we fetch Photos for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">TaggedPhoto</span></code></dt>
-<dd>The through model relating Photos to tags.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Photo</span></code></dt>
-<dd>A photo (or video) on Flickr. The <code class="docutils literal notranslate"><span class="pre">media_type</span></code> property of <code class="docutils literal notranslate"><span class="pre">'photo'</span></code> or <code class="docutils literal notranslate"><span class="pre">'video'</span></code> indicates which type this is.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Photoset</span></code></dt>
-<dd>A photoset (album) containing Photos.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">User</span></code></dt>
-<dd>A single user on Flickr. There could be lots of Users but only one (or a few) will have associated Account objects – these are the Users we fetch Photos for.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Flickr account that has API credentials and that we fetch Photos for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TaggedPhoto</span></code></dt><dd><p>The through model relating Photos to tags.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Photo</span></code></dt><dd><p>A photo (or video) on Flickr. The <code class="docutils literal notranslate"><span class="pre">media_type</span></code> property of <code class="docutils literal notranslate"><span class="pre">'photo'</span></code> or <code class="docutils literal notranslate"><span class="pre">'video'</span></code> indicates which type this is.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Photoset</span></code></dt><dd><p>A photoset (album) containing Photos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">User</span></code></dt><dd><p>A single user on Flickr. There could be lots of Users but only one (or a few) will have associated Account objects – these are the Users we fetch Photos for.</p>
+</dd>
 </dl>
 </div>
 <div class="section" id="managers">
@@ -242,19 +242,19 @@ into your Terminal.</p>
 <p>There are several managers available for Photos. There are two main
 differentiators we want to restrict things by:</p>
 <ul class="simple">
-<li><strong>Public vs private:</strong> Whether a Photo is public or private (which includes those marked as for Friends and/or Family on Flickr.com).</li>
-<li><strong>Posted Photo vs Favorited Photo:</strong> In the future we may fetch Photos that have been favorited, rather than posted, by our Users that have Accounts. In this case we’d want to be able to differentiate between Photos that we posted, and Photos that we favorited.</li>
+<li><p><strong>Public vs private:</strong> Whether a Photo is public or private (which includes those marked as for Friends and/or Family on Flickr.com).</p></li>
+<li><p><strong>Posted Photo vs Favorited Photo:</strong> In the future we may fetch Photos that have been favorited, rather than posted, by our Users that have Accounts. In this case we’d want to be able to differentiate between Photos that we posted, and Photos that we favorited.</p></li>
 </ul>
 <p>On public-facing web pages you should only use the mangaers starting <code class="docutils literal notranslate"><span class="pre">Photo.public_</span></code> as these will filter out all Photos that are not public.</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Photo.objects.all()</span></code></dt>
-<dd>The default manager fetches <em>all</em> Photos in the system. Public, private, posted by you or (in the future) only favorited by you.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Photo.public_objects.all()</span></code></dt>
-<dd>Gets all public Photos in the system, no matter who posted them to Flickr.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Photo.photo_objects.all()</span></code></dt>
-<dd>Gets all Photos, public or private, that were posted by one of the Users associated with an API-credentialled Account.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Photo.public_photo_objects.all()</span></code></dt>
-<dd>Gets public Photos that were posted by one of the Users associated with an API-credentialled Account.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Photo.objects.all()</span></code></dt><dd><p>The default manager fetches <em>all</em> Photos in the system. Public, private, posted by you or (in the future) only favorited by you.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Photo.public_objects.all()</span></code></dt><dd><p>Gets all public Photos in the system, no matter who posted them to Flickr.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Photo.photo_objects.all()</span></code></dt><dd><p>Gets all Photos, public or private, that were posted by one of the Users associated with an API-credentialled Account.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Photo.public_photo_objects.all()</span></code></dt><dd><p>Gets public Photos that were posted by one of the Users associated with an API-credentialled Account.</p>
+</dd>
 </dl>
 <p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Photos posted by a particular <code class="docutils literal notranslate"><span class="pre">User</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.flickr.models</span> <span class="k">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Photo</span>
@@ -267,11 +267,11 @@ differentiators we want to restrict things by:</p>
 </div>
 <div class="section" id="users">
 <h3>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">User.objects.all()</span></code></dt>
-<dd>The default manager fetches all Users in the system.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">User.objects_with_accounts.all()</span></code></dt>
-<dd>This only gets Users that are associated with Accounts.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">User.objects.all()</span></code></dt><dd><p>The default manager fetches all Users in the system.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">User.objects_with_accounts.all()</span></code></dt><dd><p>This only gets Users that are associated with Accounts.</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -358,7 +358,8 @@ uses <code class="docutils literal notranslate"><span class="pre">post_time</spa
 </div>
 <p>This would create HTML something like this, depending on the license:</p>
 <blockquote>
-<div>&lt;a href=”<a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/2.0/">https://creativecommons.org/licenses/by-nc-sa/2.0/</a>” title=”More about permissions”&gt;Attribution-NonCommercial-ShareAlike License&lt;/a&gt;</div></blockquote>
+<div><p>&lt;a href=”<a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/2.0/">https://creativecommons.org/licenses/by-nc-sa/2.0/</a>” title=”More about permissions”&gt;Attribution-NonCommercial-ShareAlike License&lt;/a&gt;</p>
+</div></blockquote>
 </div>
 <div class="section" id="recent-photos">
 <h3>Recent Photos<a class="headerlink" href="#recent-photos" title="Permalink to this headline">¶</a></h3>
@@ -497,7 +498,7 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
         <a href="lastfm.html" class="btn btn-neutral float-right" title="Last.fm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -523,26 +524,16 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

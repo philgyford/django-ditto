@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; Django Ditto 0.9.0 documentation</title>
+  <title>Introduction &mdash; Django Ditto 0.10.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Django Ditto: Documentation" href="index.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                0.9
+                0.10
               </div>
             
           
@@ -178,40 +180,36 @@
 <h2>Services covered<a class="headerlink" href="#services-covered" title="Permalink to this headline">¶</a></h2>
 <p>Currently, Ditto can copy these things from these services:</p>
 <ul class="simple">
-<li><dl class="first docutils">
-<dt><a class="reference external" href="https://flickr.com/">Flickr</a></dt>
-<dd><ul class="first last">
-<li>Photos</li>
-<li>Photosets</li>
-<li>Original image and video files</li>
-<li>Users</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://flickr.com/">Flickr</a></dt><dd><ul>
+<li><p>Photos</p></li>
+<li><p>Photosets</p></li>
+<li><p>Original image and video files</p></li>
+<li><p>Users</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><a class="reference external" href="https://www.last.fm/">Last.fm</a></dt>
-<dd><ul class="first last">
-<li>Scrobbles (Artist, Track and Album)</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://www.last.fm/">Last.fm</a></dt><dd><ul>
+<li><p>Scrobbles (Artist, Track and Album)</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><a class="reference external" href="https://pinboard.in/">Pinboard</a></dt>
-<dd><ul class="first last">
-<li>Bookmarks</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://pinboard.in/">Pinboard</a></dt><dd><ul>
+<li><p>Bookmarks</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><a class="reference external" href="https://twitter.com/">Twitter</a></dt>
-<dd><ul class="first last">
-<li>Tweets</li>
-<li>Favorites/Likes</li>
-<li>Images and Animated GIFs (but not videos)</li>
-<li>Users</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://twitter.com/">Twitter</a></dt><dd><ul>
+<li><p>Tweets</p></li>
+<li><p>Favorites/Likes</p></li>
+<li><p>Images and Animated GIFs (but not videos)</p></li>
+<li><p>Users</p></li>
 </ul>
 </dd>
 </dl>
@@ -227,12 +225,12 @@
 <h2>What Ditto includes<a class="headerlink" href="#what-ditto-includes" title="Permalink to this headline">¶</a></h2>
 <p>The Ditto apps provide:</p>
 <ul class="simple">
-<li>Models</li>
-<li>Admin</li>
-<li>Management commands to fetch the data/files</li>
-<li>Views and URLs</li>
-<li>Templates (that use <a class="reference external" href="https://getbootstrap.com">Bootstrap 4.1</a>)</li>
-<li>Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)</li>
+<li><p>Models</p></li>
+<li><p>Admin</p></li>
+<li><p>Management commands to fetch the data/files</p></li>
+<li><p>Views and URLs</p></li>
+<li><p>Templates (that use <a class="reference external" href="https://getbootstrap.com">Bootstrap 4.1</a>)</p></li>
+<li><p>Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)</p></li>
 </ul>
 <p>You could use the whole lot to create a minimal site that displays your Tweets,
 photos, etc – see the <code class="docutils literal notranslate"><span class="pre">devproject/</span></code> for a bare-bones example.</p>
@@ -253,7 +251,7 @@ the Template tags. Or some other combination.</p>
         <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Django Ditto: Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Django Ditto: Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -279,26 +277,16 @@ the Template tags. Or some other combination.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pinboard &mdash; Django Ditto 0.9.0 documentation</title>
+  <title>Pinboard &mdash; Django Ditto 0.10.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Twitter" href="twitter.html" />
     <link rel="prev" title="Last.fm" href="lastfm.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                0.9
+                0.10
               </div>
             
           
@@ -192,29 +194,29 @@
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.pinboard.models</span></code> are:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt>
-<dd>A single Pinboard account. (Note: other services, like Twitter and Flickr, have separate <code class="docutils literal notranslate"><span class="pre">User</span></code> and <code class="docutils literal notranslate"><span class="pre">Account</span></code> models. Pinboard is currently simpler.)</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">BookmarkTag</span></code></dt>
-<dd>A custom version of a Taggit Tag model, trying to match the way Pinboard creates slugs for tags.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">TaggedBookmark</span></code></dt>
-<dd>The through model linking Bookmarks and BookmarkTags.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Bookmark</span></code></dt>
-<dd>A single URL added to Pinboard by a particular Account.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>A single Pinboard account. (Note: other services, like Twitter and Flickr, have separate <code class="docutils literal notranslate"><span class="pre">User</span></code> and <code class="docutils literal notranslate"><span class="pre">Account</span></code> models. Pinboard is currently simpler.)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">BookmarkTag</span></code></dt><dd><p>A custom version of a Taggit Tag model, trying to match the way Pinboard creates slugs for tags.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TaggedBookmark</span></code></dt><dd><p>The through model linking Bookmarks and BookmarkTags.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Bookmark</span></code></dt><dd><p>A single URL added to Pinboard by a particular Account.</p>
+</dd>
 </dl>
 </div>
 <div class="section" id="managers">
 <h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Bookmark</span></code> models have several managers:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.objects.all()</span></code></dt>
-<dd>The default manager fetches <em>all</em> Bookmarks, posted by all Accounts, whether they’re public or private.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.public_objects.all()</span></code></dt>
-<dd>To display all Bookmarks on public-facing pages, <code class="docutils literal notranslate"><span class="pre">public_objects</span></code> should be used. It won’t return Bookmarks marked as private.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.toread_objects.all()</span></code></dt>
-<dd>Returns <em>all</em> Bookmarks, public and private, that are marked as ‘To read’.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.public_toread_objects.all()</span></code></dt>
-<dd>Returns only public ‘To read’ Bookmarks. Private ‘To read’ Bookmarks will not be included.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.objects.all()</span></code></dt><dd><p>The default manager fetches <em>all</em> Bookmarks, posted by all Accounts, whether they’re public or private.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.public_objects.all()</span></code></dt><dd><p>To display all Bookmarks on public-facing pages, <code class="docutils literal notranslate"><span class="pre">public_objects</span></code> should be used. It won’t return Bookmarks marked as private.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.toread_objects.all()</span></code></dt><dd><p>Returns <em>all</em> Bookmarks, public and private, that are marked as ‘To read’.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Bookmark.public_toread_objects.all()</span></code></dt><dd><p>Returns only public ‘To read’ Bookmarks. Private ‘To read’ Bookmarks will not be included.</p>
+</dd>
 </dl>
 <p>Of course, these can all be filtered as usual. So, to display public ‘To read’ Bookmarks posted by a particular Account:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.pinboard.models</span> <span class="k">import</span> <span class="n">Account</span><span class="p">,</span> <span class="n">Bookmark</span>
@@ -351,7 +353,7 @@ of a particular bookmark you’ve alread fetched):</p>
         <a href="twitter.html" class="btn btn-neutral float-right" title="Twitter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="lastfm.html" class="btn btn-neutral" title="Last.fm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="lastfm.html" class="btn btn-neutral float-left" title="Last.fm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -377,26 +379,16 @@ of a particular bookmark you’ve alread fetched):</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

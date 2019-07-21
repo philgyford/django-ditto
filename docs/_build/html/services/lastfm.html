@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Last.fm &mdash; Django Ditto 0.9.0 documentation</title>
+  <title>Last.fm &mdash; Django Ditto 0.10.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Pinboard" href="pinboard.html" />
     <link rel="prev" title="Flickr" href="flickr.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                0.9
+                0.10
               </div>
             
           
@@ -194,20 +196,20 @@
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.lastfm.models</span></code> are:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt>
-<dd>Representing a Last.fm account with an API key.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Scrobble</span></code></dt>
-<dd>A single listen to a particular <code class="docutils literal notranslate"><span class="pre">Track</span></code> by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code> at a certain time
-(<code class="docutils literal notranslate"><span class="pre">post_time</span></code>), optionally on an <code class="docutils literal notranslate"><span class="pre">Album</span></code>.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Track</span></code></dt>
-<dd>A track by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Last.fm account with an API key.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Scrobble</span></code></dt><dd><p>A single listen to a particular <code class="docutils literal notranslate"><span class="pre">Track</span></code> by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code> at a certain time
+(<code class="docutils literal notranslate"><span class="pre">post_time</span></code>), optionally on an <code class="docutils literal notranslate"><span class="pre">Album</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Track</span></code></dt><dd><p>A track by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of
 <code class="docutils literal notranslate"><span class="pre">Scrobble</span></code> s; all the times it has been listened to. Tracks have no direct
-relationship to <code class="docutils literal notranslate"><span class="pre">Album</span></code> s.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Artist</span></code></dt>
-<dd>A music artist. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of <code class="docutils literal notranslate"><span class="pre">Scrobble</span></code> s; all the times <code class="docutils literal notranslate"><span class="pre">Track</span></code> s by this artist have been listened to.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Album</span></code></dt>
-<dd>An album by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of <code class="docutils literal notranslate"><span class="pre">Scrobble</span></code> s; all the times <code class="docutils literal notranslate"><span class="pre">Tracks</span></code> on this album have been listened to.</dd>
+relationship to <code class="docutils literal notranslate"><span class="pre">Album</span></code> s.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Artist</span></code></dt><dd><p>A music artist. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of <code class="docutils literal notranslate"><span class="pre">Scrobble</span></code> s; all the times <code class="docutils literal notranslate"><span class="pre">Track</span></code> s by this artist have been listened to.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Album</span></code></dt><dd><p>An album by an <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. Its <code class="docutils literal notranslate"><span class="pre">scrobbles</span></code> property is a set of <code class="docutils literal notranslate"><span class="pre">Scrobble</span></code> s; all the times <code class="docutils literal notranslate"><span class="pre">Tracks</span></code> on this album have been listened to.</p>
+</dd>
 </dl>
 <p>When the Last.fm API provides it, we store an <code class="docutils literal notranslate"><span class="pre">mbid</span></code> (MusicBrainz Identifier)
 for each <code class="docutils literal notranslate"><span class="pre">Track</span></code>, <code class="docutils literal notranslate"><span class="pre">Artist</span></code> and <code class="docutils literal notranslate"><span class="pre">Album</span></code>.</p>
@@ -444,7 +446,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
         <a href="pinboard.html" class="btn btn-neutral float-right" title="Pinboard" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="flickr.html" class="btn btn-neutral" title="Flickr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="flickr.html" class="btn btn-neutral float-left" title="Flickr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -470,26 +472,16 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

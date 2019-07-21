@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Twitter &mdash; Django Ditto 0.9.0 documentation</title>
+  <title>Twitter &mdash; Django Ditto 0.10.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Development" href="../development.html" />
     <link rel="prev" title="Pinboard" href="pinboard.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                0.9
+                0.10
               </div>
             
           
@@ -207,15 +209,15 @@
 <div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.twitter.models</span></code> are:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt>
-<dd>Representing a Twitter account that has API credentials and that we fetch Tweets and/or Likes for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Media</span></code></dt>
-<dd>A photo, video or Animated GIF that was attached to one or more Tweets. Its <code class="docutils literal notranslate"><span class="pre">media_type</span></code> property differentiates between <code class="docutils literal notranslate"><span class="pre">'photo'</span></code>, <code class="docutils literal notranslate"><span class="pre">'video'</span></code> and <code class="docutils literal notranslate"><span class="pre">'animated_gif'</span></code>. (Yes, the plural model name is a bit confusing, sorry.) The files for photos and animated GIFs can be fetched from Twitter and used locally, although this isn’t the default. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet</span></code></dt>
-<dd>A Tweet. It may have been posted by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code> that we fetch Twets for. Or it might have been posted by a different <code class="docutils literal notranslate"><span class="pre">User</span></code> and favorited/liked by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code>.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">User</span></code></dt>
-<dd>A Twitter user. Every time a Tweet is fetched a new <code class="docutils literal notranslate"><span class="pre">User</span></code> object is created/updated for the person who posted it. One or more of these Users will have an associated <code class="docutils literal notranslate"><span class="pre">Account</span></code>, as these are the user(s) we fetch data for.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Twitter account that has API credentials and that we fetch Tweets and/or Likes for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Media</span></code></dt><dd><p>A photo, video or Animated GIF that was attached to one or more Tweets. Its <code class="docutils literal notranslate"><span class="pre">media_type</span></code> property differentiates between <code class="docutils literal notranslate"><span class="pre">'photo'</span></code>, <code class="docutils literal notranslate"><span class="pre">'video'</span></code> and <code class="docutils literal notranslate"><span class="pre">'animated_gif'</span></code>. (Yes, the plural model name is a bit confusing, sorry.) The files for photos and animated GIFs can be fetched from Twitter and used locally, although this isn’t the default. See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet</span></code></dt><dd><p>A Tweet. It may have been posted by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code> that we fetch Twets for. Or it might have been posted by a different <code class="docutils literal notranslate"><span class="pre">User</span></code> and favorited/liked by one of the Users with an <code class="docutils literal notranslate"><span class="pre">Account</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">User</span></code></dt><dd><p>A Twitter user. Every time a Tweet is fetched a new <code class="docutils literal notranslate"><span class="pre">User</span></code> object is created/updated for the person who posted it. One or more of these Users will have an associated <code class="docutils literal notranslate"><span class="pre">Account</span></code>, as these are the user(s) we fetch data for.</p>
+</dd>
 </dl>
 <p>So, you will end up with many <code class="docutils literal notranslate"><span class="pre">User</span></code> objects in the system. But only one (or a few) will be associated with <code class="docutils literal notranslate"><span class="pre">Account</span></code> objects – these are the Users for which you fetch Tweets or favorited/liked Tweets.</p>
 </div>
@@ -224,9 +226,9 @@
 <div class="section" id="media">
 <h3>Media<a class="headerlink" href="#media" title="Permalink to this headline">¶</a></h3>
 <p>For <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects there is only the standard manager available:</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Media.objects.all()</span></code></dt>
-<dd>Fetches all <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects, attached to Tweets by anyone, whether public or private.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Media.objects.all()</span></code></dt><dd><p>Fetches all <code class="docutils literal notranslate"><span class="pre">Media</span></code> objects, attached to Tweets by anyone, whether public or private.</p>
+</dd>
 </dl>
 <p>There is no concept in Twitter of a ‘private’ photo or video. The same photo
 could be posted by different public and private Twitter users. Exercise caution
@@ -236,23 +238,23 @@ when displaying <code class="docutils literal notranslate"><span class="pre">Med
 <h3>Tweet<a class="headerlink" href="#tweet" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">Tweet</span></code> models have several managers. There are two main differentiators we want to restrict things by:</p>
 <ul class="simple">
-<li><strong>Public vs private:</strong> Whether a Tweet was posted by a public or private Twitter user.</li>
-<li><strong>Posted Tweet vs Favorited Tweet:</strong> Sometimes we’ll want to only fetch Tweets posted by one of the Users with an API-credentialed Account. Sometimes we’ll want to only fetch Tweets those Accounts have favorited/liked. Sometimes we’ll want to fetch ALL Tweets, whether posted or favorited.</li>
+<li><p><strong>Public vs private:</strong> Whether a Tweet was posted by a public or private Twitter user.</p></li>
+<li><p><strong>Posted Tweet vs Favorited Tweet:</strong> Sometimes we’ll want to only fetch Tweets posted by one of the Users with an API-credentialed Account. Sometimes we’ll want to only fetch Tweets those Accounts have favorited/liked. Sometimes we’ll want to fetch ALL Tweets, whether posted or favorited.</p></li>
 </ul>
 <p>On public-facing web pages you should only use the managers starting <code class="docutils literal notranslate"><span class="pre">Tweet.public_</span></code> as these will filter out all Tweets posted by private Twitter users.</p>
-<dl class="docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.objects.all()</span></code></dt>
-<dd>The default manager fetches <em>all</em> Tweets in the system, posted by all Users, whether they’re public or private, and whether posted by an Account’s User or favorited by them.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_objects.all()</span></code></dt>
-<dd>Only gets Tweets posted by any Users who are not private. This includes Tweets that have simply been favorited/liked by one of your Accounts.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.tweet_objects.all()</span></code></dt>
-<dd>Only gets Tweets posted by a User with an Account, not favorited by them.  And from both public and private Users.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_tweet_objects.all()</span></code></dt>
-<dd>Only gets Tweets posted by a User with an Account, not favorited by them, but only for Users who aren’t private. For use on public pages.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.favorite_objects.all()</span></code></dt>
-<dd>Only gets Tweets favorited by a User with an Account, whether those Tweets are posted by public or private Users.</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_favorite_objects.all()</span></code></dt>
-<dd>Only gets Tweets favorited by a User with an Account, and only Tweets posted by Users who aren’t private.</dd>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.objects.all()</span></code></dt><dd><p>The default manager fetches <em>all</em> Tweets in the system, posted by all Users, whether they’re public or private, and whether posted by an Account’s User or favorited by them.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_objects.all()</span></code></dt><dd><p>Only gets Tweets posted by any Users who are not private. This includes Tweets that have simply been favorited/liked by one of your Accounts.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.tweet_objects.all()</span></code></dt><dd><p>Only gets Tweets posted by a User with an Account, not favorited by them.  And from both public and private Users.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_tweet_objects.all()</span></code></dt><dd><p>Only gets Tweets posted by a User with an Account, not favorited by them, but only for Users who aren’t private. For use on public pages.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.favorite_objects.all()</span></code></dt><dd><p>Only gets Tweets favorited by a User with an Account, whether those Tweets are posted by public or private Users.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Tweet.public_favorite_objects.all()</span></code></dt><dd><p>Only gets Tweets favorited by a User with an Account, and only Tweets posted by Users who aren’t private.</p>
+</dd>
 </dl>
 <p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Tweets posted by a particular <code class="docutils literal notranslate"><span class="pre">User</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.twitter.models</span> <span class="k">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Tweet</span>
@@ -516,7 +518,7 @@ calling <code class="docutils literal notranslate"><span class="pre">video_url</
         <a href="../development.html" class="btn btn-neutral float-right" title="Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pinboard.html" class="btn btn-neutral" title="Pinboard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pinboard.html" class="btn btn-neutral float-left" title="Pinboard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -542,26 +544,16 @@ calling <code class="docutils literal notranslate"><span class="pre">video_url</
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
