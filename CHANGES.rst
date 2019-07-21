@@ -1,6 +1,27 @@
 Changelog (Django Ditto)
 ========================
 
+
+0.10.0
+------
+
+- No new features, but upgrades of requirements.
+
+- Add support for Django 2.2, drop support for Django 2.0
+
+- Switch from django-sortedm2m to django-sorted-m2m, which contains Django 2.2
+  support.
+
+- Upgrade pillow requirement from 4.3 to 6.1.
+
+- Also upgrade requirements for django-taggit (from 0.22 to 1.1) and flickrapi
+  (from 2.3 to 2.4).
+
+- Upgrade Bootstrap in devproject from 4.1 to 4.3.
+
+- Upgrade Django used in devproject from 2.1 to 2.2.
+
+
 0.9.0
 -----
 
