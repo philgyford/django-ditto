@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 django-debug-toolbar = "==2.0"
 Django = "==2.2.3"
-django-ditto = {editable = true, path = "./.."}
+django-ditto = {editable = true,path = "./.."}
 twython = "==3.7.0"
 
 [dev-packages]
