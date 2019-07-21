@@ -51,7 +51,7 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4.1 <https://getbootstrap.com>`_)
+- Templates (that use `Bootstrap 4.3 <https://getbootstrap.com>`_)
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
 
 You could use the whole lot to create a minimal site that displays your Tweets,

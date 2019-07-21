@@ -43,5 +43,5 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4.1 <https://getbootstrap.com>`_, CSS only (no JavaScript))
+- Templates (that use `Bootstrap 4.3 <https://getbootstrap.com>`_, CSS only (no JavaScript))
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
