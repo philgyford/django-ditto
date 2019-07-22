@@ -243,14 +243,16 @@ $ pipenv run make html
 </div>
 <div class="section" id="packaging">
 <h3>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h3>
-<p>Set version number in <cite>ditto/__init__.py</cite>.</p>
+<p>Set version number in <code class="docutils literal notranslate"><span class="pre">ditto/__init__.py</span></code>.</p>
 <p>Rebuild documentation (which includes the version number).</p>
-<p>Ensure <cite>CHANGES.rst</cite> is up-to-date for new version.</p>
+<p>Ensure <code class="docutils literal notranslate"><span class="pre">CHANGES.rst</span></code> is up-to-date for new version.</p>
 <p>Commit changes to git.</p>
 <p>Add a version tag:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py tag
 </pre></div>
 </div>
+<p>Push to <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p>
+<p>Ensure Travis still builds OK.</p>
 <p>Then:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py publish
 </pre></div>
