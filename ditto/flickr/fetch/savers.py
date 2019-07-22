@@ -191,30 +191,36 @@ class PhotoSaver(SaveUtilsMixin, object):
 
         if "location" in photo["info"]:
             loc = photo["info"]["location"]
-            defaults["latitude"] = loc["latitude"]
-            defaults["longitude"] = loc["longitude"]
-            defaults["location_accuracy"] = loc["accuracy"]
-            defaults["location_context"] = loc["context"]
-            if "place_id" in loc:
+            # For a while after the SmugMug switchover, location stuff
+            # was a bit broken, so none of the place_ids or woeids were
+            # returned. So we're quite forgiving here.
+            try:
+                defaults["latitude"] = loc["latitude"]
+                defaults["longitude"] = loc["longitude"]
+                defaults["location_accuracy"] = loc["accuracy"]
+                defaults["location_context"] = loc["context"]
+
                 defaults["location_place_id"] = loc["place_id"]
-            if "woeid" in loc:
+
                 defaults["location_woeid"] = loc["woeid"]
-            if "locality" in loc:
+
                 defaults["locality_name"] = loc["locality"]["_content"]
                 defaults["locality_place_id"] = loc["locality"]["place_id"]
                 defaults["locality_woeid"] = loc["locality"]["woeid"]
-            if "county" in loc:
+
                 defaults["county_name"] = loc["county"]["_content"]
                 defaults["county_place_id"] = loc["county"]["place_id"]
                 defaults["county_woeid"] = loc["county"]["woeid"]
-            if "region" in loc:
+
                 defaults["region_name"] = loc["region"]["_content"]
                 defaults["region_place_id"] = loc["region"]["place_id"]
                 defaults["region_woeid"] = loc["region"]["woeid"]
-            if "country" in loc:
+
                 defaults["country_name"] = loc["country"]["_content"]
                 defaults["country_place_id"] = loc["country"]["place_id"]
                 defaults["country_woeid"] = loc["country"]["woeid"]
+            except KeyError:
+                pass
 
         # The size labels for all possible sizes an image might have, that we
         # also have width/height parameters for on Photo:
