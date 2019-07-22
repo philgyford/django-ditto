@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.10.1
+------
+
+- Fix error when fetching Flickr photos that have location data, as Flickr
+  currently isn't returning ``place_id`` or ``woeid`` fields.
+
 
 0.10.0
 ------
