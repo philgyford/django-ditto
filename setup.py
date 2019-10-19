@@ -48,13 +48,20 @@ if sys.argv[-1] == "tag":
 # Do `python setup.py publish` to send current version to PyPI.
 if sys.argv[-1] == "publish":
     os.system("python setup.py sdist")
-    os.system("twine upload --config-file=.pypirc dist/*")
+    os.system(
+        "twine upload --config-file=.pypirc dist/django-ditto-%s.tar.gz"
+        % (get_version())
+    )
     sys.exit()
 
 # Do `python setup.py testpublish` to send current version to Test PyPI.
 # OUT OF DATE
 if sys.argv[-1] == "testpublish":
-    os.system("python setup.py sdist upload -r pypitest")
+    os.system("python setup.py sdist")
+    os.system(
+        "twine upload --config-file=.pypirc --repository-url https://test.pypi.org/legacy/ dist/django-ditto-%s.tar.gz"  # noqa: E501
+        % (get_version())
+    )
     # os.system("python setup.py bdist_wheel upload")
     sys.exit()
 
