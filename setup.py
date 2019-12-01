@@ -74,7 +74,7 @@ setup(
         "django-sorted-m2m>=2.0.0,<2.1",
         "django-taggit>=1.1.0,<1.2",
         "flickrapi>=2.4,<2.5",
-        "pillow>=6.1.0,<6.2",
+        "pillow>=6.1.0,<6.3",
         "pytz",
         "twitter-text-python",
         "twython>=3.7.0,<3.8",
