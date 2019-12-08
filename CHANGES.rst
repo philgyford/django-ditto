@@ -1,6 +1,14 @@
 Changelog (Django Ditto)
 ========================
 
+0.10.3
+------
+
+- Allow for use of Pillow 6.2 as well as 6.1.
+
+- Update devproject dependencies.
+
+
 0.10.2
 ------
 
