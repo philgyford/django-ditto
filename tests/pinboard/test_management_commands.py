@@ -1,10 +1,10 @@
 # coding: utf-8
+from io import StringIO
 from unittest.mock import patch
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from django.utils.six import StringIO
 
 from ditto.pinboard.fetch import AllBookmarksFetcher, DateBookmarksFetcher,\
         RecentBookmarksFetcher, UrlBookmarksFetcher

@@ -5,11 +5,11 @@ name = "pypi"
 
 [packages]
 django-debug-toolbar = "==2.1"
-Django = "==2.2.7"
+Django = "==3.0.0"
 django-ditto = {editable = true,path = "./.."}
 twython = "==3.7.0"
 
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
