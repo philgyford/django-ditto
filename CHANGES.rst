@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+0.11.0
+------
+
+- Requires either Django 2.2 or 3.0; dropped support for 2.1.
+
+
 0.10.3
 ------
 
