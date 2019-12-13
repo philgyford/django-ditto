@@ -111,4 +111,10 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
     keywords="ditto twitter flickr pinboard last.fm",
+    project_urls={
+        "Blog posts": "https://www.gyford.com/phil/writing/tags/django-ditto/",
+        "Bug Reports": "https://github.com/philgyford/django-ditto/issues",
+        "Documentation": "https://django-ditto.readthedocs.io/",
+        "Source": "https://github.com/philgyford/django-ditto"
+    }
 )
