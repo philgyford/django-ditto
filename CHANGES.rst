@@ -6,6 +6,9 @@ Unreleased
 
 - Update devproject python dependencies
 
+- Update Bootstrap CSS and JS from 4.1.1 to 4.4.1, Popper to 1.16, and jQuery
+  from 3.3.1 to 3.4.1.
+
 
 0.11.0
 ------
