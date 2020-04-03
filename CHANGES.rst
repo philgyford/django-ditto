@@ -1,6 +1,12 @@
 Changelog (Django Ditto)
 ========================
 
+Unreleased
+----------
+
+- Update devproject python dependencies
+
+
 0.11.0
 ------
 
