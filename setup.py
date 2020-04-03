@@ -74,10 +74,10 @@ setup(
         "django-sortedm2m>=3.0.0,<3.1",
         "django-taggit>=1.2.0,<1.3",
         "flickrapi>=2.4,<2.5",
-        "pillow>=6.1.0,<6.3",
+        "pillow>=6.1.0,<7.2",
         "pytz",
         "twitter-text-python>=1.1.1,<1.2",
-        "twython>=3.7.0,<3.8",
+        "twython>=3.7.0,<3.9",
     ],
     dependency_links=[],
     tests_require=[
