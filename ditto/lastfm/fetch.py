@@ -193,6 +193,8 @@ class ScrobblesFetcher(object):
                 % (self.page_number, str(e))
             )
 
+        response.encoding = "utf-8"
+
         results = json.loads(response.text)
 
         if "error" in results:
