@@ -8,18 +8,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lastfm', '0004_auto_20161026_1540'),
+        ("lastfm", "0004_auto_20161026_1540"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scrobble',
-            name='post_time',
-            field=models.DateTimeField(blank=True, db_index=True, help_text='The time the item was originally posted/created on its service.', null=True),
+            model_name="scrobble",
+            name="post_time",
+            field=models.DateTimeField(
+                blank=True,
+                db_index=True,
+                help_text="The time the item was originally posted/created on its service.",  # noqa: E501
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='scrobble',
-            name='summary',
-            field=models.CharField(blank=True, help_text="eg, Brief summary or excerpt of item's text content. No linebreaks or HTML.", max_length=255),
+            model_name="scrobble",
+            name="summary",
+            field=models.CharField(
+                blank=True,
+                help_text="eg, Brief summary or excerpt of item's text content. No linebreaks or HTML.",  # noqa: E501
+                max_length=255,
+            ),
         ),
     ]

@@ -21,7 +21,7 @@ from ..models import Photo, Photoset, User
 #
 # UserSaver
 # PhotoSaver
-# PhotosetSaver
+# PhotosetSave
 
 
 class SaveUtilsMixin(object):
@@ -321,8 +321,7 @@ class PhotoSaver(SaveUtilsMixin, object):
                     except User.DoesNotExist:
                         raise FetchError(
                             "Tried to add a Tag authored by a Flickr user "
-                            "with NSID %s who doesn't exist in the DB."
-                            % tag["author"]
+                            "with NSID %s who doesn't exist in the DB." % tag["author"]
                         )
 
                 pt_obj = Photo.tags.through(

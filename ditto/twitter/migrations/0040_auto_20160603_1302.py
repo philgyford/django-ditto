@@ -15,7 +15,7 @@ def make_many_tweets(apps, schema_editor):
         Adds the Tweet object in Media.tweet to the
         many-to-many relationship in Media.tweets
     """
-    Media = apps.get_model('twitter', 'Media')
+    Media = apps.get_model("twitter", "Media")
 
     for media in Media.objects.all():
         media.tweets.add(media.tweet)
@@ -24,7 +24,7 @@ def make_many_tweets(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0039_auto_20160603_1301'),
+        ("twitter", "0039_auto_20160603_1301"),
     ]
 
     operations = [

@@ -8,13 +8,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0049_auto_20160713_1127'),
+        ("twitter", "0049_auto_20160713_1127"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='media',
-            name='media_type',
-            field=models.CharField(choices=[('animated_gif', 'Animated GIF'), ('photo', 'Photo'), ('video', 'Video')], max_length=12),
+            model_name="media",
+            name="media_type",
+            field=models.CharField(
+                choices=[
+                    ("animated_gif", "Animated GIF"),
+                    ("photo", "Photo"),
+                    ("video", "Video"),
+                ],
+                max_length=12,
+            ),
         ),
     ]

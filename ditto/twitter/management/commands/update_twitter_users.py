@@ -11,9 +11,8 @@ class Command(UpdateTwitterCommand):
 
     help = "Fetches the latest data about each Twitter user"
 
-    singular_noun = 'User'
-    plural_noun = 'Users'
+    singular_noun = "User"
+    plural_noun = "Users"
 
     def fetch(self, screen_name):
         return UsersFetcher(screen_name=screen_name).fetch()
-

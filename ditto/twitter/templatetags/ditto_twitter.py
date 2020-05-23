@@ -2,13 +2,13 @@ import datetime
 import pytz
 
 from django import template
-from django.db.models import Count
 
 from ..models import Tweet, User
 from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
+
 
 @register.simple_tag
 def recent_tweets(screen_name=None, limit=10):
@@ -23,7 +23,8 @@ def recent_tweets(screen_name=None, limit=10):
     tweets = Tweet.public_tweet_objects.all()
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
-    return tweets.prefetch_related('user')[:limit]
+    return tweets.prefetch_related("user")[:limit]
+
 
 @register.simple_tag
 def recent_favorites(screen_name=None, limit=10):
@@ -43,7 +44,8 @@ def recent_favorites(screen_name=None, limit=10):
             tweets = Tweet.objects.none()
         else:
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
-    return tweets.prefetch_related('user')[:limit]
+    return tweets.prefetch_related("user")[:limit]
+
 
 @register.simple_tag
 def day_tweets(date, screen_name=None):
@@ -57,15 +59,14 @@ def day_tweets(date, screen_name=None):
     screen_name -- A Twitter user's screen_name. If not supplied, we fetch
                     all public Tweets.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(
-                                                            tzinfo=pytz.utc)
-    end   = datetime.datetime.combine(date, datetime.time.max).replace(
-                                                            tzinfo=pytz.utc)
+    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
+    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
     tweets = Tweet.public_tweet_objects.filter(post_time__range=[start, end])
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
-    tweets = tweets.prefetch_related('user')
+    tweets = tweets.prefetch_related("user")
     return tweets
+
 
 @register.simple_tag
 def day_favorites(date, screen_name=None):
@@ -82,21 +83,19 @@ def day_favorites(date, screen_name=None):
     screen_name -- A Twitter user's screen_name. If not supplied, we fetch
                     all public Tweets.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(
-                                                            tzinfo=pytz.utc)
-    end   = datetime.datetime.combine(date, datetime.time.max).replace(
-                                                            tzinfo=pytz.utc)
+    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
+    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
     if screen_name is None:
-        tweets = Tweet.public_favorite_objects.filter(
-                                                post_time__range=[start, end])
+        tweets = Tweet.public_favorite_objects.filter(post_time__range=[start, end])
     else:
         user = User.objects.get(screen_name=screen_name)
         if user.is_private:
             tweets = Tweet.objects.none()
         else:
             tweets = Tweet.public_favorite_objects.filter(
-                post_time__range=[start, end]).filter(favoriting_users=user)
-    tweets = tweets.prefetch_related('user')
+                post_time__range=[start, end]
+            ).filter(favoriting_users=user)
+    tweets = tweets.prefetch_related("user")
     return tweets
 
 
@@ -143,4 +142,3 @@ def annual_favorite_counts(screen_name=None):
             tweets = Tweet.public_favorite_objects.filter(favoriting_users=user)
 
     return get_annual_item_counts(tweets)
-

@@ -21,4 +21,3 @@ class Command(FetchPhotosCommand):
 
     def fetch_photos(self, nsid, days):
         return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)
-

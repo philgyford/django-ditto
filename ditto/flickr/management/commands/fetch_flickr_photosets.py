@@ -13,15 +13,18 @@ class Command(FetchCommand):
     """
 
     # What we're fetching:
-    singular_noun = 'Photoset'
-    plural_noun = 'Photosets'
+    singular_noun = "Photoset"
+    plural_noun = "Photosets"
 
-    help = "Fetches all photosets for one or all Flickr Accounts (photo data must already be fetched)."
+    help = (
+        "Fetches all photosets for one or all Flickr Accounts "
+        "(photo data must already be fetched)."
+    )
 
     def handle(self, *args, **options):
         # We might be fetching for a specific account or all (None).
-        nsid = options['account'] if options['account'] else None;
+        nsid = options["account"] if options["account"] else None
 
         results = PhotosetsMultiAccountFetcher(nsid=nsid).fetch()
 
-        self.output_results(results, options.get('verbosity', 1))
+        self.output_results(results, options.get("verbosity", 1))

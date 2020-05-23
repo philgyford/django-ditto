@@ -15,7 +15,6 @@ from . import app_settings
 from . import imagegenerators
 from . import managers
 from .utils import htmlify_description, htmlify_tweet
-from ..core.managers import PublicItemManager
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
 import json
@@ -27,27 +26,40 @@ class Account(TimeStampedModelMixin, models.Model):
     details here.
     """
 
-    user = models.ForeignKey('User', blank=True, null=True,
-                                                    on_delete=models.SET_NULL)
+    user = models.ForeignKey("User", blank=True, null=True, on_delete=models.SET_NULL)
 
-    consumer_key = models.CharField(null=False, blank=True, max_length=255,
-            help_text="(API Key) From https://apps.twitter.com")
-    consumer_secret = models.CharField(null=False, blank=True, max_length=255,
-            help_text="(API Secret)")
+    consumer_key = models.CharField(
+        null=False,
+        blank=True,
+        max_length=255,
+        help_text="(API Key) From https://apps.twitter.com",
+    )
+    consumer_secret = models.CharField(
+        null=False, blank=True, max_length=255, help_text="(API Secret)"
+    )
     access_token = models.CharField(null=False, blank=True, max_length=255)
-    access_token_secret = models.CharField(null=False, blank=True,
-                                                                max_length=255)
-    last_recent_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The Twitter ID of the most recent Tweet fetched.")
-    last_favorite_id = models.BigIntegerField(null=True, blank=True,
-            help_text="The Twitter ID of the most recent favorited Tweet fetched.")
+    access_token_secret = models.CharField(null=False, blank=True, max_length=255)
+    last_recent_id = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="The Twitter ID of the most recent Tweet fetched.",
+    )
+    last_favorite_id = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="The Twitter ID of the most recent favorited Tweet fetched.",
+    )
 
-    is_active = models.BooleanField(default=True, null=False, blank=False,
-                        help_text="If false, new Tweets won't be fetched.")
+    is_active = models.BooleanField(
+        default=True,
+        null=False,
+        blank=False,
+        help_text="If false, new Tweets won't be fetched.",
+    )
 
     def save(self, *args, **kwargs):
         if self.user is None:
-            result = self.updateUserFromTwitter()
+            self.updateUserFromTwitter()
             # Quietly ignoring errors. Sorry.
         super().save(*args, **kwargs)
 
@@ -55,17 +67,18 @@ class Account(TimeStampedModelMixin, models.Model):
         if self.user:
             return str(self.user)
         else:
-            return '%d' % self.pk
+            return "%d" % self.pk
 
     class Meta:
-        ordering = ['user__screen_name']
+        ordering = ["user__screen_name"]
 
     def get_absolute_url(self):
         if self.user:
-            return reverse('twitter:user_detail',
-                        kwargs={'screen_name': self.user.screen_name})
+            return reverse(
+                "twitter:user_detail", kwargs={"screen_name": self.user.screen_name}
+            )
         else:
-            return ''
+            return ""
 
     def updateUserFromTwitter(self):
         """Calls the Twitter API to fetch the user details for this account.
@@ -85,15 +98,20 @@ class Account(TimeStampedModelMixin, models.Model):
 
         if self.has_credentials():
             results = FetchVerify(account=self).fetch()
-            if 'user' in results and isinstance(results['user'], User):
-                self.user = results['user']
+            if "user" in results and isinstance(results["user"], User):
+                self.user = results["user"]
             return results
         else:
             return False
 
     def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
-        if self.consumer_key and self.consumer_secret and self.access_token and self.access_token_secret:
+        if (
+            self.consumer_key
+            and self.consumer_secret
+            and self.access_token
+            and self.access_token_secret
+        ):
             return True
         else:
             return False
@@ -108,61 +126,76 @@ class Media(TimeStampedModelMixin, models.Model):
 
     # Mapping our internal names for sizes to the imagekit generators:
     IMAGE_SIZES = {
-        'medium':       { 'generator': imagegenerators.Medium, },
-        'small':        { 'generator': imagegenerators.Small, },
-        'thumb':        { 'generator': imagegenerators.Thumbnail, },
+        "medium": {"generator": imagegenerators.Medium},
+        "small": {"generator": imagegenerators.Small},
+        "thumb": {"generator": imagegenerators.Thumbnail},
     }
 
     MEDIA_TYPES = (
-        ('animated_gif', 'Animated GIF'),
-        ('photo', 'Photo'),
-        ('video', 'Video'),
+        ("animated_gif", "Animated GIF"),
+        ("photo", "Photo"),
+        ("video", "Video"),
     )
 
-    media_type = models.CharField(null=False, blank=False, max_length=12,
-                                                        choices=MEDIA_TYPES)
+    media_type = models.CharField(
+        null=False, blank=False, max_length=12, choices=MEDIA_TYPES
+    )
 
     # A media item can belong to more than one tweet. Why?
     # Because if tweet 1 retweets tweet 2, which has a photo, then we save
     # that photo as attached to both tweets 1 and 2.
     # Because that's how the API does it too.
-    tweets = models.ManyToManyField('Tweet', related_name='media')
+    tweets = models.ManyToManyField("Tweet", related_name="media")
 
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    image_url = models.URLField(null=False, blank=False,
-                            help_text="URL of the image itself on Twitter.com")
+    image_url = models.URLField(
+        null=False, blank=False, help_text="URL of the image itself on Twitter.com"
+    )
 
-    large_w = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Large width")
-    large_h = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Large height")
-    medium_w = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Medium width")
-    medium_h = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Medium height")
-    small_w = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Small width")
-    small_h = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Small height")
-    thumb_w = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Thumbnail width")
-    thumb_h = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                verbose_name="Thumbnail height")
+    large_w = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Large width"
+    )
+    large_h = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Large height"
+    )
+    medium_w = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Medium width"
+    )
+    medium_h = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Medium height"
+    )
+    small_w = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Small width"
+    )
+    small_h = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Small height"
+    )
+    thumb_w = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Thumbnail width"
+    )
+    thumb_h = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name="Thumbnail height"
+    )
 
     # START VIDEO-ONLY PROPERTIES.
 
     # These will be in order from lowest bitrate to highest.
-    mp4_url = models.URLField(null=False, blank=True,
-                        verbose_name='MP4 URL', help_text="For Animated GIFs")
-    dash_url = models.URLField(null=False, blank=True,
-                                verbose_name='MPEG-DASH URL (.mpd, streaming)')
-    xmpeg_url = models.URLField(null=False, blank=True,
-                            verbose_name='X-MPEG URL (HLS, .m3u8, streaming')
+    mp4_url = models.URLField(
+        null=False, blank=True, verbose_name="MP4 URL", help_text="For Animated GIFs"
+    )
+    dash_url = models.URLField(
+        null=False, blank=True, verbose_name="MPEG-DASH URL (.mpd, streaming)"
+    )
+    xmpeg_url = models.URLField(
+        null=False, blank=True, verbose_name="X-MPEG URL (HLS, .m3u8, streaming"
+    )
 
-    aspect_ratio = models.CharField(null=False, blank=True, max_length=21,
-                                            help_text='eg, "4:3" or "16:9"')
-    duration = models.PositiveIntegerField(null=True, blank=True,
-                                                help_text="In milliseconds")
+    aspect_ratio = models.CharField(
+        null=False, blank=True, max_length=21, help_text='eg, "4:3" or "16:9"'
+    )
+    duration = models.PositiveIntegerField(
+        null=True, blank=True, help_text="In milliseconds"
+    )
     # END VIDEO-ONLY PROPERTIES
 
     def upload_path(self, filename):
@@ -173,19 +206,20 @@ class Media(TimeStampedModelMixin, models.Model):
 
         # If filename is '12345678.jpg':
         # 'twitter/media/56/78/12345678.jpg'
-        return '/'.join([
-            app_settings.TWITTER_DIR_BASE,
-            'media',
-            name[-4:-2],
-            name[-2:],
-            filename
-        ])
+        return "/".join(
+            [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
+        )
 
-    image_file = models.ImageField(upload_to=upload_path,
-                                            null=False, blank=True, default='')
-    mp4_file = models.FileField(upload_to=upload_path,
-                                null=False, blank=True, default='',
-                                help_text="Only used for Animated GIFs")
+    image_file = models.ImageField(
+        upload_to=upload_path, null=False, blank=True, default=""
+    )
+    mp4_file = models.FileField(
+        upload_to=upload_path,
+        null=False,
+        blank=True,
+        default="",
+        help_text="Only used for Animated GIFs",
+    )
 
     # All Items (eg, used in Admin):
     objects = models.Manager()
@@ -194,12 +228,12 @@ class Media(TimeStampedModelMixin, models.Model):
     # private/public Media items.
 
     def __str__(self):
-        return '%s %d' % (self.get_media_type_display(), self.id)
+        return "%s %d" % (self.get_media_type_display(), self.id)
 
     class Meta:
-        ordering = ['time_created']
-        verbose_name = 'Media item'
-        verbose_name_plural = 'Media items'
+        ordering = ["time_created"]
+        verbose_name = "Media item"
+        verbose_name_plural = "Media items"
 
     @property
     def thumbnail_w(self):
@@ -214,22 +248,22 @@ class Media(TimeStampedModelMixin, models.Model):
     @property
     def large_url(self):
         "URL to local or remote original-size image."
-        return self._image_url('large')
+        return self._image_url("large")
 
     @property
     def medium_url(self):
         "URL to local or remote image, maximum 1200px high/wide."
-        return self._image_url('medium')
+        return self._image_url("medium")
 
     @property
     def small_url(self):
         "URL to local or remote image, maximum 680px high/wide."
-        return self._image_url('small')
+        return self._image_url("small")
 
     @property
     def thumb_url(self):
         "URL to local or remote image, 150px square."
-        return self._image_url('thumb')
+        return self._image_url("thumb")
 
     @property
     def thumbnail_url(self):
@@ -244,19 +278,19 @@ class Media(TimeStampedModelMixin, models.Model):
         kind of thing this is (GIF or video), and what URLs we have.
         Returns a URL or an empty string.
         """
-        url = ''
+        url = ""
         video_type = self._video_type()
 
         if video_type is not None:
-            if video_type[1] == 'local':
-                if video_type[0] == 'mp4':
+            if video_type[1] == "local":
+                if video_type[0] == "mp4":
                     return self.mp4_file.url
             else:
-                if video_type[0] == 'mp4':
+                if video_type[0] == "mp4":
                     url = self.mp4_url
-                elif video_type[0] == 'xmpeg':
+                elif video_type[0] == "xmpeg":
                     url = self.xmpeg_url
-                elif video_type[0] == 'dash':
+                elif video_type[0] == "dash":
                     url = self.dash_url
 
         return url
@@ -267,16 +301,16 @@ class Media(TimeStampedModelMixin, models.Model):
         The MIME type for our preferred video URL.
         Returns a mime type or an empty string.
         """
-        mime_type = ''
+        mime_type = ""
         video_type = self._video_type()
 
         if video_type is not None:
-            if video_type[0] == 'mp4':
-                mime_type = 'video/mp4'
-            elif video_type[0] == 'xmpeg':
-                mime_type = 'application/x-mpegURL'
-            elif video_type[0] == 'dash':
-                mime_type = 'application/dash+xml'
+            if video_type[0] == "mp4":
+                mime_type = "video/mp4"
+            elif video_type[0] == "xmpeg":
+                mime_type = "application/x-mpegURL"
+            elif video_type[0] == "dash":
+                mime_type = "application/dash+xml"
 
         return mime_type
 
@@ -297,29 +331,29 @@ class Media(TimeStampedModelMixin, models.Model):
         size -- one of 'large', 'medium', 'small', or 'thumbnail'.
         """
         if self.image_file:
-            if size == 'large':
+            if size == "large":
                 # Essentially the original file.
                 return self.image_file.url
             else:
-                generator = self.IMAGE_SIZES[size]['generator']
+                generator = self.IMAGE_SIZES[size]["generator"]
                 try:
                     image_generator = generator(source=self.image_file)
                     result = ImageCacheFile(image_generator)
                     return result.url
-                except:
+                except Exception:
                     # We have an original file but something's wrong with it.
                     # Might be 0 bytes or something.
-                    return static('img/original_error.jpg')
+                    return static("img/original_error.jpg")
         else:
             # We haven't downloaded an original file for this.
-            return static('img/original_missing.jpg')
+            return static("img/original_missing.jpg")
 
     def _remote_image_url(self, size):
         """
         Generate the URL of an image of a particular size, at Twitter.
         size -- one of 'large', 'medium', 'small', or 'thumbnail'.
         """
-        return  '%s:%s' % (self.image_url, size)
+        return "%s:%s" % (self.image_url, size)
 
     def _video_type(self):
         """
@@ -338,8 +372,8 @@ class Media(TimeStampedModelMixin, models.Model):
         Returns None or a tuple of type and 'remote'/'local',
         eg: ('xmpeg', 'remote') or ('mp4', 'local')
         """
-        if self.media_type == 'animated_gif' and self.mp4_file:
-            return ('mp4', 'local')
+        if self.media_type == "animated_gif" and self.mp4_file:
+            return ("mp4", "local")
         else:
             # We can't currently save video files except MP4s for animated
             # gifs, so try to fall back to the remote URLs.
@@ -352,17 +386,17 @@ class Media(TimeStampedModelMixin, models.Model):
         eg: ('xmpeg', 'remote') or ('mp4', 'local')
         """
         video_type = None
-        if self.media_type == 'video':
+        if self.media_type == "video":
             # Prefer the streaming URL over MP4:
             if self.xmpeg_url:
-                video_type = ('xmpeg', 'remote')
+                video_type = ("xmpeg", "remote")
             elif self.mp4_url:
-                video_type = ('mp4', 'remote')
+                video_type = ("mp4", "remote")
             elif self.dash_url:
-                video_type = ('dash', 'remote')
+                video_type = ("dash", "remote")
 
-        elif self.media_type == 'animated_gif' and self.mp4_url:
-            video_type = ('mp4', 'remote')
+        elif self.media_type == "animated_gif" and self.mp4_url:
+            video_type = ("mp4", "remote")
 
         return video_type
 
@@ -373,6 +407,7 @@ class ExtraTweetManagers(models.Model):
     These need to be here, rather than in the Tweet model, or they will
     override those in DittoItemModel.
     """
+
     # For Tweets favorited by any Account:
     favorite_objects = managers.FavoritesManager()
     public_favorite_objects = managers.PublicFavoritesManager()
@@ -395,7 +430,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     `current_user_retweet`.
     """
 
-    ditto_item_name = 'twitter_tweet'
+    ditto_item_name = "twitter_tweet"
 
     # Properties inherited from DittoItemModel:
     #
@@ -409,79 +444,127 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
 
     text = models.TextField(null=False, blank=False)
-    text_html = models.TextField(null=False, blank=True,
-        help_text="An HTMLified version of the Tweet's text")
-    twitter_id = models.BigIntegerField(null=False, blank=False, unique=True,
-                                                                db_index=True)
+    text_html = models.TextField(
+        null=False, blank=True, help_text="An HTMLified version of the Tweet's text"
+    )
+    twitter_id = models.BigIntegerField(
+        null=False, blank=False, unique=True, db_index=True
+    )
 
     # Favorite and Retweet Count not present in tweets ingested from a
     # downloaded archive, hence null=True:
-    favorite_count = models.PositiveIntegerField(null=True, blank=True,
-        help_text="Approximately how many times this had been favorited when fetched")
-    retweet_count = models.PositiveIntegerField(null=True, blank=True,
-        help_text="Number of times this had been retweeted when fetched")
+    favorite_count = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Approximately how many times this had been favorited when fetched",
+    )
+    retweet_count = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Number of times this had been retweeted when fetched",
+    )
 
-    in_reply_to_screen_name = models.CharField(null=False, blank=True,
+    in_reply_to_screen_name = models.CharField(
+        null=False,
+        blank=True,
         max_length=20,
-        help_text="Screen name of the original Tweet's author, if this is a reply")
-    in_reply_to_status_id = models.BigIntegerField(null=True, blank=True,
-        help_text="The ID of the Tweet replied to, if any")
-    in_reply_to_user_id = models.BigIntegerField(null=True, blank=True,
-        help_text="ID of the original Tweet's author, if this is a reply")
+        help_text="Screen name of the original Tweet's author, if this is a reply",
+    )
+    in_reply_to_status_id = models.BigIntegerField(
+        null=True, blank=True, help_text="The ID of the Tweet replied to, if any"
+    )
+    in_reply_to_user_id = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="ID of the original Tweet's author, if this is a reply",
+    )
 
-    language = models.CharField(null=False, blank=False, default='und',
+    language = models.CharField(
+        null=False,
+        blank=False,
+        default="und",
         max_length=20,
-        help_text="A BCP 47 language identifier, or 'und' if it couldn't be detected")
+        help_text="A BCP 47 language identifier, or 'und' if it couldn't be detected",
+    )
 
     # Just enough of the place data to display something readable and useful:
-    place_attribute_street_address = models.CharField(null=False, blank=True,
-                                                                max_length=255)
+    place_attribute_street_address = models.CharField(
+        null=False, blank=True, max_length=255
+    )
     place_full_name = models.CharField(null=False, blank=True, max_length=255)
     place_country = models.CharField(null=False, blank=True, max_length=255)
 
-    quoted_status_id = models.BigIntegerField(null=True, blank=True,
-        help_text="The ID of the Tweet quoted, if any")
+    quoted_status_id = models.BigIntegerField(
+        null=True, blank=True, help_text="The ID of the Tweet quoted, if any"
+    )
 
-    retweeted_status_id = models.BigIntegerField(null=True, blank=True,
-        help_text="The ID of the retweeted Tweet, if any")
+    retweeted_status_id = models.BigIntegerField(
+        null=True, blank=True, help_text="The ID of the retweeted Tweet, if any"
+    )
 
-    source = models.CharField(null=False, blank=True, max_length=255,
-                                help_text="Utility used to post the Tweet")
-    media_count = models.PositiveSmallIntegerField(null=False, blank=True,
-        default=0, help_text="Number of Photos/Videos attached to this Tweet")
+    source = models.CharField(
+        null=False,
+        blank=True,
+        max_length=255,
+        help_text="Utility used to post the Tweet",
+    )
+    media_count = models.PositiveSmallIntegerField(
+        null=False,
+        blank=True,
+        default=0,
+        help_text="Number of Photos/Videos attached to this Tweet",
+    )
 
     def __str__(self):
         return self.title
 
     class Meta:
-        ordering = ['-post_time']
+        ordering = ["-post_time"]
 
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"
         self.is_private = self.user.is_private
-        result = self.make_text_html()
+        self.make_text_html()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('twitter:tweet_detail', kwargs={
-                                        'screen_name': self.user.screen_name,
-                                        'twitter_id': self.twitter_id})
+        return reverse(
+            "twitter:tweet_detail",
+            kwargs={
+                "screen_name": self.user.screen_name,
+                "twitter_id": self.twitter_id,
+            },
+        )
 
     def get_next_public_by_post_time(self):
         "Next Tweet by this User, if they're public."
         try:
-            return Tweet.public_tweet_objects.filter(post_time__gte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('post_time')[:1].get()
-        except:
+            return (
+                Tweet.public_tweet_objects.filter(
+                    post_time__gte=self.post_time, user=self.user
+                )
+                .exclude(pk=self.pk)
+                .order_by("post_time")[:1]
+                .get()
+            )
+        except Exception:
             pass
 
     def get_previous_public_by_post_time(self):
         "Previous Tweet by this User, if they're public."
         try:
-            return Tweet.public_tweet_objects.filter(post_time__lte=self.post_time, user=self.user).exclude(pk=self.pk).order_by('-post_time')[:1].get()
-        except:
+            return (
+                Tweet.public_tweet_objects.filter(
+                    post_time__lte=self.post_time, user=self.user
+                )
+                .exclude(pk=self.pk)
+                .order_by("-post_time")[:1]
+                .get()
+            )
+        except Exception:
             pass
 
     # Shortcuts:
@@ -493,7 +576,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     @property
     def is_reply(self):
-        if self.in_reply_to_screen_name == '':
+        if self.in_reply_to_screen_name == "":
             return False
         else:
             return True
@@ -502,18 +585,25 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     def in_reply_to_url(self):
         "If it's a reply, the link to the tweet replied to."
         if self.is_reply:
-            return 'https://twitter.com/%s/status/%s' % (
-                    self.in_reply_to_screen_name, self.in_reply_to_status_id)
+            return "https://twitter.com/%s/status/%s" % (
+                self.in_reply_to_screen_name,
+                self.in_reply_to_status_id,
+            )
         else:
-            return ''
+            return ""
 
     @property
     def place(self):
-        return ', '.join(filter(None, (
-                self.place_attribute_street_address,
-                self.place_full_name,
-                self.place_country,
-            )))
+        return ", ".join(
+            filter(
+                None,
+                (
+                    self.place_attribute_street_address,
+                    self.place_full_name,
+                    self.place_country,
+                ),
+            )
+        )
 
     @property
     def account(self):
@@ -529,21 +619,20 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         """
         try:
             json_data = json.loads(self.raw)
-        except ValueError as error:
+        except ValueError:
             return False
         self.text_html = htmlify_tweet(json_data)
         return True
 
     def get_quoted_tweet(self):
         # There's one we saved earlier, so use that.
-        if hasattr(self, '_quoted_tweet'):
+        if hasattr(self, "_quoted_tweet"):
             return self._quoted_tweet
 
         tweet = None
         if self.quoted_status_id:
             try:
-                tweet = Tweet.public_objects.get(
-                                            twitter_id=self.quoted_status_id)
+                tweet = Tweet.public_objects.get(twitter_id=self.quoted_status_id)
             except Tweet.DoesNotExist:
                 pass
 
@@ -553,14 +642,13 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     def get_retweeted_tweet(self):
         # There's one we saved earlier, so use that.
-        if hasattr(self, '_retweeted_tweet'):
+        if hasattr(self, "_retweeted_tweet"):
             return self._retweeted_tweet
 
         tweet = None
         if self.retweeted_status_id:
             try:
-                tweet = Tweet.public_objects.get(
-                                        twitter_id=self.retweeted_status_id)
+                tweet = Tweet.public_objects.get(twitter_id=self.retweeted_status_id)
             except Tweet.DoesNotExist:
                 pass
 
@@ -580,52 +668,85 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """
 
     twitter_id = models.BigIntegerField(null=False, blank=False, unique=True)
-    screen_name = models.CharField(null=False, blank=False, max_length=20,
-        help_text="Username, eg, 'samuelpepys'")
-    name = models.CharField(null=False, blank=False, max_length=50,
-        help_text="eg, 'Samuel Pepys'")
-    url = models.URLField(null=False, blank=True, default='', max_length=255,
-        help_text="A URL provided by the user as part of their profile")
+    screen_name = models.CharField(
+        null=False, blank=False, max_length=20, help_text="Username, eg, 'samuelpepys'"
+    )
+    name = models.CharField(
+        null=False, blank=False, max_length=50, help_text="eg, 'Samuel Pepys'"
+    )
+    url = models.URLField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=255,
+        help_text="A URL provided by the user as part of their profile",
+    )
     # Inverse of Twitter's 'protected', to be similar to DittoItemModel:
-    is_private = models.BooleanField(null=False, default=False,
-        help_text="True if this user is 'protected'")
+    is_private = models.BooleanField(
+        null=False, default=False, help_text="True if this user is 'protected'"
+    )
     is_verified = models.BooleanField(null=False, default=False)
 
     # User data in ingested archives don't have this:
-    created_at = models.DateTimeField(null=True, blank=True,
-        help_text="UTC time when this account was created on Twitter")
+    created_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="UTC time when this account was created on Twitter",
+    )
 
     description = models.CharField(null=False, blank=True, max_length=255)
-    description_html = models.TextField(null=False, blank=True,
-                help_text="An HTMLified version of the User's description")
+    description_html = models.TextField(
+        null=False,
+        blank=True,
+        help_text="An HTMLified version of the User's description",
+    )
     location = models.CharField(null=False, blank=True, max_length=255)
     time_zone = models.CharField(null=False, blank=True, max_length=255)
 
-    profile_image_url_https = models.URLField(null=False, blank=True,
-                                                                max_length=255)
+    profile_image_url_https = models.URLField(null=False, blank=True, max_length=255)
 
     # This is how it's spelt in the API:
-    favourites_count = models.PositiveIntegerField(null=False, blank=False,
+    favourites_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
         default=0,
-        help_text="The number of tweets this user has favorited in the account’s lifetime")
-    followers_count = models.PositiveIntegerField(null=False, blank=False,
+        help_text=(
+            "The number of tweets this user has favorited in "
+            "the account’s lifetime"
+        )
+    )
+    followers_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
         default=0,
-        help_text="The number of followers this account has")
-    friends_count = models.PositiveIntegerField(null=False, blank=False,
+        help_text="The number of followers this account has",
+    )
+    friends_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
         default=0,
-        help_text="Tne number of users this account is following.")
-    listed_count = models.PositiveIntegerField(null=False, blank=False,
+        help_text="Tne number of users this account is following.",
+    )
+    listed_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
         default=0,
-        help_text="The number of public lists this user is a member of")
-    statuses_count = models.PositiveIntegerField(null=False, blank=False,
+        help_text="The number of public lists this user is a member of",
+    )
+    statuses_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
         default=0,
-        help_text="The number of tweets, including retweets, by this user")
+        help_text="The number of tweets, including retweets, by this user",
+    )
 
     # As on DittoItemModel:
-    fetch_time = models.DateTimeField(null=True, blank=True,
-                            help_text="The time the data was last fetched.")
-    raw = models.TextField(null=False, blank=True,
-                                    help_text="eg, the raw JSON from the API.")
+    fetch_time = models.DateTimeField(
+        null=True, blank=True, help_text="The time the data was last fetched."
+    )
+    raw = models.TextField(
+        null=False, blank=True, help_text="eg, the raw JSON from the API."
+    )
 
     def avatar_upload_path(self, filename):
         """
@@ -643,27 +764,21 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         # So this is a bit laborious:
 
         # 'twitter/avatars':
-        start = '/'.join([
-            app_settings.TWITTER_DIR_BASE,
-            'avatars'
-        ])
+        start = "/".join([app_settings.TWITTER_DIR_BASE, "avatars"])
         # '/78/12345678/avatar_name.jpg':
-        end = '/'.join([
-            str(self.twitter_id)[-2:],
-            str(self.twitter_id),
-            str(filename)
-        ])
+        end = "/".join([str(self.twitter_id)[-2:], str(self.twitter_id), str(filename)])
         # The bit that will be empty for 1-2 digit IDs:
         # '56':
         middle = str(self.twitter_id)[-4:-2]
 
         if middle:
-            return '/'.join([start, middle, end])
+            return "/".join([start, middle, end])
         else:
-            return '/'.join([start, end])
+            return "/".join([start, end])
 
-    avatar = models.ImageField(upload_to=avatar_upload_path,
-                                            null=False, blank=True, default='')
+    avatar = models.ImageField(
+        upload_to=avatar_upload_path, null=False, blank=True, default=""
+    )
 
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
 
@@ -672,24 +787,23 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     objects_with_accounts = managers.WithAccountsManager()
 
     def __str__(self):
-        return '@%s' % self.screen_name
+        return "@%s" % self.screen_name
 
     class Meta:
-        ordering = ['screen_name']
+        ordering = ["screen_name"]
 
     def save(self, *args, **kwargs):
         """If the user's privacy status has changed, we need to change the
         privacy of all their tweets
         And we also HTMLify their description.
         """
-        if self.get_field_diff('is_private') is not None:
+        if self.get_field_diff("is_private") is not None:
             Tweet.objects.filter(user=self).update(is_private=self.is_private)
-        result = self.make_description_html()
+        self.make_description_html()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('twitter:user_detail',
-                    kwargs={'screen_name': self.screen_name})
+        return reverse("twitter:user_detail", kwargs={"screen_name": self.screen_name})
 
     def make_description_html(self):
         """Uses the raw JSON for the user to set self.description_html to a nice
@@ -697,21 +811,21 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         """
         try:
             json_data = json.loads(self.raw)
-        except ValueError as error:
+        except ValueError:
             return False
         self.description_html = htmlify_description(json_data)
         return True
 
     @property
     def permalink(self):
-        return 'https://twitter.com/%s' % self.screen_name
+        return "https://twitter.com/%s" % self.screen_name
 
     @property
     def avatar_url(self):
         try:
             return self.avatar.url
         except ValueError:
-            return static('img/default_avatar.png')
+            return static("img/default_avatar.png")
 
     @property
     def profile_image_url(self):

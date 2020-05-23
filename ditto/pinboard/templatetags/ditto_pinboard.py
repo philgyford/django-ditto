@@ -2,13 +2,13 @@ import datetime
 import pytz
 
 from django import template
-from django.db.models import Count
 
 from ..models import Bookmark
 from ...core.utils import get_annual_item_counts
 
 
 register = template.Library()
+
 
 @register.simple_tag
 def recent_bookmarks(account=None, limit=10):
@@ -22,8 +22,9 @@ def recent_bookmarks(account=None, limit=10):
     bookmarks = Bookmark.public_objects.all()
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)
-    bookmarks = bookmarks.prefetch_related('account')
+    bookmarks = bookmarks.prefetch_related("account")
     return bookmarks[:limit]
+
 
 @register.simple_tag
 def day_bookmarks(date, account=None):
@@ -35,14 +36,12 @@ def day_bookmarks(date, account=None):
     Keyword arguments:
     account -- An account username, 'philgyford', or None to fetch for all.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(
-                                                            tzinfo=pytz.utc)
-    end   = datetime.datetime.combine(date, datetime.time.max).replace(
-                                                            tzinfo=pytz.utc)
+    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
+    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
     bookmarks = Bookmark.public_objects.filter(post_time__range=[start, end])
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)
-    bookmarks = bookmarks.prefetch_related('account')
+    bookmarks = bookmarks.prefetch_related("account")
     return bookmarks
 
 
@@ -67,4 +66,3 @@ def annual_bookmark_counts(account=None):
 @register.simple_tag
 def popular_bookmark_tags(limit=10):
     return Bookmark.tags.most_common()[:limit]
-

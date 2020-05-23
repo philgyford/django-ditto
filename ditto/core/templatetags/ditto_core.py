@@ -1,4 +1,3 @@
-from datetime import datetime
 from django import template
 from django.urls import reverse
 from django.http import QueryDict
@@ -36,10 +35,10 @@ def query_string(context, key, value):
     just return a query string with the supplied key=value pair.
     """
     try:
-        request = context['request']
+        request = context["request"]
         args = request.GET.copy()
     except KeyError:
-        args = QueryDict('').copy()
+        args = QueryDict("").copy()
     args[key] = value
     return args.urlencode()
 
@@ -55,7 +54,7 @@ def width_height(w, h, max_w, max_h):
     ratio = 1
 
     if w > max_w and h > max_h:
-        ratio = min( (max_w / w), (max_h / h) )
+        ratio = min((max_w / w), (max_h / h))
 
     elif w > max_w:
         ratio = max_w / w
@@ -89,25 +88,26 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
     """
 
     if granularity == 8:
-        visible_time = 'circa %s' % dt.strftime(
-                                    app_settings.CORE_DATE_YEAR_FORMAT)
-        stamp = dt.strftime('%Y')
+        visible_time = "circa %s" % dt.strftime(app_settings.CORE_DATE_YEAR_FORMAT)
+        stamp = dt.strftime("%Y")
 
     elif granularity == 6:
-        visible_time = 'sometime in %s' % dt.strftime(
-                                    app_settings.CORE_DATE_YEAR_FORMAT)
-        stamp = dt.strftime('%Y')
+        visible_time = "sometime in %s" % dt.strftime(
+            app_settings.CORE_DATE_YEAR_FORMAT
+        )
+        stamp = dt.strftime("%Y")
 
     elif granularity == 4:
-        visible_time = 'sometime in %s' % dt.strftime(
-                                    app_settings.CORE_DATE_YEAR_MONTH_FORMAT)
-        stamp = dt.strftime('%Y-%m')
+        visible_time = "sometime in %s" % dt.strftime(
+            app_settings.CORE_DATE_YEAR_MONTH_FORMAT
+        )
+        stamp = dt.strftime("%Y-%m")
 
     else:
         # Exact time and date.
         # We can link to the date, if link_to_day=True.
 
-        stamp = dt.strftime('%Y-%m-%d %H:%M:%S')
+        stamp = dt.strftime("%Y-%m-%d %H:%M:%S")
 
         # The date and time formats for display:
         d_fmt = app_settings.CORE_DATE_FORMAT
@@ -115,33 +115,40 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
         dt_fmt = app_settings.CORE_DATETIME_FORMAT
 
         if link_to_day:
-            url = reverse('ditto:day_archive', kwargs={
-                        'year':     dt.strftime('%Y'),
-                        'month':    dt.strftime('%m'),
-                        'day':      dt.strftime('%d'),
-                    })
+            url = reverse(
+                "ditto:day_archive",
+                kwargs={
+                    "year": dt.strftime("%Y"),
+                    "month": dt.strftime("%m"),
+                    "day": dt.strftime("%d"),
+                },
+            )
 
             # Replace the [date] token with the date format wrapped in <a> tag:
-            dt_fmt = dt_fmt.replace('[date]',
-                '<a href="{}" title="All items from this day">{}</a>'.format(url, d_fmt))
+            dt_fmt = dt_fmt.replace(
+                "[date]",
+                '<a href="{}" title="All items from this day">{}</a>'.format(
+                    url, d_fmt
+                ),
+            )
         else:
-            dt_fmt = dt_fmt.replace('[date]', d_fmt)
+            dt_fmt = dt_fmt.replace("[date]", d_fmt)
 
         # Replace the [time] token with the time format:
-        dt_fmt = dt_fmt.replace('[time]', t_fmt)
+        dt_fmt = dt_fmt.replace("[time]", t_fmt)
 
         # Create the text/html to display in the template:
         visible_time = dt.strftime(dt_fmt)
 
-    if case == 'lower':
+    if case == "lower":
         visible_time = visible_time.lower()
-    elif case == 'capfirst':
+    elif case == "capfirst":
         visible_time = visible_time[0].upper() + visible_time[1:]
 
-    return format_html('<time datetime="%(stamp)s">%(visible)s</time>' % {
-                'stamp': stamp,
-                'visible': visible_time
-            })
+    return format_html(
+        '<time datetime="%(stamp)s">%(visible)s</time>'
+        % {"stamp": stamp, "visible": visible_time}
+    )
 
 
 @register.simple_tag(takes_context=True)
@@ -159,7 +166,7 @@ def current_url_name(context):
     url_name = False
     if context.request.resolver_match:
         url_name = "{}:{}".format(
-                                context.request.resolver_match.namespace,
-                                context.request.resolver_match.url_name
-                            )
+            context.request.resolver_match.namespace,
+            context.request.resolver_match.url_name,
+        )
     return url_name

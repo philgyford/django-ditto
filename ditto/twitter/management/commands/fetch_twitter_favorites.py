@@ -1,8 +1,4 @@
 # coding: utf-8
-import argparse
-
-from django.core.management.base import CommandError
-
 from . import FetchTwitterCommand
 from ...fetch.fetchers import FavoriteTweetsFetcher
 
@@ -26,4 +22,3 @@ class Command(FetchTwitterCommand):
 
     def fetch_tweets(self, screen_name, count):
         return FavoriteTweetsFetcher(screen_name=screen_name).fetch(count=count)
-

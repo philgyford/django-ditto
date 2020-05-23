@@ -8,12 +8,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0040_auto_20160603_1302'),
+        ("twitter", "0040_auto_20160603_1302"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='media',
-            name='tweet',
-        ),
+        migrations.RemoveField(model_name="media", name="tweet",),
     ]

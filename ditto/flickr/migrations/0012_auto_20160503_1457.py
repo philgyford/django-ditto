@@ -8,28 +8,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0011_auto_20160502_1645'),
+        ("flickr", "0011_auto_20160502_1645"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='photoset',
-            name='flickr_id',
+            model_name="photoset",
+            name="flickr_id",
             field=models.BigIntegerField(db_index=True, unique=True),
         ),
         migrations.AlterField(
-            model_name='photoset',
-            name='photo_count',
-            field=models.PositiveIntegerField(default=0, help_text='The number of photos in the set on Flickr'),
+            model_name="photoset",
+            name="photo_count",
+            field=models.PositiveIntegerField(
+                default=0, help_text="The number of photos in the set on Flickr"
+            ),
         ),
         migrations.AlterField(
-            model_name='photoset',
-            name='video_count',
-            field=models.PositiveIntegerField(default=0, help_text='The number of videos in the set on Flickr'),
+            model_name="photoset",
+            name="video_count",
+            field=models.PositiveIntegerField(
+                default=0, help_text="The number of videos in the set on Flickr"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='nsid',
-            field=models.CharField(db_index=True, max_length=50, unique=True, verbose_name='NSID'),
+            model_name="user",
+            name="nsid",
+            field=models.CharField(
+                db_index=True, max_length=50, unique=True, verbose_name="NSID"
+            ),
         ),
     ]

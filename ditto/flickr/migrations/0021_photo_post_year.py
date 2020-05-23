@@ -9,7 +9,7 @@ def set_post_year(apps, schema_editor):
     """
     Sets the `post_year` value on every Photo.
     """
-    Photo = apps.get_model('flickr', 'Photo')
+    Photo = apps.get_model("flickr", "Photo")
     for row in Photo.objects.all():
         row.post_year = row.post_time.year
         row.save()
@@ -18,15 +18,19 @@ def set_post_year(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0020_auto_20161117_1622'),
+        ("flickr", "0020_auto_20161117_1622"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='photo',
-            name='post_year',
-            field=models.PositiveSmallIntegerField(blank=True, db_index=True, help_text='Set automatically on save', null=True),
+            model_name="photo",
+            name="post_year",
+            field=models.PositiveSmallIntegerField(
+                blank=True,
+                db_index=True,
+                help_text="Set automatically on save",
+                null=True,
+            ),
         ),
-
         migrations.RunPython(set_post_year, reverse_code=migrations.RunPython.noop),
     ]

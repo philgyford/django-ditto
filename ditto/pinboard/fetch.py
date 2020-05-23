@@ -25,8 +25,9 @@ class BookmarksFetcher(object):
     """
 
     def fetch(self):
-        raise FetchError('Call a child class like AllBookmarksFetcher or RecentBookmarksFetcher')
-
+        raise FetchError(
+            "Call a child class like AllBookmarksFetcher or RecentBookmarksFetcher"
+        )
 
     def _fetch(self, fetch_type, params={}, username=None):
         """The main method for making all types of Bookmark requests, and
@@ -49,22 +50,22 @@ class BookmarksFetcher(object):
 
             response = self._send_request(fetch_type, params, account)
 
-            if response['success']:
+            if response["success"]:
                 # Tidy the raw data:
-                bookmarks_data = self._parse_response(
-                                                fetch_type, response['json'])
+                bookmarks_data = self._parse_response(fetch_type, response["json"])
                 # Create/update in DB:
                 self._save_bookmarks(
-                                account=account,
-                                bookmarks_data=bookmarks_data,
-                                fetch_time=fetch_time)
-                response['fetched'] = len(bookmarks_data)
+                    account=account,
+                    bookmarks_data=bookmarks_data,
+                    fetch_time=fetch_time,
+                )
+                response["fetched"] = len(bookmarks_data)
                 # Don't need to pass this around any more:
-                del(response['json'])
+                del response["json"]
             else:
-                response['fetched'] = 0
+                response["fetched"] = 0
 
-            response['account'] = account.username
+            response["account"] = account.username
             result.append(response)
 
         return result
@@ -84,7 +85,9 @@ class BookmarksFetcher(object):
             if account.is_active:
                 accounts = [account]
             else:
-                raise FetchError("The account %s is curently marked as inactive." % username)
+                raise FetchError(
+                    "The account %s is curently marked as inactive." % username
+                )
         return accounts
 
     def _send_request(self, fetch_type, params, account):
@@ -100,51 +103,52 @@ class BookmarksFetcher(object):
         Account -- The account to fetch from.
         """
 
-        url_parts = ['posts']
-        if fetch_type in ['date', 'url']:
-            url_parts.append('get')
-        elif fetch_type == 'recent':
-            url_parts.append('recent')
-        elif fetch_type == 'all':
-            url_parts.append('all')
+        url_parts = ["posts"]
+        if fetch_type in ["date", "url"]:
+            url_parts.append("get")
+        elif fetch_type == "recent":
+            url_parts.append("recent")
+        elif fetch_type == "all":
+            url_parts.append("all")
 
         url = "{}{}".format(PINBOARD_API_ENDPOINT, "/".join(url_parts))
 
-        params['format'] = "json"
-        params['auth_token'] = account.api_token
+        params["format"] = "json"
+        params["auth_token"] = account.api_token
         query_string = urllib.parse.urlencode(params)
 
         final_url = "{}?{}".format(url, query_string)
 
-        error_message = ''
+        error_message = ""
 
         try:
             response = requests.get(final_url)
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError:
             error_message = "Can't connect to domain."
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             error_message = "Connection timed out."
-        except requests.exceptions.TooManyRedirects as e:
+        except requests.exceptions.TooManyRedirects:
             error_message = "Too many redirects."
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             error_message = "Something went wrong with the request."
 
         try:
             response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
             # 4xx or 5xx errors:
             error_message = "HTTP Error: %s" % response.status_code
         except NameError:
-            if error_message == '':
+            if error_message == "":
                 error_message = "Something unusual went wrong."
 
         if error_message:
-            return {'account': account.username, 'success': False,
-                                                'messages': [error_message,]}
+            return {
+                "account": account.username,
+                "success": False,
+                "messages": [error_message],
+            }
         else:
-            return {'account': account.username, 'success': True,
-                                                        'json': response.text}
-
+            return {"account": account.username, "success": True, "json": response.text}
 
     def _parse_response(self, fetch_type, json_text):
         """Takes the JSON response for a Bookmark from the API and turns it
@@ -159,24 +163,24 @@ class BookmarksFetcher(object):
         response = json.loads(json_text)
 
         # The JSON has different formats depending on what we fetched:
-        if fetch_type == 'all':
+        if fetch_type == "all":
             posts = response
         else:
-            posts = response['posts']
+            posts = response["posts"]
 
         for bookmark in posts:
             # Before we do anything to it, we give the bookmark a 'json'
             # element with its original state in:
-            bookmark['json'] = json.dumps(bookmark)
+            bookmark["json"] = json.dumps(bookmark)
             # Time string to object:
-            bookmark['time'] = datetime.datetime.strptime(
-                                        bookmark['time'], '%Y-%m-%dT%H:%M:%SZ'
-                                    ).replace(tzinfo=pytz.utc)
+            bookmark["time"] = datetime.datetime.strptime(
+                bookmark["time"], "%Y-%m-%dT%H:%M:%SZ"
+            ).replace(tzinfo=pytz.utc)
             # 'yes'/'no' to booleans:
-            bookmark['shared'] = True if bookmark['shared'] == 'yes' else False
-            bookmark['toread'] = True if bookmark['toread'] == 'yes' else False
+            bookmark["shared"] = True if bookmark["shared"] == "yes" else False
+            bookmark["toread"] = True if bookmark["toread"] == "yes" else False
             # String into an array of strings:
-            bookmark['tags'] = bookmark['tags'].split()
+            bookmark["tags"] = bookmark["tags"].split()
 
         return posts
 
@@ -204,23 +208,22 @@ class BookmarksFetcher(object):
 
         bookmark_obj, created = Bookmark.objects.update_or_create(
             account=account,
-            url=bookmark['href'],
+            url=bookmark["href"],
             defaults={
-                'title': bookmark['description'],
-                'is_private': not bookmark['shared'],
-                'raw': bookmark['json'],
-                'description': bookmark['extended'],
-                'to_read': bookmark['toread'],
-                'fetch_time': fetch_time,
-                'post_time': bookmark['time'],
-            }
+                "title": bookmark["description"],
+                "is_private": not bookmark["shared"],
+                "raw": bookmark["json"],
+                "description": bookmark["extended"],
+                "to_read": bookmark["toread"],
+                "fetch_time": fetch_time,
+                "post_time": bookmark["time"],
+            },
         )
 
-        bookmark_obj.tags.set(*bookmark['tags'])
+        bookmark_obj.tags.set(*bookmark["tags"])
 
 
 class AllBookmarksFetcher(BookmarksFetcher):
-
     def fetch(self, username=None):
         """Fetches all of the Bookmarks for all or one Accounts.
         Creates/updates the Bookmark objects.
@@ -228,11 +231,10 @@ class AllBookmarksFetcher(BookmarksFetcher):
         Keyword arguments:
         username -- the username of the one Account to fetch (or None for all).
         """
-        return self._fetch(fetch_type='all', username=username)
+        return self._fetch(fetch_type="all", username=username)
 
 
 class DateBookmarksFetcher(BookmarksFetcher):
-
     def fetch(self, post_date, username=None):
         """Fetches Bookmarks for all or one Accounts on a particular day.
         Creates/updates the Bookmark objects.
@@ -245,16 +247,14 @@ class DateBookmarksFetcher(BookmarksFetcher):
         FetchError if the date format is invalid.
         """
         try:
-            dt = datetime.datetime.strptime(post_date, '%Y-%m-%d')
+            dt = datetime.datetime.strptime(post_date, "%Y-%m-%d")
         except ValueError:
             raise FetchError("Invalid date format ('%s')" % post_date)
         else:
-            return self._fetch(
-                    fetch_type='date', params={'dt': dt}, username=username)
+            return self._fetch(fetch_type="date", params={"dt": dt}, username=username)
 
 
 class RecentBookmarksFetcher(BookmarksFetcher):
-
     def fetch(self, num=10, username=None):
         """Fetches the most recent Bookmarks for all or one Accounts.
         Creates/updates the Bookmark objects.
@@ -264,11 +264,11 @@ class RecentBookmarksFetcher(BookmarksFetcher):
         username -- the username of the one Account to fetch (or None for all).
         """
         return self._fetch(
-            fetch_type='recent', params={'count': int(num)}, username=username)
+            fetch_type="recent", params={"count": int(num)}, username=username
+        )
 
 
 class UrlBookmarksFetcher(BookmarksFetcher):
-
     def fetch(self, url, username=None):
         """Fetches a single Bookmark (by URL) for all or one Accounts.
         Creates/updates the Bookmark objects.
@@ -277,7 +277,4 @@ class UrlBookmarksFetcher(BookmarksFetcher):
         url -- the URL of the Bookmark to fetch.
         username -- the username of the one Account to fetch (or None for all).
         """
-        return self._fetch(
-                    fetch_type='url', params={'url': url}, username=username)
-
-
+        return self._fetch(fetch_type="url", params={"url": url}, username=username)

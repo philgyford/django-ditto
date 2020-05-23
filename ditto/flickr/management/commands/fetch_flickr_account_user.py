@@ -1,5 +1,3 @@
-import argparse
-
 from django.core.management.base import BaseCommand, CommandError
 
 from ...fetch.fetchers import UserIdFetcher, UserFetcher
@@ -18,49 +16,53 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--id',
-            action='store',
+            "--id",
+            action="store",
             default=False,
-            help='The ID of the Account in the Django database.',
-            type=int
+            help="The ID of the Account in the Django database.",
+            type=int,
         )
 
     def handle(self, *args, **options):
-        if options['id'] is False:
+        if options["id"] is False:
             raise CommandError("Specify an Account ID like --id=1")
 
         # First we need the Account object we're fetching for.
         account = False
         try:
-            account = Account.objects.get(id=options['id'])
+            account = Account.objects.get(id=options["id"])
         except Account.DoesNotExist:
-            self.stderr.write("No Account found with an id of '%s'" % options['id'])
+            self.stderr.write("No Account found with an id of '%s'" % options["id"])
 
         if account:
             # Then get the ID of the Flicker user for this Account's API creds.
             id_result = UserIdFetcher(account=account).fetch()
 
-            if 'success' in id_result and id_result['success'] == True and 'id' in id_result:
+            if (
+                "success" in id_result
+                and id_result["success"] is True
+                and "id" in id_result
+            ):
                 # We've got a Flickr ID, so we can get and save the user data.
-                result = UserFetcher(account=account).fetch(
-                                                        nsid=id_result['id'])
-                if 'success' in result and result['success'] == True:
+                result = UserFetcher(account=account).fetch(nsid=id_result["id"])
+                if "success" in result and result["success"] is True:
                     # Now we'll associate this User with the Account:
-                    user = User.objects.get(nsid='35034346050@N01')
+                    user = User.objects.get(nsid="35034346050@N01")
                     account.user = user
                     account.save()
-                    if options.get('verbosity', 1) > 0:
-                        self.stdout.write("Fetched and saved user '%s'" %\
-                                                        result['user']['name'])
+                    if options.get("verbosity", 1) > 0:
+                        self.stdout.write(
+                            "Fetched and saved user '%s'" % result["user"]["name"]
+                        )
                 else:
-                    if options.get('verbosity', 1) > 0:
+                    if options.get("verbosity", 1) > 0:
                         self.stderr.write(
-                        "Failed to fetch a user using Flickr ID '%s': %s" %\
-                                    (id_result['id'], result['messages'][0]))
+                            "Failed to fetch a user using Flickr ID '%s': %s"
+                            % (id_result["id"], result["messages"][0])
+                        )
             else:
-                if options.get('verbosity', 1) > 0:
+                if options.get("verbosity", 1) > 0:
                     self.stderr.write(
-                    "Failed to fetch a Flickr ID for this Account: %s" %\
-                                                    id_result['messages'][0])
-
-
+                        "Failed to fetch a Flickr ID for this Account: %s"
+                        % id_result["messages"][0]
+                    )

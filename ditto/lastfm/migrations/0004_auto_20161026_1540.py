@@ -15,33 +15,33 @@ def lowercase_slugs(apps, schema_editor):
     we add a random number to the end of the next version.
     """
 
-    Album = apps.get_model('lastfm', 'Album')
+    Album = apps.get_model("lastfm", "Album")
     slugs = []
     for row in Album.objects.all():
         row.original_slug = row.slug
         row.slug = row.slug.lower()
         if row.slug in slugs:
-            row.slug = '%s+%s' % (row.slug, random.randrange(1, 1000000))
+            row.slug = "%s+%s" % (row.slug, random.randrange(1, 1000000))
         slugs.append(row.slug)
         row.save()
 
-    Artist = apps.get_model('lastfm', 'Artist')
+    Artist = apps.get_model("lastfm", "Artist")
     slugs = []
     for row in Artist.objects.all():
         row.original_slug = row.slug
         row.slug = row.slug.lower()
         if row.slug in slugs:
-            row.slug = '%s+%s' % (row.slug, random.randrange(1, 1000000))
+            row.slug = "%s+%s" % (row.slug, random.randrange(1, 1000000))
         slugs.append(row.slug)
         row.save()
 
-    Track = apps.get_model('lastfm', 'Track')
+    Track = apps.get_model("lastfm", "Track")
     slugs = []
     for row in Track.objects.all():
         row.original_slug = row.slug
         row.slug = row.slug.lower()
         if row.slug in slugs:
-            row.slug = '%s+%s' % (row.slug, random.randrange(1, 1000000))
+            row.slug = "%s+%s" % (row.slug, random.randrange(1, 1000000))
         slugs.append(row.slug)
         row.save()
 
@@ -49,26 +49,26 @@ def lowercase_slugs(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lastfm', '0003_auto_20161026_1539'),
+        ("lastfm", "0003_auto_20161026_1539"),
     ]
 
     operations = [
-        migrations.RunPython(
-            lowercase_slugs, reverse_code=migrations.RunPython.noop
+        migrations.RunPython(lowercase_slugs, reverse_code=migrations.RunPython.noop),
+        migrations.AlterField(
+            model_name="album",
+            name="original_slug",
+            field=models.TextField(help_text="As used on Last.fm. Mixed case."),
         ),
         migrations.AlterField(
-            model_name='album',
-            name='original_slug',
-            field=models.TextField(help_text='As used on Last.fm. Mixed case.'),
+            model_name="artist",
+            name="original_slug",
+            field=models.TextField(
+                help_text="As used on Last.fm. Mixed case.", unique=True
+            ),
         ),
         migrations.AlterField(
-            model_name='artist',
-            name='original_slug',
-            field=models.TextField(help_text='As used on Last.fm. Mixed case.', unique=True),
-        ),
-        migrations.AlterField(
-            model_name='track',
-            name='original_slug',
-            field=models.TextField(help_text='As used on Last.fm. Mixed case.'),
+            model_name="track",
+            name="original_slug",
+            field=models.TextField(help_text="As used on Last.fm. Mixed case."),
         ),
     ]

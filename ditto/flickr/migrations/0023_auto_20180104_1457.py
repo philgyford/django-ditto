@@ -7,13 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0022_photo_taken_year'),
+        ("flickr", "0022_photo_taken_year"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='photoset',
-            name='primary_photo',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='primary_photosets', to='flickr.Photo'),
+            model_name="photoset",
+            name="primary_photo",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="primary_photosets",
+                to="flickr.Photo",
+            ),
         ),
     ]

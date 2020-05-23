@@ -10,7 +10,9 @@ with open(os.path.join(os.path.dirname(__file__), "README.rst")) as readme:
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
-read = lambda filepath: codecs.open(filepath, "r", "utf-8").read()
+
+def read(filepath):
+    return codecs.open(filepath, "r", "utf-8").read()
 
 
 def get_entity(package, entity):
@@ -65,6 +67,14 @@ if sys.argv[-1] == "testpublish":
     # os.system("python setup.py bdist_wheel upload")
     sys.exit()
 
+dev_require = ["django-debug-toolbar>=2.0,<3.0", "flake8>=3.8,<3.9", "black==19.10b0"]
+tests_require = dev_require + [
+    "factory-boy>=2.12.0,<3.0",
+    "freezegun>=0.3.12,<0.4",
+    "responses>=0.10.7,<1.0",
+    "coverage",
+]
+
 setup(
     name="django-ditto",
     version=get_version(),
@@ -80,15 +90,14 @@ setup(
         "twython>=3.7.0,<3.9",
     ],
     dependency_links=[],
-    tests_require=[
-        "factory-boy>=2.12.0,<3.0",
-        "freezegun>=0.3.12,<0.4",
-        "responses>=0.10.7,<1.0",
-        "coverage",
-    ],
+    tests_require=tests_require,
+    extras_require={"dev": dev_require + ["Django>=3.0,<3.1"], "test": tests_require},
     include_package_data=True,
     license=get_license(),
-    description="A Django app to copy stuff from your accounts on Flickr, Last.fm, Pinboard and Twitter.",
+    description=(
+        "A Django app to copy stuff from your accounts on "
+        "Flickr, Last.fm, Pinboard and Twitter."
+    ),
     long_description=read(os.path.join(os.path.dirname(__file__), "README.rst")),
     url="https://github.com/philgyford/django-ditto",
     author=get_author(),
@@ -115,6 +124,6 @@ setup(
         "Blog posts": "https://www.gyford.com/phil/writing/tags/django-ditto/",
         "Bug Reports": "https://github.com/philgyford/django-ditto/issues",
         "Documentation": "https://django-ditto.readthedocs.io/",
-        "Source": "https://github.com/philgyford/django-ditto"
-    }
+        "Source": "https://github.com/philgyford/django-ditto",
+    },
 )

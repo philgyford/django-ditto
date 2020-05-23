@@ -9,18 +9,22 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0038_tweet_retweeted_status_id'),
+        ("twitter", "0038_tweet_retweeted_status_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='media',
-            name='tweets',
-            field=models.ManyToManyField(to='twitter.Tweet'),
+            model_name="media",
+            name="tweets",
+            field=models.ManyToManyField(to="twitter.Tweet"),
         ),
         migrations.AlterField(
-            model_name='media',
-            name='tweet',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='temporary_name', to='twitter.Tweet'),
+            model_name="media",
+            name="tweet",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="temporary_name",
+                to="twitter.Tweet",
+            ),
         ),
     ]

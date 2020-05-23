@@ -4,10 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django-debug-toolbar = ">=2.0, <3.0"
-Django = ">=3.0, <3.1"
-django-ditto = {editable = true,path = "./.."}
-twython = ">=3.7.0, <3.9"
+"django-ditto" = {editable = true, path = "./..", extras = ["dev"]}
 
 [dev-packages]
 

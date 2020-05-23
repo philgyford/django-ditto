@@ -61,16 +61,22 @@ class MultiAccountFetcher(object):
             try:
                 account = Account.objects.get(user=user)
             except Account.DoesNotExist:
-                raise FetchError("There is no Account associated with the User with NSID '%s'" % nsid)
-            if account.is_active == False:
-                raise FetchError("The Account associated with the User with NSID '%s' is marked as inactive.")
+                raise FetchError(
+                    "There is no Account associated with the User with NSID '%s'" % nsid
+                )
+            if account.is_active is False:
+                raise FetchError(
+                    "The Account associated with the User with NSID "
+                    "'%s' is marked as inactive." % nsid
+                )
 
             self.accounts = [account]
         return super().__init__()
 
     def fetch(self, **kwargs):
         raise FetchError(
-            "Subclasess of MultiAccountFetcher should define their own fetch().")
+            "Subclasess of MultiAccountFetcher should define their own fetch()."
+        )
 
 
 class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
@@ -88,9 +94,7 @@ class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
 
     def fetch(self, days=None):
         for account in self.accounts:
-            self.return_value.append(
-                RecentPhotosFetcher(account).fetch(days=days)
-            )
+            self.return_value.append(RecentPhotosFetcher(account).fetch(days=days))
 
         return self.return_value
 
@@ -108,9 +112,7 @@ class PhotosetsMultiAccountFetcher(MultiAccountFetcher):
 
     def fetch(self):
         for account in self.accounts:
-            self.return_value.append(
-                PhotosetsFetcher(account).fetch()
-            )
+            self.return_value.append(PhotosetsFetcher(account).fetch())
 
         return self.return_value
 
@@ -133,4 +135,3 @@ class OriginalFilesMultiAccountFetcher(MultiAccountFetcher):
             )
 
         return self.return_value
-

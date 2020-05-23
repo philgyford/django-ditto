@@ -1,6 +1,13 @@
 from . import FetchError
-from .fetch import Fetch, FetchFiles, FetchTweetsRecent, FetchTweetsFavorite,\
-        FetchTweets, FetchUsers, FetchVerify
+from .fetch import (
+    Fetch,
+    FetchFiles,
+    FetchTweetsRecent,
+    FetchTweetsFavorite,
+    FetchTweets,
+    FetchUsers,
+    FetchVerify,
+)
 from ..models import Account
 
 
@@ -95,16 +102,21 @@ class TwitterFetcher(object):
         """
         if screen_name is None:
             accounts = Account.objects.filter(is_active=True)
-            if (len(accounts) == 0):
+            if len(accounts) == 0:
                 raise FetchError("No active Accounts were found to fetch.")
         else:
             try:
                 accounts = [Account.objects.get(user__screen_name=screen_name)]
             except Account.DoesNotExist:
-                raise FetchError("There is no Account in the database with a screen_name of '%s'" % screen_name)
+                raise FetchError(
+                    "There is no Account in the database with a screen_name of '%s'"
+                    % screen_name
+                )
             else:
-                if accounts[0].is_active == False:
-                    raise FetchError("The '%s' Account is marked as inactive." % screen_name)
+                if accounts[0].is_active is False:
+                    raise FetchError(
+                        "The '%s' Account is marked as inactive." % screen_name
+                    )
 
         self.accounts = accounts
 
@@ -182,7 +194,7 @@ class RecentTweetsFetcher(TwitterFetcher):
         results = fetcher.fetch(count=200) # or count='new'
     """
 
-    def fetch(self, count='new'):
+    def fetch(self, count="new"):
         """
         Keyword arguments:
         count -- Either 'new' (to fetch all tweets since the last time), or a
@@ -206,7 +218,7 @@ class FavoriteTweetsFetcher(TwitterFetcher):
         results = fetcher.fetch(count=200) # or count='new'
     """
 
-    def fetch(self, count='new'):
+    def fetch(self, count="new"):
         """
         Keyword arguments:
         count -- Either 'new' (to fetch all tweets since the last time), or a
@@ -239,6 +251,4 @@ class FilesFetcher(object):
 
         # Return a list to behave similar to the other *Fetcher() classes that
         # can deal with multiple Accounts.
-        return [ results ]
-
-
+        return [results]

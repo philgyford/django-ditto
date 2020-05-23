@@ -6,8 +6,10 @@ from django.conf import settings
 # from here, not django.conf.settings.
 
 
-FLICKR_DIR_BASE = getattr(settings, 'DITTO_FLICKR_DIR_BASE', 'flickr')
+FLICKR_DIR_BASE = getattr(settings, "DITTO_FLICKR_DIR_BASE", "flickr")
 
-FLICKR_DIR_PHOTOS_FORMAT = getattr(settings, 'DITTO_FLICKR_DIR_PHOTOS_FORMAT', '%Y/%m/%d')
+FLICKR_DIR_PHOTOS_FORMAT = getattr(
+    settings, "DITTO_FLICKR_DIR_PHOTOS_FORMAT", "%Y/%m/%d"
+)
 
-FLICKR_USE_LOCAL_MEDIA = getattr(settings, 'DITTO_FLICKR_USE_LOCAL_MEDIA', False)
+FLICKR_USE_LOCAL_MEDIA = getattr(settings, "DITTO_FLICKR_USE_LOCAL_MEDIA", False)

@@ -9,7 +9,7 @@ def set_taken_year(apps, schema_editor):
     """
     Sets the `taken_year` value on every Photo.
     """
-    Photo = apps.get_model('flickr', 'Photo')
+    Photo = apps.get_model("flickr", "Photo")
     for row in Photo.objects.all():
         if row.taken_time:
             row.taken_year = row.taken_time.year
@@ -19,15 +19,19 @@ def set_taken_year(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0021_photo_post_year'),
+        ("flickr", "0021_photo_post_year"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='photo',
-            name='taken_year',
-            field=models.PositiveSmallIntegerField(blank=True, db_index=True, help_text='Set automatically on save', null=True),
+            model_name="photo",
+            name="taken_year",
+            field=models.PositiveSmallIntegerField(
+                blank=True,
+                db_index=True,
+                help_text="Set automatically on save",
+                null=True,
+            ),
         ),
-
         migrations.RunPython(set_taken_year, reverse_code=migrations.RunPython.noop),
     ]

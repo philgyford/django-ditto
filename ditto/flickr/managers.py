@@ -11,8 +11,10 @@ class PhotosManager(models.Manager):
     As opposed to just Photos, which includes Photos by any User that
     have been favorited by a User with an Account.
     """
+
     def get_queryset(self):
         from .models import User
+
         users = User.objects_with_accounts.all()
         return super().get_queryset().filter(user__in=users)
 
@@ -22,8 +24,10 @@ class PublicPhotosManager(PublicItemManager):
     As opposed to just public Photos, which includes Photos by any User that
     have been favorited by a User with an Account.
     """
+
     def get_queryset(self):
         from .models import User
+
         users = User.objects_with_accounts.all()
         return super().get_queryset().filter(user__in=users)
 
@@ -33,6 +37,7 @@ class WithAccountsManager(models.Manager):
 
     def get_queryset(self):
         from .models import Account
+
         accounts = Account.objects.exclude(user__isnull=True)
         user_ids = [account.user.id for account in accounts]
         return super().get_queryset().filter(pk__in=user_ids)
@@ -47,10 +52,11 @@ class _PhotoTaggableManager(_TaggableManager):
         Overriding django-taggit's standard `most_common()` method.
         """
         extra_filters = {
-            'photo__is_private': False,
+            "photo__is_private": False,
         }
 
-        return self.get_queryset(extra_filters).annotate(
-            num_times=models.Count(self.through.tag_relname())
-        ).order_by('-num_times')
-
+        return (
+            self.get_queryset(extra_filters)
+            .annotate(num_times=models.Count(self.through.tag_relname()))
+            .order_by("-num_times")
+        )

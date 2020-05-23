@@ -36,13 +36,13 @@ class OriginalFilesFetcher(object):
 
         self.results_count = 0
 
-        self.return_value = {'fetched': 0}
+        self.return_value = {"fetched": 0}
 
         if account.user:
-            self.return_value['account'] = account.user.username
+            self.return_value["account"] = account.user.username
         else:
-            self.return_value['success'] = False
-            self.return_value['messages'] = ['This account has no Flickr User']
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["This account has no Flickr User"]
 
         self.account = account
 
@@ -57,10 +57,10 @@ class OriginalFilesFetcher(object):
                         got them?
         """
         # Might already have success=False from __init__():
-        if 'success' not in self.return_value:
+        if "success" not in self.return_value:
             self._fetch_files(fetch_all)
 
-            self.return_value['fetched'] = self.results_count
+            self.return_value["fetched"] = self.results_count
 
         return self.return_value
 
@@ -76,29 +76,29 @@ class OriginalFilesFetcher(object):
         photos = Photo.objects.filter(user=self.account.user)
 
         if not fetch_all:
-            photos = photos.filter(original_file='')
+            photos = photos.filter(original_file="")
 
         error_messages = []
 
         for photo in photos:
             try:
-                self._fetch_and_save_file(photo=photo, media_type='photo')
+                self._fetch_and_save_file(photo=photo, media_type="photo")
                 self.results_count += 1
             except FetchError as e:
                 error_messages.append(str(e))
 
-            if photo.media == 'video':
+            if photo.media == "video":
                 try:
-                    self._fetch_and_save_file(photo=photo, media_type='video')
+                    self._fetch_and_save_file(photo=photo, media_type="video")
                     self.results_count += 1
                 except FetchError as e:
                     error_messages.append(str(e))
 
         if len(error_messages) > 0:
-            self.return_value['success'] = False
-            self.return_value['messages'] = error_messages
+            self.return_value["success"] = False
+            self.return_value["messages"] = error_messages
         else:
-            self.return_value['success'] = True
+            self.return_value["success"] = True
 
     def _fetch_and_save_file(self, photo, media_type):
         """
@@ -111,17 +111,23 @@ class OriginalFilesFetcher(object):
         Raises FetchError if something goes wrong.
         """
 
-        if media_type == 'video':
+        if media_type == "video":
             url = photo.remote_video_original_url
             # Accepted video formats:
             # https://help.yahoo.com/kb/flickr/sln15628.html
             # BUT, they all seem to be sent as video/mp4.
-            acceptable_content_types = ['video/mp4',]
+            acceptable_content_types = [
+                "video/mp4",
+            ]
 
         else:
             url = photo.remote_original_url
             acceptable_content_types = [
-                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/gif",
+            ]
 
         filepath = False
         try:
@@ -132,14 +138,10 @@ class OriginalFilesFetcher(object):
 
         if filepath:
             # Reopen file and save to the Photo:
-            reopened_file = open(filepath, 'rb')
+            reopened_file = open(filepath, "rb")
             django_file = File(reopened_file)
 
-            if media_type == 'video':
-                photo.video_original_file.save(
-                                    os.path.basename(filepath), django_file)
+            if media_type == "video":
+                photo.video_original_file.save(os.path.basename(filepath), django_file)
             else:
-                photo.original_file.save(
-                                    os.path.basename(filepath), django_file)
-
-
+                photo.original_file.save(os.path.basename(filepath), django_file)

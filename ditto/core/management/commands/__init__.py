@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class DittoBaseCommand(BaseCommand):
@@ -10,8 +10,8 @@ class DittoBaseCommand(BaseCommand):
     """
 
     # What we're fetching:
-    singular_noun = 'Thing'
-    plural_noun = 'Things'
+    singular_noun = "Thing"
+    plural_noun = "Things"
 
     def add_arguments(self, parser):
         "We may add stuff for handling verbosity here."
@@ -41,18 +41,22 @@ class DittoBaseCommand(BaseCommand):
             return
 
         for result in results:
-            prefix = '%s: ' % result['account'] if 'account' in result else ''
-            if 'fetched' in result:
-                noun = self.singular_noun if result['fetched'] == 1 else self.plural_noun
-                self.stdout.write('%sFetched %s %s' % (
-                                            prefix, result['fetched'], noun))
+            prefix = "%s: " % result["account"] if "account" in result else ""
+            if "fetched" in result:
+                noun = (
+                    self.singular_noun if result["fetched"] == 1 else self.plural_noun
+                )
+                self.stdout.write("%sFetched %s %s" % (prefix, result["fetched"], noun))
 
-            if result['success'] == False:
-                self.stderr.write('%sFailed to fetch %s: %s' % (
-                                    prefix,
-                                    self.plural_noun,
-                                    self.format_messages(result['messages'])
-                                ))
+            if result["success"] is False:
+                self.stderr.write(
+                    "%sFailed to fetch %s: %s"
+                    % (
+                        prefix,
+                        self.plural_noun,
+                        self.format_messages(result["messages"]),
+                    )
+                )
 
     def format_messages(self, messages):
         if len(messages) == 1:
@@ -60,5 +64,3 @@ class DittoBaseCommand(BaseCommand):
         else:
             # On separate lines, and start a newline first.
             return "%s%s" % ("\n", "\n".join(messages))
-
-
