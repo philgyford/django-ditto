@@ -1,10 +1,13 @@
 # coding: utf-8
-import argparse
-
 from django.core.management.base import CommandError
 
 from ....core.management.commands import DittoBaseCommand
-from ...fetch import AllBookmarksFetcher, DateBookmarksFetcher, RecentBookmarksFetcher, UrlBookmarksFetcher
+from ...fetch import (
+    AllBookmarksFetcher,
+    DateBookmarksFetcher,
+    RecentBookmarksFetcher,
+    UrlBookmarksFetcher,
+)
 
 
 class Command(DittoBaseCommand):
@@ -26,8 +29,8 @@ class Command(DittoBaseCommand):
     ./manage.py fetch_pinboardbookmarks --all --account=philgyford
     """
 
-    singular_noun = 'Bookmark'
-    plural_noun = 'Bookmarks'
+    singular_noun = "Bookmark"
+    plural_noun = "Bookmarks"
 
     help = "Fetches bookmarks from Pinboard"
 
@@ -35,60 +38,59 @@ class Command(DittoBaseCommand):
         super().add_arguments(parser)
 
         parser.add_argument(
-            '--all',
-            action='store_true',
-            default=False,
-            help='Fetch all bookmarks.'
+            "--all", action="store_true", default=False, help="Fetch all bookmarks."
         )
         parser.add_argument(
-            '--date',
-            action='store',
+            "--date",
+            action="store",
             default=False,
-            help='Fetch bookmarks posted on one day, e.g. "2015-06-20".'
+            help='Fetch bookmarks posted on one day, e.g. "2015-06-20".',
         )
         parser.add_argument(
-            '--recent',
-            action='store',
+            "--recent",
+            action="store",
             default=False,
-            help='Fetch the most recent bookmarks, e.g. "10".'
+            help='Fetch the most recent bookmarks, e.g. "10".',
         )
         parser.add_argument(
-            '--url',
-            action='store',
+            "--url",
+            action="store",
             default=False,
             help='Fetch the bookmark for one URL, e.g. "http://www.foo.com".',
         )
         parser.add_argument(
-            '--account',
-            action='store',
+            "--account",
+            action="store",
             default=False,
-            help='Only fetch for one Pinboard account.',
+            help="Only fetch for one Pinboard account.",
         )
 
     def handle(self, *args, **options):
 
         # We might be fetching for a specific account or all (None).
-        account = options['account'] if options['account'] else None;
+        account = options["account"] if options["account"] else None
 
-        if options['all']:
+        if options["all"]:
             results = AllBookmarksFetcher().fetch(username=account)
 
-        elif options['date']:
-            results = DateBookmarksFetcher().fetch(post_date=options['date'],
-                                                            username=account)
+        elif options["date"]:
+            results = DateBookmarksFetcher().fetch(
+                post_date=options["date"], username=account
+            )
 
-        elif options['recent']:
-            results = RecentBookmarksFetcher().fetch(num=options['recent'],
-                                                            username=account)
+        elif options["recent"]:
+            results = RecentBookmarksFetcher().fetch(
+                num=options["recent"], username=account
+            )
 
-        elif options['url']:
-            results = UrlBookmarksFetcher().fetch(url=options['url'],
-                                                            username=account)
+        elif options["url"]:
+            results = UrlBookmarksFetcher().fetch(url=options["url"], username=account)
 
-        elif options['account']:
-            raise CommandError("Specify --all, --recent, --date= or --url= as well as --account.")
+        elif options["account"]:
+            raise CommandError(
+                "Specify --all, --recent, --date= or --url= as well as --account."
+            )
         else:
             raise CommandError("Specify --all, --recent, --date= or --url=")
 
-        self.output_results(results, options.get('verbosity', 1))
-
+        self.output_results(results, options.get("verbosity", 1))

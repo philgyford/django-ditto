@@ -8,13 +8,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0008_auto_20160429_1559'),
+        ("flickr", "0008_auto_20160429_1559"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='photoset',
-            name='fetch_time',
-            field=models.DateTimeField(blank=True, help_text="The time the item's data was last fetched.", null=True),
+            model_name="photoset",
+            name="fetch_time",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="The time the item's data was last fetched.",
+                null=True,
+            ),
         ),
     ]

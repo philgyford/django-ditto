@@ -8,23 +8,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0048_auto_20160615_1045'),
+        ("twitter", "0048_auto_20160615_1045"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='media',
-            name='aspect_ratio',
-            field=models.CharField(blank=True, help_text='eg, "4:3" or "16:9"', max_length=21),
+            model_name="media",
+            name="aspect_ratio",
+            field=models.CharField(
+                blank=True, help_text='eg, "4:3" or "16:9"', max_length=21
+            ),
         ),
         migrations.AlterField(
-            model_name='media',
-            name='dash_url',
-            field=models.URLField(blank=True, verbose_name='MPEG-DASH URL (.mpd, streaming)'),
+            model_name="media",
+            name="dash_url",
+            field=models.URLField(
+                blank=True, verbose_name="MPEG-DASH URL (.mpd, streaming)"
+            ),
         ),
         migrations.AlterField(
-            model_name='media',
-            name='xmpeg_url',
-            field=models.URLField(blank=True, verbose_name='X-MPEG URL (HLS, .m3u8, streaming'),
+            model_name="media",
+            name="xmpeg_url",
+            field=models.URLField(
+                blank=True, verbose_name="X-MPEG URL (HLS, .m3u8, streaming"
+            ),
         ),
     ]

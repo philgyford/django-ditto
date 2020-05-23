@@ -1,2 +1,1 @@
-default_app_config = 'ditto.pinboard.apps.DittoPinboardConfig'
-
+default_app_config = "ditto.pinboard.apps.DittoPinboardConfig"

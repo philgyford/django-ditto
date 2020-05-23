@@ -1,4 +1,3 @@
 
 class FetchError(Exception):
     pass
-

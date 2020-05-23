@@ -3,8 +3,8 @@ from django.apps import apps, AppConfig
 
 
 class DittoCoreConfig(AppConfig):
-    label = 'ditto_core'
-    name = 'ditto.core'
+    label = "ditto_core"
+    name = "ditto.core"
     verbose_name = "Ditto Core"
 
 
@@ -20,11 +20,11 @@ class Apps(object):
     def all(self):
         "A list of all possible Ditto apps that could be installed/enabled."
         return [
-                'flickr',
-                'lastfm',
-                'pinboard',
-                'twitter',
-               ]
+            "flickr",
+            "lastfm",
+            "pinboard",
+            "twitter",
+        ]
 
     def installed(self):
         "A list of all the installed Ditto apps."
@@ -36,7 +36,7 @@ class Apps(object):
 
     def is_installed(self, app_name):
         "Is this Ditto app installed?"
-        return apps.is_installed('ditto.%s' % app_name)
+        return apps.is_installed("ditto.%s" % app_name)
 
     def is_enabled(self, app_name):
         """Determine if a particular Ditto app is installed and enabled.
@@ -50,8 +50,7 @@ class Apps(object):
         Doesn't offer much over apps.is_installed() yet, but would let us add other
         conditions in future, like being able to enable/disable installed apps.
         """
-        return apps.is_installed('ditto.%s' % app_name)
+        return apps.is_installed("ditto.%s" % app_name)
 
 
 ditto_apps = Apps()
-

@@ -47,6 +47,7 @@ class Fetch(object):
         fetcher = RecentTweetsFetcher(account)
         result = fetcher.fetch()
     """
+
     # Will be an Account object, passed into init()
     account = None
 
@@ -75,23 +76,26 @@ class Fetch(object):
         self._reset()
 
         if self.account.user:
-            self.return_value['account'] = self.account.user.screen_name
+            self.return_value["account"] = self.account.user.screen_name
         elif self.account.pk:
-            self.return_value['account'] = 'Account: %s' % str(self.account)
+            self.return_value["account"] = "Account: %s" % str(self.account)
         else:
-            self.return_value['account'] = 'Unsaved Account'
+            self.return_value["account"] = "Unsaved Account"
 
         if self.account.has_credentials():
             self.api = Twython(
-                self.account.consumer_key, self.account.consumer_secret,
-                self.account.access_token, self.account.access_token_secret)
+                self.account.consumer_key,
+                self.account.consumer_secret,
+                self.account.access_token,
+                self.account.access_token_secret,
+            )
             self._fetch_pages()
             self._post_fetch()
         else:
-            self.return_value['success'] = False
-            self.return_value['messages'] = ['Account has no API credentials']
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Account has no API credentials"]
 
-        self.return_value['fetched'] = self.results_count
+        self.return_value["fetched"] = self.results_count
 
         return self.return_value
 
@@ -106,16 +110,16 @@ class Fetch(object):
         try:
             self._call_api()
         except TwythonError as e:
-            self.return_value['success'] = False
-            self.return_value['messages'] = ['Error when calling API: %s' % e]
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Error when calling API: %s" % e]
         else:
             # If we've got to the last 'page' of tweet results, we'll receive
             # an empty list from the API.
-            if (len(self.results) > 0):
+            if len(self.results) > 0:
                 self._save_results()
                 self._post_save()
 
-            self.return_value['success'] = True
+            self.return_value["success"] = True
         return
 
     def _since_id(self):
@@ -126,7 +130,9 @@ class Fetch(object):
         Should call self.api.a_function_name() and set self.results with the
         results.
         """
-        raise FetchError("Children of the Fetch class should define their own _call_api() method.")
+        raise FetchError(
+            "Children of the Fetch class should define their own _call_api() method."
+        )
 
     def _save_results(self):
         """Define in child classes.
@@ -159,7 +165,7 @@ class FetchVerify(Fetch):
 
     def _post_save(self):
         "Adds the one User we fetched to the data we'll return from fetch()."
-        self.return_value['user'] = self.objects[0]
+        self.return_value["user"] = self.objects[0]
 
     def _save_results(self):
         """Creates/updates the user data.
@@ -205,14 +211,17 @@ class FetchLookup(Fetch):
             limit = self.fetch_per_query * self.max_requests
             # Get all the IDs, up to the limit, ordered by fetch_time, so
             # that we get the least-recently updated this time.
-            ids = self.model.objects.values_list('twitter_id', flat=True).order_by('fetch_time')[:limit]
+            ids = self.model.objects.values_list("twitter_id", flat=True).order_by(
+                "fetch_time"
+            )[:limit]
 
         self.ids_remaining_to_fetch = ids
 
     def _post_save(self):
         # Remove the IDs we just fetched from the list:
         self.ids_remaining_to_fetch = self.ids_remaining_to_fetch[
-                                                        self.fetch_per_query:]
+            self.fetch_per_query :
+        ]
 
         self.results_count += len(self.results)
 
@@ -231,7 +240,7 @@ class FetchLookup(Fetch):
         If self.fetch_per_query is 100, this returns the next 100 ids from
         self.ids_remaining_to_fetch.
         """
-        return self.ids_remaining_to_fetch[:self.fetch_per_query]
+        return self.ids_remaining_to_fetch[: self.fetch_per_query]
 
 
 class FetchUsers(FetchLookup):
@@ -248,10 +257,7 @@ class FetchUsers(FetchLookup):
         # Sometimes this worked fine with numeric IDs, other times Tweepy
         # didn't put them in the URL and they had to be strings. Odd.
         ids = [str(id) for id in self._ids_to_fetch_in_query()]
-        self.results = self.api.lookup_user(
-                            user_id=ids,
-                            include_entities=True
-                        )
+        self.results = self.api.lookup_user(user_id=ids, include_entities=True)
 
     def _save_results(self):
         for user in self.results:
@@ -272,12 +278,12 @@ class FetchTweets(FetchLookup):
     def _call_api(self):
         ids = [str(id) for id in self._ids_to_fetch_in_query()]
         self.results = self.api.lookup_status(
-                            id=ids,
-                            tweet_mode='extended',
-                            include_entities=True,
-                            trim_user=False,
-                            map=False
-                        )
+            id=ids,
+            tweet_mode="extended",
+            include_entities=True,
+            trim_user=False,
+            map=False,
+        )
 
     def _save_results(self):
         for tweet in self.results:
@@ -303,18 +309,18 @@ class FetchNewTweets(Fetch):
     remaining_to_fetch = 0
 
     # Will be 'new' or 'number':
-    fetch_type = 'new'
+    fetch_type = "new"
 
-    def fetch(self, count='new'):
+    def fetch(self, count="new"):
         """
         Keyword arguments:
         count -- Either 'new' (get the Tweets since the last fetch) or a number
                 to fetch that many, up to the API limit (3200 currently).
         """
-        if count == 'new':
-            self.fetch_type = 'new'
+        if count == "new":
+            self.fetch_type = "new"
         else:
-            self.fetch_type = 'number'
+            self.fetch_type = "number"
             self.remaining_to_fetch = count
 
         return super().fetch()
@@ -323,12 +329,12 @@ class FetchNewTweets(Fetch):
         "After saving a page of results, what to do..."
 
         if self.last_id is None:
-            self.last_id = self.results[0]['id']
+            self.last_id = self.results[0]["id"]
 
         # The max_id for the next 'page' of tweets:
-        self.max_id = self.results[-1]['id'] - 1
+        self.max_id = self.results[-1]["id"] - 1
 
-        if self.fetch_type == 'number':
+        if self.fetch_type == "number":
             self.remaining_to_fetch -= len(self.results)
 
         self.results_count += len(self.results)
@@ -338,12 +344,12 @@ class FetchNewTweets(Fetch):
             self._fetch_pages()
 
     def _more_to_fetch(self):
-        if self.fetch_type == 'new':
+        if self.fetch_type == "new":
             if self._since_id() is None or self.max_id > self._since_id():
                 return True
             else:
                 return False
-        elif self.fetch_type == 'number':
+        elif self.fetch_type == "number":
             if self.remaining_to_fetch > 0:
                 return True
             else:
@@ -353,7 +359,7 @@ class FetchNewTweets(Fetch):
     def _tweets_to_fetch_in_query(self):
         "How many Tweets to fetch in the current API query."
         to_fetch = 200
-        if self.fetch_type == 'number' and self.remaining_to_fetch < 200:
+        if self.fetch_type == "number" and self.remaining_to_fetch < 200:
             to_fetch = self.remaining_to_fetch
         return to_fetch
 
@@ -362,7 +368,7 @@ class FetchTweetsRecent(FetchNewTweets):
     """For fetching recent tweets by a single Account."""
 
     def _since_id(self):
-        if self.fetch_type == 'new':
+        if self.fetch_type == "new":
             return self.account.last_recent_id
         else:
             return None
@@ -376,12 +382,13 @@ class FetchTweetsRecent(FetchNewTweets):
         # account.last_recent_id might be None, in which case it's not used in
         # the API call:
         self.results = self.api.get_user_timeline(
-                                user_id=self.account.user.twitter_id,
-                                tweet_mode="extended",
-                                include_rts=True,
-                                count=self._tweets_to_fetch_in_query(),
-                                max_id=self.max_id,
-                                since_id=self._since_id())
+            user_id=self.account.user.twitter_id,
+            tweet_mode="extended",
+            include_rts=True,
+            count=self._tweets_to_fetch_in_query(),
+            max_id=self.max_id,
+            since_id=self._since_id(),
+        )
 
     def _post_fetch(self):
         "Set last_recent_id of our Account to the most recent Tweet fetched."
@@ -403,7 +410,7 @@ class FetchTweetsFavorite(FetchNewTweets):
     """For fetching tweets favorited by a single Account."""
 
     def _since_id(self):
-        if self.fetch_type == 'new':
+        if self.fetch_type == "new":
             return self.account.last_favorite_id
         else:
             return None
@@ -417,12 +424,13 @@ class FetchTweetsFavorite(FetchNewTweets):
         # account.last_favorite_id might be None, in which case it's not used in
         # the API call:
         self.results = self.api.get_favorites(
-                                user_id=self.account.user.twitter_id,
-                                count=self._tweets_to_fetch_in_query(),
-                                max_id=self.max_id,
-                                since_id=self._since_id(),
-                                tweet_mode='extended',
-                                include_entities=True)
+            user_id=self.account.user.twitter_id,
+            count=self._tweets_to_fetch_in_query(),
+            max_id=self.max_id,
+            since_id=self._since_id(),
+            tweet_mode="extended",
+            include_entities=True,
+        )
 
     def _post_fetch(self):
         """Set the last_favorite_id of our Account to the most recent Tweet we
@@ -480,7 +488,7 @@ class FetchFiles(object):
 
         self._fetch_files(fetch_all)
 
-        self.return_value['fetched'] = self.results_count
+        self.return_value["fetched"] = self.results_count
 
         return self.return_value
 
@@ -496,31 +504,29 @@ class FetchFiles(object):
         media = Media.objects.all()
 
         if not fetch_all:
-            media = media.filter(image_file='')
+            media = media.filter(image_file="")
 
         error_messages = []
 
         for media_obj in media:
             try:
-                self._fetch_and_save_file(
-                                    media_obj=media_obj, media_type='image')
+                self._fetch_and_save_file(media_obj=media_obj, media_type="image")
                 self.results_count += 1
             except FetchError as e:
                 error_messages.append(str(e))
 
-            if media_obj.media_type == 'animated_gif':
+            if media_obj.media_type == "animated_gif":
                 try:
-                    self._fetch_and_save_file(
-                                        media_obj=media_obj, media_type='mp4')
+                    self._fetch_and_save_file(media_obj=media_obj, media_type="mp4")
                     self.results_count += 1
                 except FetchError as e:
                     error_messages.append(str(e))
 
         if len(error_messages) > 0:
-            self.return_value['success'] = False
-            self.return_value['messages'] = error_messages
+            self.return_value["success"] = False
+            self.return_value["messages"] = error_messages
         else:
-            self.return_value['success'] = True
+            self.return_value["success"] = True
 
     def _fetch_and_save_file(self, media_obj, media_type):
         """
@@ -533,13 +539,19 @@ class FetchFiles(object):
         Raises FetchError if something goes wrong.
         """
 
-        if media_type == 'mp4':
+        if media_type == "mp4":
             url = media_obj.mp4_url
-            acceptable_content_types = ['video/mp4',]
-        elif media_type == 'image':
+            acceptable_content_types = [
+                "video/mp4",
+            ]
+        elif media_type == "image":
             url = media_obj.image_url
             acceptable_content_types = [
-                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',]
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/gif",
+            ]
         else:
             raise FetchError('media_type should be "image" or "mp4"')
 
@@ -552,16 +564,10 @@ class FetchFiles(object):
 
         if filepath:
             # Reopen file and save to the Media object:
-            reopened_file = open(filepath, 'rb')
+            reopened_file = open(filepath, "rb")
             django_file = File(reopened_file)
 
-            if media_type == 'mp4':
-                media_obj.mp4_file.save(
-                                    os.path.basename(filepath), django_file)
+            if media_type == "mp4":
+                media_obj.mp4_file.save(os.path.basename(filepath), django_file)
             else:
-                media_obj.image_file.save(
-                                    os.path.basename(filepath), django_file)
-
-
-
-
+                media_obj.image_file.save(os.path.basename(filepath), django_file)

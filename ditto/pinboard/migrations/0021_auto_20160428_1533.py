@@ -8,13 +8,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pinboard', '0020_auto_20160428_1526'),
+        ("pinboard", "0020_auto_20160428_1526"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='bookmark',
-            name='url_hash',
-            field=models.CharField(blank=True, db_index=True, help_text="Slug in the Bookmark's local URL.", max_length=12, unique=True),
+            model_name="bookmark",
+            name="url_hash",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                help_text="Slug in the Bookmark's local URL.",
+                max_length=12,
+                unique=True,
+            ),
         ),
     ]

@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0053_tweet_post_year'),
+        ("twitter", "0053_tweet_post_year"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='name',
+            model_name="user",
+            name="name",
             field=models.CharField(help_text="eg, 'Samuel Pepys'", max_length=50),
         ),
     ]

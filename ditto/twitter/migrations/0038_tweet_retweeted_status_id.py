@@ -8,13 +8,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0037_user_avatar'),
+        ("twitter", "0037_user_avatar"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tweet',
-            name='retweeted_status_id',
-            field=models.BigIntegerField(blank=True, help_text='The ID of the retweeted Tweet, if any', null=True),
+            model_name="tweet",
+            name="retweeted_status_id",
+            field=models.BigIntegerField(
+                blank=True, help_text="The ID of the retweeted Tweet, if any", null=True
+            ),
         ),
     ]

@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0009_photoset_fetch_time'),
+        ("flickr", "0009_photoset_fetch_time"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='photo',
-            name='photosets',
-            field=models.ManyToManyField(to='flickr.Photoset'),
+            model_name="photo",
+            name="photosets",
+            field=models.ManyToManyField(to="flickr.Photoset"),
         ),
     ]

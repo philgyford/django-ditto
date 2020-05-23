@@ -8,13 +8,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0012_auto_20160503_1457'),
+        ("flickr", "0012_auto_20160503_1457"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='photoset',
-            name='photos_raw',
-            field=models.TextField(blank=True, help_text='The raw JSON from the API listing the photos.'),
+            model_name="photoset",
+            name="photos_raw",
+            field=models.TextField(
+                blank=True, help_text="The raw JSON from the API listing the photos."
+            ),
         ),
     ]

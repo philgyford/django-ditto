@@ -7,3 +7,4 @@ dist
 django_ditto.egg-info
 htmlcov
 build/
+.vscode

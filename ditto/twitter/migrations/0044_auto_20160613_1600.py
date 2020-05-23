@@ -8,13 +8,11 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0043_remove_media_is_private'),
+        ("twitter", "0043_remove_media_is_private"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tweet',
-            name='text',
-            field=models.TextField(),
+            model_name="tweet", name="text", field=models.TextField(),
         ),
     ]

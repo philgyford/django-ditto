@@ -12,21 +12,14 @@ class UtilsTestCase(TestCase):
 
     def test_unchanged_characters(self):
         "Some characters should remain unchanged."
-        self.assertEqual(
-            slugify_name(', . & ! ( ) ; :'),
-                         ',+.+&+!+(+)+;+:'
-
-        )
+        self.assertEqual(slugify_name(", . & ! ( ) ; :"), ",+.+&+!+(+)+;+:")
 
     def test_changed_characters_1(self):
         self.assertEqual(
-            slugify_name("/ # ? [ ] ' + %"),
-                        '%2F+%23+%3F+%5B+%5D+%27+%252B+%25'
+            slugify_name("/ # ? [ ] ' + %"), "%2F+%23+%3F+%5B+%5D+%27+%252B+%25"
         )
 
     def test_changed_characters_2(self):
         self.assertEqual(
-            slugify_name('" < > \ ^ ` { | }'),
-                        '%22+%3C+%3E+%5C%5C+%5E+%60+%7B+%7C+%7D'
+            slugify_name('" < > \ ^ ` { | }'), "%22+%3C+%3E+%5C%5C+%5E+%60+%7B+%7C+%7D"  # noqa: E501, W605
         )
-

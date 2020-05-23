@@ -1,7 +1,5 @@
 # coding: utf-8
-import argparse
-
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from ...fetch.fetchers import VerifyFetcher
 
@@ -20,15 +18,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--account',
-            action='store',
+            "--account",
+            action="store",
             default=False,
-            help='Only fetch for one Twitter account.',
+            help="Only fetch for one Twitter account.",
         )
 
     def handle(self, *args, **options):
         # We might be fetching for a specific account or all (None).
-        account = options['account'] if options['account'] else None;
+        account = options["account"] if options["account"] else None
 
         results = VerifyFetcher(screen_name=account).fetch()
 
@@ -41,12 +39,12 @@ class Command(BaseCommand):
         #   'success': False,
         #   'messages': ["This screen_name doesn't exist"]
         # }
-        if options.get('verbosity', 1) > 0:
+        if options.get("verbosity", 1) > 0:
             for result in results:
-                if result['success']:
-                    self.stdout.write('Fetched @%s' % result['account'])
+                if result["success"]:
+                    self.stdout.write("Fetched @%s" % result["account"])
                 else:
-                    self.stderr.write('Could not fetch @%s: %s' % (
-                                    result['account'], result['messages'][0]
-                                ))
-
+                    self.stderr.write(
+                        "Could not fetch @%s: %s"
+                        % (result["account"], result["messages"][0])
+                    )

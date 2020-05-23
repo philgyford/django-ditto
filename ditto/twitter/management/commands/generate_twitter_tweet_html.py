@@ -1,6 +1,4 @@
 # coding: utf-8
-import argparse
-
 from django.core.management.base import BaseCommand, CommandError
 
 from ...models import Account, Tweet
@@ -21,27 +19,28 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--account',
-            action='store',
+            "--account",
+            action="store",
             default=False,
-            help='Only generate for one Twitter account.',
+            help="Only generate for one Twitter account.",
         )
 
     def handle(self, *args, **options):
         tweets = Tweet.objects.all()
 
         # If a screen name is provided, only get the Tweets for that:
-        if options['account']:
-            screen_name = options['account']
+        if options["account"]:
+            screen_name = options["account"]
             try:
                 Account.objects.get(user__screen_name=screen_name)
             except Account.DoesNotExist:
-                raise CommandError("There's no Account with a screen name of '%s'" % screen_name)
+                raise CommandError(
+                    "There's no Account with a screen name of '%s'" % screen_name
+                )
             tweets = tweets.filter(user__screen_name=screen_name)
 
         for tweet in tweets:
             tweet.save()
 
-        if options.get('verbosity', 1) > 0:
-            self.stdout.write('Generated HTML for %d Tweets' % tweets.count())
-
+        if options.get("verbosity", 1) > 0:
+            self.stdout.write("Generated HTML for %d Tweets" % tweets.count())

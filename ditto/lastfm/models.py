@@ -1,52 +1,56 @@
 # coding: utf-8
 from django.db import models
+
 try:
     from django.urls import reverse
 except ImportError:
     # For Django 1.8
     from django.urls import reverse
 
-from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ..core.models import DittoItemModel, TimeStampedModelMixin
 from ..core.utils import truncate_string
 from . import managers
 
 
 # For generating permalinks.
-LASTFM_URL_ROOT = 'http://www.last.fm'
+LASTFM_URL_ROOT = "http://www.last.fm"
 
 # For generating links to MB.
-MUSICBRAINZ_URL_ROOT = 'https://musicbrainz.org'
+MUSICBRAINZ_URL_ROOT = "https://musicbrainz.org"
 
 
 class Account(TimeStampedModelMixin, models.Model):
     "The account of a user, with API key, on Last.fm"
 
-    username = models.CharField(null=False, blank=False, max_length=30,
-                unique=True,
-                help_text="eg, 'rj'")
+    username = models.CharField(
+        null=False, blank=False, max_length=30, unique=True, help_text="eg, 'rj'"
+    )
 
-    realname = models.CharField(null=False, blank=False, max_length=30,
-                unique=False,
-                help_text="eg, 'Richard Jones'")
+    realname = models.CharField(
+        null=False,
+        blank=False,
+        max_length=30,
+        unique=False,
+        help_text="eg, 'Richard Jones'",
+    )
 
-    api_key = models.CharField(blank=True, max_length=255,
-                                                        verbose_name='API Key')
-    is_active = models.BooleanField(default=True,
-                        help_text="If false, new scrobbles won't be fetched.")
+    api_key = models.CharField(blank=True, max_length=255, verbose_name="API Key")
+    is_active = models.BooleanField(
+        default=True, help_text="If false, new scrobbles won't be fetched."
+    )
 
     def __str__(self):
         return self.realname
 
     class Meta:
-        ordering = ['username']
+        ordering = ["username"]
 
     def get_absolute_url(self):
-        return reverse('lastfm:user_detail',
-                                        kwargs={'username': self.username})
+        return reverse("lastfm:user_detail", kwargs={"username": self.username})
 
     @property
     def permalink(self):
-        return '%s/user/%s' % (LASTFM_URL_ROOT, self.username)
+        return "%s/user/%s" % (LASTFM_URL_ROOT, self.username)
 
     def has_credentials(self):
         "Does this at least have something in its API field? True or False"
@@ -56,8 +60,9 @@ class Account(TimeStampedModelMixin, models.Model):
             return False
 
     def get_recent_scrobbles(self, limit=10):
-        return self.scrobbles.prefetch_related('artist', 'track')\
-                                .order_by('-post_time')[:limit]
+        return self.scrobbles.prefetch_related("artist", "track").order_by(
+            "-post_time"
+        )[:limit]
 
 
 class Album(TimeStampedModelMixin, models.Model):
@@ -80,15 +85,22 @@ class Album(TimeStampedModelMixin, models.Model):
     name = models.TextField(null=False, blank=False)
     # We're not using SlugField because a Track slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, db_index=True,
-            help_text="Lowercase")
-    original_slug = models.TextField(null=False, blank=False,
-            help_text="As used on Last.fm. Mixed case.")
-    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
-                                                        related_name='albums')
-    mbid = models.CharField(null=False, blank=True, max_length=36,
-            verbose_name="MBID",
-            help_text="MusicBrainz Identifier")
+    slug = models.TextField(
+        null=False, blank=False, db_index=True, help_text="Lowercase"
+    )
+    original_slug = models.TextField(
+        null=False, blank=False, help_text="As used on Last.fm. Mixed case."
+    )
+    artist = models.ForeignKey(
+        "Artist", on_delete=models.CASCADE, related_name="albums"
+    )
+    mbid = models.CharField(
+        null=False,
+        blank=True,
+        max_length=36,
+        verbose_name="MBID",
+        help_text="MusicBrainz Identifier",
+    )
 
     objects = managers.AlbumsManager()
 
@@ -96,26 +108,28 @@ class Album(TimeStampedModelMixin, models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def get_absolute_url(self):
         "The Album's URL locally."
-        return reverse('lastfm:album_detail', kwargs={
-            'artist_slug': self.artist.slug,
-            'album_slug': self.slug,
-        })
+        return reverse(
+            "lastfm:album_detail",
+            kwargs={"artist_slug": self.artist.slug, "album_slug": self.slug},
+        )
 
     @property
     def permalink(self):
         "The Album's URL at Last.fm."
-        return '%s/music/%s/%s' % (LASTFM_URL_ROOT,
-                                   self.artist.original_slug,
-                                   self.original_slug)
+        return "%s/music/%s/%s" % (
+            LASTFM_URL_ROOT,
+            self.artist.original_slug,
+            self.original_slug,
+        )
 
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return '%s/release/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return "%s/release/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
         else:
             return None
 
@@ -139,7 +153,7 @@ class Album(TimeStampedModelMixin, models.Model):
         """
         Returns the most recent Scrobble object for this Album.
         """
-        return self.scrobbles.order_by('-post_time').first()
+        return self.scrobbles.order_by("-post_time").first()
 
 
 class Artist(TimeStampedModelMixin, models.Model):
@@ -148,13 +162,20 @@ class Artist(TimeStampedModelMixin, models.Model):
     name = models.CharField(null=False, blank=False, max_length=255)
     # We're not using SlugField because an Artist slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, unique=True,
-            help_text="Lowercase")
-    original_slug = models.TextField(null=False, blank=False, unique=True,
-            help_text="As used on Last.fm. Mixed case.")
-    mbid = models.CharField(null=False, blank=True, max_length=36,
-            verbose_name="MBID",
-            help_text="MusicBrainz Identifier")
+    slug = models.TextField(null=False, blank=False, unique=True, help_text="Lowercase")
+    original_slug = models.TextField(
+        null=False,
+        blank=False,
+        unique=True,
+        help_text="As used on Last.fm. Mixed case.",
+    )
+    mbid = models.CharField(
+        null=False,
+        blank=True,
+        max_length=36,
+        verbose_name="MBID",
+        help_text="MusicBrainz Identifier",
+    )
 
     objects = managers.ArtistsManager()
 
@@ -162,23 +183,21 @@ class Artist(TimeStampedModelMixin, models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def get_absolute_url(self):
         "The Artist's URL locally."
-        return reverse('lastfm:artist_detail', kwargs={
-            'artist_slug': self.slug,
-        })
+        return reverse("lastfm:artist_detail", kwargs={"artist_slug": self.slug})
 
     @property
     def permalink(self):
         "The Artist's URL at Last.fm."
-        return '%s/music/%s' % (LASTFM_URL_ROOT, self.original_slug)
+        return "%s/music/%s" % (LASTFM_URL_ROOT, self.original_slug)
 
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return '%s/artist/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return "%s/artist/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
         else:
             return None
 
@@ -189,7 +208,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         """
         return self.scrobbles.count()
 
-    def get_top_albums(self, limit='all'):
+    def get_top_albums(self, limit="all"):
         """
         Returns a QuerySet of Albums by this Artist, ordered by most-scrobbled.
         By default returns all of them.
@@ -197,12 +216,12 @@ class Artist(TimeStampedModelMixin, models.Model):
         """
         qs = self.albums.with_scrobble_counts()
 
-        if limit == 'all':
+        if limit == "all":
             return qs
         else:
             return qs[:limit]
 
-    def get_top_tracks(self, limit='all'):
+    def get_top_tracks(self, limit="all"):
         """
         Returns a QuerySet of Tracks by this Artist, ordered by most-scrobbled.
         By default returns all of them.
@@ -210,7 +229,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         """
         qs = self.tracks.with_scrobble_counts()
 
-        if limit == 'all':
+        if limit == "all":
             return qs
         else:
             return qs[:limit]
@@ -219,7 +238,7 @@ class Artist(TimeStampedModelMixin, models.Model):
         """
         Returns the most recent Scrobble object for this Artist.
         """
-        return self.scrobbles.order_by('-post_time').first()
+        return self.scrobbles.order_by("-post_time").first()
 
 
 class Scrobble(DittoItemModel, models.Model):
@@ -231,7 +250,7 @@ class Scrobble(DittoItemModel, models.Model):
     Album model.
     """
 
-    ditto_item_name = 'lastfm_scrobble'
+    ditto_item_name = "lastfm_scrobble"
 
     # Properties inherited from DittoItemModel:
     #
@@ -245,34 +264,42 @@ class Scrobble(DittoItemModel, models.Model):
     # longitude     (DecimalField)
     # raw           (TextField)
 
-    account = models.ForeignKey('Account', on_delete=models.CASCADE,
-                                                    related_name='scrobbles')
+    account = models.ForeignKey(
+        "Account", on_delete=models.CASCADE, related_name="scrobbles"
+    )
 
-    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
-                                                    related_name='scrobbles')
-    track = models.ForeignKey('Track', on_delete=models.CASCADE,
-                                                    related_name='scrobbles')
-    album = models.ForeignKey('Album', on_delete=models.SET_NULL,
-                            related_name='scrobbles', blank=True, null=True)
+    artist = models.ForeignKey(
+        "Artist", on_delete=models.CASCADE, related_name="scrobbles"
+    )
+    track = models.ForeignKey(
+        "Track", on_delete=models.CASCADE, related_name="scrobbles"
+    )
+    album = models.ForeignKey(
+        "Album",
+        on_delete=models.SET_NULL,
+        related_name="scrobbles",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
-        return '%s (%s)' % (self.title, self.post_time)
+        return "%s (%s)" % (self.title, self.post_time)
 
     class Meta:
-        ordering = ['-post_time']
+        ordering = ["-post_time"]
 
     def save(self, *args, **kwargs):
         self.title = truncate_string(
-            '{} – {}'.format(self.track.artist.name, self.track.name),
+            "{} – {}".format(self.track.artist.name, self.track.name),
             chars=255,
-            truncate='…',
-            at_word_boundary=True
+            truncate="…",
+            at_word_boundary=True,
         )
         super().save(*args, **kwargs)
 
     def _summary_source(self):
         "Used to make the `summary` property."
-        return self.post_time.strftime('%Y-%m-%d %H:%M')
+        return self.post_time.strftime("%Y-%m-%d %H:%M")
 
 
 class Track(TimeStampedModelMixin, models.Model):
@@ -286,15 +313,22 @@ class Track(TimeStampedModelMixin, models.Model):
     name = models.TextField(null=False, blank=False)
     # We're not using SlugField because a Track slug can be longer than 255
     # characters and contain characters not allowed by SlugField().
-    slug = models.TextField(null=False, blank=False, db_index=True,
-            help_text="Lowercase")
-    original_slug = models.TextField(null=False, blank=False,
-            help_text="As used on Last.fm. Mixed case.")
-    artist = models.ForeignKey('Artist', on_delete=models.CASCADE,
-                                                        related_name='tracks')
-    mbid = models.CharField(null=False, blank=True, max_length=36,
-            verbose_name="MBID",
-            help_text="MusicBrainz Identifier")
+    slug = models.TextField(
+        null=False, blank=False, db_index=True, help_text="Lowercase"
+    )
+    original_slug = models.TextField(
+        null=False, blank=False, help_text="As used on Last.fm. Mixed case."
+    )
+    artist = models.ForeignKey(
+        "Artist", on_delete=models.CASCADE, related_name="tracks"
+    )
+    mbid = models.CharField(
+        null=False,
+        blank=True,
+        max_length=36,
+        verbose_name="MBID",
+        help_text="MusicBrainz Identifier",
+    )
 
     objects = managers.TracksManager()
 
@@ -302,26 +336,28 @@ class Track(TimeStampedModelMixin, models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def get_absolute_url(self):
         "The track's URL locally."
-        return reverse('lastfm:track_detail', kwargs={
-            'artist_slug': self.artist.slug,
-            'track_slug': self.slug,
-        })
+        return reverse(
+            "lastfm:track_detail",
+            kwargs={"artist_slug": self.artist.slug, "track_slug": self.slug},
+        )
 
     @property
     def permalink(self):
         "The Track's URL at Last.fm."
-        return '%s/music/%s/_/%s' % (LASTFM_URL_ROOT,
-                                     self.artist.original_slug,
-                                    self.original_slug)
+        return "%s/music/%s/_/%s" % (
+            LASTFM_URL_ROOT,
+            self.artist.original_slug,
+            self.original_slug,
+        )
 
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return '%s/recording/%s' % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return "%s/recording/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
         else:
             return None
 
@@ -344,5 +380,4 @@ class Track(TimeStampedModelMixin, models.Model):
         """
         Returns the most recent Scrobble object for this Track.
         """
-        return self.scrobbles.order_by('-post_time').first()
-
+        return self.scrobbles.order_by("-post_time").first()

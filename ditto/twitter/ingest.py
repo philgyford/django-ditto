@@ -1,11 +1,8 @@
 # coding: utf-8
-import datetime
 import json
 import os
-import pytz
 
 from .fetch.savers import TweetSaver
-from .models import User
 from ..core.utils import datetime_now
 
 
@@ -18,7 +15,10 @@ class TweetIngester(object):
     Request yours from https://twitter.com/settings/account
 
     Use like:
-        results = TweetIngester.ingest('/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66/data/js/tweets')
+
+    results = TweetIngester.ingest(
+        '/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66/data/js/tweets'
+    )
 
     Where that's the path to the directory containing the *.js files holding
     tweet data.
@@ -48,14 +48,18 @@ class TweetIngester(object):
         self._load_data(directory)
         self._save_tweets()
         if self.tweet_count > 0:
-            return {'success': True,
-                    'tweets': self.tweet_count,
-                    'files': self.file_count, }
+            return {
+                "success": True,
+                "tweets": self.tweet_count,
+                "files": self.file_count,
+            }
         else:
-            return {'success': False,
-                    'tweets': 0,
-                    'files': self.file_count,
-                    'messages': ["No tweets were found"], }
+            return {
+                "success": False,
+                "tweets": 0,
+                "files": self.file_count,
+                "messages": ["No tweets were found"],
+            }
 
     def _load_data(self, directory):
         """Goes through all the *.js files in `directory` and puts the tweet
@@ -73,8 +77,8 @@ class TweetIngester(object):
         """
         try:
             for file in os.listdir(directory):
-                if file.endswith('.js'):
-                    filepath = '%s/%s' % (directory, file)
+                if file.endswith(".js"):
+                    filepath = "%s/%s" % (directory, file)
                     self._get_data_from_file(filepath)
                     self.file_count += 1
         except OSError as e:
@@ -90,12 +94,12 @@ class TweetIngester(object):
         Arguments:
         filespath -- Absolute path to the file.
         """
-        f = open(filepath, 'r')
+        f = open(filepath, "r")
         lines = f.readlines()
         # Remove first line, that contains JavaScript:
         lines = lines[1:]
         try:
-            tweets_data = json.loads(''.join(lines))
+            tweets_data = json.loads("".join(lines))
         except ValueError:
             raise IngestError("Could not load JSON from %s" % filepath)
         else:
@@ -112,4 +116,3 @@ class TweetIngester(object):
         for tweet in self.tweets_data:
             TweetSaver().save_tweet(tweet, self.fetch_time)
             self.tweet_count += 1
-

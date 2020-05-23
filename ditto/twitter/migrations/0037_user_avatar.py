@@ -9,13 +9,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0036_auto_20160505_1156'),
+        ("twitter", "0036_auto_20160505_1156"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, default='', upload_to=ditto.twitter.models.User.avatar_upload_path),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                default="",
+                upload_to=ditto.twitter.models.User.avatar_upload_path,
+            ),
         ),
     ]

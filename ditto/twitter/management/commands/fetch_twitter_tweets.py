@@ -1,5 +1,5 @@
 # coding: utf-8
-from .import FetchTwitterCommand
+from . import FetchTwitterCommand
 from ...fetch.fetchers import RecentTweetsFetcher
 
 
@@ -22,5 +22,3 @@ class Command(FetchTwitterCommand):
 
     def fetch_tweets(self, screen_name, count):
         return RecentTweetsFetcher(screen_name=screen_name).fetch(count=count)
-
-

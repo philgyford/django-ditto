@@ -10,7 +10,7 @@ from django.core.files import File
 
 from . import FetchError
 from .savers import UserSaver, PhotoSaver, PhotosetSaver
-from ..models import Account, Photo, Photoset, User
+from ..models import Account, User
 from ...core.utils import datetime_now
 from ...core.utils.downloader import DownloadException, filedownloader
 
@@ -63,7 +63,7 @@ class Fetcher(object):
 
         # Will be the minimum date of upload/fave for Photos that we'll fetch.
         # By default, set it before Flickr so we get everything.
-        self.min_date = datetime.datetime.strptime('2000-01-01', '%Y-%m-%d')
+        self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
 
         # Will be the results fetched from the API via FlickrAPI.
         self.results = []
@@ -72,32 +72,33 @@ class Fetcher(object):
         self.results_count = 0
 
         # What we'll return:
-        self.return_value = {'fetched': 0}
+        self.return_value = {"fetched": 0}
 
         if isinstance(account, Account):
             if account.user:
-                self.return_value['account'] = account.user.username
+                self.return_value["account"] = account.user.username
             elif account.pk:
-                self.return_value['account'] = 'Account: %s' % str(account)
+                self.return_value["account"] = "Account: %s" % str(account)
             else:
-                self.return_value['account'] = 'Unsaved Account'
+                self.return_value["account"] = "Unsaved Account"
         else:
             raise ValueError("An Account object is required")
 
         if account.has_credentials():
             self.account = account
-            self.api = flickrapi.FlickrAPI(self.account.api_key,
-                                self.account.api_secret, format='parsed-json')
+            self.api = flickrapi.FlickrAPI(
+                self.account.api_key, self.account.api_secret, format="parsed-json"
+            )
         else:
-            self.return_value['success'] = False
-            self.return_value['messages'] = ['Account has no API credentials']
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Account has no API credentials"]
 
     def fetch(self, **kwargs):
         self._fetch_pages(**kwargs)
 
         if self._not_failed():
-            self.return_value['success'] = True
-            self.return_value['fetched'] = self.results_count
+            self.return_value["success"] = True
+            self.return_value["fetched"] = self.results_count
 
         return self.return_value
 
@@ -110,23 +111,21 @@ class Fetcher(object):
         while self.page_number <= self.total_pages and self._not_failed():
             self._fetch_page(**kwargs)
             self.page_number += 1
-            time.sleep(0.5) # Being nice.
+            time.sleep(0.5)  # Being nice.
 
     def _fetch_page(self, **kwargs):
         try:
             self._call_api(**kwargs)
         except FetchError as e:
-            self.return_value['success'] = False
-            self.return_value['messages'] = [
-                                    'Error when calling Flickr API: %s' % e]
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Error when calling Flickr API: %s" % e]
             return
 
         try:
             self._fetch_extra()
         except FetchError as e:
-            self.return_value['success'] = False
-            self.return_value['messages'] = [
-                                    'Error when fetching extra data: %s' % e]
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Error when fetching extra data: %s" % e]
             return
 
         try:
@@ -134,15 +133,15 @@ class Fetcher(object):
             # Clear for the next page:
             self.results = []
         except FetchError as e:
-            self.return_value['success'] = False
-            self.return_value['messages'] = ['Error when saving data: %s' % e]
+            self.return_value["success"] = False
+            self.return_value["messages"] = ["Error when saving data: %s" % e]
             return
 
         return
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""
-        if 'success' not in self.return_value or self.return_value['success'] == True:
+        if "success" not in self.return_value or self.return_value["success"] is True:
             return True
         else:
             return False
@@ -151,8 +150,7 @@ class Fetcher(object):
         """
         Should call self.api.a_function() and set self.results with the results.
         """
-        raise FetchError(
-            "Subclasess of Fetcher should define their own _call_api().")
+        raise FetchError("Subclasess of Fetcher should define their own _call_api().")
 
     def _fetch_extra(self):
         """Can be defined in subclasses to fetch extra data to add to
@@ -165,7 +163,8 @@ class Fetcher(object):
         on its contents.
         """
         raise FetchError(
-            "Subclasses of Fetcher should define their own _save_results().")
+            "Subclasses of Fetcher should define their own _save_results()."
+        )
 
 
 class UserIdFetcher(Fetcher):
@@ -194,11 +193,11 @@ class UserIdFetcher(Fetcher):
         except FlickrError as e:
             raise FetchError("Error when calling test.login(): %s'" % e)
 
-        self.results = [ {'id': info['user']['id']} ]
+        self.results = [{"id": info["user"]["id"]}]
 
     def _save_results(self):
         "Doesn't save any results, just prepares to return the Flickr ID."
-        self.return_value['id'] = self.results[0]['id']
+        self.return_value["id"] = self.results[0]["id"]
         self.results_count = 1
 
 
@@ -210,8 +209,7 @@ class UserFetcher(Fetcher):
         nsid -- A Flickr ID for a user.
         """
         if nsid is None:
-            raise FetchError(
-                        "UserFetcher().fetch() requires a Flickr id (NSID)")
+            raise FetchError("UserFetcher().fetch() requires a Flickr id (NSID)")
 
         return super().fetch(nsid=nsid)
 
@@ -221,16 +219,16 @@ class UserFetcher(Fetcher):
             info = self.api.people.getInfo(user_id=nsid)
         except FlickrError as e:
             raise FetchError(
-                "Error when getting info about User with Flickr ID '%s': %s" %\
-                                                                    (nsid, e))
+                "Error when getting info about User with Flickr ID '%s': %s" % (nsid, e)
+            )
 
         # info has 'person' and 'stat' elements.
-        self.results = [ info['person'] ]
+        self.results = [info["person"]]
 
     def _save_results(self):
         user_obj = UserSaver().save_user(self.results[0], datetime_now())
         self._fetch_and_save_avatar(user_obj)
-        self.return_value['user'] = {'name': user_obj.name}
+        self.return_value["user"] = {"name": user_obj.name}
         self.results_count = 1
 
     def _fetch_and_save_avatar(self, user):
@@ -239,12 +237,15 @@ class UserFetcher(Fetcher):
         user -- User object.
         """
         try:
-            avatar_filepath = filedownloader.download(user.original_icon_url,
-                        ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+            avatar_filepath = filedownloader.download(
+                user.original_icon_url,
+                ["image/jpeg", "image/jpg", "image/png", "image/gif"],
+            )
 
-            user.avatar.save(os.path.basename(avatar_filepath),
-                                File(open(avatar_filepath, 'rb')) )
-        except DownloadException as e:
+            user.avatar.save(
+                os.path.basename(avatar_filepath), File(open(avatar_filepath, "rb"))
+            )
+        except DownloadException:
             pass
 
 
@@ -266,7 +267,8 @@ class PhotosFetcher(Fetcher):
         Should call self.api.a_function() and set self.results with the results.
         """
         raise FetchError(
-            "Subclasess of PhotosFetcher should define their own _call_api().")
+            "Subclasess of PhotosFetcher should define their own _call_api()."
+        )
 
     def _fetch_extra(self):
         """Before saving we need to go through the big list of photos we've
@@ -276,17 +278,19 @@ class PhotosFetcher(Fetcher):
 
         for i, photo in enumerate(self.results):
 
-            self._fetch_user_if_missing(photo['owner'])
+            self._fetch_user_if_missing(photo["owner"])
 
-            extra_results.append({
-                'fetch_time': datetime_now(),
-                # Add the data for the photo's owner:
-                'user_obj': self.fetched_users[ photo['owner'] ],
-                # Get all the info about this photo:
-                'info': self._fetch_photo_info(photo['id']),
-                'sizes': self._fetch_photo_sizes(photo['id']),
-                'exif': self._fetch_photo_exif(photo['id']),
-            })
+            extra_results.append(
+                {
+                    "fetch_time": datetime_now(),
+                    # Add the data for the photo's owner:
+                    "user_obj": self.fetched_users[photo["owner"]],
+                    # Get all the info about this photo:
+                    "info": self._fetch_photo_info(photo["id"]),
+                    "sizes": self._fetch_photo_sizes(photo["id"]),
+                    "exif": self._fetch_photo_exif(photo["id"]),
+                }
+            )
 
         # Replace self.results with our new array that contains more info.
         self.results = extra_results
@@ -298,14 +302,12 @@ class PhotosFetcher(Fetcher):
         flickr_user_id -- The user's ID on Flickr, eg '35034346050@N01'.
         """
         if self.fetched_users.get(flickr_user_id, None) is None:
-            results = UserFetcher(account=self.account).fetch(
-                                                        nsid=flickr_user_id)
-            if results['success'] == False:
-                raise FetchError(results['messages'][0])
+            results = UserFetcher(account=self.account).fetch(nsid=flickr_user_id)
+            if results["success"] is False:
+                raise FetchError(results["messages"][0])
 
             # Get the user we just saved. A bit clunky!
-            self.fetched_users[flickr_user_id] = User.objects.get(
-                                                           nsid=flickr_user_id)
+            self.fetched_users[flickr_user_id] = User.objects.get(nsid=flickr_user_id)
 
     def _fetch_photo_info(self, photo_id):
         """Calls the photos.getInfo() method of the Flickr API and returns the
@@ -314,18 +316,19 @@ class PhotosFetcher(Fetcher):
         photo_id -- The Flickr photo ID.
         """
         try:
-            results = self.api.photos.getInfo(photo_id = photo_id)
+            results = self.api.photos.getInfo(photo_id=photo_id)
         except FlickrError as e:
-            raise FetchError("Error when fetching photo info (photo %s): %s" % \
-                                                                (photo_id, e))
+            raise FetchError(
+                "Error when fetching photo info (photo %s): %s" % (photo_id, e)
+            )
 
         # Each tag on the photo is added by a specific Flickr user.
         # (Usually, but not always, the photo owner.)
         # Check that we've got info about that user in our DB.
-        for tag in results['photo']['tags']['tag']:
-            self._fetch_user_if_missing(tag['author'])
+        for tag in results["photo"]["tags"]["tag"]:
+            self._fetch_user_if_missing(tag["author"])
 
-        return results['photo']
+        return results["photo"]
 
     def _fetch_photo_sizes(self, photo_id):
         """Calls the photos.getSizes() method of the Flickr API and returns the
@@ -334,12 +337,12 @@ class PhotosFetcher(Fetcher):
         photo_id -- The Flickr photo ID.
         """
         try:
-            results = self.api.photos.getSizes(photo_id = photo_id)
+            results = self.api.photos.getSizes(photo_id=photo_id)
         except FlickrError as e:
             raise FetchError(
-                "Error when fetching photo sizes (photo %s): %s" % \
-                                                                (photo_id, e))
-        return results['sizes']
+                "Error when fetching photo sizes (photo %s): %s" % (photo_id, e)
+            )
+        return results["sizes"]
 
     def _fetch_photo_exif(self, photo_id):
         """Calls the photos.getExif() method of the Flickr API and returns the
@@ -348,18 +351,18 @@ class PhotosFetcher(Fetcher):
         photo_id -- The Flickr photo ID.
         """
         try:
-            results = self.api.photos.getExif(photo_id = photo_id)
+            results = self.api.photos.getExif(photo_id=photo_id)
         except FlickrError as e:
             raise FetchError(
-                "Error when fetching photo EXIF data (photo %s): %s" % \
-                                                                (photo_id, e))
-        return results['photo']
+                "Error when fetching photo EXIF data (photo %s): %s" % (photo_id, e)
+            )
+        return results["photo"]
 
     def _save_results(self):
         """Save all the data we've fetched about photos to the DB."""
         saver = PhotoSaver()
         for photo in self.results:
-            p = saver.save_photo(photo)
+            saver.save_photo(photo)
         self.results_count += len(self.results)
 
 
@@ -379,7 +382,7 @@ class RecentPhotosFetcher(PhotosFetcher):
         try:
             self.min_date = datetime_now() - datetime.timedelta(days=days)
         except TypeError:
-            if days != 'all':
+            if days != "all":
                 raise FetchError("days should be a number or 'all'.")
 
         return super().fetch()
@@ -393,26 +396,30 @@ class RecentPhotosFetcher(PhotosFetcher):
 
         try:
             results = self.api.people.getPhotos(
-                                            user_id=self.account.user.nsid,
-                                            min_upload_date=min_unixtime,
-                                            per_page=self.items_per_page,
-                                            page=self.page_number
-                                        )
+                user_id=self.account.user.nsid,
+                min_upload_date=min_unixtime,
+                per_page=self.items_per_page,
+                page=self.page_number,
+            )
         except FlickrError as e:
             raise FetchError(
-                "Error when fetching recent photos (page %s): %s" % \
-                                                        (self.page_number, e))
+                "Error when fetching recent photos (page %s): %s"
+                % (self.page_number, e)
+            )
 
-        if self.page_number == 1 and 'photos' in results and 'pages' in results['photos']:
+        if (
+            self.page_number == 1
+            and "photos" in results
+            and "pages" in results["photos"]
+        ):
             # First time, set the total_pages there are to fetch.
-            self.total_pages = int(results['photos']['pages'])
+            self.total_pages = int(results["photos"]["pages"])
 
         # Add the list of photos' data from this page on to our total list:
-        self.results += results['photos']['photo']
+        self.results += results["photos"]["photo"]
 
 
 class PhotosetsFetcher(Fetcher):
-
     def _call_api(self):
         """Fetch one page of results.
 
@@ -421,21 +428,25 @@ class PhotosetsFetcher(Fetcher):
 
         try:
             results = self.api.photosets.getList(
-                                            user_id=self.account.user.nsid,
-                                            per_page=self.items_per_page,
-                                            page=self.page_number
-                                        )
+                user_id=self.account.user.nsid,
+                per_page=self.items_per_page,
+                page=self.page_number,
+            )
         except FlickrError as e:
             raise FetchError(
-                "Error when fetching photosets (page %s): %s" % \
-                                                        (self.page_number, e))
+                "Error when fetching photosets (page %s): %s" % (self.page_number, e)
+            )
 
-        if self.page_number == 1 and 'photosets' in results and 'pages' in results['photosets']:
+        if (
+            self.page_number == 1
+            and "photosets" in results
+            and "pages" in results["photosets"]
+        ):
             # First time, set the total_pages there are to fetch.
-            self.total_pages = int(results['photosets']['pages'])
+            self.total_pages = int(results["photosets"]["pages"])
 
         # Add the list of photosets' data from this page on to our total list:
-        self.results += results['photosets']['photoset']
+        self.results += results["photosets"]["photoset"]
 
     def _fetch_extra(self):
         """Before saving we need to get the list of photos in each photoset."""
@@ -444,14 +455,16 @@ class PhotosetsFetcher(Fetcher):
 
         for i, photoset in enumerate(self.results):
 
-            photos = self._fetch_photos_in_photoset(photoset['id'])
+            photos = self._fetch_photos_in_photoset(photoset["id"])
 
-            extra_results.append({
-                'fetch_time': datetime_now(),
-                'photoset': photoset,
-                'photos': photos,
-                'user_obj': self.account.user,
-            })
+            extra_results.append(
+                {
+                    "fetch_time": datetime_now(),
+                    "photoset": photoset,
+                    "photos": photos,
+                    "user_obj": self.account.user,
+                }
+            )
 
         # Replace self.results with our new array that contains more info.
         self.results = extra_results
@@ -471,27 +484,28 @@ class PhotosetsFetcher(Fetcher):
 
         photos = []
         page_number = 1
-        total_pages = 1 # Will get set to its proper value below.
+        total_pages = 1  # Will get set to its proper value below.
 
         while page_number <= total_pages:
             try:
                 results = self.api.photosets.getPhotos(
-                                                photoset_id=photoset_id,
-                                                user_id=self.account.user.nsid,
-                                                per_page=self.items_per_page,
-                                                page=page_number
-                                            )
+                    photoset_id=photoset_id,
+                    user_id=self.account.user.nsid,
+                    per_page=self.items_per_page,
+                    page=page_number,
+                )
             except FlickrError as e:
                 raise FetchError(
-                    "Error when fetching photos in photoset %s (page %s): %s"%\
-                                                (photoset_id, page_number, e))
+                    "Error when fetching photos in photoset %s (page %s): %s"
+                    % (photoset_id, page_number, e)
+                )
 
-            if 'photoset' in results and 'photo' in results['photoset']:
-                total_pages = results['photoset']['pages']
-                photos += results['photoset']['photo']
+            if "photoset" in results and "photo" in results["photoset"]:
+                total_pages = results["photoset"]["pages"]
+                photos += results["photoset"]["photo"]
 
             page_number += 1
-            time.sleep(0.5) # Being nice.
+            time.sleep(0.5)  # Being nice.
 
         return photos
 
@@ -499,6 +513,5 @@ class PhotosetsFetcher(Fetcher):
         """Save all the data we've fetched about photosets to the DB."""
         saver = PhotosetSaver()
         for photoset in self.results:
-            p = saver.save_photoset(photoset)
+            saver.save_photoset(photoset)
         self.results_count += len(self.results)
-

@@ -10,7 +10,7 @@ def set_post_year(apps, schema_editor):
     Re-saves every scrobble, so that its auto-generated `post_year` can
     be set.
     """
-    Scrobble = apps.get_model('lastfm', 'Scrobble')
+    Scrobble = apps.get_model("lastfm", "Scrobble")
     for row in Scrobble.objects.all():
         row.save()
 
@@ -18,15 +18,19 @@ def set_post_year(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lastfm', '0005_auto_20161117_1622'),
+        ("lastfm", "0005_auto_20161117_1622"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scrobble',
-            name='post_year',
-            field=models.PositiveSmallIntegerField(blank=True, db_index=True, help_text='Set automatically on save', null=True),
+            model_name="scrobble",
+            name="post_year",
+            field=models.PositiveSmallIntegerField(
+                blank=True,
+                db_index=True,
+                help_text="Set automatically on save",
+                null=True,
+            ),
         ),
         migrations.RunPython(set_post_year, reverse_code=migrations.RunPython.noop),
     ]
-

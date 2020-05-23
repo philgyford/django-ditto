@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0041_remove_media_tweet'),
+        ("twitter", "0041_remove_media_tweet"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='media',
-            name='tweets',
-            field=models.ManyToManyField(related_name='media', to='twitter.Tweet'),
+            model_name="media",
+            name="tweets",
+            field=models.ManyToManyField(related_name="media", to="twitter.Tweet"),
         ),
     ]

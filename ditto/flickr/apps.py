@@ -2,10 +2,9 @@ from django.apps import AppConfig
 
 
 class DittoFlickrConfig(AppConfig):
-    name = 'ditto.flickr'
+    name = "ditto.flickr"
     verbose_name = "Ditto Flickr"
 
     def ready(self):
         # import ditto.flickr.signals
-        import ditto.flickr.checks
-
+        import ditto.flickr.checks  # noqa: F401

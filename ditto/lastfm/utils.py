@@ -1,4 +1,3 @@
-
 from urllib.parse import quote_plus
 
 
@@ -26,4 +25,3 @@ def slugify_name(name):
         name = name.replace(find, repl)
 
     return name
-

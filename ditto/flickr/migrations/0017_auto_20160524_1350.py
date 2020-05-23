@@ -9,18 +9,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0016_photo_video_original_file'),
+        ("flickr", "0016_photo_video_original_file"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, default='', upload_to=ditto.flickr.models.User.avatar_upload_path),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                default="",
+                upload_to=ditto.flickr.models.User.avatar_upload_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='photo',
-            name='original_file',
-            field=models.ImageField(blank=True, default='', upload_to=ditto.flickr.models.Photo.upload_path),
+            model_name="photo",
+            name="original_file",
+            field=models.ImageField(
+                blank=True, default="", upload_to=ditto.flickr.models.Photo.upload_path
+            ),
         ),
     ]

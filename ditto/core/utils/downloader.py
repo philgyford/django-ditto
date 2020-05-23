@@ -19,7 +19,7 @@ class FileDownloader(object):
     filepath would be like '/tmp/image.jpg'
     """
 
-    path = '/tmp/'
+    path = "/tmp/"
 
     def download(self, url, acceptable_content_types):
         """
@@ -38,30 +38,33 @@ class FileDownloader(object):
             r = requests.get(url, stream=True)
             if r.status_code == 200:
                 try:
-                    if r.headers['Content-Type'] in acceptable_content_types:
+                    if r.headers["Content-Type"] in acceptable_content_types:
                         # Where we'll temporarily save the file:
                         filename = self.make_filename(url, r.headers)
-                        filepath = '%s%s' % (self.path, filename)
+                        filepath = "%s%s" % (self.path, filename)
                         # Save the file there:
-                        with open(filepath, 'wb') as f:
+                        with open(filepath, "wb") as f:
                             r.raw.decode_content = True
                             shutil.copyfileobj(r.raw, f)
                         return filepath
 
                     else:
                         raise DownloadException(
-                                "Invalid content type (%s) when fetching %s"%\
-                                            (r.headers['content_type'], url))
+                            "Invalid content type (%s) when fetching %s"
+                            % (r.headers["content_type"], url)
+                        )
                 except KeyError:
                     raise DownloadException(
-                        "No content_type headers found when fetching %s" % url)
+                        "No content_type headers found when fetching %s" % url
+                    )
             else:
                 raise DownloadException(
-                                "Got status code %s when fetching %s" % \
-                                                        (r.status_code, url))
+                    "Got status code %s when fetching %s" % (r.status_code, url)
+                )
         except requests.exceptions.RequestException as e:
             raise DownloadException(
-                        "Something when wrong when fetching %s: %s" % (url, e))
+                "Something when wrong when fetching %s: %s" % (url, e)
+            )
 
     def make_filename(self, url, headers={}):
         """
@@ -79,14 +82,13 @@ class FileDownloader(object):
         # Should work for photos:
         filename = os.path.basename(url)
 
-        if filename == '':
+        if filename == "":
             # Probably a Flickr video, so we have to get the filename from
             # headers:
             try:
                 # Could be like 'attachment; filename=26897200312.avi'
-                disposition = headers['Content-Disposition']
-                m = re.search(
-                            'filename\=(.*?)$', headers['Content-Disposition'])
+                headers["Content-Disposition"]
+                m = re.search(r"filename\=(.*?)$", headers["Content-Disposition"])
                 try:
                     filename = m.group(1)
                 except (AttributeError, IndexError):
@@ -96,5 +98,5 @@ class FileDownloader(object):
 
         return filename
 
-filedownloader = FileDownloader()
 
+filedownloader = FileDownloader()

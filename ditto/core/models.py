@@ -8,10 +8,12 @@ from .utils import truncate_string
 
 class TimeStampedModelMixin(models.Model):
     "Should be mixed in to all models."
-    time_created = models.DateTimeField(auto_now_add=True,
-                help_text="The time this item was created in the database.")
-    time_modified = models.DateTimeField(auto_now=True,
-                help_text="The time this item was last saved to the database.")
+    time_created = models.DateTimeField(
+        auto_now_add=True, help_text="The time this item was created in the database."
+    )
+    time_modified = models.DateTimeField(
+        auto_now=True, help_text="The time this item was last saved to the database."
+    )
 
     class Meta:
         abstract = True
@@ -65,8 +67,7 @@ class DiffModelMixin(object):
 
     @property
     def _dict(self):
-        return model_to_dict(self, fields=[field.name for field in
-                             self._meta.fields])
+        return model_to_dict(self, fields=[field.name for field in self._meta.fields])
 
 
 class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -81,33 +82,48 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # Should be overridden for child classes.
     # eg, 'flickr_photo', 'twitter_tweet', etc.
     # Used in templates.
-    ditto_item_name = 'set__ditto_item_name__in_child_class'
+    ditto_item_name = "set__ditto_item_name__in_child_class"
 
     title = models.CharField(blank=True, max_length=255)
-    permalink = models.URLField(blank=True,
-                    help_text="URL of the item on the service's website.")
+    permalink = models.URLField(
+        blank=True, help_text="URL of the item on the service's website."
+    )
     # Ensures that all children have a common short piece of text for display:
-    summary = models.CharField(blank=True, max_length=255,
-        help_text="eg, Brief summary or excerpt of item's text content. No linebreaks or HTML.")
-    is_private = models.BooleanField(default=False,
-        help_text="If true, this item will not be shown on public-facing pages.")
-    fetch_time = models.DateTimeField(null=True, blank=True,
-                        help_text="The time the item's data was last fetched.")
+    summary = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text=(
+            "eg, Brief summary or excerpt of item's text content. "
+            "No linebreaks or HTML."
+        ),
+    )
+    is_private = models.BooleanField(
+        default=False,
+        help_text="If true, this item will not be shown on public-facing pages.",
+    )
+    fetch_time = models.DateTimeField(
+        null=True, blank=True, help_text="The time the item's data was last fetched."
+    )
 
-    post_time = models.DateTimeField(null=True, blank=True, db_index=True,
-        help_text="The time the item was originally posted/created on its service.")
+    post_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="The time the item was originally posted/created on its service.",
+    )
     post_year = models.PositiveSmallIntegerField(
-                                    null=True, blank=True, db_index=True,
-                                    help_text="Set automatically on save")
+        null=True, blank=True, db_index=True, help_text="Set automatically on save"
+    )
 
     # Obviously not relevant to some items, like Bookmarks.
-    latitude = models.DecimalField(null=True, blank=True,
-                                            max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(null=True, blank=True,
-                                            max_digits=9, decimal_places=6)
+    latitude = models.DecimalField(
+        null=True, blank=True, max_digits=9, decimal_places=6
+    )
+    longitude = models.DecimalField(
+        null=True, blank=True, max_digits=9, decimal_places=6
+    )
 
-    raw = models.TextField(blank=True,
-                                    help_text="eg, the raw JSON from the API.")
+    raw = models.TextField(blank=True, help_text="eg, the raw JSON from the API.")
 
     # All Items (eg, used in Admin):
     objects = models.Manager()
@@ -117,7 +133,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     class Meta:
         abstract = True
-        get_latest_by = 'post_time'
+        get_latest_by = "post_time"
 
     def __str__(self):
         return self.title
@@ -137,16 +153,20 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
         e.g.:
             return self.description
         """
-        return ''
+        return ""
 
     def _make_summary(self):
         """
         Returns the string to be used for the `summary` property.
         """
-        return truncate_string(self._summary_source(),
-                                strip_html=True,
-                                chars=255,
-                                truncate='…',
-                                at_word_boundary=True).replace('\n', ' ')\
-                                                      .replace('\r', ' ')
-
+        return (
+            truncate_string(
+                self._summary_source(),
+                strip_html=True,
+                chars=255,
+                truncate="…",
+                at_word_boundary=True,
+            )
+            .replace("\n", " ")
+            .replace("\r", " ")
+        )

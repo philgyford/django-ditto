@@ -59,71 +59,78 @@ class WithScrobbleCountsManager(models.Manager):
         Include a `min_post_time` to only include Scrobbles after then.
         Include a `max_post_time` to only include Scrobbles before then.
         """
-        account         = kwargs.get('account', None)
-        min_post_time   = kwargs.get('min_post_time', None)
-        max_post_time   = kwargs.get('max_post_time', None)
-        album           = kwargs.get('album', None)
-        artist          = kwargs.get('artist', None)
-        track           = kwargs.get('track', None)
+        account = kwargs.get("account", None)
+        min_post_time = kwargs.get("min_post_time", None)
+        max_post_time = kwargs.get("max_post_time", None)
+        album = kwargs.get("album", None)
+        artist = kwargs.get("artist", None)
+        track = kwargs.get("track", None)
 
         if album and not self.is_filterable_by_album:
-            raise ValueError('This is not filterable by album')
+            raise ValueError("This is not filterable by album")
 
         if artist and not self.is_filterable_by_artist:
-            raise ValueError('This is not filterable by artist')
+            raise ValueError("This is not filterable by artist")
 
         if track and not self.is_filterable_by_track:
-            raise ValueError('This is not filterable by track')
+            raise ValueError("This is not filterable by track")
 
-        if account is not None and account.__class__.__name__ != 'Account':
-            raise TypeError('account must be an Account instance, '
-                            'not a %s' % type(account))
+        if account is not None and account.__class__.__name__ != "Account":
+            raise TypeError(
+                "account must be an Account instance, " "not a %s" % type(account)
+            )
 
-        if album is not None and album.__class__.__name__ != 'Album':
-            raise TypeError('album must be an Album instance, '
-                            'not a %s' % type(album))
+        if album is not None and album.__class__.__name__ != "Album":
+            raise TypeError(
+                "album must be an Album instance, " "not a %s" % type(album)
+            )
 
-        if artist is not None and artist.__class__.__name__ != 'Artist':
-            raise TypeError('artist must be an Artist instance, '
-                            'not a %s' % type(account))
+        if artist is not None and artist.__class__.__name__ != "Artist":
+            raise TypeError(
+                "artist must be an Artist instance, " "not a %s" % type(account)
+            )
 
         if min_post_time is not None and type(min_post_time) is not datetime:
-            raise TypeError('min_post_time must be a datetime.datetime, '
-                            'not a %s' % type(min_post_time))
+            raise TypeError(
+                "min_post_time must be a datetime.datetime, "
+                "not a %s" % type(min_post_time)
+            )
 
         if max_post_time is not None and type(max_post_time) is not datetime:
-            raise TypeError('max_post_time must be a datetime.datetime, '
-                            'not a %s' % type(max_post_time))
+            raise TypeError(
+                "max_post_time must be a datetime.datetime, "
+                "not a %s" % type(max_post_time)
+            )
 
         filter_kwargs = {}
 
         if account:
-            filter_kwargs['scrobbles__account'] = account
+            filter_kwargs["scrobbles__account"] = account
 
         if album:
-            filter_kwargs['scrobbles__album'] = album
+            filter_kwargs["scrobbles__album"] = album
 
         if artist:
-            filter_kwargs['scrobbles__artist'] = artist
+            filter_kwargs["scrobbles__artist"] = artist
 
         if track:
-            filter_kwargs['scrobbles__track'] = track
+            filter_kwargs["scrobbles__track"] = track
 
         if min_post_time and max_post_time:
-            filter_kwargs['scrobbles__post_time__gte'] = min_post_time
-            filter_kwargs['scrobbles__post_time__lte'] = max_post_time
+            filter_kwargs["scrobbles__post_time__gte"] = min_post_time
+            filter_kwargs["scrobbles__post_time__lte"] = max_post_time
 
         elif min_post_time:
-            filter_kwargs['scrobbles__post_time__gte'] = min_post_time
+            filter_kwargs["scrobbles__post_time__gte"] = min_post_time
 
         elif max_post_time:
-            filter_kwargs['scrobbles__post_time__lte'] = max_post_time
+            filter_kwargs["scrobbles__post_time__lte"] = max_post_time
 
         qs = self.filter(**filter_kwargs)
 
         return qs.annotate(
-                scrobble_count = models.Count('scrobbles', distinct=True)
-            ).order_by('-scrobble_count')
+            scrobble_count=models.Count("scrobbles", distinct=True)
+        ).order_by("-scrobble_count")
 
 
 class TracksManager(WithScrobbleCountsManager):
@@ -131,14 +138,17 @@ class TracksManager(WithScrobbleCountsManager):
     Adds a `scrobble_count` field to the Track objects.
     See WithScrobbleCountsManager for docs.
     """
+
     # We can't filter a list of Tracks by Tracks.
     is_filterable_by_track = False
 
     def with_scrobble_counts(self, **kwargs):
         "Pre-fetch all the Tracks' Artists."
-        qs = super(TracksManager, self)\
-                    .with_scrobble_counts(**kwargs)\
-                    .prefetch_related('artist')
+        qs = (
+            super(TracksManager, self)
+            .with_scrobble_counts(**kwargs)
+            .prefetch_related("artist")
+        )
         return qs
 
 
@@ -147,14 +157,17 @@ class AlbumsManager(WithScrobbleCountsManager):
     Adds a `scrobble_count` field to the Album objects.
     See WithScrobbleCountsManager for docs.
     """
+
     # We can't filter a list of Albums by Album.
     is_filterable_by_album = False
 
     def with_scrobble_counts(self, **kwargs):
         "Pre-fetch all the Albums' Artists."
-        qs = super(AlbumsManager, self)\
-                    .with_scrobble_counts(**kwargs)\
-                    .prefetch_related('artist')
+        qs = (
+            super(AlbumsManager, self)
+            .with_scrobble_counts(**kwargs)
+            .prefetch_related("artist")
+        )
         return qs
 
 
@@ -163,6 +176,6 @@ class ArtistsManager(WithScrobbleCountsManager):
     Adds a `scrobble_count` field to the Artist objects.
     See WithScrobbleCountsManager for docs.
     """
+
     # We can't filter a list of Artists by Artist.
     is_filterable_by_artist = False
-

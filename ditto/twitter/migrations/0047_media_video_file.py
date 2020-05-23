@@ -9,13 +9,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('twitter', '0046_auto_20160615_1038'),
+        ("twitter", "0046_auto_20160615_1038"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='media',
-            name='video_file',
-            field=models.FileField(blank=True, default='', help_text='MP4 file. Only used for Animated GIFs', upload_to=ditto.twitter.models.Media.upload_path),
+            model_name="media",
+            name="video_file",
+            field=models.FileField(
+                blank=True,
+                default="",
+                help_text="MP4 file. Only used for Animated GIFs",
+                upload_to=ditto.twitter.models.Media.upload_path,
+            ),
         ),
     ]

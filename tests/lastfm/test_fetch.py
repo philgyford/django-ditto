@@ -8,10 +8,18 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
-from ditto.lastfm.factories import AccountFactory, AlbumFactory,\
-    ArtistFactory, ScrobbleFactory, TrackFactory
-from ditto.lastfm.fetch import FetchError, ScrobblesFetcher,\
-    ScrobblesMultiAccountFetcher
+from ditto.lastfm.factories import (
+    AccountFactory,
+    AlbumFactory,
+    ArtistFactory,
+    ScrobbleFactory,
+    TrackFactory,
+)
+from ditto.lastfm.fetch import (
+    FetchError,
+    ScrobblesFetcher,
+    ScrobblesMultiAccountFetcher,
+)
 from ditto.lastfm.models import Album, Artist, Scrobble, Track
 
 
@@ -21,15 +29,15 @@ class ScrobblesFetcherTestCase(TestCase):
     """
 
     def setUp(self):
-        self.fetcher = ScrobblesFetcher(account=AccountFactory(
-                                        username='bob', realname='Bob Ferris'))
+        self.fetcher = ScrobblesFetcher(
+            account=AccountFactory(username="bob", realname="Bob Ferris")
+        )
 
         # Patch the _send_request() method:
-        self.send_request_patch = patch.object(
-                                            ScrobblesFetcher, '_send_request')
+        self.send_request_patch = patch.object(ScrobblesFetcher, "_send_request")
         self.send_request = self.send_request_patch.start()
         self.send_request.return_value = []
-        self.sleep_patch = patch('time.sleep')
+        self.sleep_patch = patch("time.sleep")
         self.sleep = self.sleep_patch.start()
 
     def tearDown(self):
@@ -39,57 +47,55 @@ class ScrobblesFetcherTestCase(TestCase):
     def test_requires_account_argument(self):
         "__init__ should throw error with no account argument."
         with self.assertRaises(TypeError):
-            result = ScrobblesFetcher()
+            ScrobblesFetcher()
 
     def test_requires_valid_account_object(self):
         "__init__ should throw error with no Account object."
         with self.assertRaises(ValueError):
-            result = ScrobblesFetcher(account=None)
+            ScrobblesFetcher(account=None)
 
     def test_no_credentials(self):
         "__init__ should return error if Account has no API creds."
-        account = AccountFactory(api_key='')
+        account = AccountFactory(api_key="")
         result = ScrobblesFetcher(account=account).fetch()
-        self.assertFalse(result['success'])
-        self.assertEqual(result['messages'],
-                        ['Account has no API credentials'])
+        self.assertFalse(result["success"])
+        self.assertEqual(result["messages"], ["Account has no API credentials"])
 
     def test_will_not_fetch_inactive_accounts(self):
-        account = AccountFactory(is_active=False, username='terry')
+        account = AccountFactory(is_active=False, username="terry")
         result = ScrobblesFetcher(account=account).fetch()
-        self.assertFalse(result['success'])
-        self.assertEqual(result['messages'],
-                        ['The Account terry is currently marked as inactive.'])
+        self.assertFalse(result["success"])
+        self.assertEqual(
+            result["messages"], ["The Account terry is currently marked as inactive."]
+        )
 
     def test_raises_error_with_invalid_fetch_type(self):
         "fetch only accepts valid fetch_type's."
         with self.assertRaises(ValueError):
-            self.fetcher.fetch(fetch_type='bibble')
+            self.fetcher.fetch(fetch_type="bibble")
 
     def test_does_not_raise_error_with_valid_fetch_type(self):
         try:
-            self.fetcher.fetch(fetch_type='all')
+            self.fetcher.fetch(fetch_type="all")
         except ValueError:
-            self.fail(
-                "ScrobblesFetcher().fetch() raised ValueError unexpectedly")
+            self.fail("ScrobblesFetcher().fetch() raised ValueError unexpectedly")
 
     def test_raises_error_with_non_integer_days(self):
         "When fetching for a number of days"
         with self.assertRaises(ValueError):
-            self.fetcher.fetch(fetch_type='days', days='oops')
+            self.fetcher.fetch(fetch_type="days", days="oops")
 
     def test_no_error_with_integer_days(self):
         "When fetching for a number of days"
         try:
-            self.fetcher.fetch(fetch_type='days', days=3)
+            self.fetcher.fetch(fetch_type="days", days=3)
         except ValueError:
-            self.fail(
-                "ScrobblesFetcher().fetch() raised ValueError unexpectedly")
+            self.fail("ScrobblesFetcher().fetch() raised ValueError unexpectedly")
 
     def test_returns_account(self):
         "Returned data should include the account name"
         results = self.fetcher.fetch()
-        self.assertEqual(results['account'], 'Bob Ferris')
+        self.assertEqual(results["account"], "Bob Ferris")
 
     def test_get_slugs_with_semicolon(self):
         """Successfully handles a URL that contains a semicolon.
@@ -98,8 +104,9 @@ class ScrobblesFetcherTestCase(TestCase):
         alternative to '&' for separating query strings.
         """
         artist_slug, track_slug = self.fetcher._get_slugs(
-                            'http://www.last.fm/music/iamamiwhoami/_/;+john')
-        self.assertEqual(track_slug, ';+john')
+            "http://www.last.fm/music/iamamiwhoami/_/;+john"
+        )
+        self.assertEqual(track_slug, ";+john")
 
 
 class ScrobblesFetcherSendTestCase(TestCase):
@@ -108,12 +115,12 @@ class ScrobblesFetcherSendTestCase(TestCase):
     mock the requests.
     """
 
-    fixture_path = 'tests/lastfm/fixtures/api/'
+    fixture_path = "tests/lastfm/fixtures/api/"
 
     def setUp(self):
-        self.account = AccountFactory(username='bob', api_key='1234')
+        self.account = AccountFactory(username="bob", api_key="1234")
         self.fetcher = ScrobblesFetcher(account=self.account)
-        self.sleep_patch = patch('time.sleep')
+        self.sleep_patch = patch("time.sleep")
         self.sleep = self.sleep_patch.start()
 
     def tearDown(self):
@@ -125,7 +132,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         fixture_name -- eg 'messages' to load 'messages.json'.
         Returns the JSON text.
         """
-        json_file = open('%s%s.json' % (self.fixture_path, fixture_name))
+        json_file = open("%s%s.json" % (self.fixture_path, fixture_name))
         json_data = json_file.read()
         json_file.close()
         return json_data
@@ -153,7 +160,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
             status=status,
             body=body,
             match_querystring=True,
-            content_type='application/json; charset=utf-8'
+            content_type="application/json; charset=utf-8",
         )
 
     def add_recent_tracks_response(self, body=None, page=1, status=200, from_time=None):
@@ -164,14 +171,17 @@ class ScrobblesFetcherSendTestCase(TestCase):
         from_time -- A UTC unixtime value.
         """
 
-        url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=bob&api_key=1234&format=json&page=%s&limit=200' % page
+        url = (
+            "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=bob&"
+            "api_key=1234&format=json&page=%s&limit=200" % page
+        )
 
         if from_time is not None:
-            url += '&from=%s' % from_time
+            url += "&from=%s" % from_time
 
         if body is None:
             # Default success response
-            body = self.load_raw_fixture('user_getrecenttracks')
+            body = self.load_raw_fixture("user_getrecenttracks")
 
         self.add_response(body=body, url=url, status=status)
 
@@ -180,34 +190,38 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "If the API request fails, fetch() should return an error."
         self.add_recent_tracks_response(status=500)
         results = self.fetcher.fetch()
-        self.assertFalse(results['success'])
+        self.assertFalse(results["success"])
         self.assertIn(
-                'Error when fetching Scrobbles (page 1): 500 Server Error',
-                results['messages'][0])
+            "Error when fetching Scrobbles (page 1): 500 Server Error",
+            results["messages"][0],
+        )
 
     @responses.activate
     def test_returns_error_when_request_contains_error(self):
         "If API response contains an error message, fetch() should return it."
         self.add_recent_tracks_response(
-                            body='{"error": 10, "message": "Invalid API Key"}')
+            body='{"error": 10, "message": "Invalid API Key"}'
+        )
         results = self.fetcher.fetch()
-        self.assertFalse(results['success'])
+        self.assertFalse(results["success"])
         self.assertIn(
-                'Error 10 when fetching Scrobbles (page 1): Invalid API Key',
-                results['messages'][0])
+            "Error 10 when fetching Scrobbles (page 1): Invalid API Key",
+            results["messages"][0],
+        )
 
     @responses.activate
     def test_sends_from_time_correctly_for_recent(self):
         "Sends the correct min time to API if we only want recent results."
         # We should fetch results from this scrobble's post_time onwards:
-        scrobble = ScrobbleFactory(
+        ScrobbleFactory(
             post_time=datetime.datetime.strptime(
-                '2015-08-11 12:00:00', '%Y-%m-%d %H:%M:%S').replace(
-                                                            tzinfo=pytz.utc))
+                "2015-08-11 12:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=pytz.utc)
+        )
         # Timestamp for 2015-08-11 12:00:00 UTC:
         self.add_recent_tracks_response(from_time=1439294400)
-        self.fetcher.fetch(fetch_type='recent')
-        self.assertIn('from=1439294400', responses.calls[0].request.url)
+        self.fetcher.fetch(fetch_type="recent")
+        self.assertIn("from=1439294400", responses.calls[0].request.url)
 
     @responses.activate
     @freeze_time("2015-08-14 12:00:00", tz_offset=0)
@@ -215,21 +229,21 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Sends the correct min time to API if we only want n days' results."
         # Timestamp for 2015-08-11 12:00:00 UTC:
         self.add_recent_tracks_response(from_time=1439294400)
-        self.fetcher.fetch(fetch_type='days', days=3)
-        self.assertIn('from=1439294400', responses.calls[0].request.url)
+        self.fetcher.fetch(fetch_type="days", days=3)
+        self.assertIn("from=1439294400", responses.calls[0].request.url)
 
     @responses.activate
     def test_requests_multiple_pages(self):
         "Fetches multiple pages of results if there are multiple."
-        body = self.load_fixture('user_getrecenttracks')
-        body['recenttracks']['@attr']['totalPages'] = "2"
+        body = self.load_fixture("user_getrecenttracks")
+        body["recenttracks"]["@attr"]["totalPages"] = "2"
         self.add_recent_tracks_response(body=json.dumps(body))
-        body['recenttracks']['@attr']['page'] = "2"
+        body["recenttracks"]["@attr"]["page"] = "2"
         self.add_recent_tracks_response(body=json.dumps(body), page=2)
         self.fetcher.fetch()
         self.assertEqual(len(responses.calls), 2)
-        self.assertIn('page=1', responses.calls[0].request.url)
-        self.assertIn('page=2', responses.calls[1].request.url)
+        self.assertIn("page=1", responses.calls[0].request.url)
+        self.assertIn("page=2", responses.calls[1].request.url)
 
     @responses.activate
     def test_returns_correct_scrobble_count(self):
@@ -237,136 +251,136 @@ class ScrobblesFetcherSendTestCase(TestCase):
         self.add_recent_tracks_response()
         results = self.fetcher.fetch()
         # We have this many finished scrobbles in our JSON fixture:
-        self.assertEqual(results['fetched'], 3)
+        self.assertEqual(results["fetched"], 3)
 
     @responses.activate
     def test_doesnt_add_nowplaying_track(self):
         "Doesn't save data from a currently-playing scrobble."
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artists = Artist.objects.filter(name='K.Flay')
+        self.fetcher.fetch()
+        artists = Artist.objects.filter(name="K.Flay")
         self.assertEqual(len(artists), 0)
 
     @responses.activate
     def test_creates_new_artist(self):
         "Creates a new Artist if it doesn't exist"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artists = Artist.objects.filter(slug='lou+reed')
+        self.fetcher.fetch()
+        artists = Artist.objects.filter(slug="lou+reed")
         self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].slug, 'lou+reed')
-        self.assertEqual(artists[0].original_slug, 'Lou+Reed')
-        self.assertEqual(artists[0].name, 'Lou Reed')
-        self.assertEqual(artists[0].mbid,
-                        '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
+        self.assertEqual(artists[0].slug, "lou+reed")
+        self.assertEqual(artists[0].original_slug, "Lou+Reed")
+        self.assertEqual(artists[0].name, "Lou Reed")
+        self.assertEqual(artists[0].mbid, "9d1ebcfe-4c15-4d18-95d3-d919898638a1")
 
     @responses.activate
     def test_updates_existing_artist(self):
         "Doesn't create a new Artist if it already exists"
-        ArtistFactory(slug='lou+reed', mbid='')
+        ArtistFactory(slug="lou+reed", mbid="")
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artists = Artist.objects.filter(slug='lou+reed')
+        self.fetcher.fetch()
+        artists = Artist.objects.filter(slug="lou+reed")
         self.assertEqual(len(artists), 1)
-        self.assertEqual(artists[0].slug, 'lou+reed')
-        self.assertEqual(artists[0].original_slug, 'Lou+Reed')
-        self.assertEqual(artists[0].name, 'Lou Reed')
-        self.assertEqual(artists[0].mbid,
-                        '9d1ebcfe-4c15-4d18-95d3-d919898638a1')
+        self.assertEqual(artists[0].slug, "lou+reed")
+        self.assertEqual(artists[0].original_slug, "Lou+Reed")
+        self.assertEqual(artists[0].name, "Lou Reed")
+        self.assertEqual(artists[0].mbid, "9d1ebcfe-4c15-4d18-95d3-d919898638a1")
 
     @responses.activate
     def test_ignores_case_when_finding_artist(self):
         "Should match an Artist with slug 'Lou+Reed' with 'lou+reed'."
-        ArtistFactory(slug='lou+reed', name='Lou Reed', mbid='')
+        ArtistFactory(slug="lou+reed", name="Lou Reed", mbid="")
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artists = Artist.objects.filter(name='Lou Reed')
+        self.fetcher.fetch()
+        artists = Artist.objects.filter(name="Lou Reed")
         self.assertEqual(len(artists), 1)
 
     @responses.activate
     def test_creates_new_track(self):
         "Creates a new Track if it doesn't exist"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        loureed = Artist.objects.get(slug='lou+reed')
-        tracks = Track.objects.filter(name='Make Up', slug='make+up')
+        self.fetcher.fetch()
+        loureed = Artist.objects.get(slug="lou+reed")
+        tracks = Track.objects.filter(name="Make Up", slug="make+up")
         self.assertEqual(len(tracks), 1)
-        self.assertEqual(tracks[0].name,'Make Up')
-        self.assertEqual(tracks[0].slug,'make+up')
-        self.assertEqual(tracks[0].original_slug,'Make+Up')
-        self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
+        self.assertEqual(tracks[0].name, "Make Up")
+        self.assertEqual(tracks[0].slug, "make+up")
+        self.assertEqual(tracks[0].original_slug, "Make+Up")
+        self.assertEqual(tracks[0].mbid, "8e73b23a-6a01-4743-b414-047974f66e22")
         self.assertEqual(tracks[0].artist, loureed)
 
     @responses.activate
     def test_updates_existing_track(self):
         "Doesn't create a new Track if it already exists"
-        loureed = ArtistFactory(slug='lou+reed')
-        TrackFactory(artist=loureed, slug='make+up')
+        loureed = ArtistFactory(slug="lou+reed")
+        TrackFactory(artist=loureed, slug="make+up")
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        tracks = Track.objects.filter(slug='make+up')
+        self.fetcher.fetch()
+        tracks = Track.objects.filter(slug="make+up")
         self.assertEqual(len(tracks), 1)
-        self.assertEqual(tracks[0].name,'Make Up')
-        self.assertEqual(tracks[0].slug,'make+up')
-        self.assertEqual(tracks[0].original_slug,'Make+Up')
-        self.assertEqual(tracks[0].mbid,'8e73b23a-6a01-4743-b414-047974f66e22')
+        self.assertEqual(tracks[0].name, "Make Up")
+        self.assertEqual(tracks[0].slug, "make+up")
+        self.assertEqual(tracks[0].original_slug, "Make+Up")
+        self.assertEqual(tracks[0].mbid, "8e73b23a-6a01-4743-b414-047974f66e22")
         self.assertEqual(tracks[0].artist, loureed)
 
     @responses.activate
     def test_creates_new_album(self):
         "Creates a new Album if it doesn't exist"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        loureed = Artist.objects.get(slug='lou+reed')
-        albums = Album.objects.filter(slug='transformer')
+        self.fetcher.fetch()
+        loureed = Artist.objects.get(slug="lou+reed")
+        albums = Album.objects.filter(slug="transformer")
         self.assertEqual(len(albums), 1)
-        self.assertEqual(albums[0].slug,'transformer')
-        self.assertEqual(albums[0].original_slug,'Transformer')
-        self.assertEqual(albums[0].name,'Transformer')
-        self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
+        self.assertEqual(albums[0].slug, "transformer")
+        self.assertEqual(albums[0].original_slug, "Transformer")
+        self.assertEqual(albums[0].name, "Transformer")
+        self.assertEqual(albums[0].mbid, "4ee40d97-630c-3f0d-9ea2-d49fa253c354")
         self.assertEqual(albums[0].artist, loureed)
 
     @responses.activate
     def test_updates_existing_album(self):
         "Doesn't create a new Album if it already exists"
-        loureed = ArtistFactory(slug='lou+reed')
-        AlbumFactory(artist=loureed, slug='transformer')
+        loureed = ArtistFactory(slug="lou+reed")
+        AlbumFactory(artist=loureed, slug="transformer")
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        albums = Album.objects.filter(slug='transformer')
+        self.fetcher.fetch()
+        albums = Album.objects.filter(slug="transformer")
         self.assertEqual(len(albums), 1)
-        self.assertEqual(albums[0].name,'Transformer')
-        self.assertEqual(albums[0].slug,'transformer')
-        self.assertEqual(albums[0].original_slug,'Transformer')
-        self.assertEqual(albums[0].mbid,'4ee40d97-630c-3f0d-9ea2-d49fa253c354')
+        self.assertEqual(albums[0].name, "Transformer")
+        self.assertEqual(albums[0].slug, "transformer")
+        self.assertEqual(albums[0].original_slug, "Transformer")
+        self.assertEqual(albums[0].mbid, "4ee40d97-630c-3f0d-9ea2-d49fa253c354")
         self.assertEqual(albums[0].artist, loureed)
 
     @responses.activate
     def test_does_not_create_album_if_it_has_no_name(self):
         "Doesn't create a new Album if the scrobble has none"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        artist = Artist.objects.get(slug='%5bunknown%5d')
+        self.fetcher.fetch()
+        artist = Artist.objects.get(slug="%5bunknown%5d")
         albums = Album.objects.filter(artist=artist)
         self.assertEqual(len(albums), 0)
 
     @responses.activate
-    @patch('ditto.lastfm.fetch.slugify_name')
+    @patch("ditto.lastfm.fetch.slugify_name")
     def test_slugifies_album_name(self, slugify_name):
         "It should call slugify_name for each scrobbled Album name."
-        slugify_name.side_effect = ['Spotify+Session', 'Transformer',]
+        slugify_name.side_effect = [
+            "Spotify+Session",
+            "Transformer",
+        ]
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
-        slugify_name.assert_has_calls([
-            call('Spotify Session'),
-            call('Transformer'),
-        ])
+        self.fetcher.fetch()
+        slugify_name.assert_has_calls(
+            [call("Spotify Session"), call("Transformer")]
+        )
 
     @responses.activate
     def test_creates_scrobbles(self):
         "Creates new scrobble objects"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch()
+        self.fetcher.fetch()
         scrobbles = Scrobble.objects.all()
         # We have this many finished scrobbles in our JSON fixture:
         self.assertEqual(len(scrobbles), 3)
@@ -375,17 +389,17 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def test_updates_existing_scrobbles(self):
         "Updates existing scrobble objects"
         # Make our existing scrobble:
-        artist = ArtistFactory(slug='lou+reed')
-        track = TrackFactory(artist=artist, slug='make+up')
+        artist = ArtistFactory(slug="lou+reed")
+        track = TrackFactory(artist=artist, slug="make+up")
         post_time = datetime.datetime.strptime(
-                        '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
-                    ).replace(tzinfo=pytz.utc)
-        scrobble = ScrobbleFactory(account=self.account,
-                                   track=track,
-                                   post_time=post_time)
+            "2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=pytz.utc)
+        scrobble = ScrobbleFactory(
+            account=self.account, track=track, post_time=post_time
+        )
 
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch(fetch_type='all')
+        self.fetcher.fetch(fetch_type="all")
 
         scrobbles = Scrobble.objects.all()
         # We have this many finished scrobbles in our JSON fixture:
@@ -398,18 +412,20 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def test_sets_scrobble_data(self):
         "Sets all the scrobble data correctly"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist__slug='lou+reed')
-        self.assertEqual(scrobble.title, 'Lou Reed – Make Up')
+        self.fetcher.fetch(fetch_type="all")
+        scrobble = Scrobble.objects.get(artist__slug="lou+reed")
+        self.assertEqual(scrobble.title, "Lou Reed – Make Up")
         self.assertEqual(scrobble.account, self.account)
-        self.assertEqual(scrobble.track.slug, 'make+up')
-        self.assertEqual(scrobble.album.slug, 'transformer')
-        self.assertEqual(scrobble.post_time,
-                            datetime.datetime.strptime(
-                                    '2016-09-22 09:23:33', '%Y-%m-%d %H:%M:%S'
-                                ).replace(tzinfo=pytz.utc))
-        json_data = self.load_fixture('user_getrecenttracks')
-        scrobble_json = json_data['recenttracks']['track'][2]
+        self.assertEqual(scrobble.track.slug, "make+up")
+        self.assertEqual(scrobble.album.slug, "transformer")
+        self.assertEqual(
+            scrobble.post_time,
+            datetime.datetime.strptime(
+                "2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=pytz.utc),
+        )
+        json_data = self.load_fixture("user_getrecenttracks")
+        scrobble_json = json_data["recenttracks"]["track"][2]
         self.assertEqual(scrobble.raw, json.dumps(scrobble_json))
         self.assertEqual(scrobble.fetch_time, datetime_now())
 
@@ -417,8 +433,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
     def test_leaves_album_blank(self):
         "If scrobble has no album, leaves its fields empty"
         self.add_recent_tracks_response()
-        results = self.fetcher.fetch(fetch_type='all')
-        scrobble = Scrobble.objects.get(artist__slug='%5bunknown%5d')
+        self.fetcher.fetch(fetch_type="all")
+        scrobble = Scrobble.objects.get(artist__slug="%5bunknown%5d")
         self.assertEqual(scrobble.album, None)
 
 
@@ -429,13 +445,13 @@ class ScrobblesMultiAccountFetcherTestCase(TestCase):
     """
 
     def setUp(self):
-        self.account_1 = AccountFactory(api_key='1234', username='bob')
-        self.inactive_account = AccountFactory(api_key='2345', username='terry',
-                                                            is_active=False)
-        self.account_2 = AccountFactory(api_key='3456', username='thelma')
+        self.account_1 = AccountFactory(api_key="1234", username="bob")
+        self.inactive_account = AccountFactory(
+            api_key="2345", username="terry", is_active=False
+        )
+        self.account_2 = AccountFactory(api_key="3456", username="thelma")
 
-        self.ScrobblesFetcher_patch = patch(
-                                        'ditto.lastfm.fetch.ScrobblesFetcher')
+        self.ScrobblesFetcher_patch = patch("ditto.lastfm.fetch.ScrobblesFetcher")
         self.ScrobblesFetcher = self.ScrobblesFetcher_patch.start()
 
     def tearDown(self):
@@ -443,29 +459,28 @@ class ScrobblesMultiAccountFetcherTestCase(TestCase):
 
     def test_uses_all_active_accounts_by_default(self):
         ScrobblesMultiAccountFetcher().fetch()
-        self.ScrobblesFetcher.assert_has_calls([
-            call(self.account_1),
-            call().fetch(),
-            call(self.account_2),
-            call().fetch(),
-        ])
+        self.ScrobblesFetcher.assert_has_calls(
+            [
+                call(self.account_1),
+                call().fetch(),
+                call(self.account_2),
+                call().fetch(),
+            ]
+        )
 
     def test_uses_one_account(self):
         "If an account is supplied, only uses that."
-        ScrobblesMultiAccountFetcher(username='thelma').fetch()
-        self.ScrobblesFetcher.assert_has_calls([
-            call(self.account_2),
-            call().fetch(),
-        ])
+        ScrobblesMultiAccountFetcher(username="thelma").fetch()
+        self.ScrobblesFetcher.assert_has_calls(
+            [call(self.account_2), call().fetch()]
+        )
 
     def test_passes_kwargs_to_fetch(self):
         "Passes kwargs to the ScrobbleFetcher.fetch() method"
-        ScrobblesMultiAccountFetcher(username='bob').fetch(
-                                                    fetch_type='days', days=3)
-        self.ScrobblesFetcher.assert_has_calls([
-            call(self.account_1),
-            call().fetch(fetch_type='days', days=3),
-        ])
+        ScrobblesMultiAccountFetcher(username="bob").fetch(fetch_type="days", days=3)
+        self.ScrobblesFetcher.assert_has_calls(
+            [call(self.account_1), call().fetch(fetch_type="days", days=3)]
+        )
 
     def test_raises_error_if_no_accounts_are_active(self):
         self.account_1.is_active = False
@@ -477,11 +492,11 @@ class ScrobblesMultiAccountFetcherTestCase(TestCase):
 
     def test_raises_error_if_supplied_account_does_not_exist(self):
         with self.assertRaises(FetchError):
-            ScrobblesMultiAccountFetcher(username='audrey').fetch()
+            ScrobblesMultiAccountFetcher(username="audrey").fetch()
 
     def test_raises_error_if_supplied_account_is_inactive(self):
         with self.assertRaises(FetchError):
-            ScrobblesMultiAccountFetcher(username='terry').fetch()
+            ScrobblesMultiAccountFetcher(username="terry").fetch()
 
 
 class ScrobblesMultiAccountFetcherResultsTestCase(TestCase):
@@ -489,17 +504,24 @@ class ScrobblesMultiAccountFetcherResultsTestCase(TestCase):
     Testing the return value from ScrobblesMultiAccountFetcher().fetch()
     and only need to patch ScrobblesFetcher().fetch().
     """
-    def setUp(self):
-        self.account_1 = AccountFactory(api_key='1234', username='bob')
-        self.account_2 = AccountFactory(api_key='3456', username='thelma')
 
-    @patch.object(ScrobblesFetcher, 'fetch')
+    def setUp(self):
+        self.account_1 = AccountFactory(api_key="1234", username="bob")
+        self.account_2 = AccountFactory(api_key="3456", username="thelma")
+
+    @patch.object(ScrobblesFetcher, "fetch")
     def test_return_value(self, fetch):
         "Return should be a list of return values from ScrobbleFetcher.fetch()"
-        ret = {'success': True, 'account': 'bob', 'fetched': 7,}
-        fetch.side_effect = [ret, ret,]
+        ret = {
+            "success": True,
+            "account": "bob",
+            "fetched": 7,
+        }
+        fetch.side_effect = [
+            ret,
+            ret,
+        ]
 
         results = ScrobblesMultiAccountFetcher().fetch()
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['account'], 'bob')
-
+        self.assertEqual(results[0]["account"], "bob")

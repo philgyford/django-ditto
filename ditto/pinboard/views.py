@@ -9,8 +9,8 @@ from .models import Account, Bookmark, BookmarkTag
 
 class SingleAccountMixin(SingleObjectMixin):
     "For views which list bookmarks and also need an Account object."
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
+    slug_field = "username"
+    slug_url_kwarg = "username"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Account.objects.all())
@@ -18,59 +18,61 @@ class SingleAccountMixin(SingleObjectMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account'] = self.object
+        context["account"] = self.object
         return context
 
 
 class HomeView(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
-    template_name = 'pinboard/home.html'
-    queryset = Bookmark.public_objects.all().prefetch_related('account')
+    template_name = "pinboard/home.html"
+    queryset = Bookmark.public_objects.all().prefetch_related("account")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account_list'] = Account.objects.all()
+        context["account_list"] = Account.objects.all()
         return context
 
 
 class ToreadListView(PaginatedListView):
-    template_name = 'pinboard/toread_list.html'
-    queryset = Bookmark.public_toread_objects.all().prefetch_related('account')
+    template_name = "pinboard/toread_list.html"
+    queryset = Bookmark.public_toread_objects.all().prefetch_related("account")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account_list'] = Account.objects.all()
+        context["account_list"] = Account.objects.all()
         return context
 
 
 class AccountDetailView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its Bookmarks."
-    template_name = 'pinboard/account_detail.html'
+    template_name = "pinboard/account_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['bookmark_list'] = context['object_list']
+        context["bookmark_list"] = context["object_list"]
         return context
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this account."
-        return Bookmark.public_objects.filter(account=self.object)\
-                                                .prefetch_related('account')
+        return Bookmark.public_objects.filter(account=self.object).prefetch_related(
+            "account"
+        )
 
 
 class AccountToreadView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its 'to read' Bookmarks."
-    template_name = 'pinboard/account_toread.html'
+    template_name = "pinboard/account_toread.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['bookmark_list'] = context['object_list']
+        context["bookmark_list"] = context["object_list"]
         return context
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this account."
-        return Bookmark.public_toread_objects.filter(account=self.object)\
-                                                .prefetch_related('account')
+        return Bookmark.public_toread_objects.filter(
+            account=self.object
+        ).prefetch_related("account")
 
 
 class BookmarkDetailView(DetailView):
@@ -78,26 +80,26 @@ class BookmarkDetailView(DetailView):
     model = Bookmark
     # Only display public bookmarks; private ones will 404.
     queryset = Bookmark.public_objects.all()
-    slug_field = 'url_hash'
-    slug_url_kwarg = 'hash'
+    slug_field = "url_hash"
+    slug_url_kwarg = "hash"
 
 
 class TagListView(ListView):
-    template_name = 'pinboard/tag_list.html'
-    context_object_name = 'tag_list'
+    template_name = "pinboard/tag_list.html"
+    context_object_name = "tag_list"
 
     def get_queryset(self):
         return Bookmark.tags.most_common()[:100]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['account_list'] = Account.objects.all()
+        context["account_list"] = Account.objects.all()
         return context
 
 
 class TagDetailView(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain tag from all Accounts"
-    template_name = 'pinboard/tag_detail.html'
+    template_name = "pinboard/tag_detail.html"
     allow_empty = False
 
     def get(self, request, *args, **kwargs):
@@ -106,21 +108,21 @@ class TagDetailView(SingleObjectMixin, PaginatedListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tag'] = self.object
-        context['account_list'] = Account.objects.all()
-        context['bookmark_list'] = context['object_list']
+        context["tag"] = self.object
+        context["account_list"] = Account.objects.all()
+        context["bookmark_list"] = context["object_list"]
         return context
 
     def get_queryset(self):
         "Show all the public Bookmarks associated with this tag."
-        return Bookmark.public_objects\
-                                .filter(tags__slug__in=[self.object.slug])\
-                                .prefetch_related('account')
+        return Bookmark.public_objects.filter(
+            tags__slug__in=[self.object.slug]
+        ).prefetch_related("account")
 
 
 class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
     "All Bookmarks with a certain Tag from one Account"
-    template_name = 'pinboard/account_tag_detail.html'
+    template_name = "pinboard/account_tag_detail.html"
     allow_empty = False
 
     def get(self, request, *args, **kwargs):
@@ -130,20 +132,19 @@ class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
     def get_tag_object(self):
         """Custom method for fetching the Tag."""
         try:
-            obj = BookmarkTag.objects.get(slug=self.kwargs['tag_slug'])
+            obj = BookmarkTag.objects.get(slug=self.kwargs["tag_slug"])
         except BookmarkTag.DoesNotExist:
             raise Http404(_("No Tags found matching the query"))
         return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tag'] = self.tag_object
-        context['bookmark_list'] = context['object_list']
+        context["tag"] = self.tag_object
+        context["bookmark_list"] = context["object_list"]
         return context
 
     def get_queryset(self):
         """Show all the public Bookmarks associated with this account."""
-        return Bookmark.public_objects.filter(account=self.object,
-                                    tags__slug__in=[self.kwargs['tag_slug']])
-
-
+        return Bookmark.public_objects.filter(
+            account=self.object, tags__slug__in=[self.kwargs["tag_slug"]]
+        )
