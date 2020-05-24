@@ -4,7 +4,9 @@ Changelog (Django Ditto)
 Unreleased
 ----------
 
-- Nothing
+- Add flake8 to tests
+
+- Upgrade Bootstrap CSS  and JS from v4.4 to v4.5, and jQuery from 3.4.1 to 3.5.1.
 
 
 0.11.1
