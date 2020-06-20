@@ -131,11 +131,11 @@ class BookmarksFetcher(object):
             error_message = "Too many redirects."
         except requests.exceptions.RequestException:
             error_message = "Something went wrong with the request."
-
-        # 2020-06-20. Pinboard changed something on the server that introduced a BOM
-        # which caused json.loads() to throw an error. This seems to be the way to
-        # ensure this'll work fine if that happens.
-        response.encoding = "utf-8-sig"
+        else:
+            # 2020-06-20. Pinboard changed something on the server that introduced a BOM
+            # which caused json.loads() to throw an error. This seems to be the way to
+            # ensure this'll work fine if that happens.
+            response.encoding = "utf-8-sig"
 
         try:
             response.raise_for_status()
