@@ -1,6 +1,10 @@
 Changelog (Django Ditto)
 ========================
 
+NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
+-------------------------------------------------------
+
+
 Unreleased
 ----------
 

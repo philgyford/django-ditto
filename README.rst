@@ -2,17 +2,17 @@
  Django Ditto
 ==============
 
-.. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
-  :target: https://travis-ci.org/philgyford/django-ditto?branch=master
+.. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=main
+  :target: https://travis-ci.org/philgyford/django-ditto?branch=main
 
-.. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
-  :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
+.. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=main
+  :target: https://coveralls.io/github/philgyford/django-ditto?branch=main
 
 A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. Requires Python 3.5, 3.6, 3.7 or 3.8, and Django 2.2 or 3.0.
 
 `Read the documentation. <http://django-ditto.readthedocs.io/en/latest/>`_
 
-`See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/master/screenshots>`_
+`See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/main/screenshots>`_
 
 Install using `pip <https://pip.pypa.io/en/stable/>`_::
 
