@@ -205,6 +205,36 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         self.assertFalse(results[0]["success"])
         self.assertEqual(results[0]["messages"][0], "HTTP Error: 500")
 
+    @responses.activate
+    def test_no_bom(self):
+        """It should successfully fetch if the response has no BOM
+        It didn't until June 2020 when Pinboard upgraded the server
+        and something happened to add a BOM to API responses.
+        """
+        json_file = open("tests/pinboard/fixtures/api/bookmarks_no_bom.json")
+        self.add_response(body=json_file.read())
+        result = DateBookmarksFetcher().fetch(
+            post_date="2015-06-18", username="philgyford"
+        )
+        self.assertEqual(result[0]["account"], "philgyford")
+        self.assertTrue(result[0]["success"])
+        self.assertEqual(result[0]["fetched"], 1)
+
+    @responses.activate
+    def test_has_bom(self):
+        """It should successfully fetch if the response has a BOM
+        It didn't until June 2020 when Pinboard upgraded the server
+        and something happened to add a BOM to API responses.
+        """
+        json_file = open("tests/pinboard/fixtures/api/bookmarks_bom.json")
+        self.add_response(body=json_file.read())
+        result = DateBookmarksFetcher().fetch(
+            post_date="2015-06-18", username="philgyford"
+        )
+        self.assertEqual(result[0]["account"], "philgyford")
+        self.assertTrue(result[0]["success"])
+        self.assertEqual(result[0]["fetched"], 1)
+
 
 class FetchInactiveAccountsTestCase(TestCase):
     def test_only_inactive_account(self):
@@ -312,7 +342,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
             (
                 "Create your own icon font using only the icons you need, select from "
                 "Font Awesome and other free libraries."
-            )
+            ),
         )
         self.assertEqual(bookmarks[1].raw, raw_bookmark)
         self.assertEqual(bookmarks[1].account, account)
@@ -328,7 +358,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
             (
                 "Create your own icon font using only the icons you need, select from "
                 "Font Awesome and other free libraries."
-            )
+            ),
         )
 
         self.assertFalse(bookmarks[1].is_private)
@@ -378,7 +408,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
             (
                 "Create your own icon font using only the icons you need, select from "
                 "Font Awesome and other free libraries."
-            )
+            ),
         )
         # This should be updated to now, as we've changed things:
         self.assertEqual(
