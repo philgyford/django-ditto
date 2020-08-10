@@ -80,7 +80,8 @@ class UserTestCase(TestCase):
             nsid="12345678901@N01", avatar__filename="12345678901N01.jpg"
         )
         self.assertEqual(
-            user.avatar_url, "flickr/89/01/12345678901N01/avatars/12345678901N01.jpg"
+            user.avatar_url,
+            "/media/flickr/89/01/12345678901N01/avatars/12345678901N01.jpg",
         )
 
     def test_avatar_url_missing(self):
@@ -465,7 +466,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
         filename = os.path.basename(self.photo.original_file.name)
         self.assertEqual(
             self.photo.original_url,
-            "flickr/34/56/123456N01/photos/2015/08/14/%s" % filename,
+            "/media/flickr/34/56/123456N01/photos/2015/08/14/%s" % filename,
         )
 
     def test_remote_original_url(self):

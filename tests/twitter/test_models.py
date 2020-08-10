@@ -390,7 +390,7 @@ class AnimatedGifLocalTestCase(TestCase):
     def test_video_url_mp4(self):
         gif = AnimatedGifFactory(mp4_url="https://example.org/test.mp4")
         filename = os.path.basename(gif.mp4_file.name)
-        self.assertEqual(gif.video_url, "twitter/media/mp/le/%s" % filename)
+        self.assertEqual(gif.video_url, "/media/twitter/media/mp/le/%s" % filename)
 
 
 class TweetTestCase(TestCase):
@@ -676,11 +676,13 @@ class UserTestCase(TestCase):
 
     def test_avatar_url(self):
         user = UserFactory(twitter_id=123456, avatar__filename="my_face.jpg")
-        self.assertEqual(user.avatar_url, "twitter/avatars/34/56/123456/my_face.jpg")
+        self.assertEqual(
+            user.avatar_url, "/media/twitter/avatars/34/56/123456/my_face.jpg"
+        )
 
     def test_avatar_url_short_id(self):
         user = UserFactory(twitter_id=12, avatar__filename="my_face.jpg")
-        self.assertEqual(user.avatar_url, "twitter/avatars/12/12/my_face.jpg")
+        self.assertEqual(user.avatar_url, "/media/twitter/avatars/12/12/my_face.jpg")
 
     def test_avatar_url_missing(self):
         user = UserFactory(avatar=None)
