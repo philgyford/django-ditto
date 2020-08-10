@@ -8,7 +8,7 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
-- None
+- Allow for use of Django 3.1, django-taggit 1.3, pillow 7.2.
 
 
 0.11.2
