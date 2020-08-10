@@ -108,8 +108,6 @@ Add a version tag:
 
     $ python setup.py tag
 
-Push to ``master`` branch.
-
 Ensure Travis still builds OK.
 
 Then:
