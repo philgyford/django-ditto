@@ -1,6 +1,6 @@
 import math
 from functools import reduce
-from django.core.paginator import Paginator, QuerySetPaginator, Page, InvalidPage
+from django.core.paginator import Paginator, Page, InvalidPage
 
 # From https://djangosnippets.org/snippets/773/
 # Lets us do better pagination, so we don't need to show *every* page.
@@ -304,7 +304,7 @@ class DiggPage(Page):
         )
 
 
-class QuerySetDiggPaginator(DiggPaginator, QuerySetPaginator):
+class QuerySetDiggPaginator(DiggPaginator, Paginator):
     pass
 
 
