@@ -8,6 +8,12 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+
+1.0.0
+-----
+
+- About time we went to version 1.
+
 - Allow for use of Django 3.1, django-taggit 1.3, pillow 7.2.
 
 - Update included Bootstrap CSS from 4.5.0 to 4.5.2.
