@@ -635,10 +635,10 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 except Exception:
                     # We have an original file but something's wrong with it.
                     # Might be 0 bytes or something.
-                    return static("img/original_error.jpg")
+                    return static("ditto-core/img/original_error.jpg")
         else:
             # We haven't downloaded an original file for this Photo.
-            return static("img/original_missing.jpg")
+            return static("ditto-core/img/original_missing.jpg")
 
     def _remote_image_url(self, size):
         """

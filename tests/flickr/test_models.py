@@ -522,7 +522,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     def test_image_url_when_original_missing(self):
         "If we have no original file, we should use the 'missing' image."
         photo = PhotoFactory(original_file="")
-        self.assertEqual(photo.small_url, "/static/img/original_missing.jpg")
+        self.assertEqual(photo.small_url, "/static/ditto-core/img/original_missing.jpg")
 
     def test_broken_image(self):
         "We have an original file, but can't make a smaller version."
@@ -532,7 +532,9 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
             "small": {"generator": generator},
         }
         with patch.dict("ditto.flickr.models.Photo.PHOTO_SIZES", photo_sizes):
-            self.assertEqual(self.photo.small_url, "/static/img/original_error.jpg")
+            self.assertEqual(
+                self.photo.small_url, "/static/ditto-core/img/original_error.jpg"
+            )
 
 
 class PhotoNextPrevTestCase(TestCase):

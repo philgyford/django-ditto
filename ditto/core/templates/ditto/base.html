@@ -8,7 +8,7 @@
         <title>{% block head_title %}{% block title %}{% endblock %} ({% block head_site_title %}Ditto{% endblock %}){% endblock %}</title>
 
         {% block bootstrap_css %}
-            <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+            <link rel="stylesheet" href="{% static "ditto-core/css/bootstrap.min.css" %}">
         {% endblock %}
 
         {% block head_extra %}
@@ -89,13 +89,13 @@
     {% endblock %}
 
     {% block jquery_js %}
-        <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"></script>
+        <script src="{% static "ditto-core/js/jquery-3.5.1.slim.min.js" %}"></script>
     {% endblock %}
 
     {% block bootstrap_js %}
-        <script src="{% static "js/popper.min.js" %}"></script>
-        <script src="{% static "js/bootstrap/util.js" %}"></script>
-        <script src="{% static "js/bootstrap/collapse.js" %}"></script>
+        <script src="{% static "ditto-core/js/popper.min.js" %}"></script>
+        <script src="{% static "ditto-core/js/bootstrap/util.js" %}"></script>
+        <script src="{% static "ditto-core/js/bootstrap/collapse.js" %}"></script>
     {% endblock %}
 
     {% block foot_extra %}
