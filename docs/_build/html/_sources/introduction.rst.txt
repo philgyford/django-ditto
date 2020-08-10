@@ -2,9 +2,9 @@
 Introduction
 ############
 
-A collection of Django apps for copying things from third-party sites and services. This is still in-progress and things may change. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
+A collection of Django apps for copying things from third-party sites and services. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
 
-Requires Python 3.5, 3.6 3.7 or 3.8, and Django 2.2 or 3.0.
+Requires Python 3.6 3.7 or 3.8, and Django 2.2, 3.0 or 3.1.
 
 `See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/master/screenshots>`_
 
@@ -51,7 +51,7 @@ The Ditto apps provide:
 - Admin
 - Management commands to fetch the data/files
 - Views and URLs
-- Templates (that use `Bootstrap 4.3 <https://getbootstrap.com>`_)
+- Templates (that use `Bootstrap 4 <https://getbootstrap.com>`_)
 - Template tags for common things (eg, most recent Tweets, or Flickr photos uploaded on a particular day)
 
 You could use the whole lot to create a minimal site that displays your Tweets,
