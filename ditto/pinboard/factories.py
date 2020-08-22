@@ -5,7 +5,7 @@ from . import models
 from ..core.utils import datetime_now
 
 
-class AccountFactory(factory.DjangoModelFactory):
+class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
 
@@ -14,7 +14,7 @@ class AccountFactory(factory.DjangoModelFactory):
     api_token = factory.LazyAttribute(lambda obj: "%s:123ABC" % obj.username)
 
 
-class BookmarkFactory(factory.DjangoModelFactory):
+class BookmarkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Bookmark
 

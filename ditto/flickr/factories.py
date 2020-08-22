@@ -7,7 +7,7 @@ from . import models
 from ..core.utils import datetime_now
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
@@ -32,7 +32,7 @@ class UserFactory(factory.DjangoModelFactory):
     avatar = factory.django.ImageField(filename="my_avatar.jpg")
 
 
-class AccountFactory(factory.DjangoModelFactory):
+class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
 
@@ -43,7 +43,7 @@ class AccountFactory(factory.DjangoModelFactory):
     )
 
 
-class PhotoFactory(factory.DjangoModelFactory):
+class PhotoFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Photo
 
@@ -97,7 +97,7 @@ class PhotoFactory(factory.DjangoModelFactory):
     original_height = 2000
 
 
-class TagFactory(factory.DjangoModelFactory):
+class TagFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = taggit_models.Tag
 
@@ -105,7 +105,7 @@ class TagFactory(factory.DjangoModelFactory):
     name = slug
 
 
-class TaggedPhotoFactory(factory.DjangoModelFactory):
+class TaggedPhotoFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.TaggedPhoto
 
@@ -116,7 +116,7 @@ class TaggedPhotoFactory(factory.DjangoModelFactory):
     content_object = factory.SubFactory(PhotoFactory)
 
 
-class PhotosetFactory(factory.DjangoModelFactory):
+class PhotosetFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Photoset
 

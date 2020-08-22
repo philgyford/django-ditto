@@ -9,8 +9,20 @@ Unreleased
 ----------
 
 
-1.0.0
------
+1.2.0 - 2020-08-22
+------------------
+
+- Fix Factory Boy imports and allow for Factory Boy v3
+
+
+1.1.0 - 2020-08-10
+------------------
+
+- Move all static files from ``static/`` to ``static/ditto-core/``.
+
+
+1.0.0 - 2020-08-10
+------------------
 
 - About time we went to version 1.
 
