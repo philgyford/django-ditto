@@ -69,7 +69,7 @@ if sys.argv[-1] == "testpublish":
 
 dev_require = ["django-debug-toolbar>=2.0,<3.0", "flake8>=3.8,<3.9", "black==19.10b0"]
 tests_require = dev_require + [
-    "factory-boy>=2.12.0,<3.0",
+    "factory-boy>=2.12.0,<4.0",
     "freezegun>=0.3.12,<0.4",
     "responses>=0.10.7,<1.0",
     "coverage",
