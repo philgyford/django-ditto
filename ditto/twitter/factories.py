@@ -5,7 +5,7 @@ from . import models
 from ..core.utils import datetime_now
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
@@ -24,7 +24,7 @@ class UserFactory(factory.DjangoModelFactory):
     avatar = factory.django.ImageField(filename="my_avatar.jpg")
 
 
-class AccountFactory(factory.DjangoModelFactory):
+class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
 
@@ -46,7 +46,7 @@ class AccountWithCredentialsFactory(AccountFactory):
     access_token_secret = "TESTACCESSTOKENSECRET"
 
 
-class TweetFactory(factory.DjangoModelFactory):
+class TweetFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Tweet
 
@@ -61,7 +61,7 @@ class TweetFactory(factory.DjangoModelFactory):
     source = "web"
 
 
-class MediaFactory(factory.DjangoModelFactory):
+class MediaFactory(factory.django.DjangoModelFactory):
     "Parent class for the photo, video and gif factories."
 
     class Meta:

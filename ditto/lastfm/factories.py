@@ -4,7 +4,7 @@ from . import models
 from ..core.utils import datetime_now
 
 
-class AccountFactory(factory.DjangoModelFactory):
+class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
 
@@ -13,7 +13,7 @@ class AccountFactory(factory.DjangoModelFactory):
     api_key = factory.Sequence(lambda n: "api-key-%04d" % n)
 
 
-class ArtistFactory(factory.DjangoModelFactory):
+class ArtistFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Artist
 
@@ -22,7 +22,7 @@ class ArtistFactory(factory.DjangoModelFactory):
     original_slug = factory.Sequence(lambda n: "Artist+%04d" % n)
 
 
-class TrackFactory(factory.DjangoModelFactory):
+class TrackFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Track
 
@@ -32,7 +32,7 @@ class TrackFactory(factory.DjangoModelFactory):
     artist = factory.SubFactory(ArtistFactory)
 
 
-class AlbumFactory(factory.DjangoModelFactory):
+class AlbumFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Album
 
@@ -42,7 +42,7 @@ class AlbumFactory(factory.DjangoModelFactory):
     artist = factory.SubFactory(ArtistFactory)
 
 
-class ScrobbleFactory(factory.DjangoModelFactory):
+class ScrobbleFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Scrobble
 
