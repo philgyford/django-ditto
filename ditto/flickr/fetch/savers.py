@@ -240,8 +240,8 @@ class PhotoSaver(SaveUtilsMixin, object):
 
         for size in photo["sizes"]["size"]:
             if size["label"] in sizes:
-                # eg, 'Small 320' becomes 'small_320':
-                name = size["label"].lower().replace(" ", "_")
+                # eg, 'X-Large 3K' becomes 'x_large_3k':
+                name = size["label"].lower().replace(" ", "_").replace("-", "_")
                 defaults[name + "_width"] = int(size["width"])
                 defaults[name + "_height"] = int(size["height"])
 

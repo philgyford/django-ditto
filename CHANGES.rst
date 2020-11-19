@@ -8,6 +8,15 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+- Update Flickr Photo models, fetchers and imagegenerators to include the
+  X-Large 3K, X-Large 4K, X-Large 5K and X-Large 6K sizes.
+
+  A data migration will populate the model fields for any Photos that have this
+  size data already fetched in their raw API data. It does the same for the
+  Medium 800, Large, Large 1600, and Large 2048 sizes too.
+
+- Fix ordering of Tweets posted at the same time (as in some threads).
+
 - Update python dependencies, including Pillow v8, freezegun v1, and
   django-debug-toolbar v3.
 

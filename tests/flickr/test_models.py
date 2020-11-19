@@ -356,6 +356,10 @@ class PhotoUrlsTestCase(TestCase):
             "b": "large_url",
             "h": "large_1600_url",
             "k": "large_2048_url",
+            "3k": "x_large_3k_url",
+            "4k": "x_large_4k_url",
+            "5k": "x_large_5k_url",
+            "6k": "x_large_6k_url",
         }
 
         # Map size names to property names:

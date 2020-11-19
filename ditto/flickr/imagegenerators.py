@@ -135,3 +135,35 @@ class Large2048(FlickrSpec):
 
 
 register.generator("ditto_flickr:large_2048", Large2048)
+
+
+class XLarge3K(FlickrSpec):
+    width = 3072
+    height = 3072
+
+
+register.generator("ditto_flickr:x_large_3k", XLarge3K)
+
+
+class XLarge4K(FlickrSpec):
+    width = 4096
+    height = 4096
+
+
+register.generator("ditto_flickr:x_large_4k", XLarge4K)
+
+
+class XLarge5K(FlickrSpec):
+    width = 5120
+    height = 5120
+
+
+register.generator("ditto_flickr:x_large_5k", XLarge5K)
+
+
+class XLarge6K(FlickrSpec):
+    width = 6000
+    height = 6000
+
+
+register.generator("ditto_flickr:x_large_6k", XLarge6K)
