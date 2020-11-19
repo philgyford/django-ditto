@@ -525,6 +525,11 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         # It's possible to have tweets posted in the same second that
         # need to be then ordered by twitter_id:
         ordering = ["-post_time", "-twitter_id"]
+        # So that the ordering is faster:
+        indexes = [
+            # Speeds up the COUNT(*) query on daily pages:
+            models.Index(fields=["user", "post_time", "is_private"]),
+        ]
 
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"
