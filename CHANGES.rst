@@ -8,6 +8,9 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+- Update python dependencies, including Pillow v8, freezegun v1, and
+  django-debug-toolbar v3.
+
 
 1.2.0 - 2020-08-22
 ------------------
