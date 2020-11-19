@@ -522,7 +522,9 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         return self.title
 
     class Meta:
-        ordering = ["-post_time"]
+        # It's possible to have tweets posted in the same second that
+        # need to be then ordered by twitter_id:
+        ordering = ["-post_time", "-twitter_id"]
 
     def save(self, *args, **kwargs):
         "Privacy depends on the user, so ensure it's set correctly"
