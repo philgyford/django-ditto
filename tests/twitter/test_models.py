@@ -417,6 +417,23 @@ class TweetTestCase(TestCase):
         tweets = Tweet.objects.all()
         self.assertEqual(tweets[0].pk, tweet_2.pk)
 
+    def test_ordering_at_same_time(self):
+        "Tweets posted at the same time should also be ordered by twitter_id desc" 
+        tweet_1 = TweetFactory(
+            post_time=datetime_from_str("2015-01-01 12:00:00"), twitter_id=1000
+        )
+        tweet_3 = TweetFactory(
+            post_time=datetime_from_str("2015-01-01 12:00:00"), twitter_id=1003
+        )
+        tweet_2 = TweetFactory(
+            post_time=datetime_from_str("2015-01-01 12:00:00"), twitter_id=1002
+        )
+
+        tweets = Tweet.objects.all()
+        self.assertEqual(tweets[0], tweet_3)
+        self.assertEqual(tweets[1], tweet_2)
+        self.assertEqual(tweets[2], tweet_1)
+
     def test_unique_twitter_id(self):
         "Ensures twitter_id is unique"
         TweetFactory(twitter_id=123)
