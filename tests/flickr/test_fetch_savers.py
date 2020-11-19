@@ -199,7 +199,11 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
             "large": (1024, 793),
             "large_1600": (1600, 1239),
             "large_2048": (2048, 1585),
-            "original": (3772, 2920),
+            "x_large_3k": (3072, 2378),
+            "x_large_4k": (4096, 3171),
+            "x_large_5k": (5120, 3964),
+            "x_large_6k": (6000, 4645),
+            "original": (12000, 9290),
         }
         for name, wh in sizes.items():
             self.assertEqual(getattr(photo, name + "_width"), wh[0])

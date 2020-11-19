@@ -15,7 +15,11 @@
 			{ "label": "Large", "width": "1024", "height": "793", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_8f6590a206_b.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/l\/", "media": "photo" },
 			{ "label": "Large 1600", "width": "1600", "height": "1239", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_268daf3fe5_h.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/h\/", "media": "photo" },
 			{ "label": "Large 2048", "width": "2048", "height": "1585", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_94823796ca_k.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/k\/", "media": "photo" },
-			{ "label": "Original", "width": "3772", "height": "2920", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_093e4e951e_o.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/o\/", "media": "photo" }
+			{ "label": "X-Large 3K", "width": "3072", "height": "2378", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_94823796ca_3k.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/3k\/", "media": "photo" },
+			{ "label": "X-Large 4K", "width": "4096", "height": "3171", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_94823796ca_4k.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/4k\/", "media": "photo" },
+			{ "label": "X-Large 5K", "width": "5120", "height": "3964", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_94823796ca_5k.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/5k\/", "media": "photo" },
+			{ "label": "X-Large 6K", "width": "6000", "height": "4645", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_94823796ca_6k.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/6k\/", "media": "photo" },
+			{ "label": "Original", "width": "12000", "height": "9290", "source": "https:\/\/farm2.staticflickr.com\/1576\/26069027966_093e4e951e_o.jpg", "url": "https:\/\/www.flickr.com\/photos\/philgyford\/26069027966\/sizes\/o\/", "media": "photo" }
 		]
 	},
 	"stat": "ok"
