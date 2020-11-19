@@ -418,7 +418,7 @@ class TweetTestCase(TestCase):
         self.assertEqual(tweets[0].pk, tweet_2.pk)
 
     def test_ordering_at_same_time(self):
-        "Tweets posted at the same time should also be ordered by twitter_id desc" 
+        "Tweets posted at the same time should also be ordered by twitter_id desc"
         tweet_1 = TweetFactory(
             post_time=datetime_from_str("2015-01-01 12:00:00"), twitter_id=1000
         )
