@@ -145,17 +145,41 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         },
         # Before May 25th 2010, large only exist for very large original images.
         "large": {"label": "Large", "suffix": "b", "generator": imagegenerators.Large},
-        # Only exist after March 1st 2012.
+        # Introduced March 2012, but since backfilled to older photos
+        # https://www.flickr.com/help/forum/en-us/72157710955873986/
         "large_1600": {
             "label": "Large 1600",
             "suffix": "h",
             "generator": imagegenerators.Large1600,
         },
-        # Only exist after March 1st 2012.
         "large_2048": {
             "label": "Large 2048",
             "suffix": "k",
             "generator": imagegenerators.Large2048,
+        },
+        # Up to 5K sizes announced October 2018
+        # https://blog.flickr.net/en/2018/10/31/putting-your-best-photo-forward-flickr-updates/
+        "x_large_3k": {
+            "label": "X-Large 3K",
+            "suffix": "3k",
+            "generator": imagegenerators.XLarge3K,
+        },
+        "x_large_4k": {
+            "label": "X-Large 4K",
+            "suffix": "4k",
+            "generator": imagegenerators.XLarge4K,
+        },
+        "x_large_5k": {
+            "label": "X-Large 5K",
+            "suffix": "5k",
+            "generator": imagegenerators.XLarge5K,
+        },
+        # 6K size announced October 2019
+        # https://www.flickr.com/help/forum/en-us/72157711364062311/
+        "x_large_6k": {
+            "label": "X-Large 6K",
+            "suffix": "6k",
+            "generator": imagegenerators.XLarge6K,
         },
         "original": {"label": "Original", "suffix": "o"},
     }
@@ -342,6 +366,14 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     large_1600_height = models.PositiveSmallIntegerField(null=True, blank=True)
     large_2048_width = models.PositiveSmallIntegerField(null=True, blank=True)
     large_2048_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_3k_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_3k_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_4k_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_4k_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_5k_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_5k_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_6k_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    x_large_6k_height = models.PositiveSmallIntegerField(null=True, blank=True)
     original_width = models.PositiveSmallIntegerField(null=True, blank=True)
     original_height = models.PositiveSmallIntegerField(null=True, blank=True)
 

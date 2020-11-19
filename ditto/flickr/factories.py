@@ -93,8 +93,16 @@ class PhotoFactory(factory.django.DjangoModelFactory):
     large_1600_height = 1067
     large_2048_width = 2048
     large_2048_height = 1365
-    original_width = 3000
-    original_height = 2000
+    x_large_3k_width = 3072
+    x_large_3k_height = 2048
+    x_large_4k_width = 4096
+    x_large_4k_height = 2731
+    x_large_5k_width = 5120
+    x_large_5k_height = 3413
+    x_large_6k_width = 6000
+    x_large_6k_height = 4000
+    original_width = 6000
+    original_height = 4000
 
 
 class TagFactory(factory.django.DjangoModelFactory):
