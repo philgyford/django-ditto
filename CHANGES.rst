@@ -8,6 +8,12 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+- Nothing
+
+
+1.3.0 - 2020-11-20
+------------------
+
 - Update Flickr Photo models, fetchers and imagegenerators to include the
   X-Large 3K, X-Large 4K, X-Large 5K and X-Large 6K sizes.
 
@@ -17,8 +23,11 @@ Unreleased
 
 - Fix ordering of Tweets posted at the same time (as in some threads).
 
+- Update included Bootstrap from 4.5.2 to 4.5.3.
+
 - Update python dependencies, including Pillow v8, freezegun v1, and
   django-debug-toolbar v3.
+
 
 
 1.2.0 - 2020-08-22
