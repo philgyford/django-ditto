@@ -8,7 +8,7 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
-- Nothing
+- Add missing update migration for Pinboard.
 
 
 1.3.0 - 2020-11-20
