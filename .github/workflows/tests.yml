@@ -59,7 +59,7 @@ jobs:
 
   # The flake8 test in tox.ini won't run with the test job so we need to add it here.
   lint:
-    name: ${{ matrix.toxenv }}
+    name: "Lint: ${{ matrix.toxenv }}"
     runs-on: ubuntu-latest
 
     strategy:

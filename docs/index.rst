@@ -35,8 +35,8 @@ Pinboard, and displaying them on your Django site.
    Django Ditto on PyPI <https://pypi.python.org/pypi/django-ditto>
 
 
-.. image:: https://travis-ci.org/philgyford/django-ditto.svg?branch=master
-  :target: https://travis-ci.org/philgyford/django-ditto?branch=master
+.. image:: https://github.com/philgyford/django-ditto/actions/workflows/tests.yml/badge.svg
+  :target: https://github.com/philgyford/django-ditto/actions/workflows/tests.yml
 
 .. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=master
   :target: https://coveralls.io/github/philgyford/django-ditto?branch=master
@@ -49,4 +49,3 @@ Pinboard, and displaying them on your Django site.
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-
