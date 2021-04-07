@@ -7,6 +7,9 @@ class DittoCoreConfig(AppConfig):
     name = "ditto.core"
     verbose_name = "Ditto Core"
 
+    # Maintain pre Django 3.2 default behaviour:
+    default_auto_field = "django.db.models.AutoField"
+
 
 class Apps(object):
     """Methods for seeing which Ditto apps are installed/enabled.
