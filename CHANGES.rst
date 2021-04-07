@@ -8,6 +8,12 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+- None
+
+
+1.4.0 - 2021-04-07
+------------------
+
 - Allow for use of Django 3.2; update devproject to use it.
 
 - Change status in ``setup.py`` from Beta to Production/Stable.
