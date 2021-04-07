@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
-        django-version: ["2.2", "3.0", "3.1"]
+        django-version: ["2.2", "3.1", "3.2"]
         # If we wanted to exclude combinations, we could add them here:
         # exclude:
           # - python-version: "3.5"
@@ -110,8 +110,8 @@ jobs:
         uses: 8398a7/action-slack@v2
         # if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
-          # One of:
-          # neutral, success, skipped, cancelled, timed_out, action_required, failure
           status: ${{ env.WORKFLOW_CONCLUSION }}
+          # fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
+          fields: repo,message,commit,author,action,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.ACTIONS_CI_SLACK_HOOK }}
