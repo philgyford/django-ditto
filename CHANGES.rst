@@ -8,7 +8,9 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
-- None
+- Allow for use of Django 3.2; update devproject to use it.
+
+- Change status in ``setup.py`` from Beta to Production/Stable.
 
 
 1.3.9 - 2020-12-23
@@ -33,7 +35,6 @@ Unreleased
 
 - Update python dependencies, including Pillow v8, freezegun v1, and
   django-debug-toolbar v3.
-
 
 
 1.2.0 - 2020-08-22
