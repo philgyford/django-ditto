@@ -8,6 +8,8 @@ NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
 Unreleased
 ----------
 
+- Replace use of deprecated `django.conf.urls.url()` method.
+
 - Fix path to `img/default_avatar.png` static file.
 
 

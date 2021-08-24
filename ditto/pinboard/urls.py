@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
@@ -6,31 +6,31 @@ from . import views
 app_name = "pinboard"
 
 urlpatterns = [
-    url(regex=r"^$", view=views.HomeView.as_view(), name="home"),
-    url(regex=r"^to-read/$", view=views.ToreadListView.as_view(), name="toread"),
-    url(regex=r"^tags/$", view=views.TagListView.as_view(), name="tag_list"),
-    url(
-        regex=r"^tags/(?P<slug>[^/]+)/$",
+    path("", view=views.HomeView.as_view(), name="home"),
+    path("to-read/", view=views.ToreadListView.as_view(), name="toread"),
+    path("tags/", view=views.TagListView.as_view(), name="tag_list"),
+    re_path(
+        r"^tags/(?P<slug>[^/]+)/$",
         view=views.TagDetailView.as_view(),
         name="tag_detail",
     ),
-    url(
-        regex=r"^(?P<username>\w+)/$",
+    re_path(
+        r"^(?P<username>\w+)/$",
         view=views.AccountDetailView.as_view(),
         name="account_detail",
     ),
-    url(
-        regex=r"^(?P<username>\w+)/to-read/$",
+    re_path(
+        r"^(?P<username>\w+)/to-read/$",
         view=views.AccountToreadView.as_view(),
         name="account_toread",
     ),
-    url(
-        regex=r"^(?P<username>\w+)/tags/(?P<tag_slug>[^/]+)/$",
+    re_path(
+        r"^(?P<username>\w+)/tags/(?P<tag_slug>[^/]+)/$",
         view=views.AccountTagDetailView.as_view(),
         name="account_tag_detail",
     ),
-    url(
-        regex=r"^(?P<username>\w+)/(?P<hash>\w+)/$",
+    re_path(
+        r"^(?P<username>\w+)/(?P<hash>\w+)/$",
         view=views.BookmarkDetailView.as_view(),
         name="bookmark_detail",
     ),
