@@ -15,7 +15,7 @@ By default this will only allow the fetching of fully public photos. To fetch al
 
 1. Enter your API key and secret in the indicated place in the file
    ``ditto/scripts/flickr_authorize.py``. (If you've installed Ditto using pip,
-   it might be easier to `download the script from GitHub <https://github.com/philgyford/django-ditto/blob/master/ditto/scripts/flickr_authorize.py>`_.)
+   it might be easier to `download the script from GitHub <https://github.com/philgyford/django-ditto/blob/main/ditto/scripts/flickr_authorize.py>`_.)
 
 2. Run the script on the command line (if you downloaded the file, change the path to wherever the script is):
 
@@ -389,5 +389,3 @@ Or fetch for only one Account:
 .. code-block:: shell
 
     $ ./manage.py fetch_flickr_photosets --account=35034346050@N01
-
-
