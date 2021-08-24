@@ -67,7 +67,7 @@ if sys.argv[-1] == "testpublish":
     # os.system("python setup.py bdist_wheel upload")
     sys.exit()
 
-dev_require = ["django-debug-toolbar>=2.0,<4.0", "flake8>=3.8,<3.9", "black==20.8b1"]
+dev_require = ["django-debug-toolbar>=2.0,<4.0", "flake8>=3.8,<4.0", "black==21.7b0"]
 tests_require = dev_require + [
     "factory-boy>=2.12.0,<4.0",
     "freezegun>=0.3.12,<2.0",
