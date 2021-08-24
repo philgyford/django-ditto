@@ -86,7 +86,7 @@ class UserTestCase(TestCase):
 
     def test_avatar_url_missing(self):
         user = UserFactory(avatar=None)
-        self.assertEqual(user.avatar_url, "/static/img/default_avatar.png")
+        self.assertEqual(user.avatar_url, "/static/ditto-core/img/default_avatar.png")
 
     def test_original_icon_url(self):
         user = UserFactory(iconfarm=8, iconserver=7420, nsid="35034346050@N01")

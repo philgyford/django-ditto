@@ -922,7 +922,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         try:
             return self.avatar.url
         except ValueError:
-            return static("img/default_avatar.png")
+            return static("ditto-core/img/default_avatar.png")
 
     @property
     def original_icon_url(self):
