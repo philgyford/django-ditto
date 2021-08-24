@@ -4,9 +4,15 @@
 
 .. image:: https://github.com/philgyford/django-ditto/actions/workflows/tests.yml/badge.svg
   :target: https://github.com/philgyford/django-ditto/actions/workflows/tests.yml
+  :alt: Tests status
 
 .. image:: https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=main
   :target: https://coveralls.io/github/philgyford/django-ditto?branch=main
+  :alt: Test coverage
+
+.. image:: https://readthedocs.org/projects/django-ditto/badge/?version=stable
+  :target: https://django-ditto.readthedocs.io/en/stable/?badge=stable
+  :alt: Documentation Status
 
 A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6 to 3.9, and Django 2.2 to 3.2.
 
