@@ -1,14 +1,11 @@
 Changelog (Django Ditto)
 ========================
 
-NOTE: 2020-06-20: Renamed ``master`` branch to ``main``
--------------------------------------------------------
-
 
 Unreleased
 ----------
 
-- Nothing
+- Update dependences in ``devproject/Pipfile``.
 
 
 1.4.1 - 2021-08-24
