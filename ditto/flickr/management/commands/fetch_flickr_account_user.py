@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 result = UserFetcher(account=account).fetch(nsid=id_result["id"])
                 if "success" in result and result["success"] is True:
                     # Now we'll associate this User with the Account:
-                    user = User.objects.get(nsid="35034346050@N01")
+                    user = User.objects.get(nsid=id_result["id"])
                     account.user = user
                     account.save()
                     if options.get("verbosity", 1) > 0:
