@@ -4,7 +4,20 @@ Changelog (Django Ditto)
 Unreleased
 ----------
 
-- Update dependences in `devproject/Pipfile`.
+- None.
+
+
+1.4.2 - 2021-10-22
+------------------
+
+- Update python dependences in `devproject/Pipfile` and `docs/Pipfile`.
+
+- Update included Bootstrap CSS and JS files to v4.6.0.
+
+- Change README and CHANGELOG from `.rst` to `.md` format.
+
+- Remove hard-coded Flickr ID in `fetch_flickr_account_user` management command (thanks @garrettc).
+
 
 1.4.1 - 2021-08-24
 ------------------
