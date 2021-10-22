@@ -4,7 +4,7 @@ import re
 import sys
 from setuptools import setup
 
-with open(os.path.join(os.path.dirname(__file__), "README.rst")) as readme:
+with open(os.path.join(os.path.dirname(__file__), "README.md")) as readme:
     README = readme.read()
 
 # allow setup.py to be run from any path
@@ -98,7 +98,8 @@ setup(
         "A Django app to copy stuff from your accounts on "
         "Flickr, Last.fm, Pinboard and Twitter."
     ),
-    long_description=read(os.path.join(os.path.dirname(__file__), "README.rst")),
+    long_description=read(os.path.join(os.path.dirname(__file__), "README.md")),
+    long_description_content_type="text/markdown",
     url="https://github.com/philgyford/django-ditto",
     author=get_author(),
     author_email=get_author_email(),

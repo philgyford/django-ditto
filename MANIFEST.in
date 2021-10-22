@@ -1,5 +1,5 @@
 include LICENSE
-include README.rst
+include README.md
 include runtests.py
 include tox.ini
 recursive-include ditto *.html *.py *.sh
@@ -11,4 +11,3 @@ recursive-exclude screenshots *
 recursive-exclude tests *
 
 recursive-exclude * *.pyc *.pyo *.sw* *.sv* *.un~ *.DS_Store
-
