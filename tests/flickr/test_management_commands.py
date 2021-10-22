@@ -13,7 +13,7 @@ class FetchFlickrAccountUserTestCase(TestCase):
         # What we'll use as return values from UserIdFetcher().fetch()...
         self.id_fetcher_success = {
             "success": True,
-            "id": "35034346050@N01",
+            "id": "99999999999@N99",
             "fetched": 1,
         }
         # ...and UserFetcher().fetch():
@@ -38,7 +38,7 @@ class FetchFlickrAccountUserTestCase(TestCase):
     @patch("ditto.flickr.management.commands.fetch_flickr_account_user.UserFetcher")
     @patch("ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher")
     def test_with_id(self, id_fetcher, user_fetcher):
-        UserFactory(nsid="35034346050@N01")
+        UserFactory(nsid="99999999999@N99")
         id_fetcher.return_value.fetch.return_value = self.id_fetcher_success
         user_fetcher.return_value.fetch.return_value = self.user_fetcher_success
         call_command("fetch_flickr_account_user", id="32", stdout=self.out)
@@ -58,7 +58,7 @@ class FetchFlickrAccountUserTestCase(TestCase):
         }
         call_command("fetch_flickr_account_user", id="32", stderr=self.out_err)
         self.assertIn(
-            "Failed to fetch a user using Flickr ID '35034346050@N01': Oops",
+            "Failed to fetch a user using Flickr ID '99999999999@N99': Oops",
             self.out_err.getvalue(),
         )
 
@@ -79,12 +79,12 @@ class FetchFlickrAccountUserTestCase(TestCase):
     @patch("ditto.flickr.management.commands.fetch_flickr_account_user.UserIdFetcher")
     def test_associates_account_with_user(self, id_fetcher, user_fetcher):
         "After fetching and saving the user, associate it with the Account."
-        UserFactory(nsid="35034346050@N01")
+        UserFactory(nsid="99999999999@N99")
         id_fetcher.return_value.fetch.return_value = self.id_fetcher_success
         user_fetcher.return_value.fetch.return_value = self.user_fetcher_success
         call_command("fetch_flickr_account_user", id="32", stdout=self.out)
         self.account.refresh_from_db()
-        self.assertEqual(self.account.user.nsid, "35034346050@N01")
+        self.assertEqual(self.account.user.nsid, "99999999999@N99")
 
 
 class FetchFlickrOriginalsTestCase(TestCase):
@@ -96,8 +96,8 @@ class FetchFlickrOriginalsTestCase(TestCase):
         "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
     )
     def test_sends_all_true_to_fetcher_with_account(self, fetcher):
-        call_command("fetch_flickr_originals", "--all", account="35034346050@N01")
-        fetcher.assert_called_with(nsid="35034346050@N01")
+        call_command("fetch_flickr_originals", "--all", account="99999999999@N99")
+        fetcher.assert_called_with(nsid="99999999999@N99")
         fetcher.return_value.fetch.assert_called_with(fetch_all=True)
 
     @patch(
@@ -160,7 +160,7 @@ class FetchFlickrPhotosTestCase(TestCase):
 
     def test_fail_with_account_only(self):
         with self.assertRaises(CommandError):
-            call_command("fetch_flickr_photos", account="35034346050@N01")
+            call_command("fetch_flickr_photos", account="99999999999@N99")
 
     def test_fail_with_non_numeric_days(self):
         with self.assertRaises(CommandError):
@@ -170,8 +170,8 @@ class FetchFlickrPhotosTestCase(TestCase):
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
     )
     def test_sends_days_to_fetcher_with_account(self, fetcher):
-        call_command("fetch_flickr_photos", account="35034346050@N01", days="4")
-        fetcher.assert_called_with(nsid="35034346050@N01")
+        call_command("fetch_flickr_photos", account="99999999999@N99", days="4")
+        fetcher.assert_called_with(nsid="99999999999@N99")
         fetcher.return_value.fetch.assert_called_with(days=4)
 
     @patch(
@@ -186,8 +186,8 @@ class FetchFlickrPhotosTestCase(TestCase):
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
     )
     def test_sends_all_to_fetcher_with_account(self, fetcher):
-        call_command("fetch_flickr_photos", account="35034346050@N01", days="all")
-        fetcher.assert_called_with(nsid="35034346050@N01")
+        call_command("fetch_flickr_photos", account="99999999999@N99", days="all")
+        fetcher.assert_called_with(nsid="99999999999@N99")
         fetcher.return_value.fetch.assert_called_with(days="all")
 
     @patch(
@@ -234,8 +234,8 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
     )
     def test_calls_fetcher_with_account(self, fetcher):
-        call_command("fetch_flickr_photosets", account="35034346050@N01")
-        fetcher.assert_called_with(nsid="35034346050@N01")
+        call_command("fetch_flickr_photosets", account="99999999999@N99")
+        fetcher.assert_called_with(nsid="99999999999@N99")
         fetcher.return_value.fetch.assert_called_with()
 
     @patch(
