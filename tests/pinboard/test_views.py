@@ -215,7 +215,7 @@ class PinboardViewTests(TestCase):
     def test_bookmark_detail_tag_privacy(self):
         "Does not display private tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("publictag", ".notpublic", "alsopublic")
+        bookmark.tags.set(["publictag", ".notpublic", "alsopublic"])
         response = self.client.get(
             reverse(
                 "pinboard:bookmark_detail",
@@ -255,9 +255,9 @@ class PinboardViewTests(TestCase):
     def test_tag_list_context(self):
         "Sends the correct data to templates"
         bookmark_1 = BookmarkFactory()
-        bookmark_1.tags.set("fish", "carp")
+        bookmark_1.tags.set(["fish", "carp"])
         bookmark_2 = BookmarkFactory()
-        bookmark_2.tags.set("fish", "cod")
+        bookmark_2.tags.set(["fish", "cod"])
         response = self.client.get(reverse("pinboard:tag_list"))
         self.assertIn("account_list", response.context)
         self.assertIn("tag_list", response.context)
@@ -266,9 +266,9 @@ class PinboardViewTests(TestCase):
     def test_tag_list_privacy_bookmarks(self):
         "Doesn't display tags from private bookmarks"
         bookmark_1 = BookmarkFactory(is_private=True)
-        bookmark_1.tags.set("fish", "carp")
+        bookmark_1.tags.set(["fish", "carp"])
         bookmark_2 = BookmarkFactory(is_private=False)
-        bookmark_2.tags.set("fish", "cod")
+        bookmark_2.tags.set(["fish", "cod"])
         response = self.client.get(reverse("pinboard:tag_list"))
         self.assertEqual(len(response.context["tag_list"]), 2)
         self.assertEqual(response.context["tag_list"][0].name, "fish")
@@ -277,7 +277,7 @@ class PinboardViewTests(TestCase):
     def test_tag_list_privacy_tags(self):
         "Doesn't display private .tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("ispublic", ".notpublic", "alsopublic")
+        bookmark.tags.set(["ispublic", ".notpublic", "alsopublic"])
         response = self.client.get(reverse("pinboard:tag_list"))
         self.assertEqual(len(response.context["tag_list"]), 2)
         # Tags on this page are ordered by popularity, so can't be sure
@@ -291,7 +291,7 @@ class PinboardViewTests(TestCase):
     def test_tag_detail_templates(self):
         "Uses the correct templates"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("fish")
+        bookmark.tags.set(["fish"])
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
@@ -303,11 +303,11 @@ class PinboardViewTests(TestCase):
     def test_tag_detail_context(self):
         "Sends the correct data to the templates"
         bookmark_1 = BookmarkFactory(title="Carp")
-        bookmark_1.tags.set("Fish", "carp")
+        bookmark_1.tags.set(["Fish", "carp"])
         bookmark_2 = BookmarkFactory(title="Cod")
-        bookmark_2.tags.set("Fish", "cod")
+        bookmark_2.tags.set(["Fish", "cod"])
         bookmark_3 = BookmarkFactory(title="Dog")
-        bookmark_3.tags.set("mammals", "dog")
+        bookmark_3.tags.set(["mammals", "dog"])
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
@@ -326,7 +326,7 @@ class PinboardViewTests(TestCase):
     def test_tag_detail_privacy(self):
         "Does not display private bookmarks"
         bookmark = BookmarkFactory(is_private=True)
-        bookmark.tags.set("fish")
+        bookmark.tags.set(["fish"])
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
@@ -345,7 +345,7 @@ class PinboardViewTests(TestCase):
         "Uses the correct templates"
         account = AccountFactory()
         bookmark = BookmarkFactory(account=account, title="Carp")
-        bookmark.tags.set("fish", "carp")
+        bookmark.tags.set(["fish", "carp"])
         response = self.client.get(
             reverse(
                 "pinboard:account_tag_detail",
@@ -362,13 +362,13 @@ class PinboardViewTests(TestCase):
         account_1 = AccountFactory()
         account_2 = AccountFactory()
         bookmarks_1 = BookmarkFactory.create_batch(3, account=account_1)
-        bookmarks_1[0].tags.set("Fish", "carp")
-        bookmarks_1[1].tags.set("Fish", "cod")
-        bookmarks_1[2].tags.set("mammals", "dog")
+        bookmarks_1[0].tags.set(["Fish", "carp"])
+        bookmarks_1[1].tags.set(["Fish", "cod"])
+        bookmarks_1[2].tags.set(["mammals", "dog"])
         bookmarks_2 = BookmarkFactory.create_batch(3, account=account_2)
-        bookmarks_2[0].tags.set("Fish", "carp")
-        bookmarks_2[1].tags.set("Fish", "cod")
-        bookmarks_2[2].tags.set("mammals", "dog")
+        bookmarks_2[0].tags.set(["Fish", "carp"])
+        bookmarks_2[1].tags.set(["Fish", "cod"])
+        bookmarks_2[2].tags.set(["mammals", "dog"])
         response = self.client.get(
             reverse(
                 "pinboard:account_tag_detail",
@@ -389,7 +389,7 @@ class PinboardViewTests(TestCase):
     def test_account_tag_detail_privacy(self):
         "Does not display private bookmarks"
         bookmark = BookmarkFactory(is_private=True)
-        bookmark.tags.set("fish")
+        bookmark.tags.set(["fish"])
         response = self.client.get(
             reverse(
                 "pinboard:account_tag_detail",
@@ -401,7 +401,7 @@ class PinboardViewTests(TestCase):
     def test_account_tag_detail_fails_1(self):
         "Returns a 404 if a non-existent account is requested"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("fish")
+        bookmark.tags.set(["fish"])
 
         response = self.client.get(
             reverse(
@@ -415,7 +415,7 @@ class PinboardViewTests(TestCase):
         "Returns a 404 if a non-existent tag is requested"
         account = AccountFactory()
         bookmark = BookmarkFactory(account=account)
-        bookmark.tags.set("fish")
+        bookmark.tags.set(["fish"])
 
         response = self.client.get(
             reverse(

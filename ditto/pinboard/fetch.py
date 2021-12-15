@@ -225,7 +225,7 @@ class BookmarksFetcher(object):
             },
         )
 
-        bookmark_obj.tags.set(*bookmark["tags"])
+        bookmark_obj.tags.set(bookmark["tags"])
 
 
 class AllBookmarksFetcher(BookmarksFetcher):

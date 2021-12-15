@@ -7,8 +7,8 @@ from django.core.paginator import InvalidPage
 from django.urls import reverse
 from django.http import Http404
 from django.shortcuts import redirect
-from django.utils.encoding import force_str, force_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
 from django.views.generic import ListView, TemplateView
 from django.views.generic import DayArchiveView as DjangoDayArchiveView
 
@@ -574,7 +574,7 @@ class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
                     raise Http404(
                         _("No %(verbose_name_plural)s available")
                         % {
-                            "verbose_name_plural": force_text(
+                            "verbose_name_plural": force_str(
                                 qs.model._meta.verbose_name_plural
                             )
                         }
