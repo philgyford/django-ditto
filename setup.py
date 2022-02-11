@@ -67,7 +67,7 @@ if sys.argv[-1] == "testpublish":
     # os.system("python setup.py bdist_wheel upload")
     sys.exit()
 
-dev_require = ["django-debug-toolbar>=2.0,<4.0", "flake8>=3.8,<4.0", "black==21.7b0"]
+dev_require = ["django-debug-toolbar>=2.0,<4.0", "flake8>=3.8,<5.0", "black==22.1.0"]
 tests_require = dev_require + [
     "factory-boy>=2.12.0,<4.0",
     "freezegun>=0.3.12,<2.0",
@@ -82,9 +82,9 @@ setup(
     install_requires=[
         "django-imagekit>=4.0,<4.2",
         "django-sortedm2m>=3.0.0,<3.2",
-        "django-taggit>=2.0.0,<2.1",
+        "django-taggit>=2.0.0,<2.2",
         "flickrapi>=2.4,<2.5",
-        "pillow>=7.0.0,<9.0",
+        "pillow>=8.0.0,<10.0",
         "pytz",
         "twitter-text-python>=1.1.1,<1.2",
         "twython>=3.7.0,<3.10",
@@ -107,6 +107,7 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Django",
+        "Framework :: Django :: 2.2",
         "Framework :: Django :: 3.1",
         "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.0",
@@ -118,6 +119,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
