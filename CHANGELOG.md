@@ -4,14 +4,14 @@ Changelog (Django Ditto)
 Unreleased
 ----------
 
-- **Backwards incompatible:** Drop support for Django 2.2.
+- **Backwards incompatible:** Drop support for Django 2.2 and 3.1.
 
 - **Backwards incompatible:** Requires django-taggit >= v2.0.0
   (It changed how `TaggableManager` sets tags: https://github.com/jazzband/django-taggit/blob/master/CHANGELOG.rst#200-2021-11-14 )
 
-- Add support for Django 4.0 [WAITING ON django-taggit]
+- Add support for Django 4.0
 
-- Add support for Python 3.10 [WAITING ON django-taggit]
+- Add support for Python 3.10
 
 
 1.4.2 - 2021-10-22
