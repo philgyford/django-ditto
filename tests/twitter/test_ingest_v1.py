@@ -4,14 +4,14 @@ from unittest.mock import call, mock_open, patch
 from django.test import TestCase
 
 from ditto.twitter import factories
-from ditto.twitter.ingest import IngestError, TweetIngester
+from ditto.twitter.ingest import IngestError, Version1TweetIngester
 from ditto.twitter.models import Tweet
 
 
-class TweetIngesterTestCase(TestCase):
+class Version1TweetIngesterTestCase(TestCase):
 
     # A sample file of the format we'd get in a Twitter archive.
-    ingest_fixture = "tests/twitter/fixtures/ingest/2015_08.js"
+    ingest_fixture = "tests/twitter/fixtures/ingest/v1/2015_08.js"
 
     def get_tweet_data(self):
         "Returns the JSON tweet data, as text, from the fixture."
@@ -23,14 +23,14 @@ class TweetIngesterTestCase(TestCase):
     def test_raises_error_with_invalid_dir(self):
         with patch("os.path.isdir", return_value=False):
             with self.assertRaises(IngestError):
-                TweetIngester().ingest(directory="/bad/dir")
+                Version1TweetIngester().ingest(directory="/bad/dir")
 
     def test_raises_error_with_empty_dir(self):
         "If no .js files are found, raises IngestError"
         with patch("os.path.isdir", return_value=True):
-            with patch("ditto.twitter.ingest.TweetIngester", file_count=0):
+            with patch("ditto.twitter.ingest.Version1TweetIngester", file_count=0):
                 with self.assertRaises(IngestError):
-                    TweetIngester().ingest(directory="/bad/dir")
+                    Version1TweetIngester().ingest(directory="/bad/dir")
 
     # All the below have a similar structure to mock out file-related functions.
     # Here's what's happening:
@@ -56,7 +56,7 @@ class TweetIngesterTestCase(TestCase):
 
     # Ingest! This will save Tweets using our fixture data, and imagine it's
     # loaded data from our fake files:
-    #           result = TweetIngester().ingest(directory='/good/dir')
+    #           result = Version1TweetIngester().ingest(directory='/good/dir')
 
     def test_opens_all_files(self):
         "All the .js files in the directory are opened."
@@ -71,7 +71,7 @@ class TweetIngesterTestCase(TestCase):
             m = mock_open(read_data=file_content)
             with patch("builtins.open", m):
                 m.return_value.readlines.return_value = file_content.splitlines()
-                ingester = TweetIngester()
+                ingester = Version1TweetIngester()
                 ingester.ingest(directory="/good/dir")
         m.assert_has_calls(
             [
@@ -91,7 +91,7 @@ class TweetIngesterTestCase(TestCase):
             m = mock_open(read_data=file_content)
             with patch("builtins.open", m):
                 m.return_value.readlines.return_value = file_content.splitlines()
-                TweetIngester().ingest(directory="/good/dir")
+                Version1TweetIngester().ingest(directory="/good/dir")
         # We load three dummy files; our results have three tweets in each:
         self.assertEqual(Tweet.objects.count(), 3)
 
@@ -103,7 +103,7 @@ class TweetIngesterTestCase(TestCase):
             m = mock_open(read_data=file_content)
             with patch("builtins.open", m):
                 m.return_value.readlines.return_value = file_content.splitlines()
-                result = TweetIngester().ingest(directory="/good/dir")
+                result = Version1TweetIngester().ingest(directory="/good/dir")
         self.assertTrue(result["success"])
         self.assertEqual(result["tweets"], 3)
         self.assertEqual(result["files"], 1)
@@ -116,7 +116,7 @@ class TweetIngesterTestCase(TestCase):
             m = mock_open(read_data=file_content)
             with patch("builtins.open", m):
                 m.return_value.readlines.return_value = file_content.splitlines()
-                result = TweetIngester().ingest(directory="/good/dir")
+                result = Version1TweetIngester().ingest(directory="/good/dir")
         self.assertFalse(result["success"])
         self.assertEqual(result["tweets"], 0)
         self.assertEqual(result["files"], 1)

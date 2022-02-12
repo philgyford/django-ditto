@@ -3,7 +3,7 @@ import os
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...ingest import TweetIngester
+from ...ingest import Version1TweetIngester
 
 
 class Command(BaseCommand):
@@ -24,23 +24,39 @@ class Command(BaseCommand):
             help="Path to the directory that is the archive",
         )
 
+        parser.add_argument(
+            "--archive-version",
+            action="store",
+            default=None,
+            help="v1 or v2 (default). Which format of archives to import from.",
+        )
+
     def handle(self, *args, **options):
         # Location of the directory holding the tweet JSON files within the
         # archive:
         subpath = "/data/js/tweets"
 
+        ingester_class = None
+
+        if options["archive_version"]:
+            if options["archive_version"] == "v1":
+                ingester_class = Version1TweetIngester
+            else:
+                raise CommandError(
+                    f"version should be v1 or v2, not '{options['archive_version']}"
+                )
         if options["path"]:
             if os.path.isdir(options["path"]):
                 tweets_dir = "%s%s" % (options["path"], subpath)
                 if os.path.isdir(tweets_dir):
-                    result = TweetIngester().ingest(directory=tweets_dir)
+                    result = ingester_class().ingest(directory=tweets_dir)
                 else:
                     raise CommandError(
-                        "Expected to find a directory at '%s' containing JSON files"
-                        % tweets_dir
+                        f"Expected to find a directory at '{tweets_dir}' "
+                        "containing JSON files"
                     )
             else:
-                raise CommandError("Can't find a directory at '%s'" % options["path"])
+                raise CommandError(f"Can't find a directory at '{options['path']}'")
         else:
             raise CommandError(
                 (
@@ -55,11 +71,9 @@ class Command(BaseCommand):
                 filenoun = "file" if result["files"] == 1 else "files"
 
                 self.stdout.write(
-                    "Imported %s %s from %s %s"
-                    % (result["tweets"], tweetnoun, result["files"], filenoun)
+                    f"Imported {result['tweets']} {tweetnoun} from "
+                    f"{result['files']} {filenoun}"
                 )
             else:
 
-                self.stderr.write(
-                    "Failed to import tweets: %s" % (result["messages"][0])
-                )
+                self.stderr.write(f"Failed to import tweets: {result['messages'][0]}")

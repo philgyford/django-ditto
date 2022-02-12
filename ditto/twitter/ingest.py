@@ -62,30 +62,10 @@ class TweetIngester(object):
             }
 
     def _load_data(self, directory):
-        """Goes through all the *.js files in `directory` and puts the tweet
-        data inside into self.tweets_data.
-
-        No data is saved to the database until we've successfully loaded JSON
-        from all of the files.
-
-        Keyword arguments:
-        directory -- The directory to load the files from.
-
-        Raises:
-        FetchError -- If the directory is invalid, or there are no .js files,
-            or we can't load JSON from one of the files.
-        """
-        try:
-            for file in os.listdir(directory):
-                if file.endswith(".js"):
-                    filepath = "%s/%s" % (directory, file)
-                    self._get_data_from_file(filepath)
-                    self.file_count += 1
-        except OSError as e:
-            raise IngestError(e)
-
-        if self.file_count == 0:
-            raise IngestError("No .js files found in %s" % directory)
+        raise NotImplementedError(
+            "Child classes of TweetImporter must implement their own "
+            "_load_data() method."
+        )
 
     def _get_data_from_file(self, filepath):
         """Looks in a file, parses its JSON, and adds a dict of data about
@@ -116,3 +96,32 @@ class TweetIngester(object):
         for tweet in self.tweets_data:
             TweetSaver().save_tweet(tweet, self.fetch_time)
             self.tweet_count += 1
+
+
+class Version1TweetIngester(TweetIngester):
+
+    def _load_data(self, directory):
+        """Goes through all the *.js files in `directory` and puts the tweet
+        data inside into self.tweets_data.
+
+        No data is saved to the database until we've successfully loaded JSON
+        from all of the files.
+
+        Keyword arguments:
+        directory -- The directory to load the files from.
+
+        Raises:
+        FetchError -- If the directory is invalid, or there are no .js files,
+            or we can't load JSON from one of the files.
+        """
+        try:
+            for file in os.listdir(directory):
+                if file.endswith(".js"):
+                    filepath = "%s/%s" % (directory, file)
+                    self._get_data_from_file(filepath)
+                    self.file_count += 1
+        except OSError as e:
+            raise IngestError(e)
+
+        if self.file_count == 0:
+            raise IngestError("No .js files found in %s" % directory)

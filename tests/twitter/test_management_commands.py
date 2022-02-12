@@ -216,10 +216,12 @@ class FetchTwitterAccountsOutput(FetchTwitterOutput):
         self.assertIn("Could not fetch @philgyford: It broke", self.out_err.getvalue())
 
 
-class ImportTweets(TestCase):
+class ImportTweetsVersion1(TestCase):
+    "Only testing using archive-version=v1 argument"
+
     def setUp(self):
         self.patcher = patch(
-            "ditto.twitter.management.commands.import_twitter_tweets.TweetIngester.ingest"  # noqa: E501
+            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"  # noqa: E501
         )
         self.ingest_mock = self.patcher.start()
         self.out = StringIO()
@@ -233,39 +235,60 @@ class ImportTweets(TestCase):
         with self.assertRaises(CommandError):
             call_command("import_twitter_tweets")
 
+    def test_fails_with_invalid_version(self):
+        with self.assertRaises(CommandError):
+            call_command(
+                "import_twitter_tweets", path="/right/path", archive_version="nope"
+            )
+
     def test_fails_with_invalid_directory(self):
+        "Test fails with invalid directory"
         with patch("os.path.isdir", return_value=False):
             with self.assertRaises(CommandError):
-                call_command("import_twitter_tweets", path="/wrong/path")
+                call_command(
+                    "import_twitter_tweets", path="/wrong/path", archive_version="v1"
+                )
 
     def test_calls_ingest_method(self):
+        "Calls correct class and method"
         with patch("os.path.isdir", return_value=True):
-            call_command("import_twitter_tweets", path="/right/path", stdout=self.out)
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v1",
+                stdout=self.out,
+            )
             self.ingest_mock.assert_called_once_with(
                 directory="/right/path/data/js/tweets"
             )
 
     def test_success_output(self):
-        """Outputs the correct response if ingesting succeeds."""
-        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
-        with patch("os.path.isdir", return_value=True):
-            call_command("import_twitter_tweets", path="/right/path", stdout=self.out)
-            self.assertIn("Imported 12345 tweets from 21 files", self.out.getvalue())
-
-    def test_success_output_verbosity_0(self):
-        """Outputs nothing if ingesting succeeds."""
+        """Outputs the correct response if ingesting succeeds"""
         self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
         with patch("os.path.isdir", return_value=True):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
+                archive_version="v1",
+                stdout=self.out,
+            )
+            self.assertIn("Imported 12345 tweets from 21 files", self.out.getvalue())
+
+    def test_success_output_verbosity_0(self):
+        """Outputs nothing if ingesting succeeds"""
+        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
+        with patch("os.path.isdir", return_value=True):
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v1",
                 verbosity=0,
                 stdout=self.out,
             )
             self.assertEqual("", self.out.getvalue())
 
     def test_error_output(self):
-        """Outputs the correct error if ingesting fails."""
+        """Outputs the correct error if ingesting fails"""
         self.ingest_mock.return_value = {
             "success": False,
             "messages": ["Something went wrong"],
@@ -274,6 +297,7 @@ class ImportTweets(TestCase):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
+                archive_version="v1",
                 stdout=self.out,
                 stderr=self.out_err,
             )
