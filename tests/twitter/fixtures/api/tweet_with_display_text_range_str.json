@@ -1,0 +1,20 @@
+{
+  "retweeted": false,
+  "source": "<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for iΟS</a>",
+  "entities": {
+    "hashtags": [],
+    "symbols": [],
+    "user_mentions": [],
+    "urls": []
+  },
+  "display_text_range": ["0", "140"],
+  "favorite_count": "6",
+  "id_str": "915152022273449987",
+  "truncated": false,
+  "retweet_count": "0",
+  "id": "915152022273449987",
+  "created_at": "Tue Oct 03 09:50:19 +0000 2017",
+  "favorited": false,
+  "full_text": "Open iPad Slack, scroll to bottom. Close Slack. Open Slack; it’s scrolled back up. Every time. Maddening. Not biggest problem in world, BUT.",
+  "lang": "en"
+}

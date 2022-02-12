@@ -35,6 +35,7 @@ class HtmlifyDescriptionTestCase(HtmlifyTestCase):
         )
 
 
+
 class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     "Linkify URLs from entities: urls, screen_names, hashtags."
 
@@ -158,6 +159,49 @@ class HtmlifyTweetTestCase(HtmlifyTestCase):
         tweet_html = htmlify_tweet(tweet)
         self.assertEqual("X", tweet_html[0])
         self.assertEqual("Y", tweet_html[-1])
+
+
+class HtmlifyTweetStrsNotIntsTestCase(HtmlifyTestCase):
+
+    def test_handles_display_text_range_str(self):
+        """Cope correctly if display_text_range is strings, not ints.
+
+        Some tweet JSON have the display_text_range set as strings not ints,
+        e.g. ["0", "140"] rather than [0, 140]. Particularly when the
+        JSON has come from the downloaded Twitter archive.
+        It should be able to cope with that.
+        """
+        api_fixture = "tweet_with_display_text_range_str.json"
+        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        self.assertEqual(
+            tweet_html,
+            (
+                "Open iPad Slack, scroll to bottom. Close Slack. Open Slack; it’s "
+                "scrolled back up. Every time. Maddening. Not biggest problem in "
+                "world, BUT."
+            )
+        )
+
+    def test_handles_entities_indicies_str(self):
+        """Cope correctly if entities' indicies are strings, not ints.
+
+        Some tweet JSON have the ["entities"][<kind>]["indices"] set as
+        strings not ints, e.g. ["0", "9"] rather than [0, 9].
+        Particularly when the JSON has come from the downloaded Twitter
+        archive.
+        It should be able to cope with that.
+        """
+        api_fixture = "tweet_with_entities_indices_str.json"
+        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        self.assertEqual(
+            tweet_html,
+            (
+                '<a href="https://twitter.com/terrycol" rel="external">@terrycol</a> '
+                '<a href="https://twitter.com/bobferris" rel="external">@bobferris</a> '
+                'I liked it and only thought some of it was a bit silly. But analysis '
+                'beyond that is probably beyond the scope of Twitter.'
+            )
+        )
 
 
 class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
