@@ -1,4 +1,3 @@
-# coding: utf-8
 from unittest.mock import call, mock_open, patch
 
 from django.test import TestCase

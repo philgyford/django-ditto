@@ -3,7 +3,7 @@ import os
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...ingest import Version1TweetIngester
+from ...ingest import Version1TweetIngester, Version2TweetIngester
 
 
 class Command(BaseCommand):
@@ -34,26 +34,34 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Location of the directory holding the tweet JSON files within the
         # archive:
-        subpath = "/data/js/tweets"
 
         ingester_class = None
 
         if options["archive_version"]:
             if options["archive_version"] == "v1":
+                # Where the JS files are:
+                subpath = "/data/js/tweets"
                 ingester_class = Version1TweetIngester
+
+            elif options["archive_version"] in ("v2", None):
+                # Where the JS files are:
+                subpath = "/data"
+                ingester_class = Version2TweetIngester
+
             else:
                 raise CommandError(
                     f"version should be v1 or v2, not '{options['archive_version']}"
                 )
+
         if options["path"]:
             if os.path.isdir(options["path"]):
-                tweets_dir = "%s%s" % (options["path"], subpath)
-                if os.path.isdir(tweets_dir):
-                    result = ingester_class().ingest(directory=tweets_dir)
+                js_dir = "%s%s" % (options["path"], subpath)
+                if os.path.isdir(js_dir):
+                    result = ingester_class().ingest(directory=js_dir)
                 else:
                     raise CommandError(
-                        f"Expected to find a directory at '{tweets_dir}' "
-                        "containing JSON files"
+                        f"Expected to find a directory at '{js_dir}' "
+                        "containing .js file(s)"
                     )
             else:
                 raise CommandError(f"Can't find a directory at '{options['path']}'")

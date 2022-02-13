@@ -216,19 +216,12 @@ class FetchTwitterAccountsOutput(FetchTwitterOutput):
         self.assertIn("Could not fetch @philgyford: It broke", self.out_err.getvalue())
 
 
-class ImportTweetsVersion1(TestCase):
-    "Only testing using archive-version=v1 argument"
+class ImportTweets(TestCase):
+    "Testing failures that aren't specific to v1 or v2 archive-version."
 
     def setUp(self):
-        self.patcher = patch(
-            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"  # noqa: E501
-        )
-        self.ingest_mock = self.patcher.start()
         self.out = StringIO()
         self.out_err = StringIO()
-
-    def tearDown(self):
-        self.patcher.stop()
 
     def test_fails_with_no_args(self):
         "Fails when no arguments are provided"
@@ -241,13 +234,22 @@ class ImportTweetsVersion1(TestCase):
                 "import_twitter_tweets", path="/right/path", archive_version="nope"
             )
 
-    def test_fails_with_invalid_directory(self):
-        "Test fails with invalid directory"
-        with patch("os.path.isdir", return_value=False):
-            with self.assertRaises(CommandError):
-                call_command(
-                    "import_twitter_tweets", path="/wrong/path", archive_version="v1"
-                )
+
+class ImportTweetsVersion1(TestCase):
+    """Only testing using --archive-version=v1 argument
+    Leaving lots of more generat tests to the ImportTweetsVersion2 class.
+    """
+
+    def setUp(self):
+        self.patcher = patch(
+            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"  # noqa: E501
+        )
+        self.ingest_mock = self.patcher.start()
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_calls_ingest_method(self):
         "Calls correct class and method"
@@ -262,6 +264,43 @@ class ImportTweetsVersion1(TestCase):
                 directory="/right/path/data/js/tweets"
             )
 
+
+class ImportTweetsVersion2(TestCase):
+    """Only testing using --archive-version=v2 argument
+    """
+
+    def setUp(self):
+        self.patcher = patch(
+            "ditto.twitter.management.commands.import_twitter_tweets.Version2TweetIngester.ingest"  # noqa: E501
+        )
+        self.ingest_mock = self.patcher.start()
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_fails_with_invalid_directory(self):
+        "Test fails with invalid directory"
+        with patch("os.path.isdir", return_value=False):
+            with self.assertRaises(CommandError):
+                call_command(
+                    "import_twitter_tweets", path="/wrong/path", archive_version="v2"
+                )
+
+    def test_calls_ingest_method(self):
+        "Calls correct class and method"
+        with patch("os.path.isdir", return_value=True):
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v2",
+                stdout=self.out,
+            )
+            self.ingest_mock.assert_called_once_with(
+                directory="/right/path/data"
+            )
+
     def test_success_output(self):
         """Outputs the correct response if ingesting succeeds"""
         self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
@@ -269,7 +308,7 @@ class ImportTweetsVersion1(TestCase):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
-                archive_version="v1",
+                archive_version="v2",
                 stdout=self.out,
             )
             self.assertIn("Imported 12345 tweets from 21 files", self.out.getvalue())
@@ -281,7 +320,7 @@ class ImportTweetsVersion1(TestCase):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
-                archive_version="v1",
+                archive_version="v2",
                 verbosity=0,
                 stdout=self.out,
             )
@@ -297,7 +336,7 @@ class ImportTweetsVersion1(TestCase):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
-                archive_version="v1",
+                archive_version="v2",
                 stdout=self.out,
                 stderr=self.out_err,
             )

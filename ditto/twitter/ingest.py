@@ -46,7 +46,9 @@ class TweetIngester(object):
         """Import all the tweet data and create/update the tweets."""
 
         self._load_data(directory)
+
         self._save_tweets()
+
         if self.tweet_count > 0:
             return {
                 "success": True,
@@ -62,29 +64,19 @@ class TweetIngester(object):
             }
 
     def _load_data(self, directory):
+        """
+        Child classes must implement their own _load_data() method.
+
+        It should populate self.tweets_data with a list of dicts, each
+        one being data about a single tweet.
+
+        And it should set self.file_count to be the number of JS files
+        we import the data from.
+        """
         raise NotImplementedError(
             "Child classes of TweetImporter must implement their own "
             "_load_data() method."
         )
-
-    def _get_data_from_file(self, filepath):
-        """Looks in a file, parses its JSON, and adds a dict of data about
-        each tweet found to self.tweets_data.
-
-        Arguments:
-        filespath -- Absolute path to the file.
-        """
-        f = open(filepath, "r")
-        lines = f.readlines()
-        # Remove first line, that contains JavaScript:
-        lines = lines[1:]
-        try:
-            tweets_data = json.loads("".join(lines))
-        except ValueError:
-            raise IngestError("Could not load JSON from %s" % filepath)
-        else:
-            self.tweets_data.extend(tweets_data)
-        f.close()
 
     def _save_tweets(self):
         """Go through the list of dicts that is self.tweets_data and
@@ -99,6 +91,15 @@ class TweetIngester(object):
 
 
 class Version1TweetIngester(TweetIngester):
+    """
+    Used for the old (original?) format of twitter archives, which contained
+    three files and five folders, including data/js/tweets/ which contained
+    a .js file for every month, like 2016_02.js. This is what we import
+    the tweet data from.
+
+    Sometime in 2019, between January and May, the format changed to
+    what we call version 2.
+    """
 
     def _load_data(self, directory):
         """Goes through all the *.js files in `directory` and puts the tweet
@@ -111,7 +112,7 @@ class Version1TweetIngester(TweetIngester):
         directory -- The directory to load the files from.
 
         Raises:
-        FetchError -- If the directory is invalid, or there are no .js files,
+        IngestError -- If the directory is invalid, or there are no .js files,
             or we can't load JSON from one of the files.
         """
         try:
@@ -125,3 +126,117 @@ class Version1TweetIngester(TweetIngester):
 
         if self.file_count == 0:
             raise IngestError("No .js files found in %s" % directory)
+
+    def _get_data_from_file(self, filepath):
+        """Looks in a file, parses its JSON, and adds a dict of data about
+        each tweet found to self.tweets_data.
+
+        Arguments:
+        filespath -- Absolute path to the file.
+        """
+        f = open(filepath, "r")
+        lines = f.readlines()
+        # Remove first line, that contains JavaScript:
+        lines = lines[1:]
+        try:
+            tweets_data = json.loads("".join(lines))
+        except ValueError as e:
+            raise IngestError(f"Could not load JSON from {filepath}: {e}")
+        else:
+            self.tweets_data.extend(tweets_data)
+        f.close()
+
+
+class Version2TweetIngester(TweetIngester):
+    """
+    Used for what we call the version 2 format of twitter archive, which
+    was introduced sometime between January and May of 2019.
+
+    It contains two directories - assets and data - and a "Your archive.html" file.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        # Tweets in this format don't contain data about the user.
+        # So we create and store that once, in this separate field.
+        self.user_data = {}
+
+    def _load_data(self, directory):
+        """
+        Generate the user data and load all the tweets' data
+        In this archive format, the tweets contain no data about the user.
+        So we create a user data dict to use when saving the tweets.
+        """
+
+        self.user_data = self._construct_user_data(directory)
+
+        self.tweets_data = self._get_json_from_file(os.path.join(directory, "tweet.js"))
+
+        self.file_count = 1
+
+    def _save_tweets(self):
+        """
+        Save the tweets with our constructed user data.
+        """
+        if len(self.tweets_data) == 0:
+            return
+
+        for tweet in self.tweets_data:
+            # Here we pass in our user_data too, so save_tweet() can use
+            # that in lieu of the data that is usually within each tweet's data.
+            TweetSaver().save_tweet(tweet["tweet"], self.fetch_time, self.user_data)
+            self.tweet_count += 1
+
+    def _construct_user_data(self, directory):
+        """
+        Make a single dict of data about a user like we'd get from the API.
+        This data is in several separate files in the download so we need to
+        piece it together from those.
+        """
+
+        account_data = self._get_json_from_file(os.path.join(directory, "account.js"))
+
+        profile_data = self._get_json_from_file(os.path.join(directory, "profile.js"))
+
+        verified_data = self._get_json_from_file(os.path.join(directory, "verified.js"))
+
+        try:
+            user_data = {
+                "id": int(account_data[0]["account"]["accountId"]),
+                "id_str": account_data[0]["account"]["accountId"],
+                "screen_name": account_data[0]["account"]["username"],
+                "name": account_data[0]["account"]["accountDisplayName"],
+                "profile_image_url_https": profile_data[0]["profile"]["avatarMediaUrl"],
+                "verified": verified_data[0]["verified"]["verified"],
+                # TODO:
+                "protected": False,
+                # So that we don't mistake this for coming from the API when
+                # we save the JSON:
+                "ditto_note": (
+                    "This user data was compiled from separate parts of a "
+                    "downloaded twitter archive by Django Ditto"
+                ),
+            }
+        except KeyError as e:
+            raise ImportError(f"Error creating user data: {e}")
+
+        return user_data
+
+    def _get_json_from_file(self, filepath):
+        try:
+            f = open(filepath)
+        except OSError as e:
+            raise ImportError(e)
+
+        lines = f.readlines()
+        # Remove first line, that contains JavaScript:
+        lines = ["["] + lines[1:]
+
+        try:
+            data = json.loads("".join(lines))
+        except ValueError as e:
+            raise IngestError(f"Could not load JSON from {filepath}: {e}")
+        else:
+            f.close()
+            return data
