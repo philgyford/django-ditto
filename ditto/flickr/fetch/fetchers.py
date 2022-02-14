@@ -374,16 +374,27 @@ class RecentPhotosFetcher(PhotosFetcher):
     Supply a number of days to fetch() to restrict to the most recent days.
     """
 
-    def fetch(self, days=None):
+    def fetch(self, days=None, range=None):
         """Fetch all of the Account's user's photos, by default.
-        days -- Required. The number of days back to look, by upload date, or
+        days  - The number of days back to look, by upload date, or
                 'all' to fetch all photos.
+        range - The start and end date of a range in YYYY-MM-DD,YYYY-MM-DD format
         """
+        
+        if days:
         try:
             self.min_date = datetime_now() - datetime.timedelta(days=days)
         except TypeError:
             if days != "all":
                 raise FetchError("days should be a number or 'all'.")
+        elif range:
+            try:
+                start, end = range.split(',')
+                self.min_taken_date = datetime.strptime(start, "%Y-%m-%d")
+                self.self_taken_date = datetime.strptime(end, "%Y-%m-%d")
+                
+            except TypeError:
+                raise FetchError("Soemthing went wrong there.") 
 
         return super().fetch()
 
@@ -391,6 +402,7 @@ class RecentPhotosFetcher(PhotosFetcher):
         """Fetch one page of results, containing very basic info about the
         Photos."""
 
+        if self.min_date:
         # Turn our datetime object into a unix timestamp:
         min_unixtime = calendar.timegm(self.min_date.timetuple())
 
@@ -398,6 +410,21 @@ class RecentPhotosFetcher(PhotosFetcher):
             results = self.api.people.getPhotos(
                 user_id=self.account.user.nsid,
                 min_upload_date=min_unixtime,
+                    per_page=self.items_per_page,
+                    page=self.page_number,
+                )
+            except FlickrError as e:
+                raise FetchError(
+                    "Error when fetching recent photos (page %s): %s"
+                    % (self.page_number, e)
+                )
+                
+        elif self.min_taken_date and self.max_taken_date:
+            try:
+                results = self.api.photos.search(
+                    user_id=self.account.user.nsid,
+                    min_taken_date=self.min_taken_date,
+                    max_taken_date=self.max_taken_date,
                 per_page=self.items_per_page,
                 page=self.page_number,
             )

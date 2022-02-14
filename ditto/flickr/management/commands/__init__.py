@@ -30,14 +30,21 @@ class FetchPhotosCommand(FetchCommand):
     singular_noun = "Photo"
     plural_noun = "Photos"
 
-    # Child classes should supply some help text for the --days argument:
+    # Child classes should supply some help text for the --days and --start --end arguments:
     days_help = ""
+    range_help = ""
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
-        parser.add_argument(
+        group = parser.add_mutually_excluseive_group()
+        
+        group.add_argument(
             "--days", action="store", default=False, help=self.days_help
+        )
+        
+        group.add_argument(
+            "--range", action="store", default=False, help=self.range_help
         )
 
     def handle(self, *args, **options):
@@ -59,7 +66,12 @@ class FetchPhotosCommand(FetchCommand):
         else:
             raise CommandError("Specify --days , eg --days=3 or --days=all.")
 
-    def fetch_photos(self, nsid, days):
+        if options["range"]:
+            results = self.fetch_photos(nsid, options["range"])
+            self.output_results(results, options.get("verbosity", 1))
+                        
+
+    def fetch_photos(self, nsid, days, start, end):
         """Child classes should override this method to call a method that
         fetches photos and returns results, eg:
             return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)
