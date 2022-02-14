@@ -8,13 +8,15 @@ You can fetch, store and display data about your own Tweets and Liked Tweets for
 Set-up
 ******
 
-Go to https://apps.twitter.com/ and create a new Application for your Twitter account. You can leave the 'Callback URL' field empty.
+Go to https://developer.twitter.com/portal. You'll need to sign up for a Developer Account, and then create a new App for your Twitter account. Note down the three credentials it says that you should note down.
 
-When viewing the Application Settings, click 'manage keys and access tokens'.
+When viewing your App's details, click the "Edit" button, then the "Keys and tokens" tab.
 
-On the next screen click the 'Create my access token' button.
+In the "Access Token and Secret" section, tap the "Generate" button. Make a note of the Access Token and Access Token Secret.
 
-Now, go to the Django admin, and add a new ``Account`` in the Twitter app. Copy the Consumer Key, Consumer Secret, Access Token and Access Token Secret from Twitter into the Django admin (ignore the other fields), and save the account. A new ``User`` object will be created, reflecting the Twitter user your API credentials are associated with.
+Django Ditto currently uses the v1.1 Twitter API rather than the latest v2. Unfortunately, accessing v1.1 requires that you apply for "Elevated" access before the API calls used will work. You can do that here: https://developer.twitter.com/en/portal/products/elevated You will then need to wait for approval.
+
+Once you have that, go to the Django admin, and add a new ``Account`` in the Twitter app. Copy the API Key, API Key Secret, Access Token and Access Token Secret from your Twitter App into the Django admin (ignore the other fields), and save the account. A new ``User`` object will be created, reflecting the Twitter user your API credentials are associated with. If it's worked your Account should have a title like **@philgyford** instead of a number like **1**.
 
 Once this is done you'll need to import a downloaded archive of Tweets, and/or fetch Tweets from the Twitter API. See :ref:`twitter-management-commands` below.
 
@@ -253,13 +255,21 @@ Management commands
 Import Tweets
 =============
 
-If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at https://twitter.com/settings/account . When you've downloaded it, do:
+If you have more than 3,200 Tweets, you can only include older Tweets by downloading your archive and importing it. To do so, request your archive at https://twitter.com/settings/download_your_data . When you've downloaded it, do:
 
 .. code-block:: shell
 
-    $ ./manage.py import_twitter_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
+    $ ./manage.py import_twitter_tweets --path=/path/to/twitter-2022-01-31-123456abcdef
 
-using the correct path to the directory you've downloaded and unzipped (in this case, the unzipped directory is ``12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66``). This will import all of the Tweets found in the archive.
+using the correct path to the directory you've downloaded and unzipped (in this case, the unzipped directory is ``twitter-2022-01-031-123456abcdef``). This will import all of the Tweets found in the archive and all of the images and animated GIFs' MP4 files (other videos aren't currently imported).
+
+**NOTE:** If you have an archive of data you downloaded before sometime in early 2019 it will be a different format. You can tell because the folder will contain five directories, and three files: ``index.html``, ``README.txt``, and ``tweets.csv``. If you want to import an archive in this format add the `--archive-version=v1` argument:
+
+.. code-block:: shell
+
+    $ ./manage.py import_twitter_tweets --archive-version=v1 --path=/path/to/123456_abcdef
+
+using the correct path to the directory (in this case, the unzipped directory is ``123456_abcdef``). This will import Tweet data but no images etc, because these files weren't included in the older archive format.
 
 Update Tweets
 =============
@@ -423,4 +433,3 @@ Fetch Accounts
     $ ./manage.py fetch_twitter_accounts
 
 I don't think this is needed now.
-
