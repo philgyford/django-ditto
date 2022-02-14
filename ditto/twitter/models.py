@@ -70,7 +70,11 @@ class Account(TimeStampedModelMixin, models.Model):
 
             # It would be nice to make this more visible, but not sure how to
             # given we don't have access to a request at this point.
-            if "success" in result and result["success"] is False:
+            if (
+                type(result) is dict
+                and "success" in result
+                and result["success"] is False
+            ):
                 if "messages" in result:
                     messages = ", ".join(result["messages"])
                 else:

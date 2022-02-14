@@ -59,13 +59,15 @@ class UserSaver(SaveUtilsMixin, object):
             "raw": raw_json,
             "screen_name": user["screen_name"],
             "name": user["name"],
-            "is_private": user["protected"],
             "is_verified": user["verified"],
             "profile_image_url_https": user["profile_image_url_https"],
         }
 
         # When ingesting tweets there are lots of fields the 'user' element
         # doesn't have, compared to the API:
+
+        if "protected" in user:
+            defaults["is_private"] = user["protected"]
 
         if "created_at" in user:
             defaults["created_at"] = self._api_time_to_datetime(user["created_at"])
