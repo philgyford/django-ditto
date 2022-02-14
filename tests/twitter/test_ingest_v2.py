@@ -1,11 +1,9 @@
 import json
 import os
-from unittest.mock import call, mock_open, patch
 
 from django.test import TestCase
 
-from ditto.twitter import factories
-from ditto.twitter.ingest import IngestError, Version2TweetIngester
+from ditto.twitter.ingest import Version2TweetIngester
 from ditto.twitter.models import Tweet, User
 
 

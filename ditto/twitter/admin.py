@@ -17,7 +17,15 @@ class AccountAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("user", "is_active",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "user",
+                    "is_active",
+                )
+            },
+        ),
         (
             "API",
             {
@@ -29,7 +37,8 @@ class AccountAdmin(admin.ModelAdmin):
                 ),
                 "description": (
                     "Keys and secrets require creation of an app at "
-                    '<a href="https://developer.twitter.com/portal">developer.twitter.com/portal</a>'
+                    '<a href="https://developer.twitter.com/portal">'
+                    "developer.twitter.com/portal</a>"
                 ),
             },
         ),
@@ -123,7 +132,13 @@ class MediaAdmin(admin.ModelAdmin):
         ),
         (
             "Data",
-            {"classes": ("collapse",), "fields": ("time_created", "time_modified",)},
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                ),
+            },
         ),
     )
 
@@ -240,7 +255,12 @@ class TweetAdmin(DittoItemModelAdmin):
             "Data",
             {
                 "classes": ("collapse",),
-                "fields": ("raw", "fetch_time", "time_created", "time_modified",),
+                "fields": (
+                    "raw",
+                    "fetch_time",
+                    "time_created",
+                    "time_modified",
+                ),
             },
         ),
     )
@@ -309,7 +329,17 @@ class UserAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Data", {"fields": ("raw", "fetch_time", "time_created", "time_modified",)}),
+        (
+            "Data",
+            {
+                "fields": (
+                    "raw",
+                    "fetch_time",
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     formfield_overrides = {

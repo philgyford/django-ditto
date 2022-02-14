@@ -226,8 +226,9 @@ class Version2TweetIngester(TweetIngester):
                             media_obj.media_type != "video"
                             and media_obj.has_file is False
                         ):
-                            # We don't save video files - only image files, and mp4s for # GIFs - and only want to do this if we don't already have a
-                            # file.
+                            # We don't save video files - only image files, and mp4s
+                            # for # GIFs - and only want to do this if we don't already
+                            # have a file.
 
                             if (
                                 media_obj.media_type == "animated_gif"
