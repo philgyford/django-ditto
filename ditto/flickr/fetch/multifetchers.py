@@ -94,7 +94,9 @@ class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
 
     def fetch(self, days=None, range=None):
         for account in self.accounts:
-            self.return_value.append(RecentPhotosFetcher(account).fetch(days=days,range=range))
+            self.return_value.append(
+                RecentPhotosFetcher(account).fetch(days=days, range=range)
+            )
 
         return self.return_value
 

@@ -38,11 +38,9 @@ class FetchPhotosCommand(FetchCommand):
         super().add_arguments(parser)
 
         group = parser.add_mutually_excluseive_group()
-        
-        group.add_argument(
-            "--days", action="store", default=False, help=self.days_help
-        )
-        
+
+        group.add_argument("--days", action="store", default=False, help=self.days_help)
+
         group.add_argument(
             "--range", action="store", default=False, help=self.range_help
         )
@@ -69,7 +67,6 @@ class FetchPhotosCommand(FetchCommand):
         if options["range"]:
             results = self.fetch_photos(nsid, options["range"])
             self.output_results(results, options.get("verbosity", 1))
-                        
 
     def fetch_photos(self, nsid, days, start, end):
         """Child classes should override this method to call a method that
