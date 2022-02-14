@@ -165,11 +165,11 @@ $ pipenv run make html
 <p>Rebuild documentation (which includes the version number).</p>
 <p>Ensure <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> is up-to-date for new version.</p>
 <p>Commit changes to git.</p>
+<p>Ensure GitHub Actions still build OK.</p>
 <p>Add a version tag:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py tag
 </pre></div>
 </div>
-<p>Ensure Travis still builds OK.</p>
 <p>Then:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py publish
 </pre></div>

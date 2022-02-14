@@ -102,13 +102,13 @@ Ensure ``CHANGELOG.md`` is up-to-date for new version.
 
 Commit changes to git.
 
+Ensure GitHub Actions still build OK.
+
 Add a version tag:
 
 .. code-block:: shell
 
     $ python setup.py tag
-
-Ensure Travis still builds OK.
 
 Then:
 
