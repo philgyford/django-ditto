@@ -1,4 +1,6 @@
 # coding: utf-8
+import json
+import logging
 import os
 
 try:
@@ -17,7 +19,8 @@ from . import managers
 from .utils import htmlify_description, htmlify_tweet
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
-import json
+
+logger = logging.getLogger("ditto")
 
 
 class Account(TimeStampedModelMixin, models.Model):
@@ -63,8 +66,20 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def save(self, *args, **kwargs):
         if self.user is None:
-            self.updateUserFromTwitter()
-            # Quietly ignoring errors. Sorry.
+            result = self.updateUserFromTwitter()
+
+            # It would be nice to make this more visible, but not sure how to
+            # given we don't have access to a request at this point.
+            if "success" in result and result["success"] is False:
+                if "messages" in result:
+                    messages = ", ".join(result["messages"])
+                else:
+                    messages = ""
+                logger.error(
+                    "There was an error while trying to update the User data from "
+                    f"the Twitter API: {messages}"
+                )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
