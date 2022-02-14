@@ -54,7 +54,6 @@ class Version2TweetIngesterTestCase(TestCase):
                 "name": "Phil Gyford",
                 "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300.jpg",  # NOQA: E501
                 "verified": False,
-                "protected": False,
                 "ditto_note": (
                     "This user data was compiled from separate parts of a "
                     "downloaded twitter archive by Django Ditto"

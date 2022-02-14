@@ -281,8 +281,6 @@ class Version2TweetIngester(TweetIngester):
                 "name": account_data[0]["account"]["accountDisplayName"],
                 "profile_image_url_https": profile_data[0]["profile"]["avatarMediaUrl"],
                 "verified": verified_data[0]["verified"]["verified"],
-                # TODO:
-                "protected": False,
                 # So that we don't mistake this for coming from the API when
                 # we save the JSON:
                 "ditto_note": (
