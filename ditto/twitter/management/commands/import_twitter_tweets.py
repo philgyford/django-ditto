@@ -37,18 +37,18 @@ class Command(BaseCommand):
 
         ingester_class = None
 
+        # For v2, the default:
+        # Where the JS files are:
+        subpath = "/data"
+        ingester_class = Version2TweetIngester
+
         if options["archive_version"]:
             if options["archive_version"] == "v1":
                 # Where the JS files are:
                 subpath = "/data/js/tweets"
                 ingester_class = Version1TweetIngester
 
-            elif options["archive_version"] in ("v2", None):
-                # Where the JS files are:
-                subpath = "/data"
-                ingester_class = Version2TweetIngester
-
-            else:
+            elif options["archive_version"] != "v2":
                 raise CommandError(
                     f"version should be v1 or v2, not '{options['archive_version']}"
                 )
@@ -68,8 +68,8 @@ class Command(BaseCommand):
         else:
             raise CommandError(
                 (
-                    "Specify the location of the archive, "
-                    "e.g. --path=/Path/To/1234567890_abcdefg12345"
+                    "Specify the location of the archive directory, "
+                    "e.g. --path=/path/to/twitter-2022-01-31-abcdef123456"
                 )
             )
 
@@ -77,10 +77,12 @@ class Command(BaseCommand):
             if result["success"]:
                 tweetnoun = "tweet" if result["tweets"] == 1 else "tweets"
                 filenoun = "file" if result["files"] == 1 else "files"
+                mediafilenoun = "file" if result["media"] == 1 else "files"
 
                 self.stdout.write(
                     f"Imported {result['tweets']} {tweetnoun} from "
-                    f"{result['files']} {filenoun}"
+                    f"{result['files']} {filenoun}, "
+                    f"and {result['media']} media {mediafilenoun}"
                 )
             else:
 

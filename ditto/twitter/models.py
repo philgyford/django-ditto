@@ -236,6 +236,14 @@ class Media(TimeStampedModelMixin, models.Model):
         verbose_name_plural = "Media items"
 
     @property
+    def has_file(self):
+        "Do we have a file saved at all?"
+        if self.image_file.name or self.mp4_file.name:
+            return True
+        else:
+            return False
+
+    @property
     def thumbnail_w(self):
         "Because we usually actually want 150, not whatever thumb_w is."
         return 150

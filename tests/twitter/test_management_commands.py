@@ -266,8 +266,7 @@ class ImportTweetsVersion1(TestCase):
 
 
 class ImportTweetsVersion2(TestCase):
-    """Only testing using --archive-version=v2 argument
-    """
+    """Only testing using --archive-version=v2 argument"""
 
     def setUp(self):
         self.patcher = patch(
@@ -297,13 +296,16 @@ class ImportTweetsVersion2(TestCase):
                 archive_version="v2",
                 stdout=self.out,
             )
-            self.ingest_mock.assert_called_once_with(
-                directory="/right/path/data"
-            )
+            self.ingest_mock.assert_called_once_with(directory="/right/path/data")
 
     def test_success_output(self):
         """Outputs the correct response if ingesting succeeds"""
-        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
+        self.ingest_mock.return_value = {
+            "success": True,
+            "tweets": 12345,
+            "files": 1,
+            "media": 345,
+        }
         with patch("os.path.isdir", return_value=True):
             call_command(
                 "import_twitter_tweets",
@@ -311,11 +313,19 @@ class ImportTweetsVersion2(TestCase):
                 archive_version="v2",
                 stdout=self.out,
             )
-            self.assertIn("Imported 12345 tweets from 21 files", self.out.getvalue())
+            self.assertIn(
+                "Imported 12345 tweets from 1 file, and 345 media files",
+                self.out.getvalue(),
+            )
 
     def test_success_output_verbosity_0(self):
         """Outputs nothing if ingesting succeeds"""
-        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
+        self.ingest_mock.return_value = {
+            "success": True,
+            "tweets": 12345,
+            "files": 1,
+            "media": 345,
+        }
         with patch("os.path.isdir", return_value=True):
             call_command(
                 "import_twitter_tweets",

@@ -1,8 +1,11 @@
-# coding: utf-8
 import json
 import os
+from urllib.parse import urlparse
+
+from django.core.files import File
 
 from .fetch.savers import TweetSaver
+from .models import Media
 from ..core.utils import datetime_now
 
 
@@ -37,6 +40,9 @@ class TweetIngester(object):
         # How mnay tweets we found in all the files:
         self.tweet_count = 0
 
+        # How many media files we imported:
+        self.media_count = 0
+
         # Stores all the imported data from the files before saving.
         # So that we know we've got through all the files within JSON errors
         # etc before we begin touching the DB.
@@ -47,19 +53,23 @@ class TweetIngester(object):
 
         self._load_data(directory)
 
-        self._save_tweets()
+        self._save_tweets(directory)
+
+        self._save_media(directory)
 
         if self.tweet_count > 0:
             return {
                 "success": True,
                 "tweets": self.tweet_count,
                 "files": self.file_count,
+                "media": self.media_count,
             }
         else:
             return {
                 "success": False,
                 "tweets": 0,
                 "files": self.file_count,
+                "media": self.media_count,
                 "messages": ["No tweets were found"],
             }
 
@@ -78,7 +88,7 @@ class TweetIngester(object):
             "_load_data() method."
         )
 
-    def _save_tweets(self):
+    def _save_tweets(self, directory):
         """Go through the list of dicts that is self.tweets_data and
         create/update each tweet in the DB.
         """
@@ -88,6 +98,12 @@ class TweetIngester(object):
         for tweet in self.tweets_data:
             TweetSaver().save_tweet(tweet, self.fetch_time)
             self.tweet_count += 1
+
+    def _save_media(self, directory):
+        """Save media files.
+        Not doing anything by default.
+        """
+        pass
 
 
 class Version1TweetIngester(TweetIngester):
@@ -153,6 +169,9 @@ class Version2TweetIngester(TweetIngester):
     was introduced sometime between January and May of 2019.
 
     It contains two directories - assets and data - and a "Your archive.html" file.
+
+    This not only saves the Tweet objects but also imports media from the
+    tweet_media directory, saving it as Media files .
     """
 
     def __init__(self):
@@ -171,11 +190,11 @@ class Version2TweetIngester(TweetIngester):
 
         self.user_data = self._construct_user_data(directory)
 
-        self.tweets_data = self._get_json_from_file(os.path.join(directory, "tweet.js"))
+        self.tweets_data = self._get_json_from_file(directory, "tweet.js")
 
         self.file_count = 1
 
-    def _save_tweets(self):
+    def _save_tweets(self, directory):
         """
         Save the tweets with our constructed user data.
         """
@@ -188,6 +207,59 @@ class Version2TweetIngester(TweetIngester):
             TweetSaver().save_tweet(tweet["tweet"], self.fetch_time, self.user_data)
             self.tweet_count += 1
 
+    def _save_media(self, directory):
+        """
+        Save any animated gif's mp4 or an image's file for the saved tweets.
+        """
+
+        for t in self.tweets_data:
+            tweet = t["tweet"]
+
+            if "extended_entities" in tweet and "media" in tweet["extended_entities"]:
+                for item in tweet["extended_entities"]["media"]:
+                    try:
+                        media_obj = Media.objects.get(twitter_id=int(item["id"]))
+                    except Media.DoesNotExist:
+                        pass
+                    else:
+                        if (
+                            media_obj.media_type != "video"
+                            and media_obj.has_file is False
+                        ):
+                            # We don't save video files - only image files, and mp4s for # GIFs - and only want to do this if we don't already have a
+                            # file.
+
+                            if (
+                                media_obj.media_type == "animated_gif"
+                                and media_obj.mp4_url
+                            ):
+                                url = media_obj.mp4_url
+                            elif (
+                                media_obj.media_type == "photo" and media_obj.image_url
+                            ):
+                                url = media_obj.image_url
+
+                            if url:
+                                # Work out name of file in the tweet_media directory:
+                                parsed_url = urlparse(url)
+                                filename = os.path.basename(parsed_url.path)
+                                local_filename = f"{tweet['id_str']}-{filename}"
+                                filepath = os.path.join(
+                                    directory, "tweet_media", local_filename
+                                )
+
+                                django_file = File(open(filepath, "rb"))
+
+                                if media_obj.media_type == "animated_gif":
+                                    # When we fetch GIFs we also fetch an image file for
+                                    # them. But their images aren't included in the
+                                    # downloaded archive so we'll make do without here.
+                                    media_obj.mp4_file.save(filename, django_file)
+                                    self.media_count += 1
+                                elif media_obj.media_type == "photo":
+                                    media_obj.image_file.save(filename, django_file)
+                                    self.media_count += 1
+
     def _construct_user_data(self, directory):
         """
         Make a single dict of data about a user like we'd get from the API.
@@ -195,11 +267,11 @@ class Version2TweetIngester(TweetIngester):
         piece it together from those.
         """
 
-        account_data = self._get_json_from_file(os.path.join(directory, "account.js"))
+        account_data = self._get_json_from_file(directory, "account.js")
 
-        profile_data = self._get_json_from_file(os.path.join(directory, "profile.js"))
+        profile_data = self._get_json_from_file(directory, "profile.js")
 
-        verified_data = self._get_json_from_file(os.path.join(directory, "verified.js"))
+        verified_data = self._get_json_from_file(directory, "verified.js")
 
         try:
             user_data = {
@@ -223,7 +295,8 @@ class Version2TweetIngester(TweetIngester):
 
         return user_data
 
-    def _get_json_from_file(self, filepath):
+    def _get_json_from_file(self, directory, filepath):
+        filepath = os.path.join(directory, filepath)
         try:
             f = open(filepath)
         except OSError as e:
