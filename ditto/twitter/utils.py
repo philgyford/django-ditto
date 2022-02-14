@@ -74,6 +74,21 @@ def htmlify_tweet(json_data):
     if "entities" in json_data and "symbols" not in json_data["entities"]:
         json_data["entities"]["symbols"] = []
 
+    # Some Tweets (eg from a downloaded archive) have strings instead of ints
+    # to define text ranges. ["0", "140"] rather than [0, 140].
+    # We fix those here so that Twython doesn't complain.
+    if "display_text_range" in json_data:
+        json_data["display_text_range"] = [
+            int(n) for n in json_data["display_text_range"]
+        ]
+    if "entities" in json_data:
+        for key, value in json_data["entities"].items():
+            for count, entity in enumerate(value):
+                if "indices" in entity:
+                    json_data["entities"][key][count]["indices"] = [
+                        int(n) for n in entity["indices"]
+                    ]
+
     # This does most of the work for us:
     # https://twython.readthedocs.org/en/latest/usage/special_functions.html#html-for-tweet
     html = Twython.html_for_tweet(

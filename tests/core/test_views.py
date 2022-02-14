@@ -159,7 +159,7 @@ class DittoViewTests(TestCase):
     # def test_tag_detail_templates(self):
     # "Uses the correct templates"
     # bookmark = pinboardfactories.BookmarkFactory.create()
-    # bookmark.tags.set('fish')
+    # bookmark.tags.set(['fish'])
     # response = self.client.get(reverse('ditto:tag_detail',
     # kwargs={'slug': 'fish'}))
     # self.assertEquals(response.status_code, 200)
@@ -169,11 +169,11 @@ class DittoViewTests(TestCase):
     # def test_tag_detail_context(self):
     # "Sends correct data to templates"
     # bookmark_1 = pinboardfactories.BookmarkFactory.create(title='Carp')
-    # bookmark_1.tags.set('Fish', 'carp')
+    # bookmark_1.tags.set(['Fish', 'carp'])
     # bookmark_2 = pinboardfactories.BookmarkFactory.create(title='Cod')
-    # bookmark_2.tags.set('Fish', 'cod')
+    # bookmark_2.tags.set(['Fish', 'cod'])
     # bookmark_3 = pinboardfactories.BookmarkFactory.create(title='Dog')
-    # bookmark_3.tags.set('mammals', 'dog')
+    # bookmark_3.tags.set(['mammals', 'dog'])
     # response = self.client.get(reverse('ditto:tag_detail',
     # kwargs={'slug': 'fish'}))
     # self.assertTrue('tag' in response.context)
@@ -186,9 +186,9 @@ class DittoViewTests(TestCase):
     # def test_tag_detail_privacy(self):
     # "Does not display private bookmarks"
     # bookmark_1 = pinboardfactories.BookmarkFactory.create(is_private=True)
-    # bookmark_1.tags.set('fish')
+    # bookmark_1.tags.set(['fish'])
     # bookmark_2 = pinboardfactories.BookmarkFactory.create(is_private=False)
-    # bookmark_2.tags.set('fish')
+    # bookmark_2.tags.set(['fish'])
     # response = self.client.get(reverse('ditto:tag_detail',
     # kwargs={'slug': 'fish'}))
     # self.assertTrue('bookmark_list' in response.context)

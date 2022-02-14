@@ -387,7 +387,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
             description="My initial description",
             url="http://fontello.com/",
         )
-        bookmark.tags.set("initial", "tags")
+        bookmark.tags.set(["initial", "tags"])
 
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json["bookmarks"]

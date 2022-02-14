@@ -59,13 +59,15 @@ class UserSaver(SaveUtilsMixin, object):
             "raw": raw_json,
             "screen_name": user["screen_name"],
             "name": user["name"],
-            "is_private": user["protected"],
             "is_verified": user["verified"],
             "profile_image_url_https": user["profile_image_url_https"],
         }
 
         # When ingesting tweets there are lots of fields the 'user' element
         # doesn't have, compared to the API:
+
+        if "protected" in user:
+            defaults["is_private"] = user["protected"]
 
         if "created_at" in user:
             defaults["created_at"] = self._api_time_to_datetime(user["created_at"])
@@ -265,7 +267,7 @@ class TweetSaver(SaveUtilsMixin, object):
 
         return media_count
 
-    def save_tweet(self, tweet, fetch_time):
+    def save_tweet(self, tweet, fetch_time, user_data=None):
         """Takes a dict of tweet data from the API and creates or updates a
         Tweet object and its associated User object.
 
@@ -286,15 +288,21 @@ class TweetSaver(SaveUtilsMixin, object):
                 tweet["created_at"], time_format="%Y-%m-%d %H:%M:%S +0000"
             )
 
-        user = UserSaver().save_user(tweet["user"], fetch_time)
+        if user_data is None:
+            if "user" in tweet:
+                user_data = tweet["user"]
+            else:
+                raise ValueError("No user data found to save tweets with")
+
+        user = UserSaver().save_user(user_data, fetch_time)
 
         if "full_text" in tweet:
             # For new (2016) 'extended' format tweet data.
             # https://dev.twitter.com/overview/api/upcoming-changes-to-tweets
             text = tweet["full_text"]
             # Cuts off any @usernames at the start and a trailing URL at the end:
-            frm = tweet["display_text_range"][0]
-            to = tweet["display_text_range"][1]
+            frm = int(tweet["display_text_range"][0])
+            to = int(tweet["display_text_range"][1])
             title = text[frm:to]
         else:
             # Older 'classic' format tweet data.

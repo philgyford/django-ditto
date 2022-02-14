@@ -124,7 +124,7 @@ class BookmarkTestCase(TestCase):
     def test_tags(self):
         "Can save and recall tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("banana", "cherry", "apple")
+        bookmark.tags.set(["banana", "cherry", "apple"])
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 3)
         self.assertIsInstance(bookmark_reloaded.tags.first(), BookmarkTag)
@@ -135,7 +135,7 @@ class BookmarkTestCase(TestCase):
     def test_tags_private(self):
         "Doesn't fetch private tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("ispublic", ".isprivate", "alsopublic")
+        bookmark.tags.set(["ispublic", ".isprivate", "alsopublic"])
         bookmark_reloaded = Bookmark.objects.get(pk=bookmark.pk)
         self.assertEqual(len(bookmark_reloaded.tags.all()), 2)
         self.assertEqual(bookmark_reloaded.tags.names().first(), "alsopublic")
@@ -145,13 +145,13 @@ class BookmarkTestCase(TestCase):
     def test_slugs_match_tags_true(self):
         "Returns true if a list of slugs is the same to bookmark's tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("banana", "cherry")
+        bookmark.tags.set(["banana", "cherry"])
         self.assertTrue(bookmark.slugs_match_tags(["cherry", "banana"]))
 
     def test_slugs_match_tags_false(self):
         "Returns false if a list of slugs is different to bookmark's tags"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("banana", "cherry")
+        bookmark.tags.set(["banana", "cherry"])
         self.assertFalse(bookmark.slugs_match_tags(["banana", "apple"]))
 
     def test_default_manager(self):
@@ -255,39 +255,39 @@ class PinboardBookmarkTagSlugsTestCase(TestCase):
 
     def test_standard(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("normal")
+        bookmark.tags.set(["normal"])
         self.assertEqual(bookmark.tags.first().slug, "normal")
 
     def test_hyphens(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("one-tag")
+        bookmark.tags.set(["one-tag"])
         self.assertEqual(bookmark.tags.first().slug, "one-tag")
 
     def test_underscores(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("one_tag")
+        bookmark.tags.set(["one_tag"])
         self.assertEqual(bookmark.tags.first().slug, "one_tag")
 
     def test_private(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set(".private")
+        bookmark.tags.set([".private"])
         self.assertEqual(bookmark.tags.first().slug, ".private")
 
     def test_capitals(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("CAPITALtags")
+        bookmark.tags.set(["CAPITALtags"])
         self.assertEqual(bookmark.tags.first().slug, "capitaltags")
 
     def test_special_characters_1(self):
         "Characters that don't change"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("!$()*:;=@[]-.^_`{|}")
+        bookmark.tags.set(["!$()*:;=@[]-.^_`{|}"])
         self.assertEqual(bookmark.tags.first().slug, "!$()*:;=@[]-.^_`{|}")
 
     def test_special_characters_2(self):
         "Characters that do change"
         bookmark = BookmarkFactory()
-        bookmark.tags.set("#-&-'-+-/-?-\"-%-<->-\\")
+        bookmark.tags.set(["#-&-'-+-/-?-\"-%-<->-\\"])
         self.assertEqual(
             bookmark.tags.first().slug,
             "%23-%2526-%27-%252B-%252f-%3f-%22-%25-%3C-%3E-%5c",
@@ -295,26 +295,26 @@ class PinboardBookmarkTagSlugsTestCase(TestCase):
 
     def test_accents(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("Àddîñg-áçćèńtš-tô-Éñgłïśh-íš-śīłłÿ!")
+        bookmark.tags.set(["Àddîñg-áçćèńtš-tô-Éñgłïśh-íš-śīłłÿ!"])
         self.assertEqual(
             bookmark.tags.first().slug, "àddîñg-áçćèńtš-tô-éñgłïśh-íš-śīłłÿ!"
         )
 
     def test_musical_notes(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("♬♫♪♩")
+        bookmark.tags.set(["♬♫♪♩"])
         self.assertEqual(bookmark.tags.first().slug, "♬♫♪♩")
 
     def test_chinese(self):
         bookmark = BookmarkFactory()
-        bookmark.tags.set("美国")
+        bookmark.tags.set(["美国"])
         self.assertEqual(bookmark.tags.first().slug, "美国")
 
     @override_settings(TAGGIT_CASE_INSENSITIVE=True)
     def test_case_insensitive_tags(self):
         "Creating tags named 'dog' and 'DOG' should not create different slugs."
         bookmark = BookmarkFactory()
-        bookmark.tags.set("dog", "cat", "DOG")
+        bookmark.tags.set(["dog", "cat", "DOG"])
         self.assertEqual(
             sorted([tag.slug for tag in bookmark.tags.all()]), ["cat", "dog"]
         )

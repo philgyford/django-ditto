@@ -1,4 +1,6 @@
 # coding: utf-8
+import json
+import logging
 import os
 
 try:
@@ -17,7 +19,8 @@ from . import managers
 from .utils import htmlify_description, htmlify_tweet
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
 
-import json
+
+logger = logging.getLogger("ditto")
 
 
 class Account(TimeStampedModelMixin, models.Model):
@@ -32,13 +35,17 @@ class Account(TimeStampedModelMixin, models.Model):
         null=False,
         blank=True,
         max_length=255,
-        help_text="(API Key) From https://apps.twitter.com",
+        verbose_name="API Key",
     )
     consumer_secret = models.CharField(
-        null=False, blank=True, max_length=255, help_text="(API Secret)"
+        null=False, blank=True, max_length=255, verbose_name="API Key Secret"
     )
-    access_token = models.CharField(null=False, blank=True, max_length=255)
-    access_token_secret = models.CharField(null=False, blank=True, max_length=255)
+    access_token = models.CharField(
+        null=False, blank=True, max_length=255, verbose_name="Access Token"
+    )
+    access_token_secret = models.CharField(
+        null=False, blank=True, max_length=255, verbose_name="Access Token Secret"
+    )
     last_recent_id = models.BigIntegerField(
         null=True,
         blank=True,
@@ -59,8 +66,24 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def save(self, *args, **kwargs):
         if self.user is None:
-            self.updateUserFromTwitter()
-            # Quietly ignoring errors. Sorry.
+            result = self.updateUserFromTwitter()
+
+            # It would be nice to make this more visible, but not sure how to
+            # given we don't have access to a request at this point.
+            if (
+                type(result) is dict
+                and "success" in result
+                and result["success"] is False
+            ):
+                if "messages" in result:
+                    messages = ", ".join(result["messages"])
+                else:
+                    messages = ""
+                logger.error(
+                    "There was an error while trying to update the User data from "
+                    f"the Twitter API: {messages}"
+                )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -234,6 +257,14 @@ class Media(TimeStampedModelMixin, models.Model):
         ordering = ["time_created"]
         verbose_name = "Media item"
         verbose_name_plural = "Media items"
+
+    @property
+    def has_file(self):
+        "Do we have a file saved at all?"
+        if self.image_file.name or self.mp4_file.name:
+            return True
+        else:
+            return False
 
     @property
     def thumbnail_w(self):

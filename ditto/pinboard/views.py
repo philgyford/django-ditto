@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 

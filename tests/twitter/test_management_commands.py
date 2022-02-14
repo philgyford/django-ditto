@@ -217,9 +217,32 @@ class FetchTwitterAccountsOutput(FetchTwitterOutput):
 
 
 class ImportTweets(TestCase):
+    "Testing failures that aren't specific to v1 or v2 archive-version."
+
+    def setUp(self):
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def test_fails_with_no_args(self):
+        "Fails when no arguments are provided"
+        with self.assertRaises(CommandError):
+            call_command("import_twitter_tweets")
+
+    def test_fails_with_invalid_version(self):
+        with self.assertRaises(CommandError):
+            call_command(
+                "import_twitter_tweets", path="/right/path", archive_version="nope"
+            )
+
+
+class ImportTweetsVersion1(TestCase):
+    """Only testing using --archive-version=v1 argument
+    Leaving lots of more generat tests to the ImportTweetsVersion2 class.
+    """
+
     def setUp(self):
         self.patcher = patch(
-            "ditto.twitter.management.commands.import_twitter_tweets.TweetIngester.ingest"  # noqa: E501
+            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"  # noqa: E501
         )
         self.ingest_mock = self.patcher.start()
         self.out = StringIO()
@@ -228,44 +251,93 @@ class ImportTweets(TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def test_fails_with_no_args(self):
-        "Fails when no arguments are provided"
-        with self.assertRaises(CommandError):
-            call_command("import_twitter_tweets")
-
-    def test_fails_with_invalid_directory(self):
-        with patch("os.path.isdir", return_value=False):
-            with self.assertRaises(CommandError):
-                call_command("import_twitter_tweets", path="/wrong/path")
-
     def test_calls_ingest_method(self):
-        with patch("os.path.isdir", return_value=True):
-            call_command("import_twitter_tweets", path="/right/path", stdout=self.out)
-            self.ingest_mock.assert_called_once_with(
-                directory="/right/path/data/js/tweets"
-            )
-
-    def test_success_output(self):
-        """Outputs the correct response if ingesting succeeds."""
-        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
-        with patch("os.path.isdir", return_value=True):
-            call_command("import_twitter_tweets", path="/right/path", stdout=self.out)
-            self.assertIn("Imported 12345 tweets from 21 files", self.out.getvalue())
-
-    def test_success_output_verbosity_0(self):
-        """Outputs nothing if ingesting succeeds."""
-        self.ingest_mock.return_value = {"success": True, "tweets": 12345, "files": 21}
+        "Calls correct class and method"
         with patch("os.path.isdir", return_value=True):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
+                archive_version="v1",
+                stdout=self.out,
+            )
+            self.ingest_mock.assert_called_once_with(
+                directory="/right/path/data/js/tweets"
+            )
+
+
+class ImportTweetsVersion2(TestCase):
+    """Only testing using --archive-version=v2 argument"""
+
+    def setUp(self):
+        self.patcher = patch(
+            "ditto.twitter.management.commands.import_twitter_tweets.Version2TweetIngester.ingest"  # noqa: E501
+        )
+        self.ingest_mock = self.patcher.start()
+        self.out = StringIO()
+        self.out_err = StringIO()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_fails_with_invalid_directory(self):
+        "Test fails with invalid directory"
+        with patch("os.path.isdir", return_value=False):
+            with self.assertRaises(CommandError):
+                call_command(
+                    "import_twitter_tweets", path="/wrong/path", archive_version="v2"
+                )
+
+    def test_calls_ingest_method(self):
+        "Calls correct class and method"
+        with patch("os.path.isdir", return_value=True):
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v2",
+                stdout=self.out,
+            )
+            self.ingest_mock.assert_called_once_with(directory="/right/path/data")
+
+    def test_success_output(self):
+        """Outputs the correct response if ingesting succeeds"""
+        self.ingest_mock.return_value = {
+            "success": True,
+            "tweets": 12345,
+            "files": 1,
+            "media": 345,
+        }
+        with patch("os.path.isdir", return_value=True):
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v2",
+                stdout=self.out,
+            )
+            self.assertIn(
+                "Imported 12345 tweets from 1 file, and 345 media files",
+                self.out.getvalue(),
+            )
+
+    def test_success_output_verbosity_0(self):
+        """Outputs nothing if ingesting succeeds"""
+        self.ingest_mock.return_value = {
+            "success": True,
+            "tweets": 12345,
+            "files": 1,
+            "media": 345,
+        }
+        with patch("os.path.isdir", return_value=True):
+            call_command(
+                "import_twitter_tweets",
+                path="/right/path",
+                archive_version="v2",
                 verbosity=0,
                 stdout=self.out,
             )
             self.assertEqual("", self.out.getvalue())
 
     def test_error_output(self):
-        """Outputs the correct error if ingesting fails."""
+        """Outputs the correct error if ingesting fails"""
         self.ingest_mock.return_value = {
             "success": False,
             "messages": ["Something went wrong"],
@@ -274,6 +346,7 @@ class ImportTweets(TestCase):
             call_command(
                 "import_twitter_tweets",
                 path="/right/path",
+                archive_version="v2",
                 stdout=self.out,
                 stderr=self.out_err,
             )
