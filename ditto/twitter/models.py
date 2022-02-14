@@ -32,13 +32,17 @@ class Account(TimeStampedModelMixin, models.Model):
         null=False,
         blank=True,
         max_length=255,
-        help_text="(API Key) From https://apps.twitter.com",
+        verbose_name="API Key",
     )
     consumer_secret = models.CharField(
-        null=False, blank=True, max_length=255, help_text="(API Secret)"
+        null=False, blank=True, max_length=255, verbose_name="API Key Secret"
     )
-    access_token = models.CharField(null=False, blank=True, max_length=255)
-    access_token_secret = models.CharField(null=False, blank=True, max_length=255)
+    access_token = models.CharField(
+        null=False, blank=True, max_length=255, verbose_name="Access Token"
+    )
+    access_token_secret = models.CharField(
+        null=False, blank=True, max_length=255, verbose_name="Access Token Secret"
+    )
     last_recent_id = models.BigIntegerField(
         null=True,
         blank=True,

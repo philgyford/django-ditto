@@ -29,7 +29,7 @@ class AccountAdmin(admin.ModelAdmin):
                 ),
                 "description": (
                     "Keys and secrets require creation of an app at "
-                    '<a href="https://apps.twitter.com/">apps.twitter.com</a>'
+                    '<a href="https://developer.twitter.com/portal">developer.twitter.com/portal</a>'
                 ),
             },
         ),
