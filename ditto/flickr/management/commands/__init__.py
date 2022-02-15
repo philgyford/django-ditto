@@ -30,7 +30,7 @@ class FetchPhotosCommand(FetchCommand):
     singular_noun = "Photo"
     plural_noun = "Photos"
 
-    # Child classes should supply some help text for the --days and --start --end arguments:
+    # Child classes should supply some help text for the --days and --range arguments:
     days_help = ""
     range_help = ""
 
