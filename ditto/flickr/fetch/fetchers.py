@@ -250,8 +250,7 @@ class UserFetcher(Fetcher):
 
 
 class PhotosFetcher(Fetcher):
-    """Parent class for fetching and saving data about Photos for an Account.
-    """
+    """Parent class for fetching and saving data about Photos for an Account."""
 
     def __init__(self, *args, **kwargs):
         # Will match Flickr IDs with their User object.
@@ -380,21 +379,25 @@ class RecentPhotosFetcher(PhotosFetcher):
                 'all' to fetch all photos.
         range - The start and end date of a range in YYYY-MM-DD,YYYY-MM-DD format
         """
-        
+
         if days:
-        try:
-            self.min_date = datetime_now() - datetime.timedelta(days=days)
-        except TypeError:
-            if days != "all":
-                raise FetchError("days should be a number or 'all'.")
+            try:
+                self.min_date = datetime_now() - datetime.timedelta(days=days)
+            except TypeError:
+                if days != "all":
+                    raise FetchError("days should be a number or 'all'.")
         elif range:
             try:
-                start, end = range.split(',')
-                self.min_taken_date = datetime.strptime(start, "%Y-%m-%d")
-                self.self_taken_date = datetime.strptime(end, "%Y-%m-%d")
-                
+                start, end = range.split(",")
+                self.min_taken_date = datetime.datetime.isoformat(
+                    datetime.datetime.strptime(start, "%Y-%m-%d")
+                )
+                self.max_taken_date = datetime.datetime.isoformat(
+                    datetime.datetime.strptime(end, "%Y-%m-%d")
+                )
+
             except TypeError:
-                raise FetchError("Soemthing went wrong there.") 
+                raise FetchError("Soemthing went wrong there.")
 
         return super().fetch()
 
@@ -403,13 +406,13 @@ class RecentPhotosFetcher(PhotosFetcher):
         Photos."""
 
         if self.min_date:
-        # Turn our datetime object into a unix timestamp:
-        min_unixtime = calendar.timegm(self.min_date.timetuple())
+            # Turn our datetime object into a unix timestamp:
+            min_unixtime = calendar.timegm(self.min_date.timetuple())
 
-        try:
-            results = self.api.people.getPhotos(
-                user_id=self.account.user.nsid,
-                min_upload_date=min_unixtime,
+            try:
+                results = self.api.people.getPhotos(
+                    user_id=self.account.user.nsid,
+                    min_upload_date=min_unixtime,
                     per_page=self.items_per_page,
                     page=self.page_number,
                 )
@@ -418,21 +421,21 @@ class RecentPhotosFetcher(PhotosFetcher):
                     "Error when fetching recent photos (page %s): %s"
                     % (self.page_number, e)
                 )
-                
+
         elif self.min_taken_date and self.max_taken_date:
             try:
                 results = self.api.photos.search(
                     user_id=self.account.user.nsid,
                     min_taken_date=self.min_taken_date,
                     max_taken_date=self.max_taken_date,
-                per_page=self.items_per_page,
-                page=self.page_number,
-            )
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching recent photos (page %s): %s"
-                % (self.page_number, e)
-            )
+                    per_page=self.items_per_page,
+                    page=self.page_number,
+                )
+            except FlickrError as e:
+                raise FetchError(
+                    "Error when fetching recent photos (page %s): %s"
+                    % (self.page_number, e)
+                )
 
         if (
             self.page_number == 1

@@ -37,7 +37,7 @@ class FetchPhotosCommand(FetchCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
-        group = parser.add_mutually_excluseive_group()
+        group = parser.add_mutually_exclusive_group()
 
         group.add_argument("--days", action="store", default=False, help=self.days_help)
 
@@ -57,18 +57,17 @@ class FetchPhotosCommand(FetchCommand):
             elif options["days"] != "all":
                 raise CommandError("--days should be an integer or 'all'.")
 
-            results = self.fetch_photos(nsid, options["days"])
+            results = self.fetch_photos(nsid, options["days"], range=None)
+            self.output_results(results, options.get("verbosity", 1))
+        elif options["range"]:
+            results = self.fetch_photos(nsid, options["days"], options["range"])
             self.output_results(results, options.get("verbosity", 1))
         elif options["account"]:
             raise CommandError("Specify --days as well as --account.")
         else:
             raise CommandError("Specify --days , eg --days=3 or --days=all.")
 
-        if options["range"]:
-            results = self.fetch_photos(nsid, options["range"])
-            self.output_results(results, options.get("verbosity", 1))
-
-    def fetch_photos(self, nsid, days, start, end):
+    def fetch_photos(self, nsid, days, range):
         """Child classes should override this method to call a method that
         fetches photos and returns results, eg:
             return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)
