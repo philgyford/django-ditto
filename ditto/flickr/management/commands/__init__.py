@@ -37,18 +37,24 @@ class FetchPhotosCommand(FetchCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
-        group = parser.add_mutually_exclusive_group()
+        parser.add_argument(
+            "--days", action="store", default=False, help=self.days_help
+        )
 
-        group.add_argument("--days", action="store", default=False, help=self.days_help)
-
-        group.add_argument(
-            "--range", action="store", default=False, help=self.range_help
+        parser.add_argument(
+            "--start-date", action="store", default=False, help=self.range_help
+        )
+        parser.add_argument(
+            "--end-date", action="store", default=False, help=self.range_help
         )
 
     def handle(self, *args, **options):
 
         # We might be fetching for a specific account or all (None).
         nsid = options["account"] if options["account"] else None
+
+        if options["days"] and (options["start"] or options["end"]):
+            raise CommandError("You can't use --days with --start-date or --end-date")
 
         if options["days"]:
             # Will be either 'all' or a number; make the number an int.
@@ -57,10 +63,12 @@ class FetchPhotosCommand(FetchCommand):
             elif options["days"] != "all":
                 raise CommandError("--days should be an integer or 'all'.")
 
-            results = self.fetch_photos(nsid, options["days"], range=None)
+            results = self.fetch_photos(nsid, options["days"], start=None, end=None)
             self.output_results(results, options.get("verbosity", 1))
-        elif options["range"]:
-            results = self.fetch_photos(nsid, options["days"], options["range"])
+        elif options["start"] or options["end"]:
+            results = self.fetch_photos(
+                nsid, options["days"], options["start"], options["end"]
+            )
             self.output_results(results, options.get("verbosity", 1))
         elif options["account"]:
             raise CommandError("Specify --days as well as --account.")

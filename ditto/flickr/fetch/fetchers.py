@@ -61,10 +61,6 @@ class Fetcher(object):
         # the first page.
         self.total_pages = 1
 
-        # Will be the minimum date of upload/fave for Photos that we'll fetch.
-        # By default, set it before Flickr so we get everything.
-        self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
-
         # Will be the results fetched from the API via FlickrAPI.
         self.results = []
 
@@ -373,31 +369,49 @@ class RecentPhotosFetcher(PhotosFetcher):
     Supply a number of days to fetch() to restrict to the most recent days.
     """
 
-    def fetch(self, days=None, range=None):
+    def __init__(self):
+        # Minimum date of photos to return
+        self.min_date = None
+
+        # Maximum date of photos to return
+        self.max_date = None
+
+    def fetch(self, days=None, start=None, end=None):
         """Fetch all of the Account's user's photos, by default.
         days  - The number of days back to look, by upload date, or
                 'all' to fetch all photos.
-        range - The start and end date of a range in YYYY-MM-DD,YYYY-MM-DD format
+        start - The start date of a range in YYYY-MM-DD,YYYY-MM-DD format
+        end - The end date of a range in YYYY-MM-DD,YYYY-MM-DD format
         """
+
+        if days and (start or end):
+            raise ValueError("You can't use --days with --start-date or --end-date")
 
         if days:
             try:
                 self.min_date = datetime_now() - datetime.timedelta(days=days)
             except TypeError:
                 if days != "all":
-                    raise FetchError("days should be a number or 'all'.")
-        elif range:
+                    raise FetchError("days should be an integer or 'all'.")
+        elif start or end:
             try:
-                start, end = range.split(",")
-                self.min_taken_date = datetime.datetime.isoformat(
-                    datetime.datetime.strptime(start, "%Y-%m-%d")
-                )
-                self.max_taken_date = datetime.datetime.isoformat(
-                    datetime.datetime.strptime(end, "%Y-%m-%d")
+                if start:
+                    self.min_date = datetime.datetime.isoformat(
+                        datetime.datetime.strptime(start, "%Y-%m-%d")
+                    )
+                if end:
+                    self.max_date = datetime.datetime.isoformat(
+                        datetime.datetime.strptime(end, "%Y-%m-%d")
+                    )
+            except TypeError:
+                raise FetchError(
+                    "Something went wrong with start or end. Please check the date format. It should be YYYY-MM-DD"
                 )
 
-            except TypeError:
-                raise FetchError("Soemthing went wrong there.")
+        if start > end:
+            raise ValueError(
+                "Start date is after the end date. You can't do that, unless you're The Doctor."
+            )
 
         return super().fetch()
 
@@ -405,37 +419,30 @@ class RecentPhotosFetcher(PhotosFetcher):
         """Fetch one page of results, containing very basic info about the
         Photos."""
 
+        # Set up default arguments dictionary
+        api_args = {
+            "user_id": self.account.user.nsid,
+            "per_page": self.items_per_page,
+            "page": self.page_number,
+        }
+
         if self.min_date:
-            # Turn our datetime object into a unix timestamp:
+            # Turn our datetime object into a unix timestamp and add to arguments:
             min_unixtime = calendar.timegm(self.min_date.timetuple())
+            api_args["min_date"] = min_unixtime
 
-            try:
-                results = self.api.people.getPhotos(
-                    user_id=self.account.user.nsid,
-                    min_upload_date=min_unixtime,
-                    per_page=self.items_per_page,
-                    page=self.page_number,
-                )
-            except FlickrError as e:
-                raise FetchError(
-                    "Error when fetching recent photos (page %s): %s"
-                    % (self.page_number, e)
-                )
+        if self.max_date:
+            # Turn our datetime object into a unix timestamp and add to arguments:
+            max_unixtime = calendar.timegm(self.max_date.timetuple())
+            api_args["max_date"] = max_unixtime
 
-        elif self.min_taken_date and self.max_taken_date:
-            try:
-                results = self.api.photos.search(
-                    user_id=self.account.user.nsid,
-                    min_taken_date=self.min_taken_date,
-                    max_taken_date=self.max_taken_date,
-                    per_page=self.items_per_page,
-                    page=self.page_number,
-                )
-            except FlickrError as e:
-                raise FetchError(
-                    "Error when fetching recent photos (page %s): %s"
-                    % (self.page_number, e)
-                )
+        try:
+            results = self.api.people.getPhotos(**api_args)
+        except FlickrError as e:
+            raise FetchError(
+                "Error when fetching recent photos (page %s): %s"
+                % (self.page_number, e)
+            )
 
         if (
             self.page_number == 1
