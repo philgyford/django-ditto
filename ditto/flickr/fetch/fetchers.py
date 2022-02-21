@@ -369,7 +369,7 @@ class RecentPhotosFetcher(PhotosFetcher):
     Supply a number of days to fetch() to restrict to the most recent days.
     """
 
-    def __init__(self):
+    def __init__(self, account):
         # Minimum date of photos to return
         self.min_date = None
 
@@ -396,22 +396,14 @@ class RecentPhotosFetcher(PhotosFetcher):
         elif start or end:
             try:
                 if start:
-                    self.min_date = datetime.datetime.isoformat(
-                        datetime.datetime.strptime(start, "%Y-%m-%d")
-                    )
+                    self.min_date = datetime.datetime.isoformat(datetime.datetime.strptime(start, "%Y-%m-%d"))
                 if end:
-                    self.max_date = datetime.datetime.isoformat(
-                        datetime.datetime.strptime(end, "%Y-%m-%d")
-                    )
-            except TypeError:
-                raise FetchError(
-                    "Something went wrong with start or end. Please check the date format. It should be YYYY-MM-DD"
-                )
-
+                    self.max_date = datetime.datetime.isoformat(datetime.datetime.strptime(end, "%Y-%m-%d"))
         if start > end:
-            raise ValueError(
-                "Start date is after the end date. You can't do that, unless you're The Doctor."
-            )
+                    raise ValueError("Start date is after the end date. You can't do that, unless you're The Doctor.")
+                    
+            except TypeError:
+                raise FetchError("Something went wrong with start or end. Please check the date format. It should be YYYY-MM-DD") 
 
         return super().fetch()
 
@@ -419,7 +411,7 @@ class RecentPhotosFetcher(PhotosFetcher):
         """Fetch one page of results, containing very basic info about the
         Photos."""
 
-        # Set up default arguments dictionary
+        # Set up default arguments dictionary
         api_args = {
             "user_id": self.account.user.nsid,
             "per_page": self.items_per_page,

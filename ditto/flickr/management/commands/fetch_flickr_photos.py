@@ -23,6 +23,4 @@ class Command(FetchPhotosCommand):
     range_help = "Fetch photos taken between a range of dates in YYYY-MM-DD format. Mutually exclusive with --days"
 
     def fetch_photos(self, nsid, days, start, end):
-        return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(
-            days=days, start=start, end=end
-        )
+        return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days, start=start, end=end)
