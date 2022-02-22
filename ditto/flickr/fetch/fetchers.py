@@ -370,6 +370,8 @@ class RecentPhotosFetcher(PhotosFetcher):
     """
 
     def __init__(self, account):
+        super().__init__(account)
+
         # Minimum date of photos to return
         self.min_date = None
 
@@ -381,11 +383,11 @@ class RecentPhotosFetcher(PhotosFetcher):
         days  - The number of days back to look, by upload date, or
                 'all' to fetch all photos.
         start - The start date of a range in YYYY-MM-DD,YYYY-MM-DD format
-        end - The end date of a range in YYYY-MM-DD,YYYY-MM-DD format
+        end   - The end date of a range in YYYY-MM-DD,YYYY-MM-DD format
         """
 
         if days and (start or end):
-            raise ValueError("You can't use --days with --start-date or --end-date")
+            raise ValueError("You can't use --days with --start or --end")
 
         if days:
             try:
@@ -396,13 +398,11 @@ class RecentPhotosFetcher(PhotosFetcher):
         elif start or end:
             try:
                 if start:
-                    self.min_date = datetime.datetime.isoformat(
-                        datetime.datetime.strptime(start, "%Y-%m-%d")
-                    )
+                    self.min_date = datetime.datetime.strptime(start, "%Y-%m-%d")
+
                 if end:
-                    self.max_date = datetime.datetime.isoformat(
-                        datetime.datetime.strptime(end, "%Y-%m-%d")
-                    )
+                    self.max_date = datetime.datetime.strptime(end, "%Y-%m-%d")
+
                 if start > end:
                     raise ValueError(
                         "Start date is after the end date. You can't do that, unless you're The Doctor."
@@ -429,12 +429,12 @@ class RecentPhotosFetcher(PhotosFetcher):
         if self.min_date:
             # Turn our datetime object into a unix timestamp and add to arguments:
             min_unixtime = calendar.timegm(self.min_date.timetuple())
-            api_args["min_date"] = min_unixtime
+            api_args["min_upload_date"] = min_unixtime
 
         if self.max_date:
             # Turn our datetime object into a unix timestamp and add to arguments:
             max_unixtime = calendar.timegm(self.max_date.timetuple())
-            api_args["max_date"] = max_unixtime
+            api_args["max_upload_date"] = max_unixtime
 
         try:
             results = self.api.people.getPhotos(**api_args)

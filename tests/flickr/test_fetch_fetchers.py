@@ -362,6 +362,21 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         with self.assertRaises(FetchError):
             self.fetcher.fetch()
 
+    def test_raises_error_with_days_and_start(self):
+        "days can't be used with start."
+        with self.assertRaises(ValueError):
+            self.fetcher.fetch(days="1", start="2012-01-01")
+
+    def test_raises_error_with_days_and_end(self):
+        "days can't be used with end."
+        with self.assertRaises(ValueError):
+            self.fetcher.fetch(days="1", end="2012-01-01")
+
+    def test_raises_error_with_timelord(self):
+        "start can't be after end."
+        with self.assertRaises(ValueError):
+            self.fetcher.fetch(start="2013-01-01", end="2012-01-01")
+
     def test_call_api_error(self):
         "_call_api() should throw an error if there's an API error."
         self.expect_response(
