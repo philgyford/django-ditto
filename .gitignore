@@ -8,3 +8,4 @@ django_ditto.egg-info
 htmlcov
 build/
 .vscode
+__pycache__
