@@ -40,10 +40,10 @@ class FetchPhotosCommand(FetchCommand):
         parser.add_argument("--days", action="store", default=False, help=self.days_help)
 
         parser.add_argument(
-            "--start-date", action="store", default=False, help=self.range_help
+            "--start", action="store", default=False, help=self.range_help
         )
         parser.add_argument(
-            "--end-date", action="store", default=False, help=self.range_help
+            "--end", action="store", default=False, help=self.range_help
         )
 
     def handle(self, *args, **options):
@@ -52,7 +52,7 @@ class FetchPhotosCommand(FetchCommand):
         nsid = options["account"] if options["account"] else None
         
         if options["days"] and (options["start"] or options["end"]):
-            raise CommandError("You can't use --days with --start-date or --end-date")
+            raise CommandError("You can't use --days with --start or --end")
 
         if options["days"]:
             # Will be either 'all' or a number; make the number an int.
