@@ -30,14 +30,16 @@ class FetchPhotosCommand(FetchCommand):
     singular_noun = "Photo"
     plural_noun = "Photos"
 
-    # Child classes should supply some help text for the --days and --range arguments:
+    # Child classes should supply some help text for the --days and --start/--end arguments:
     days_help = ""
     range_help = ""
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
-        parser.add_argument("--days", action="store", default=False, help=self.days_help)
+        parser.add_argument(
+            "--days", action="store", default=False, help=self.days_help
+        )
 
         parser.add_argument(
             "--start", action="store", default=False, help=self.range_help
@@ -50,7 +52,7 @@ class FetchPhotosCommand(FetchCommand):
 
         # We might be fetching for a specific account or all (None).
         nsid = options["account"] if options["account"] else None
-        
+
         if options["days"] and (options["start"] or options["end"]):
             raise CommandError("You can't use --days with --start or --end")
 
@@ -64,14 +66,14 @@ class FetchPhotosCommand(FetchCommand):
             results = self.fetch_photos(nsid, options["days"], start=None, end=None)
             self.output_results(results, options.get("verbosity", 1))
         elif options["start"] or options["end"]:
-            results = self.fetch_photos(nsid, options["days"], options["start"], options["end"])
+            results = self.fetch_photos(
+                nsid, options["days"], options["start"], options["end"]
+            )
             self.output_results(results, options.get("verbosity", 1))
         elif options["account"]:
             raise CommandError("Specify --days as well as --account.")
         else:
             raise CommandError("Specify --days , eg --days=3 or --days=all.")
-
-        
 
     def fetch_photos(self, nsid, days, range):
         """Child classes should override this method to call a method that
