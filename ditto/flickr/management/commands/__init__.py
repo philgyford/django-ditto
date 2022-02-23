@@ -75,7 +75,7 @@ class FetchPhotosCommand(FetchCommand):
         else:
             raise CommandError("Specify --days , eg --days=3 or --days=all.")
 
-    def fetch_photos(self, nsid, days, range):
+    def fetch_photos(self, nsid, days, start, end):
         """Child classes should override this method to call a method that
         fetches photos and returns results, eg:
             return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days)
