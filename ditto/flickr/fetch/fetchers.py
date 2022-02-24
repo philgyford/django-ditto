@@ -235,7 +235,7 @@ class UserFetcher(Fetcher):
                         "photos": {
                             "count": {"_content": "0"},
                             "firstdate": {"_content": "0"},
-                            "firstdatetaken": {"_content": "1970-01-01 00:00:01"},
+                            "firstdatetaken": {"_content": "1970-01-01 00:00:00"},
                         },
                     }
                 ]
@@ -273,8 +273,7 @@ class UserFetcher(Fetcher):
 
 
 class PhotosFetcher(Fetcher):
-    """Parent class for fetching and saving data about Photos for an Account.
-    """
+    """Parent class for fetching and saving data about Photos for an Account."""
 
     def __init__(self, *args, **kwargs):
         # Will match Flickr IDs with their User object.
