@@ -239,7 +239,9 @@ class PhotoSaver(SaveUtilsMixin, object):
         sizes.remove("Large square")
 
         for size in photo["sizes"]["size"]:
-            if size["label"] in sizes:
+            if size["label"] in sizes and (
+                size["width"] != None or size["height"] != None
+            ):
                 # eg, 'X-Large 3K' becomes 'x_large_3k':
                 name = size["label"].lower().replace(" ", "_").replace("-", "_")
                 defaults[name + "_width"] = int(size["width"])
