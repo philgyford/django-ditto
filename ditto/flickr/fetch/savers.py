@@ -72,6 +72,12 @@ class UserSaver(SaveUtilsMixin, object):
         """
         raw_json = json.dumps(user)
 
+        # Sometimes this isn't set, not sure why
+        if "realname" in user:
+            realname = user["realname"]
+        else:
+            realname = "No realname"
+
         defaults = {
             "fetch_time": fetch_time,
             "raw": raw_json,
@@ -80,7 +86,7 @@ class UserSaver(SaveUtilsMixin, object):
             "iconserver": user["iconserver"],
             "iconfarm": user["iconfarm"],
             "username": user["username"]["_content"],
-            "realname": user["realname"]["_content"],
+            "realname": realname,
             "description": user["description"]["_content"],
             "photos_url": user["photosurl"]["_content"],
             "profile_url": user["profileurl"]["_content"],
