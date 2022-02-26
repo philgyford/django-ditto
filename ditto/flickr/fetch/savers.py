@@ -74,7 +74,7 @@ class UserSaver(SaveUtilsMixin, object):
 
         # Sometimes this isn't set, not sure why
         if "realname" in user:
-            realname = user["realname"]
+            realname = user["realname"]["_content"]
         else:
             realname = "No realname"
 
