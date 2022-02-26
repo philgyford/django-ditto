@@ -76,7 +76,7 @@ class UserSaver(SaveUtilsMixin, object):
         if "realname" in user:
             realname = user["realname"]["_content"]
         else:
-            realname = "No realname"
+            realname = user["username"]["_content"]
 
         defaults = {
             "fetch_time": fetch_time,
