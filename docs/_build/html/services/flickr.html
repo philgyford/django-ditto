@@ -315,7 +315,16 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
 </section>
 <section id="fetch-photos">
 <h3>Fetch Photos<a class="headerlink" href="#fetch-photos" title="Permalink to this headline"></a></h3>
-<p>Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts:</p>
+<p>Fetches data about Photos (including videos). The data fetched can be restricted by setting:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--days</span></code> - fetch data from that many most recent days</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--start</span></code> - fetch from that date onward</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--end</span></code> - fetch from that date and earlier</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--account</span></code> - only fetch for a single Flickr account</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> arguments can be combined to fetch data from within a range of dates.</p>
+<p>If no <cite>–account</cite> argument is supplied, data is fecthed for ALL Accounts.</p>
+<p>So, this will fetch data for ALL Photos for ALL Accounts:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>all
 </pre></div>
 </div>
@@ -325,7 +334,19 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
-<p>Both options can be restricted to only fetch for a single Account by adding the NSID of the Account’s User, eg:</p>
+<p>This will fetch Photos uploaded since midnight at the start of 31 December 2021:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --start<span class="o">=</span><span class="m">2021</span>-12-31
+</pre></div>
+</div>
+<p>This will fetch Photos uploaded before the end of the day (23:59:59) on 1 February 2022:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --end<span class="o">=</span><span class="m">2022</span>-02-01
+</pre></div>
+</div>
+<p>And this will fetch Photos uploaded from the start of 31 December 2021 and the end of 1 February 2022:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --start<span class="o">=</span><span class="m">2021</span>-12-31 --end<span class="o">=</span><span class="m">2022</span>-02-01
+</pre></div>
+</div>
+<p>All time-related options can be restricted to only fetch for a single Account by adding the NSID of the Account’s User, eg:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --account<span class="o">=</span><span class="m">35034346050</span>@N01 --days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>

@@ -269,7 +269,18 @@ Once the ``Account`` has been created in the Django admin, and its API credentia
 Fetch Photos
 ============
 
-Fetches data about Photos (including videos). This will fetch data for ALL Photos for ALL Accounts:
+Fetches data about Photos (including videos). The data fetched can be restricted by setting:
+
+- ``--days`` - fetch data from that many most recent days
+- ``--start`` - fetch from that date onward
+- ``--end`` - fetch from that date and earlier
+- ``--account`` - only fetch for a single Flickr account
+
+The ``start`` and ``end`` arguments can be combined to fetch data from within a range of dates.
+
+If no `--account` argument is supplied, data is fecthed for ALL Accounts.
+
+So, this will fetch data for ALL Photos for ALL Accounts:
 
 .. code-block:: shell
 
@@ -285,7 +296,25 @@ This will only fetch Photos uploaded in the past 3 days:
 
     $ ./manage.py fetch_flickr_photos --days=3
 
-Both options can be restricted to only fetch for a single Account by adding the NSID of the Account's User, eg:
+This will fetch Photos uploaded since midnight at the start of 31 December 2021:
+
+.. code-block:: shell
+
+    $ ./manage.py fetch_flickr_photos --start=2021-12-31
+
+This will fetch Photos uploaded before the end of the day (23:59:59) on 1 February 2022:
+
+.. code-block:: shell
+
+    $ ./manage.py fetch_flickr_photos --end=2022-02-01
+
+And this will fetch Photos uploaded from the start of 31 December 2021 and the end of 1 February 2022:
+
+.. code-block:: shell
+
+    $ ./manage.py fetch_flickr_photos --start=2021-12-31 --end=2022-02-01
+
+All time-related options can be restricted to only fetch for a single Account by adding the NSID of the Account's User, eg:
 
 .. code-block:: shell
 
