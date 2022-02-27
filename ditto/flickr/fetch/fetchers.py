@@ -373,7 +373,8 @@ class RecentPhotosFetcher(PhotosFetcher):
         super().__init__(account)
 
         # Maximum date of photos to return, if days or start are passed in:
-        self.min_date = None
+        # By default, set it before Flickr so we get everything.
+        self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
 
         # Maximum date of photos to return, if end is passed in:
         self.max_date = None
@@ -390,21 +391,22 @@ class RecentPhotosFetcher(PhotosFetcher):
             raise ValueError("You can't use --days with --start or --end")
 
         if days:
-            if days == "all":
-                # Set it before Flickr so we get everything.
-                self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
-            else:
-                try:
-                    self.min_date = datetime_now() - datetime.timedelta(days=days)
-                except TypeError:
+            try:
+                self.min_date = datetime_now() - datetime.timedelta(days=days)
+            except TypeError:
+                if days != "all":
                     raise FetchError("days should be an integer or 'all'.")
         elif start or end:
             try:
                 if start:
-                    self.min_date = datetime.datetime.strptime(start, "%Y-%m-%d")
+                    self.min_date = datetime.datetime.strptime(
+                        f"{start} 00:00:00", "%Y-%m-%d %H:%M:%S"
+                    )
 
                 if end:
-                    self.max_date = datetime.datetime.strptime(end, "%Y-%m-%d")
+                    self.max_date = datetime.datetime.strptime(
+                        f"{end} 23:59:59", "%Y-%m-%d %H:%M:%S"
+                    )
 
                 if (start and end) and (start > end):
                     raise ValueError("Start date must be before the end date.")

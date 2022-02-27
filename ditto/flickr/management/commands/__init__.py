@@ -33,7 +33,8 @@ class FetchPhotosCommand(FetchCommand):
     # Child classes should supply some help text for the --days and
     # --start/--end arguments:
     days_help = ""
-    range_help = ""
+    start_help = ""
+    end_help = ""
 
     def add_arguments(self, parser):
         super().add_arguments(parser)

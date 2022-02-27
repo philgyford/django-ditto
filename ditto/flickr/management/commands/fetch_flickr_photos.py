@@ -25,12 +25,12 @@ class Command(FetchPhotosCommand):
 
     start_help = (
         "Fetch photos taken on or after a date in YYYY-MM-DD format. "
-        "Cannot be used with --days."
+        "Cannot be used with --days, can be combined with --end."
     )
 
     end_help = (
-        "Fetch photos on efore a date in YYYY-MM-DD format. "
-        "Cannot be used with --days."
+        "Fetch photos on or before a date in YYYY-MM-DD format. "
+        "Cannot be used with --days, can be combined with --start."
     )
 
     def fetch_photos(self, nsid, days=None, start=None, end=None):

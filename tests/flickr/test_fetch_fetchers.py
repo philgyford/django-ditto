@@ -443,11 +443,25 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
     @patch.object(PhotosFetcher, "_fetch_extra")
     @patch.object(PhotoSaver, "save_photo")
+    def test_fetches_from_end(self, save_photo, fetch_extra):
+        "Should ask for photos before the end date, if specified."
+        # Yes, we also send a min_upload_date, which is for 2000-01-01, before
+        # Flickr was created.
+        self.expect_response(
+            "people.getPhotos",
+            params={"min_upload_date": "946684800", "max_upload_date": "1439596799"},
+        )
+
+        with patch("time.sleep"):
+            self.fetcher.fetch(end="2015-08-14")
+
+    @patch.object(PhotosFetcher, "_fetch_extra")
+    @patch.object(PhotoSaver, "save_photo")
     def test_fetches_from_start_and_end(self, save_photo, fetch_extra):
         "Should ask for photos between the start and end dates, if specified."
         self.expect_response(
             "people.getPhotos",
-            params={"min_upload_date": "1439251200", "max_upload_date": "1439510400"},
+            params={"min_upload_date": "1439251200", "max_upload_date": "1439596799"},
         )
 
         with patch("time.sleep"):
