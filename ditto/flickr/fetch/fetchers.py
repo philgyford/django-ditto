@@ -372,10 +372,10 @@ class RecentPhotosFetcher(PhotosFetcher):
     def __init__(self, account):
         super().__init__(account)
 
-        # Minimum date of photos to return
+        # Maximum date of photos to return, if days or start are passed in:
         self.min_date = None
 
-        # Maximum date of photos to return
+        # Maximum date of photos to return, if end is passed in:
         self.max_date = None
 
     def fetch(self, days=None, start=None, end=None):
@@ -390,10 +390,13 @@ class RecentPhotosFetcher(PhotosFetcher):
             raise ValueError("You can't use --days with --start or --end")
 
         if days:
-            try:
-                self.min_date = datetime_now() - datetime.timedelta(days=days)
-            except TypeError:
-                if days != "all":
+            if days == "all":
+                # Set it before Flickr so we get everything.
+                self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
+            else:
+                try:
+                    self.min_date = datetime_now() - datetime.timedelta(days=days)
+                except TypeError:
                     raise FetchError("days should be an integer or 'all'.")
         elif start or end:
             try:
@@ -403,15 +406,16 @@ class RecentPhotosFetcher(PhotosFetcher):
                 if end:
                     self.max_date = datetime.datetime.strptime(end, "%Y-%m-%d")
 
-                if start > end:
-                    raise ValueError(
-                        "Start date is after the end date. You can't do that, unless you're The Doctor."
-                    )
+                if (start and end) and (start > end):
+                    raise ValueError("Start date must be before the end date.")
 
             except TypeError:
                 raise FetchError(
-                    "Something went wrong with start or end. Please check the date format. It should be YYYY-MM-DD"
+                    "Something went wrong with start or end. Please check the date "
+                    "format. It should be YYYY-MM-DD"
                 )
+        else:
+            raise FetchError("Either set days or start and/or end.")
 
         return super().fetch()
 

@@ -8,19 +8,32 @@ class Command(FetchPhotosCommand):
     For all accounts:
         ./manage.py fetch_flickr_photos --days=3
         ./manage.py fetch_flickr_photos --days=all
-        ./manage.py fetch_flickr_photos --start-date=2001-01-17 --end-date=2003-11-10
+        ./manage.py fetch_flickr_photos --start=2001-01-17
+        ./manage.py fetch_flickr_photos --end=2003-11-10
+        ./manage.py fetch_flickr_photos --start=2001-01-17 --end=2003-11-10
 
     For one account:
         ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=3
         ./manage.py fetch_flickr_photos --account=35034346050@N01 --days=all
-        ./manage.py fetch_flickr_photos --account=35034346050@N01 --start-date=2001-01-17 --end-date=2003-11-10
+        ./manage.py fetch_flickr_photos --account=35034346050@N01
+            --start=2001-01-17 --end=2003-11-10
     """
 
     help = "Fetches recent or all photos for one or all Flickr Accounts"
 
     days_help = 'Fetches the most recent or all Photos, eg "3" or "all".'
 
-    range_help = "Fetch photos taken between a range of dates in YYYY-MM-DD format. Mutually exclusive with --days"
+    start_help = (
+        "Fetch photos taken on or after a date in YYYY-MM-DD format. "
+        "Cannot be used with --days."
+    )
 
-    def fetch_photos(self, nsid, days, start, end):
-        return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(days=days, start=start, end=end)
+    end_help = (
+        "Fetch photos on efore a date in YYYY-MM-DD format. "
+        "Cannot be used with --days."
+    )
+
+    def fetch_photos(self, nsid, days=None, start=None, end=None):
+        return RecentPhotosMultiAccountFetcher(nsid=nsid).fetch(
+            days=days, start=start, end=end
+        )

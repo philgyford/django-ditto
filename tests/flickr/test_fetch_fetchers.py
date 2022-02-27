@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import tempfile
@@ -372,7 +373,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         with self.assertRaises(ValueError):
             self.fetcher.fetch(days="1", end="2012-01-01")
 
-    def test_raises_error_with_timelord(self):
+    def test_raises_error_with_start_after_end(self):
         "start can't be after end."
         with self.assertRaises(ValueError):
             self.fetcher.fetch(start="2013-01-01", end="2012-01-01")
@@ -385,6 +386,8 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         )
 
         with self.assertRaises(FetchError):
+            # Need to set the min_date just because our test params are expecting this:
+            self.fetcher.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
             self.fetcher._call_api()
 
     @patch.object(PhotosFetcher, "_fetch_extra")
@@ -426,6 +429,29 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
         with patch("time.sleep"):
             self.fetcher.fetch(days=3)
+
+    @patch.object(PhotosFetcher, "_fetch_extra")
+    @patch.object(PhotoSaver, "save_photo")
+    def test_fetches_from_start(self, save_photo, fetch_extra):
+        "Should ask for photos from the start date, if specified."
+        self.expect_response(
+            "people.getPhotos", params={"min_upload_date": "1439251200"}
+        )
+
+        with patch("time.sleep"):
+            self.fetcher.fetch(start="2015-08-11")
+
+    @patch.object(PhotosFetcher, "_fetch_extra")
+    @patch.object(PhotoSaver, "save_photo")
+    def test_fetches_from_start_and_end(self, save_photo, fetch_extra):
+        "Should ask for photos between the start and end dates, if specified."
+        self.expect_response(
+            "people.getPhotos",
+            params={"min_upload_date": "1439251200", "max_upload_date": "1439510400"},
+        )
+
+        with patch("time.sleep"):
+            self.fetcher.fetch(start="2015-08-11", end="2015-08-14")
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @patch.object(PhotoSaver, "save_photo")
