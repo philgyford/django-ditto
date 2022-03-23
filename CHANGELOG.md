@@ -6,6 +6,8 @@ Unreleased
 
 - Add optional `start` and `end` arguments to the `fetch_flickr_photos` management command. (Thanks @garrettc)
 
+- Handle error when importing Flickr data (such as tags) created by a Flickr user who has since been deleted. (#234, thanks @garrettc)
+
 
 2.0.0 - 2022-02-14
 ------------------
