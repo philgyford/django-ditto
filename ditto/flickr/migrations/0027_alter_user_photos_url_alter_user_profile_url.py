@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0026_alter_taggedphoto_content_object_and_more'),
+        ("flickr", "0026_alter_taggedphoto_content_object_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='photos_url',
-            field=models.URLField(blank=True, max_length=255, verbose_name='Photos URL at Flickr'),
+            model_name="user",
+            name="photos_url",
+            field=models.URLField(
+                blank=True, max_length=255, verbose_name="Photos URL at Flickr"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='profile_url',
-            field=models.URLField(blank=True, max_length=255, verbose_name='Avatar URL on Flickr'),
+            model_name="user",
+            name="profile_url",
+            field=models.URLField(
+                blank=True, max_length=255, verbose_name="Avatar URL on Flickr"
+            ),
         ),
     ]

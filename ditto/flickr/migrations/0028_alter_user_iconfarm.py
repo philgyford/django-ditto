@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0027_alter_user_photos_url_alter_user_profile_url'),
+        ("flickr", "0027_alter_user_photos_url_alter_user_profile_url"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='iconfarm',
+            model_name="user",
+            name="iconfarm",
             field=models.PositiveIntegerField(default=0),
         ),
     ]
