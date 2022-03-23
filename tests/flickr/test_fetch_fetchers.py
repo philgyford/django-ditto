@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import pytz
 import tempfile
 from unittest.mock import call, patch
 
@@ -196,6 +197,30 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertIn("fetched", result)
         self.assertEqual(result["fetched"], 1)
 
+    def test_deleted_user(self):
+        "If the user to fetch was deleted, we should save dummy data."
+        self.expect_response(
+            "people.getInfo",
+            body='{"stat": "fail", "code": 5, "message": "User deleted"}',
+        )
+        response = UserFetcher(account=self.account).fetch(nsid="35034346050@N01")
+        self.assertEqual(response["fetched"], 1)
+        self.assertEqual(response["user"]["name"], "Deleted User")
+        self.assertTrue(response["success"])
+
+        user = User.objects.get(nsid="35034346050@N01")
+
+        self.assertEqual(user.username, "deleted_user_35034346050@N01")
+        self.assertEqual(user.realname, "Deleted User")
+        self.assertEqual(user.description, "Deleted user")
+        self.assertEqual(user.photos_count, 0)
+
+        dt = datetime.datetime.strptime(
+            "1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=pytz.utc)
+        self.assertEqual(user.photos_first_date, dt)
+        self.assertEqual(user.photos_first_date_taken, dt)
+
 
 class PhotosFetcherTestCase(FlickrFetchTestCase):
     """Testing the parent class that's used for all kinds of fetching lists of
@@ -363,21 +388,6 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         with self.assertRaises(FetchError):
             self.fetcher.fetch()
 
-    def test_raises_error_with_days_and_start(self):
-        "days can't be used with start."
-        with self.assertRaises(ValueError):
-            self.fetcher.fetch(days="1", start="2012-01-01")
-
-    def test_raises_error_with_days_and_end(self):
-        "days can't be used with end."
-        with self.assertRaises(ValueError):
-            self.fetcher.fetch(days="1", end="2012-01-01")
-
-    def test_raises_error_with_start_after_end(self):
-        "start can't be after end."
-        with self.assertRaises(ValueError):
-            self.fetcher.fetch(start="2013-01-01", end="2012-01-01")
-
     def test_call_api_error(self):
         "_call_api() should throw an error if there's an API error."
         self.expect_response(
@@ -386,8 +396,6 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
         )
 
         with self.assertRaises(FetchError):
-            # Need to set the min_date just because our test params are expecting this:
-            self.fetcher.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
             self.fetcher._call_api()
 
     @patch.object(PhotosFetcher, "_fetch_extra")
@@ -429,43 +437,6 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
         with patch("time.sleep"):
             self.fetcher.fetch(days=3)
-
-    @patch.object(PhotosFetcher, "_fetch_extra")
-    @patch.object(PhotoSaver, "save_photo")
-    def test_fetches_from_start(self, save_photo, fetch_extra):
-        "Should ask for photos from the start date, if specified."
-        self.expect_response(
-            "people.getPhotos", params={"min_upload_date": "1439251200"}
-        )
-
-        with patch("time.sleep"):
-            self.fetcher.fetch(start="2015-08-11")
-
-    @patch.object(PhotosFetcher, "_fetch_extra")
-    @patch.object(PhotoSaver, "save_photo")
-    def test_fetches_from_end(self, save_photo, fetch_extra):
-        "Should ask for photos before the end date, if specified."
-        # Yes, we also send a min_upload_date, which is for 2000-01-01, before
-        # Flickr was created.
-        self.expect_response(
-            "people.getPhotos",
-            params={"min_upload_date": "946684800", "max_upload_date": "1439596799"},
-        )
-
-        with patch("time.sleep"):
-            self.fetcher.fetch(end="2015-08-14")
-
-    @patch.object(PhotosFetcher, "_fetch_extra")
-    @patch.object(PhotoSaver, "save_photo")
-    def test_fetches_from_start_and_end(self, save_photo, fetch_extra):
-        "Should ask for photos between the start and end dates, if specified."
-        self.expect_response(
-            "people.getPhotos",
-            params={"min_upload_date": "1439251200", "max_upload_date": "1439596799"},
-        )
-
-        with patch("time.sleep"):
-            self.fetcher.fetch(start="2015-08-11", end="2015-08-14")
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     @patch.object(PhotoSaver, "save_photo")
