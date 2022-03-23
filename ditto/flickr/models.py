@@ -852,10 +852,10 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     description = models.TextField(null=False, blank=True, help_text="May contain HTML")
 
     photos_url = models.URLField(
-        null=False, blank=False, max_length=255, verbose_name="Photos URL at Flickr"
+        null=False, blank=True, max_length=255, verbose_name="Photos URL at Flickr"
     )
     profile_url = models.URLField(
-        null=False, blank=False, max_length=255, verbose_name="Avatar URL on Flickr"
+        null=False, blank=True, max_length=255, verbose_name="Avatar URL on Flickr"
     )
 
     photos_count = models.PositiveIntegerField(null=False, blank=False, default=0)
