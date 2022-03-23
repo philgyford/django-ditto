@@ -86,7 +86,9 @@ class RecentPhotosMultiAccountFetcherTestCase(MultiAccountFetcherTestCase):
     def test_calls_fetch_for_active_accounts(self, fetch):
         "RecentPhotosFetcher.fetch() should be called twice."
         RecentPhotosMultiAccountFetcher().fetch(days=3)
-        fetch.assert_has_calls([call(days=3), call(days=3)])
+        fetch.assert_has_calls(
+            [call(days=3, start=None, end=None), call(days=3, start=None, end=None)]
+        )
 
     @patch.object(RecentPhotosFetcher, "fetch")
     def test_returns_list_of_return_values(self, fetch):

@@ -92,9 +92,11 @@ class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
     went wrong) for each account.
     """
 
-    def fetch(self, days=None):
+    def fetch(self, days=None, start=None, end=None):
         for account in self.accounts:
-            self.return_value.append(RecentPhotosFetcher(account).fetch(days=days))
+            self.return_value.append(
+                RecentPhotosFetcher(account).fetch(days=days, start=start, end=end)
+            )
 
         return self.return_value
 

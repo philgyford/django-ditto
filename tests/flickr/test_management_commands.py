@@ -154,6 +154,8 @@ class FetchFlickrPhotosTestCase(TestCase):
         self.out = StringIO()
         self.out_err = StringIO()
 
+    # Failures
+
     def test_fail_with_no_args(self):
         with self.assertRaises(CommandError):
             call_command("fetch_flickr_photos")
@@ -166,13 +168,23 @@ class FetchFlickrPhotosTestCase(TestCase):
         with self.assertRaises(CommandError):
             call_command("fetch_flickr_photos", days="foo")
 
+    def test_fail_with_days_and_start(self):
+        with self.assertRaises(CommandError):
+            call_command("fetch_flickr_photos", days=7, start="2022-01-31")
+
+    def test_fail_with_days_and_end(self):
+        with self.assertRaises(CommandError):
+            call_command("fetch_flickr_photos", days=7, end="2022-01-31")
+
+    # Sending --days argument
+
     @patch(
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
     )
     def test_sends_days_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photos", account="99999999999@N99", days="4")
         fetcher.assert_called_with(nsid="99999999999@N99")
-        fetcher.return_value.fetch.assert_called_with(days=4)
+        fetcher.return_value.fetch.assert_called_with(days=4, start=None, end=None)
 
     @patch(
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
@@ -180,7 +192,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     def test_sends_days_to_fetcher_no_account(self, fetcher):
         call_command("fetch_flickr_photos", days="4")
         fetcher.assert_called_with(nsid=None)
-        fetcher.return_value.fetch.assert_called_with(days=4)
+        fetcher.return_value.fetch.assert_called_with(days=4, start=None, end=None)
 
     @patch(
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
@@ -188,7 +200,82 @@ class FetchFlickrPhotosTestCase(TestCase):
     def test_sends_all_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photos", account="99999999999@N99", days="all")
         fetcher.assert_called_with(nsid="99999999999@N99")
-        fetcher.return_value.fetch.assert_called_with(days="all")
+        fetcher.return_value.fetch.assert_called_with(days="all", start=None, end=None)
+
+    # Sending --start argument
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_start_to_fetcher_with_account(self, fetcher):
+        call_command(
+            "fetch_flickr_photos", account="99999999999@N99", start="2022-01-31"
+        )
+        fetcher.assert_called_with(nsid="99999999999@N99")
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start="2022-01-31", end=None
+        )
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_start_to_fetcher_with_no_account(self, fetcher):
+        call_command("fetch_flickr_photos", start="2022-01-31")
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start="2022-01-31", end=None
+        )
+
+    # Sending --end argument
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_end_to_fetcher_with_account(self, fetcher):
+        call_command("fetch_flickr_photos", account="99999999999@N99", end="2022-01-31")
+        fetcher.assert_called_with(nsid="99999999999@N99")
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start=None, end="2022-01-31"
+        )
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_end_to_fetcher_with_no_account(self, fetcher):
+        call_command("fetch_flickr_photos", end="2022-01-31")
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start=None, end="2022-01-31"
+        )
+
+    # Sending --start and --end arguments
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_start_and_end_to_fetcher_with_account(self, fetcher):
+        call_command(
+            "fetch_flickr_photos",
+            account="99999999999@N99",
+            start="2022-01-31",
+            end="2022-02-14",
+        )
+        fetcher.assert_called_with(nsid="99999999999@N99")
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start="2022-01-31", end="2022-02-14"
+        )
+
+    @patch(
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+    )
+    def test_sends_start_and_end_to_fetcher_with_no_account(self, fetcher):
+        call_command("fetch_flickr_photos", start="2022-01-31", end="2022-02-14")
+        fetcher.assert_called_with(nsid=None)
+        fetcher.return_value.fetch.assert_called_with(
+            days=None, start="2022-01-31", end="2022-02-14"
+        )
+
+    # Outputs
 
     @patch(
         "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
