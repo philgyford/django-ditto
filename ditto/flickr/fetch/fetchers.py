@@ -214,6 +214,24 @@ class UserFetcher(Fetcher):
         try:
             info = self.api.people.getInfo(user_id=nsid)
         except FlickrError as e:
+            # User has deleted their account, so create a dummy result
+            if e.code == 5:
+                self.results = [
+                    {
+                        "raw": "{}",
+                        "nsid": nsid,
+                        "username": {"_content": "deleted_user_" + nsid},
+                        "realname": {"_content": "Deleted User"},
+                        "description": {"_content": "Deleted user"},
+                        "photos": {
+                            "count": {"_content": "0"},
+                            "firstdate": {"_content": "0"},
+                            "firstdatetaken": {"_content": "1970-01-01 00:00:00"},
+                        },
+                    }
+                ]
+                return
+
             raise FetchError(
                 "Error when getting info about User with Flickr ID '%s': %s" % (nsid, e)
             )

@@ -26,7 +26,9 @@ Expects:
         <li class="list-group-item flickr-user-first-date">First upload: {{ user.photos_first_date|date:"M Y" }}</li>
         <li class="list-group-item flickr-user-first-date-taken">First photo: {{ user.photos_first_date_taken|date:"M Y" }}</li>
         {% if account == None or account.is_active %}
-            <li class="list-group-item flickr-user-link"><a href="{{ user.permalink }}">At Flickr.com</a></li>
+            {% if user.permalink %}
+                <li class="list-group-item flickr-user-link"><a href="{{ user.permalink }}">At Flickr.com</a></li>
+            {% endif %}
         {% endif %}
         {% if perms and perms.flickr.can_change_user %}
             <li class="list-group-item"><a href="{% url 'admin:flickr_user_change' user.id %}" title="Edit this user in the Django Admin">Edit</a></li>
@@ -40,4 +42,3 @@ Expects:
         <li class="list-group-item">{{ user.photos_views|localize }} view{{ user.photos_views|pluralize }}</li>
     </ul>
 </div>
-
