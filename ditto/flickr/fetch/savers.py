@@ -76,14 +76,9 @@ class UserSaver(SaveUtilsMixin, object):
             "fetch_time": fetch_time,
             "raw": raw_json,
             "nsid": user["nsid"],
-            "is_pro": (int(user["ispro"]) == 1),
-            "iconserver": user["iconserver"],
-            "iconfarm": user["iconfarm"],
             "username": user["username"]["_content"],
             "realname": user["realname"]["_content"],
             "description": user["description"]["_content"],
-            "photos_url": user["photosurl"]["_content"],
-            "profile_url": user["profileurl"]["_content"],
             "photos_count": int(user["photos"]["count"]["_content"]),
             "photos_first_date": self._unixtime_to_datetime(
                 user["photos"]["firstdate"]["_content"]
@@ -92,6 +87,18 @@ class UserSaver(SaveUtilsMixin, object):
                 user["photos"]["firstdatetaken"]["_content"]
             ),
         }
+
+        # Things we won't have in our dummy data if the user was deleted:
+        if "iconserver" in user:
+            defaults["iconserver"] = user["iconserver"]
+        if "iconfarm" in user:
+            defaults["iconfarm"] = user["iconfarm"]
+        if "ispro" in user:
+            defaults["is_pro"] = (int(user["ispro"]) == 1)
+        if "photosurl" in user:
+            defaults["photos_url"] = user["photosurl"]["_content"]
+        if "profileurl" in user:
+            defaults["profile_url"] = user["profileurl"]["_content"]
 
         # 'location' and 'timezone' were missing for at least one user fetched:
         if "location" in user:

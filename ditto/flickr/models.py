@@ -844,7 +844,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         null=False, blank=False, default=False, verbose_name="Is Pro?"
     )
     iconserver = models.PositiveIntegerField(null=False, blank=False, default=0)
-    iconfarm = models.PositiveIntegerField(null=False, blank=False)
+    iconfarm = models.PositiveIntegerField(null=False, blank=False, default=0)
 
     username = models.CharField(null=False, blank=False, unique=True, max_length=50)
     realname = models.CharField(null=False, blank=False, max_length=255)

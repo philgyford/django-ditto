@@ -220,14 +220,9 @@ class UserFetcher(Fetcher):
                     {
                         "raw": "{}",
                         "nsid": nsid,
-                        "ispro": False,
-                        "iconserver": "0",
-                        "iconfarm": "0",
                         "username": {"_content": "deleted_user_" + nsid},
                         "realname": {"_content": "Deleted User"},
-                        "description": {"_content": "Deleted User"},
-                        "photosurl": {"_content": "deleted_user"},
-                        "profileurl": {"_content": "deleted_user"},
+                        "description": {"_content": "Deleted user"},
                         "photos": {
                             "count": {"_content": "0"},
                             "firstdate": {"_content": "0"},
