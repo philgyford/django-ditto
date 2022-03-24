@@ -205,14 +205,12 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         )
         response = UserFetcher(account=self.account).fetch(nsid="35034346050@N01")
         self.assertEqual(response["fetched"], 1)
-        self.assertEqual(response["user"]["name"], "Deleted User")
+        self.assertEqual(response["user"]["name"], "deleted_user_35034346050@N01")
         self.assertTrue(response["success"])
 
         user = User.objects.get(nsid="35034346050@N01")
 
         self.assertEqual(user.username, "deleted_user_35034346050@N01")
-        self.assertEqual(user.realname, "Deleted User")
-        self.assertEqual(user.description, "Deleted user")
         self.assertEqual(user.photos_count, 0)
 
         dt = datetime.datetime.strptime(

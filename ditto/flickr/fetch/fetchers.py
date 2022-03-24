@@ -221,8 +221,6 @@ class UserFetcher(Fetcher):
                         "raw": "{}",
                         "nsid": nsid,
                         "username": {"_content": "deleted_user_" + nsid},
-                        "realname": {"_content": "Deleted User"},
-                        "description": {"_content": "Deleted user"},
                         "photos": {
                             "count": {"_content": "0"},
                             "firstdate": {"_content": "0"},

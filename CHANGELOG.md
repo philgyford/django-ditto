@@ -10,6 +10,8 @@ Unreleased
 
 - Handle error when importing Flickr photos that don't have all expected image sizes. (#235, thanks @garrettc)
 
+- Allow for the `User.realname` property to be blank because the Flickr API doesn't return that field at all for some users (#237)
+
 
 2.0.0 - 2022-02-14
 ------------------

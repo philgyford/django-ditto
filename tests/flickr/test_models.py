@@ -47,16 +47,35 @@ class AccountTestCase(TestCase):
 
 
 class UserTestCase(TestCase):
+    def test_str(self):
+        user = UserFactory(realname="Terry")
+        self.assertEqual(str(user), "Terry")
+
+    def test_str_no_realname(self):
+        user = UserFactory(realname="", username="terry")
+        self.assertEqual(str(user), "terry")
+
     def test_name(self):
         user = UserFactory(realname="Terry")
         self.assertEqual(user.name, "Terry")
 
-    def test_ordering(self):
+    def test_name_no_realname(self):
+        user = UserFactory(realname="", username="terry")
+        self.assertEqual(user.name, "terry")
+
+    def test_ordering_by_realname(self):
         UserFactory(realname="Terry")
         UserFactory(realname="Bob")
         users = User.objects.all()
         self.assertEqual(users[0].realname, "Bob")
         self.assertEqual(users[1].realname, "Terry")
+
+    def test_ordering_by_realname_then_username(self):
+        UserFactory(realname="Terry", username="terry2")
+        UserFactory(realname="Terry", username="terry1")
+        users = User.objects.all()
+        self.assertEqual(users[0].username, "terry1")
+        self.assertEqual(users[1].username, "terry2")
 
     def test_users_with_accounts(self):
         user_1 = UserFactory(realname="Terry")

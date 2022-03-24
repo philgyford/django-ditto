@@ -63,6 +63,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display_links = (
         "show_avatar",
         "realname",
+        "username",
     )
 
     fieldsets = (

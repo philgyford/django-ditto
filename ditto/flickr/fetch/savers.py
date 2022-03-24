@@ -77,8 +77,6 @@ class UserSaver(SaveUtilsMixin, object):
             "raw": raw_json,
             "nsid": user["nsid"],
             "username": user["username"]["_content"],
-            "realname": user["realname"]["_content"],
-            "description": user["description"]["_content"],
             "photos_count": int(user["photos"]["count"]["_content"]),
             "photos_first_date": self._unixtime_to_datetime(
                 user["photos"]["firstdate"]["_content"]
@@ -95,10 +93,16 @@ class UserSaver(SaveUtilsMixin, object):
             defaults["iconfarm"] = user["iconfarm"]
         if "ispro" in user:
             defaults["is_pro"] = (int(user["ispro"]) == 1)
+        if "description" in user:
+            defaults["description"] = user["description"]["_content"]
         if "photosurl" in user:
             defaults["photos_url"] = user["photosurl"]["_content"]
         if "profileurl" in user:
             defaults["profile_url"] = user["profileurl"]["_content"]
+
+        # Surprisingly, not always present:
+        if "realname" in user:
+            defaults["realname"] = user["realname"]["_content"]
 
         # 'location' and 'timezone' were missing for at least one user fetched:
         if "location" in user:

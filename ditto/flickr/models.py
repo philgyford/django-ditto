@@ -847,7 +847,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     iconfarm = models.PositiveIntegerField(null=False, blank=False, default=0)
 
     username = models.CharField(null=False, blank=False, unique=True, max_length=50)
-    realname = models.CharField(null=False, blank=False, max_length=255)
+    realname = models.CharField(null=False, blank=True, max_length=255)
     location = models.CharField(null=False, blank=True, max_length=255)
     description = models.TextField(null=False, blank=True, help_text="May contain HTML")
 
@@ -901,17 +901,17 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     objects_with_accounts = managers.WithAccountsManager()
 
     def __str__(self):
-        return self.realname
+        return self.realname if self.realname else self.username
 
     class Meta:
-        ordering = ["realname"]
+        ordering = ["realname", "username"]
 
     def get_absolute_url(self):
         return reverse("flickr:user_detail", kwargs={"nsid": self.nsid})
 
     @property
     def name(self):
-        return self.realname
+        return self.realname if self.realname else self.username
 
     @property
     def permalink(self):
