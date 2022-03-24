@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2022-03-24
 
+### Removed
+- The no-longer-used `ditto/core/context_processors.py` file has been removed (deprecated in v0.6.0).
+
 ### Added
 - Optional `start` and `end` arguments to the `fetch_flickr_photos` management command. (Thanks @garrettc)
 
