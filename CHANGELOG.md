@@ -4,6 +4,12 @@ Changelog (Django Ditto)
 Unreleased
 ----------
 
+- None
+
+
+2.1.0 - 2022-03-24
+------------------
+
 - Add optional `start` and `end` arguments to the `fetch_flickr_photos` management command. (Thanks @garrettc)
 
 - Handle error when importing Flickr data (such as tags) created by a Flickr user who has since been deleted. (#234, thanks @garrettc)
