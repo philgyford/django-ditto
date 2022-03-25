@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - None
 
 
+## [2.1.1] - 2022-03-25
+
+### Fixed
+- Include `.map` files in `core/static/ditto-core/`. They were missing which causes issues when running `collectstatic`.
+
+
 ## [2.1.0] - 2022-03-24
 
 ### Removed

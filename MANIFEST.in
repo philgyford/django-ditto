@@ -3,7 +3,7 @@ include README.md
 include runtests.py
 include tox.ini
 recursive-include ditto *.html *.py *.sh
-recursive-include ditto/core/static *.css *.jpg *.js *.png
+recursive-include ditto/core/static *
 
 recursive-exclude devproject *
 recursive-exclude docs *
