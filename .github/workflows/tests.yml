@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        django-version: ["3.2", "4.0", "tip"]
+        django-version: ["3.2", "4.0", "main"]
         exclude:
           # Django 4.0 isn't compatible with python 3.6 and 3.7:
           - python-version: "3.6"
@@ -26,9 +26,9 @@ jobs:
           - python-version: "3.7"
             django-version: "4.0"
           - python-version: "3.6"
-            django-version: "tip"
+            django-version: "main"
           - python-version: "3.7"
-            django-version: "tip"
+            django-version: "main"
 
     steps:
       - name: Git clone
