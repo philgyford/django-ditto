@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- None
+### Added
+- Add the latest master branch Django to the tox testing matrix.
+
+### Changed
+- Update development project depenencies
+- Update included Bootstrap CSS from 4.6.0 to 4.6.1.
 
 
 ## [2.1.1] - 2022-03-25
