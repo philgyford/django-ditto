@@ -5,7 +5,7 @@ Django Ditto
 [![image](https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=main)](https://coveralls.io/github/philgyford/django-ditto?branch=main "Test coverage")
 [![image](https://readthedocs.org/projects/django-ditto/badge/?version=stable)](https://django-ditto.readthedocs.io/en/stable/?badge=stable "Documentation status")
 
-A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6, 3.7, 3.8, 3.9 and 3.10, and Django 3.2 and 4.0.
+A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6, 3.7, 3.8, 3.9 and 3.10, and Django 3.2, 4.0 and 4.1.
 
 [Read the documentation.](http://django-ditto.readthedocs.io/en/latest/)
 
