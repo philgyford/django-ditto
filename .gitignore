@@ -4,6 +4,7 @@ devproject/db.sqlite3
 devproject/media
 devproject/static
 devproject/venv/
+devproject/.env
 dist
 django_ditto.egg-info
 htmlcov

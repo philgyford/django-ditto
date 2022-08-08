@@ -27,7 +27,16 @@ I think you just need to do this first:
 
 .. code-block:: shell
 
-  $ pre-commit install
+    $ pre-commit install
+
+You can add a `.env` file in `devproject/` and its environment variables will be
+read in `devproject/devproject/settings.py`. e.g.:
+
+.. code-block:: shell
+
+    DJANGO_SECRET_KEY="your-secret-key"
+    DJANGO_LOG_LEVEL="INFO"
+
 
 *****
 Tests
