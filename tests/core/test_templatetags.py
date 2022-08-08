@@ -5,8 +5,12 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from ditto.core.apps import Apps
-from ditto.core.templatetags.ditto_core import (display_time, get_enabled_apps,
-                                                query_string, width_height)
+from ditto.core.templatetags.ditto_core import (
+    display_time,
+    get_enabled_apps,
+    query_string,
+    width_height,
+)
 from ditto.core.utils import datetime_now
 
 from . import override_app_settings

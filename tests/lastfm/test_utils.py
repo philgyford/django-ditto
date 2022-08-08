@@ -21,6 +21,6 @@ class UtilsTestCase(TestCase):
 
     def test_changed_characters_2(self):
         self.assertEqual(
-            slugify_name('" < > \ ^ ` { | }'),
-            "%22+%3C+%3E+%5C%5C+%5E+%60+%7B+%7C+%7D",  # noqa: E501, W605
+            slugify_name('" < > \ ^ ` { | }'),  # noqa: W605
+            "%22+%3C+%3E+%5C%5C+%5E+%60+%7B+%7C+%7D",
         )

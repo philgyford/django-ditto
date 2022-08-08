@@ -7,8 +7,7 @@ from taggit.managers import TaggableManager
 from taggit.models import GenericTaggedItemBase, TagBase
 
 from ..core.models import DittoItemModel, TimeStampedModelMixin
-from .managers import (PublicToreadManager, ToreadManager,
-                       _BookmarkTaggableManager)
+from .managers import PublicToreadManager, ToreadManager, _BookmarkTaggableManager
 
 
 class Account(TimeStampedModelMixin, models.Model):

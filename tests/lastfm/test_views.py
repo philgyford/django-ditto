@@ -3,9 +3,13 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_from_str
-from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
-                                    ArtistFactory, ScrobbleFactory,
-                                    TrackFactory)
+from ditto.lastfm.factories import (
+    AccountFactory,
+    AlbumFactory,
+    ArtistFactory,
+    ScrobbleFactory,
+    TrackFactory,
+)
 
 # from ditto.lastfm.models import *
 

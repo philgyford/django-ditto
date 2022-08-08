@@ -11,10 +11,15 @@ from django.urls import reverse
 
 from ditto.core.utils import datetime_from_str
 from ditto.twitter import app_settings
-from ditto.twitter.factories import (AccountFactory,
-                                     AccountWithCredentialsFactory,
-                                     AnimatedGifFactory, PhotoFactory,
-                                     TweetFactory, UserFactory, VideoFactory)
+from ditto.twitter.factories import (
+    AccountFactory,
+    AccountWithCredentialsFactory,
+    AnimatedGifFactory,
+    PhotoFactory,
+    TweetFactory,
+    UserFactory,
+    VideoFactory,
+)
 from ditto.twitter.fetch.savers import UserSaver
 from ditto.twitter.models import Account, Media, Tweet, User
 

@@ -4,10 +4,12 @@ from ditto.flickr.factories import AccountFactory, UserFactory
 from ditto.flickr.fetch import FetchError
 from ditto.flickr.fetch.fetchers import PhotosetsFetcher, RecentPhotosFetcher
 from ditto.flickr.fetch.filesfetchers import OriginalFilesFetcher
-from ditto.flickr.fetch.multifetchers import (MultiAccountFetcher,
-                                              OriginalFilesMultiAccountFetcher,
-                                              PhotosetsMultiAccountFetcher,
-                                              RecentPhotosMultiAccountFetcher)
+from ditto.flickr.fetch.multifetchers import (
+    MultiAccountFetcher,
+    OriginalFilesMultiAccountFetcher,
+    PhotosetsMultiAccountFetcher,
+    RecentPhotosMultiAccountFetcher,
+)
 
 from .test_fetch import FlickrFetchTestCase
 

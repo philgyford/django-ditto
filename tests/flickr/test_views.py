@@ -4,9 +4,14 @@ from django.test import TestCase
 from django.urls import reverse
 
 from ditto.core.utils import datetime_now
-from ditto.flickr.factories import (AccountFactory, PhotoFactory,
-                                    PhotosetFactory, TagFactory,
-                                    TaggedPhotoFactory, UserFactory)
+from ditto.flickr.factories import (
+    AccountFactory,
+    PhotoFactory,
+    PhotosetFactory,
+    TagFactory,
+    TaggedPhotoFactory,
+    UserFactory,
+)
 
 
 class HomeViewTests(TestCase):

@@ -12,9 +12,14 @@ from ditto.core.utils import datetime_now
 from ditto.core.utils.downloader import filedownloader
 from ditto.flickr.factories import AccountFactory, UserFactory
 from ditto.flickr.fetch import FetchError
-from ditto.flickr.fetch.fetchers import (Fetcher, PhotosetsFetcher,
-                                         PhotosFetcher, RecentPhotosFetcher,
-                                         UserFetcher, UserIdFetcher)
+from ditto.flickr.fetch.fetchers import (
+    Fetcher,
+    PhotosetsFetcher,
+    PhotosFetcher,
+    RecentPhotosFetcher,
+    UserFetcher,
+    UserIdFetcher,
+)
 from ditto.flickr.fetch.savers import PhotoSaver, PhotosetSaver, UserSaver
 from ditto.flickr.models import User
 

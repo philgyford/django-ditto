@@ -8,11 +8,18 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
-from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
-                                    ArtistFactory, ScrobbleFactory,
-                                    TrackFactory)
-from ditto.lastfm.fetch import (FetchError, ScrobblesFetcher,
-                                ScrobblesMultiAccountFetcher)
+from ditto.lastfm.factories import (
+    AccountFactory,
+    AlbumFactory,
+    ArtistFactory,
+    ScrobbleFactory,
+    TrackFactory,
+)
+from ditto.lastfm.fetch import (
+    FetchError,
+    ScrobblesFetcher,
+    ScrobblesMultiAccountFetcher,
+)
 from ditto.lastfm.models import Album, Artist, Scrobble, Track
 
 

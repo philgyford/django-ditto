@@ -1,7 +1,14 @@
 from ..models import Account
 from . import FetchError
-from .fetch import (Fetch, FetchFiles, FetchTweets, FetchTweetsFavorite,
-                    FetchTweetsRecent, FetchUsers, FetchVerify)
+from .fetch import (
+    Fetch,
+    FetchFiles,
+    FetchTweets,
+    FetchTweetsFavorite,
+    FetchTweetsRecent,
+    FetchUsers,
+    FetchVerify,
+)
 
 # The classes to call to fetch data from the API to create/update objects.
 # Each one can fetch a kind of thing for ONE OR MORE Accounts.

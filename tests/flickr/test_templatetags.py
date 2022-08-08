@@ -4,8 +4,12 @@ import pytz
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
-from ditto.flickr.factories import (AccountFactory, PhotoFactory,
-                                    PhotosetFactory, UserFactory)
+from ditto.flickr.factories import (
+    AccountFactory,
+    PhotoFactory,
+    PhotosetFactory,
+    UserFactory,
+)
 from ditto.flickr.templatetags import ditto_flickr
 
 

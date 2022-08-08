@@ -7,13 +7,22 @@ import pytz
 import responses
 from django.test import TestCase
 from freezegun import freeze_time
-from requests.exceptions import (ConnectionError, RequestException, Timeout,
-                                 TooManyRedirects)
+from requests.exceptions import (
+    ConnectionError,
+    RequestException,
+    Timeout,
+    TooManyRedirects,
+)
 
 from ditto.pinboard.factories import AccountFactory, BookmarkFactory
-from ditto.pinboard.fetch import (AllBookmarksFetcher, BookmarksFetcher,
-                                  DateBookmarksFetcher, FetchError,
-                                  RecentBookmarksFetcher, UrlBookmarksFetcher)
+from ditto.pinboard.fetch import (
+    AllBookmarksFetcher,
+    BookmarksFetcher,
+    DateBookmarksFetcher,
+    FetchError,
+    RecentBookmarksFetcher,
+    UrlBookmarksFetcher,
+)
 from ditto.pinboard.models import Account, Bookmark, BookmarkTag
 
 

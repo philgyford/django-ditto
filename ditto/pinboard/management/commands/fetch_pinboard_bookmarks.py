@@ -2,8 +2,12 @@
 from django.core.management.base import CommandError
 
 from ....core.management.commands import DittoBaseCommand
-from ...fetch import (AllBookmarksFetcher, DateBookmarksFetcher,
-                      RecentBookmarksFetcher, UrlBookmarksFetcher)
+from ...fetch import (
+    AllBookmarksFetcher,
+    DateBookmarksFetcher,
+    RecentBookmarksFetcher,
+    UrlBookmarksFetcher,
+)
 
 
 class Command(DittoBaseCommand):

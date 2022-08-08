@@ -8,18 +8,33 @@ from django.http import QueryDict
 from django.test import TestCase, override_settings
 
 from ditto.core.utils.downloader import DownloadException, filedownloader
-from ditto.twitter.factories import (AccountFactory,
-                                     AccountWithCredentialsFactory,
-                                     AnimatedGifFactory, PhotoFactory,
-                                     TweetFactory, UserFactory, VideoFactory)
+from ditto.twitter.factories import (
+    AccountFactory,
+    AccountWithCredentialsFactory,
+    AnimatedGifFactory,
+    PhotoFactory,
+    TweetFactory,
+    UserFactory,
+    VideoFactory,
+)
 from ditto.twitter.fetch import FetchError
-from ditto.twitter.fetch.fetch import (FetchFiles, FetchTweets,
-                                       FetchTweetsFavorite, FetchTweetsRecent,
-                                       FetchUsers, FetchVerify)
-from ditto.twitter.fetch.fetchers import (FavoriteTweetsFetcher, FilesFetcher,
-                                          RecentTweetsFetcher, TweetsFetcher,
-                                          TwitterFetcher, UsersFetcher,
-                                          VerifyFetcher)
+from ditto.twitter.fetch.fetch import (
+    FetchFiles,
+    FetchTweets,
+    FetchTweetsFavorite,
+    FetchTweetsRecent,
+    FetchUsers,
+    FetchVerify,
+)
+from ditto.twitter.fetch.fetchers import (
+    FavoriteTweetsFetcher,
+    FilesFetcher,
+    RecentTweetsFetcher,
+    TweetsFetcher,
+    TwitterFetcher,
+    UsersFetcher,
+    VerifyFetcher,
+)
 from ditto.twitter.fetch.savers import TweetSaver, UserSaver
 from ditto.twitter.models import Account, Tweet, User
 
