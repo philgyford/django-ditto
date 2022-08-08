@@ -1,84 +1,84 @@
-[
-  {
-    "contributors": null,
-    "truncated": false,
-    "text": "@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.",
-    "is_quote_status": false,
-    "in_reply_to_status_id": 629375876216528896,
-    "id": 300,
-    "favorite_count": 2,
-    "source": "<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for iΟS</a>",
-    "retweeted": false,
-    "coordinates": {
-      "coordinates": [-75.14310264, 40.05701649],
-      "type": "Point"
+[  
+  {  
+    "contributors":null,
+    "truncated":false,
+    "text":"@flaneur ooh, very exciting, thank you!\n\nBoth my ears owe you a drink.",
+    "is_quote_status":false,
+    "in_reply_to_status_id":629375876216528896,
+    "id":300,
+    "favorite_count":2,
+    "source":"<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for iΟS</a>",
+    "retweeted":false,
+    "coordinates":{
+      "coordinates": [ -75.14310264, 40.05701649 ],
+      "type":"Point"
     },
-    "entities": {
-      "symbols": [],
-      "user_mentions": [
-        {
-          "id": 1859981,
-          "indices": [0, 8],
-          "id_str": "1859981",
-          "screen_name": "flaneur",
-          "name": "Matthew Ogle"
+    "entities":{  
+      "symbols":[],
+      "user_mentions":[  
+        {  
+          "id":1859981,
+          "indices":[0, 8],
+          "id_str":"1859981",
+          "screen_name":"flaneur",
+          "name":"Matthew Ogle"
         }
       ],
-      "hashtags": [],
-      "urls": []
+      "hashtags":[],
+      "urls":[]
     },
-    "in_reply_to_screen_name": "flaneur",
-    "id_str": "300",
-    "retweet_count": 1,
-    "in_reply_to_user_id": 1859981,
-    "favorited": false,
-    "user": {
-      "follow_request_sent": false,
-      "default_profile_image": false,
-      "id": 12552,
-      "verified": false,
-      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
-      "entities": {
-        "url": {
-          "urls": [
-            {
-              "url": "http://t.co/UEs0CCkdrl",
-              "indices": [0, 22],
-              "expanded_url": "http://www.gyford.com/",
-              "display_url": "gyford.com"
+    "in_reply_to_screen_name":"flaneur",
+    "id_str":"300",
+    "retweet_count":1,
+    "in_reply_to_user_id":1859981,
+    "favorited":false,
+    "user":{  
+      "follow_request_sent":false,
+      "default_profile_image":false,
+      "id":12552,
+      "verified":false,
+      "profile_image_url_https":"https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
+      "entities":{  
+        "url":{  
+          "urls":[  
+            {  
+              "url":"http://t.co/UEs0CCkdrl",
+              "indices":[0, 22],
+              "expanded_url":"http://www.gyford.com/",
+              "display_url":"gyford.com"
             }
           ]
         },
-        "description": {
-          "urls": []
+        "description":{  
+          "urls":[]
         }
       },
-      "followers_count": 2436,
-      "id_str": "12552",
-      "listed_count": 138,
-      "utc_offset": 3600,
-      "statuses_count": 16428,
-      "description": "Good. Good to Firm in places.",
-      "friends_count": 309,
-      "location": "London, UK",
-      "following": false,
-      "screen_name": "philgyford",
-      "favourites_count": 1389,
-      "name": "Phil Gyford",
-      "notifications": false,
-      "url": "http://t.co/UEs0CCkdrl",
-      "created_at": "Wed Nov 15 16:55:59 +0000 2006",
-      "contributors_enabled": false,
-      "time_zone": "London",
-      "protected": false,
-      "default_profile": false,
-      "is_translator": false
+      "followers_count":2436,
+      "id_str":"12552",
+      "listed_count":138,
+      "utc_offset":3600,
+      "statuses_count":16428,
+      "description":"Good. Good to Firm in places.",
+      "friends_count":309,
+      "location":"London, UK",
+      "following":false,
+      "screen_name":"philgyford",
+      "favourites_count":1389,
+      "name":"Phil Gyford",
+      "notifications":false,
+      "url":"http://t.co/UEs0CCkdrl",
+      "created_at":"Wed Nov 15 16:55:59 +0000 2006",
+      "contributors_enabled":false,
+      "time_zone":"London",
+      "protected":false,
+      "default_profile":false,
+      "is_translator":false
     },
-    "geo": null,
-    "in_reply_to_user_id_str": "1859981",
-    "lang": "en",
-    "created_at": "Thu Aug 06 19:42:59 +0000 2015",
-    "in_reply_to_status_id_str": "629375876216528896",
+    "geo":null,
+    "in_reply_to_user_id_str":"1859981",
+    "lang":"en",
+    "created_at":"Thu Aug 06 19:42:59 +0000 2015",
+    "in_reply_to_status_id_str":"629375876216528896",
     "place": {
       "name": "Twitter HQ",
       "polylines": [],
@@ -107,160 +107,160 @@
       ],
       "full_name": "Twitter HQ, San Francisco",
       "geometry": {
-        "coordinates": [-122.400612831116, 37.7821120598956],
+        "coordinates": [ -122.400612831116, 37.7821120598956 ],
         "type": "Point"
       },
       "place_type": "poi"
     }
   },
-  {
-    "contributors": null,
-    "truncated": false,
-    "text": "@rooreynolds I've read stories of people travelling abroad who were mistaken for military/security because of that kind of thing… careful :)",
-    "is_quote_status": false,
-    "in_reply_to_status_id": 629282853856116737,
-    "id": 200,
-    "favorite_count": 0,
-    "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
-    "retweeted": false,
-    "coordinates": null,
-    "entities": {
-      "symbols": [],
-      "user_mentions": [
-        {
-          "id": 787166,
-          "indices": [0, 12],
-          "id_str": "787166",
-          "screen_name": "rooreynolds",
-          "name": "Roo Reynolds"
+  {  
+    "contributors":null,
+    "truncated":false,
+    "text":"@rooreynolds I've read stories of people travelling abroad who were mistaken for military/security because of that kind of thing… careful :)",
+    "is_quote_status":false,
+    "in_reply_to_status_id":629282853856116737,
+    "id":200,
+    "favorite_count":0,
+    "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+    "retweeted":false,
+    "coordinates":null,
+    "entities":{  
+      "symbols":[],
+      "user_mentions":[  
+        {  
+          "id":787166,
+          "indices":[0, 12],
+          "id_str":"787166",
+          "screen_name":"rooreynolds",
+          "name":"Roo Reynolds"
         }
       ],
-      "hashtags": [],
-      "urls": []
+      "hashtags":[],
+      "urls":[]
     },
-    "in_reply_to_screen_name": "rooreynolds",
-    "id_str": "200",
-    "retweet_count": 0,
-    "in_reply_to_user_id": 787166,
-    "favorited": false,
-    "user": {
-      "follow_request_sent": false,
-      "default_profile_image": false,
-      "id": 12552,
-      "verified": false,
-      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
-      "entities": {
-        "url": {
-          "urls": [
-            {
-              "url": "http://t.co/UEs0CCkdrl",
-              "indices": [0, 22],
-              "expanded_url": "http://www.gyford.com/",
-              "display_url": "gyford.com"
+    "in_reply_to_screen_name":"rooreynolds",
+    "id_str":"200",
+    "retweet_count":0,
+    "in_reply_to_user_id":787166,
+    "favorited":false,
+    "user":{  
+      "follow_request_sent":false,
+      "default_profile_image":false,
+      "id":12552,
+      "verified":false,
+      "profile_image_url_https":"https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
+      "entities":{  
+        "url":{  
+          "urls":[  
+            {  
+              "url":"http://t.co/UEs0CCkdrl",
+              "indices":[0, 22],
+              "expanded_url":"http://www.gyford.com/",
+              "display_url":"gyford.com"
             }
           ]
         },
-        "description": {
-          "urls": []
+        "description":{  
+          "urls":[]
         }
       },
-      "followers_count": 2436,
-      "id_str": "12552",
-      "listed_count": 138,
-      "utc_offset": 3600,
-      "statuses_count": 16428,
-      "description": "Good. Good to Firm in places.",
-      "friends_count": 309,
-      "location": "London, UK",
-      "following": false,
-      "screen_name": "philgyford",
-      "favourites_count": 1389,
-      "name": "Phil Gyford",
-      "notifications": false,
-      "url": "http://t.co/UEs0CCkdrl",
-      "created_at": "Wed Nov 15 16:55:59 +0000 2006",
-      "contributors_enabled": false,
-      "time_zone": "London",
-      "protected": false,
-      "default_profile": false,
-      "is_translator": false
+      "followers_count":2436,
+      "id_str":"12552",
+      "listed_count":138,
+      "utc_offset":3600,
+      "statuses_count":16428,
+      "description":"Good. Good to Firm in places.",
+      "friends_count":309,
+      "location":"London, UK",
+      "following":false,
+      "screen_name":"philgyford",
+      "favourites_count":1389,
+      "name":"Phil Gyford",
+      "notifications":false,
+      "url":"http://t.co/UEs0CCkdrl",
+      "created_at":"Wed Nov 15 16:55:59 +0000 2006",
+      "contributors_enabled":false,
+      "time_zone":"London",
+      "protected":false,
+      "default_profile":false,
+      "is_translator":false
     },
-    "geo": null,
-    "in_reply_to_user_id_str": "787166",
-    "lang": "en",
-    "created_at": "Thu Aug 06 13:32:13 +0000 2015",
-    "in_reply_to_status_id_str": "629282853856116737",
-    "place": null
+    "geo":null,
+    "in_reply_to_user_id_str":"787166",
+    "lang":"en",
+    "created_at":"Thu Aug 06 13:32:13 +0000 2015",
+    "in_reply_to_status_id_str":"629282853856116737",
+    "place":null
   },
-  {
-    "contributors": null,
-    "truncated": false,
-    "text": "/me closes Tweetbot",
-    "is_quote_status": false,
-    "in_reply_to_status_id": null,
-    "id": 100,
-    "favorite_count": 0,
-    "source": "<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
-    "retweeted": false,
-    "coordinates": null,
-    "entities": {
-      "symbols": [],
-      "user_mentions": [],
-      "hashtags": [],
-      "urls": []
+  {  
+    "contributors":null,
+    "truncated":false,
+    "text":"/me closes Tweetbot",
+    "is_quote_status":false,
+    "in_reply_to_status_id":null,
+    "id":100,
+    "favorite_count":0,
+    "source":"<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
+    "retweeted":false,
+    "coordinates":null,
+    "entities":{  
+      "symbols":[],
+      "user_mentions":[],
+      "hashtags":[],
+      "urls":[]
     },
-    "in_reply_to_screen_name": null,
-    "id_str": "100",
-    "retweet_count": 0,
-    "in_reply_to_user_id": null,
-    "favorited": false,
-    "user": {
-      "follow_request_sent": false,
-      "default_profile_image": false,
-      "id": 12552,
-      "verified": false,
-      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
-      "entities": {
-        "url": {
-          "urls": [
-            {
-              "url": "http://t.co/UEs0CCkdrl",
-              "indices": [0, 22],
-              "expanded_url": "http://www.gyford.com/",
-              "display_url": "gyford.com"
+    "in_reply_to_screen_name":null,
+    "id_str":"100",
+    "retweet_count":0,
+    "in_reply_to_user_id":null,
+    "favorited":false,
+    "user":{  
+      "follow_request_sent":false,
+      "default_profile_image":false,
+      "id":12552,
+      "verified":false,
+      "profile_image_url_https":"https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
+      "entities":{  
+        "url":{  
+          "urls":[  
+            {  
+              "url":"http://t.co/UEs0CCkdrl",
+              "indices":[0, 22],
+              "expanded_url":"http://www.gyford.com/",
+              "display_url":"gyford.com"
             }
           ]
         },
-        "description": {
-          "urls": []
+        "description":{  
+          "urls":[]
         }
       },
-      "followers_count": 2436,
-      "id_str": "12552",
-      "listed_count": 138,
-      "utc_offset": 3600,
-      "statuses_count": 16428,
-      "description": "Good. Good to Firm in places.",
-      "friends_count": 309,
-      "location": "London, UK",
-      "following": false,
-      "screen_name": "philgyford",
-      "favourites_count": 1389,
-      "name": "Phil Gyford",
-      "notifications": false,
-      "url": "http://t.co/UEs0CCkdrl",
-      "created_at": "Wed Nov 15 16:55:59 +0000 2006",
-      "contributors_enabled": false,
-      "time_zone": "London",
-      "protected": false,
-      "default_profile": false,
-      "is_translator": false
+      "followers_count":2436,
+      "id_str":"12552",
+      "listed_count":138,
+      "utc_offset":3600,
+      "statuses_count":16428,
+      "description":"Good. Good to Firm in places.",
+      "friends_count":309,
+      "location":"London, UK",
+      "following":false,
+      "screen_name":"philgyford",
+      "favourites_count":1389,
+      "name":"Phil Gyford",
+      "notifications":false,
+      "url":"http://t.co/UEs0CCkdrl",
+      "created_at":"Wed Nov 15 16:55:59 +0000 2006",
+      "contributors_enabled":false,
+      "time_zone":"London",
+      "protected":false,
+      "default_profile":false,
+      "is_translator":false
     },
-    "geo": null,
-    "in_reply_to_user_id_str": null,
-    "lang": "en",
-    "created_at": "Tue Aug 04 14:41:41 +0000 2015",
-    "in_reply_to_status_id_str": null,
-    "place": null
+    "geo":null,
+    "in_reply_to_user_id_str":null,
+    "lang":"en",
+    "created_at":"Tue Aug 04 14:41:41 +0000 2015",
+    "in_reply_to_status_id_str":null,
+    "place":null
   }
 ]

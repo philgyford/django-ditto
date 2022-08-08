@@ -1,1 +1,2 @@
-window.YTD.tweet.part0 = [];
+window.YTD.tweet.part0 = [
+]

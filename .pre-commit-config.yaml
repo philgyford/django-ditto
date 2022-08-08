@@ -6,6 +6,10 @@ exclude: |
     dist/.*
     |docs/.*
     |ditto/core/static/.*
+    |tests/flickr/fixtures/.*
+    |tests/lastfm/fixtures/.*
+    |tests/pinboard/fixtures/.*
+    |tests/twitter/fixtures/.*
   )$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

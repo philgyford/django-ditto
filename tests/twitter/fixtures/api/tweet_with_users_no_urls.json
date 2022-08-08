@@ -1,79 +1,93 @@
-{
-  "user": {
-    "following": false,
-    "statuses_count": 16720,
-    "protected": false,
-    "is_translator": false,
-    "contributors_enabled": false,
-    "friends_count": 315,
-    "follow_request_sent": false,
-    "id_str": "12552",
-    "notifications": false,
-    "name": "Phil Gyford",
-    "url": "http://t.co/UEs0CCkdrl",
-    "time_zone": "London",
-    "listed_count": 140,
-    "default_profile": false,
-    "description": "Good. Good to Firm in places.",
-    "created_at": "Wed Nov 15 16:55:59 +0000 2006",
-    "location": "London, UK",
-    "verified": false,
-    "favourites_count": 1462,
-    "default_profile_image": false,
-    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
-    "screen_name": "philgyford",
-    "followers_count": 2454,
-    "id": 12552,
-    "utc_offset": 0,
-    "entities": {
-      "url": {
-        "urls": [
-          {
-            "url": "http://t.co/UEs0CCkdrl",
-            "expanded_url": "http://www.gyford.com/",
-            "indices": [0, 22],
-            "display_url": "gyford.com"
+{  
+  "user":{  
+    "following":false,
+    "statuses_count":16720,
+    "protected":false,
+    "is_translator":false,
+    "contributors_enabled":false,
+    "friends_count":315,
+    "follow_request_sent":false,
+    "id_str":"12552",
+    "notifications":false,
+    "name":"Phil Gyford",
+    "url":"http://t.co/UEs0CCkdrl",
+    "time_zone":"London",
+    "listed_count":140,
+    "default_profile":false,
+    "description":"Good. Good to Firm in places.",
+    "created_at":"Wed Nov 15 16:55:59 +0000 2006",
+    "location":"London, UK",
+    "verified":false,
+    "favourites_count":1462,
+    "default_profile_image":false,
+    "profile_image_url_https":"https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
+    "screen_name":"philgyford",
+    "followers_count":2454,
+    "id":12552,
+    "utc_offset":0,
+    "entities":{  
+      "url":{  
+        "urls":[  
+          {  
+            "url":"http://t.co/UEs0CCkdrl",
+            "expanded_url":"http://www.gyford.com/",
+            "indices":[  
+              0,
+              22
+            ],
+            "display_url":"gyford.com"
           }
         ]
       },
-      "description": {
-        "urls": []
+      "description":{  
+        "urls":[  
+
+        ]
       }
     }
   },
-  "in_reply_to_status_id_str": "661965848412823553",
-  "retweeted": false,
-  "in_reply_to_user_id": 13124,
-  "id_str": "661966128604971008",
-  "text": "@genmon lovely, on my way.",
-  "place": null,
-  "truncated": false,
-  "retweet_count": 0,
-  "created_at": "Wed Nov 04 17:59:58 +0000 2015",
-  "is_quote_status": false,
-  "favorite_count": 1,
-  "in_reply_to_status_id": 661965848412823553,
-  "favorited": false,
-  "in_reply_to_screen_name": "genmon",
-  "in_reply_to_user_id_str": "13124",
-  "source": "<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for i\u039fS</a>",
-  "coordinates": null,
-  "id": 661966128604971008,
-  "geo": null,
-  "contributors": null,
-  "entities": {
-    "user_mentions": [
-      {
-        "id": 13124,
-        "id_str": "13124",
-        "name": "Matt Webb",
-        "screen_name": "genmon",
-        "indices": [0, 7]
+  "in_reply_to_status_id_str":"661965848412823553",
+  "retweeted":false,
+  "in_reply_to_user_id":13124,
+  "id_str":"661966128604971008",
+  "text":"@genmon lovely, on my way.",
+  "place":null,
+  "truncated":false,
+  "retweet_count":0,
+  "created_at":"Wed Nov 04 17:59:58 +0000 2015",
+  "is_quote_status":false,
+  "favorite_count":1,
+  "in_reply_to_status_id":661965848412823553,
+  "favorited":false,
+  "in_reply_to_screen_name":"genmon",
+  "in_reply_to_user_id_str":"13124",
+  "source":"<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for i\u039fS</a>",
+  "coordinates":null,
+  "id":661966128604971008,
+  "geo":null,
+  "contributors":null,
+  "entities":{  
+    "user_mentions":[  
+      {  
+        "id":13124,
+        "id_str":"13124",
+        "name":"Matt Webb",
+        "screen_name":"genmon",
+        "indices":[  
+          0,
+          7
+        ]
       }
     ],
-    "hashtags": [],
-    "symbols": [],
-    "urls": []
+    "hashtags":[  
+
+    ],
+    "symbols":[  
+
+    ],
+    "urls":[  
+
+    ]
   },
-  "lang": "en"
+  "lang":"en"
 }

@@ -1,89 +1,109 @@
 [
-  {
-    "created_at": "Tue Jan 02 19:24:03 +0000 2018",
-    "id": 300,
-    "id_str": "300",
-    "full_text": "@BarclaysUKHelp Thanks Jonny. I tried online chat at the time and they said the form doesn\u2019t work on iOS Safari. It\u2019d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at @TSB instead - their form worked.",
-    "truncated": false,
-    "display_text_range": [16, 272],
-    "entities": {
-      "hashtags": [],
-      "symbols": [],
-      "user_mentions": [
-        {
-          "screen_name": "BarclaysUKHelp",
-          "name": "Barclays UK Help",
-          "id": 3046525515,
-          "id_str": "3046525515",
-          "indices": [0, 15]
+  {  
+    "created_at":"Tue Jan 02 19:24:03 +0000 2018",
+    "id":300,
+    "id_str":"300",
+    "full_text":"@BarclaysUKHelp Thanks Jonny. I tried online chat at the time and they said the form doesn\u2019t work on iOS Safari. It\u2019d be nice if it said that on the form, rather than it returning to the start half-way through :) So I set up an account at @TSB instead - their form worked.",
+    "truncated":false,
+    "display_text_range":[  
+      16,
+      272
+    ],
+    "entities":{  
+      "hashtags":[  
+
+      ],
+      "symbols":[  
+
+      ],
+      "user_mentions":[  
+        {  
+          "screen_name":"BarclaysUKHelp",
+          "name":"Barclays UK Help",
+          "id":3046525515,
+          "id_str":"3046525515",
+          "indices":[  
+            0,
+            15
+          ]
         },
-        {
-          "screen_name": "TSB",
-          "name": "TSB",
-          "id": 746954528,
-          "id_str": "746954528",
-          "indices": [239, 243]
+        {  
+          "screen_name":"TSB",
+          "name":"TSB",
+          "id":746954528,
+          "id_str":"746954528",
+          "indices":[  
+            239,
+            243
+          ]
         }
       ],
-      "urls": []
+      "urls":[  
+
+      ]
     },
-    "source": "<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
-    "in_reply_to_status_id": 948273291906764800,
-    "in_reply_to_status_id_str": "948273291906764800",
-    "in_reply_to_user_id": 3046525515,
-    "in_reply_to_user_id_str": "3046525515",
-    "in_reply_to_screen_name": "BarclaysUKHelp",
-    "user": {
-      "id": 12552,
-      "id_str": "12552",
-      "name": "Phil Gyford",
-      "screen_name": "philgyford",
-      "location": "London, UK",
-      "description": "Quality varies from episode to episode, but nothing atrocious.",
-      "url": "https://t.co/FsYzXrATit",
-      "entities": {
-        "url": {
-          "urls": [
-            {
-              "url": "https://t.co/FsYzXrATit",
-              "expanded_url": "http://www.gyford.com",
-              "display_url": "gyford.com",
-              "indices": [0, 23]
+    "source":"<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
+    "in_reply_to_status_id":948273291906764800,
+    "in_reply_to_status_id_str":"948273291906764800",
+    "in_reply_to_user_id":3046525515,
+    "in_reply_to_user_id_str":"3046525515",
+    "in_reply_to_screen_name":"BarclaysUKHelp",
+    "user":{  
+      "id":12552,
+      "id_str":"12552",
+      "name":"Phil Gyford",
+      "screen_name":"philgyford",
+      "location":"London, UK",
+      "description":"Quality varies from episode to episode, but nothing atrocious.",
+      "url":"https://t.co/FsYzXrATit",
+      "entities":{  
+        "url":{  
+          "urls":[  
+            {  
+              "url":"https://t.co/FsYzXrATit",
+              "expanded_url":"http://www.gyford.com",
+              "display_url":"gyford.com",
+              "indices":[  
+                0,
+                23
+              ]
             }
           ]
         },
-        "description": {
-          "urls": []
+        "description":{  
+          "urls":[  
+
+          ]
         }
       },
-      "protected": false,
-      "followers_count": 2612,
-      "friends_count": 310,
-      "listed_count": 131,
-      "created_at": "Wed Nov 15 16:55:59 +0000 2006",
-      "favourites_count": 2264,
-      "utc_offset": 0,
-      "time_zone": "London",
-      "verified": false,
-      "statuses_count": 19463,
-      "contributors_enabled": false,
-      "is_translator": false,
-      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
-      "default_profile": false,
-      "default_profile_image": false,
-      "following": false,
-      "follow_request_sent": false,
-      "notifications": false
+      "protected":false,
+      "followers_count":2612,
+      "friends_count":310,
+      "listed_count":131,
+      "created_at":"Wed Nov 15 16:55:59 +0000 2006",
+      "favourites_count":2264,
+      "utc_offset":0,
+      "time_zone":"London",
+      "verified":false,
+      "statuses_count":19463,
+      "contributors_enabled":false,
+      "is_translator":false,
+      "profile_image_url_https":"https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300_normal.jpg",
+      "default_profile":false,
+      "default_profile_image":false,
+      "following":false,
+      "follow_request_sent":false,
+      "notifications":false
     },
-    "geo": null,
-    "coordinates": null,
-    "place": null,
-    "contributors": null,
-    "is_quote_status": false,
-    "retweet_count": 0,
-    "favorite_count": 0,
-    "favorited": false,
-    "retweeted": false,
-    "lang": "en"
+    "geo":null,
+    "coordinates":null,
+    "place":null,
+    "contributors":null,
+    "is_quote_status":false,
+    "retweet_count":0,
+    "favorite_count":0,
+    "favorited":false,
+    "retweeted":false,
+    "lang":"en"
   }
 ]
