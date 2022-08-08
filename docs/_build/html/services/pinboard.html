@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinboard &mdash; Django Ditto 2.1.1 documentation</title>
+  <title>Pinboard &mdash; Django Ditto 2.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> Django Ditto
           </a>
               <div class="version">
-                2.1
+                2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -102,15 +103,15 @@
            <div itemprop="articleBody">
              
   <section id="pinboard">
-<h1>Pinboard<a class="headerlink" href="#pinboard" title="Permalink to this headline"></a></h1>
+<h1>Pinboard<a class="headerlink" href="#pinboard" title="Permalink to this heading"></a></h1>
 <p>You can fetch, store and display data about all your bookmarks for one or more <a class="reference external" href="https://pinboard.in/">Pinboard</a> accounts.</p>
 <section id="set-up">
-<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline"></a></h2>
+<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this heading"></a></h2>
 <p>In the Django admin, add an <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Pinboard app with your API token from <a class="reference external" href="https://pinboard.in/settings/password">https://pinboard.in/settings/password</a> .</p>
 <p>Then use the <a class="reference internal" href="#pinboard-management-commands"><span class="std std-ref">Management commands</span></a> to download your Bookmarks.</p>
 </section>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline"></a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.pinboard.models</span></code> are:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>A single Pinboard account. (Note: other services, like Twitter and Flickr, have separate <code class="docutils literal notranslate"><span class="pre">User</span></code> and <code class="docutils literal notranslate"><span class="pre">Account</span></code> models. Pinboard is currently simpler.)</p>
@@ -124,7 +125,7 @@
 </dl>
 </section>
 <section id="managers">
-<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline"></a></h2>
+<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Bookmark</span></code> models have several managers:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Bookmark.objects.all()</span></code></dt><dd><p>The default manager fetches <em>all</em> Bookmarks, posted by all Accounts, whether they’re public or private.</p>
@@ -145,10 +146,10 @@
 </div>
 </section>
 <section id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline"></a></h2>
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this heading"></a></h2>
 <p>There are two template tags available for displaying Bookmarks in your templates.</p>
 <section id="annual-bookmark-counts">
-<h3>Annual Bookmark Counts<a class="headerlink" href="#annual-bookmark-counts" title="Permalink to this headline"></a></h3>
+<h3>Annual Bookmark Counts<a class="headerlink" href="#annual-bookmark-counts" title="Permalink to this heading"></a></h3>
 <p>Get the number of bookmarks per year for all or one Account. This fetches totals for all Accounts:</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -168,7 +169,7 @@
 </div>
 </section>
 <section id="day-bookmarks">
-<h3>Day Bookmarks<a class="headerlink" href="#day-bookmarks" title="Permalink to this headline"></a></h3>
+<h3>Day Bookmarks<a class="headerlink" href="#day-bookmarks" title="Permalink to this heading"></a></h3>
 <p>To display Bookmarks posted to Pinboard on a particular day, use
 <code class="docutils literal notranslate"><span class="pre">day_bookmarks</span></code>. By default it gets Bookmarks posted by all Accounts.
 In this example, <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
@@ -187,7 +188,7 @@ In this example, <code class="docutils literal notranslate"><span class="pre">my
 </div>
 </section>
 <section id="recent-bookmarks">
-<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this headline"></a></h3>
+<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this heading"></a></h3>
 <p>To display the most recently-posted Bookmarks use <code class="docutils literal notranslate"><span class="pre">recent_bookmarks</span></code>. By default it gets the 10 most recent Bookmarks posted by all Accounts:</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -204,7 +205,7 @@ In this example, <code class="docutils literal notranslate"><span class="pre">my
 </div>
 </section>
 <section id="popular-bookmark-tags">
-<h3>Popular Bookmark Tags<a class="headerlink" href="#popular-bookmark-tags" title="Permalink to this headline"></a></h3>
+<h3>Popular Bookmark Tags<a class="headerlink" href="#popular-bookmark-tags" title="Permalink to this heading"></a></h3>
 <p>To display the most common public Tags on public Bookmarks use
 <code class="docutils literal notranslate"><span class="pre">popular_bookmark_tags</span></code>. By default it gets the 10 Tags used most across all
 Accounts.</p>
@@ -229,11 +230,11 @@ Accounts.</p>
 </section>
 </section>
 <section id="management-commands">
-<span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline"></a></h2>
+<span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this heading"></a></h2>
 <p>Once you have set up an Account with your Pinboard API token (see above), you
 can fetch Bookmarks.</p>
 <section id="fetch-bookmarks">
-<h3>Fetch Bookmarks<a class="headerlink" href="#fetch-bookmarks" title="Permalink to this headline"></a></h3>
+<h3>Fetch Bookmarks<a class="headerlink" href="#fetch-bookmarks" title="Permalink to this heading"></a></h3>
 <p>Import all of your bookmarks:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all
 </pre></div>
@@ -271,7 +272,7 @@ of a particular bookmark you’ve alread fetched):</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2016, Phil Gyford.</p>
+    <p>&#169; Copyright 2016-22, Phil Gyford.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

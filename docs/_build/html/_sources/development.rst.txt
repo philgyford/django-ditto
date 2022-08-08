@@ -10,9 +10,33 @@ installed):
 .. code-block:: shell
 
     $ cd devproject
-    $ pipenv install
-    $ pipenv run ./manage.py migrate
-    $ pipenv run ./manage.py runserver
+    $ virtualenv --prompt ditto-devproject venv
+    $ source venv/bin/activate
+    (ditto-devproject)$ pyenv local 3.10.5
+    (ditto-devproject)$ python -m pip install -r requirements.txt
+
+Then run migrations and start the server:
+
+.. code-block:: shell
+
+    (ditto-devproject)$ ./manage.py migrate
+    (ditto-devproject)$ ./manage.py runserver
+
+pre-commit will run flake8, black, isort and prettier across all files on commit.
+I think you just need to do this first:
+
+.. code-block:: shell
+
+    $ pre-commit install
+
+You can add a `.env` file in `devproject/` and its environment variables will be
+read in `devproject/devproject/settings.py`. e.g.:
+
+.. code-block:: shell
+
+    DJANGO_SECRET_KEY="your-secret-key"
+    DJANGO_LOG_LEVEL="INFO"
+
 
 *****
 Tests
@@ -35,7 +59,7 @@ Django 1.9:
 
 .. code-block:: shell
 
-    $ tox -e py35-django19
+    $ tox -e py310-django41
 
 To run a specific test, add its path after ``--``, eg:
 
@@ -77,19 +101,20 @@ Documentation
 =============
 
 You'll need `sphinx <http://www.sphinx-doc.org/en/master/>`_ installed. You
-could do this using pipenv and the Pipfiles:
+could do this using pip and the ``requirements.txt`` file:
 
 .. code-block:: shell
 
     $ cd docs
-    $ pipenv install
+    $ virtualenv --prompt ditto-docs venv
+    $ source venv/bin/activate
+    (ditto-docs)$ python -m pip install -r requirements.txt
 
-Build the documentation (assuming usage of pipenv):
+Build the documentation:
 
 .. code-block:: shell
 
-    $ cd docs
-    $ pipenv run make html
+    (ditto-docs)$ make html
 
 Packaging
 =========

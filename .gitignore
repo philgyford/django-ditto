@@ -6,6 +6,7 @@ devproject/static
 devproject/venv/
 devproject/.env
 dist
+docs/venv/
 django_ditto.egg-info
 htmlcov
 build/

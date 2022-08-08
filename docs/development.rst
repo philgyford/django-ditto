@@ -101,19 +101,20 @@ Documentation
 =============
 
 You'll need `sphinx <http://www.sphinx-doc.org/en/master/>`_ installed. You
-could do this using pipenv and the Pipfiles:
+could do this using pip and the ``requirements.txt`` file:
 
 .. code-block:: shell
 
     $ cd docs
-    $ pipenv install
+    $ virtualenv --prompt ditto-docs venv
+    $ source venv/bin/activate
+    (ditto-docs)$ python -m pip install -r requirements.txt
 
-Build the documentation (assuming usage of pipenv):
+Build the documentation:
 
 .. code-block:: shell
 
-    $ cd docs
-    $ pipenv run make html
+    (ditto-docs)$ make html
 
 Packaging
 =========

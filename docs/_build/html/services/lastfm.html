@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Last.fm &mdash; Django Ditto 2.1.1 documentation</title>
+  <title>Last.fm &mdash; Django Ditto 2.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> Django Ditto
           </a>
               <div class="version">
-                2.1
+                2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -104,15 +105,15 @@
            <div itemprop="articleBody">
              
   <section id="last-fm">
-<h1>Last.fm<a class="headerlink" href="#last-fm" title="Permalink to this headline"></a></h1>
+<h1>Last.fm<a class="headerlink" href="#last-fm" title="Permalink to this heading"></a></h1>
 <p>You can fetch all your Scrobbles (listens) from one or more <a class="reference external" href="https://www.last.fm/">Last.fm</a> accounts. You can then view: recent Scrobbles; the most popular Artists, Tracks and Albums (for different time periods); number of Scrobbles per year; all Scrobbles for a single day; etc.</p>
 <section id="set-up">
-<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this headline"></a></h2>
+<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this heading"></a></h2>
 <p>In the Django admin, create a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Last.fm app. Enter your Last.fm username, your full name, and a Last.fm API key from <a class="reference external" href="http://www.last.fm/api/account/create">http://www.last.fm/api/account/create</a></p>
 <p>Now you can download your scrobbles. See <a class="reference internal" href="#lastfm-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
 </section>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline"></a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.lastfm.models</span></code> are:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Last.fm account with an API key.</p>
@@ -152,7 +153,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 <p>See <code class="docutils literal notranslate"><span class="pre">ditto.lastfm.models</span></code> for more useful properties and methods.</p>
 </section>
 <section id="managers">
-<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this headline"></a></h2>
+<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this heading"></a></h2>
 <p>The default manager for each of <code class="docutils literal notranslate"><span class="pre">Track</span></code>, <code class="docutils literal notranslate"><span class="pre">Album</span></code> and <code class="docutils literal notranslate"><span class="pre">Artist</span></code> has a <code class="docutils literal notranslate"><span class="pre">with_scrobble_counts()</span></code> method. This gives each returned object a <code class="docutils literal notranslate"><span class="pre">scrobble_count</span></code> property which is an aggregated count of the number of times that thing has been scrobbled. These results are also filterable by <code class="docutils literal notranslate"><span class="pre">Account</span></code>, minimum and maximum scrobble time, and (for <code class="docutils literal notranslate"><span class="pre">Track</span></code> and <code class="docutils literal notranslate"><span class="pre">Album</span></code>) by <code class="docutils literal notranslate"><span class="pre">Artist</span></code>.</p>
 <p>By default, the manager behaves as expected, eg:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># A QuerySet of all Track objects:</span>
@@ -195,10 +196,10 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline"></a></h2>
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this heading"></a></h2>
 <p>There are several template tags for getting common lists of things.</p>
 <section id="annual-scrobble-counts">
-<h3>Annual Scrobble Counts<a class="headerlink" href="#annual-scrobble-counts" title="Permalink to this headline"></a></h3>
+<h3>Annual Scrobble Counts<a class="headerlink" href="#annual-scrobble-counts" title="Permalink to this heading"></a></h3>
 <p>Get the number of scrobbles per year for all or one <code class="docutils literal notranslate"><span class="pre">Account</span></code>. This fetches totals for all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s:</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -218,7 +219,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="day-scrobbles">
-<h3>Day Scrobbles<a class="headerlink" href="#day-scrobbles" title="Permalink to this headline"></a></h3>
+<h3>Day Scrobbles<a class="headerlink" href="#day-scrobbles" title="Permalink to this heading"></a></h3>
 <p>Get a QuerySet of all Scrobbles from a particular day for one or all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s, earliest first. In these examples, <code class="docutils literal notranslate"><span class="pre">today</span></code> can be either a <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> or a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>.</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -238,7 +239,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="recent-scrobbles">
-<h3>Recent Scrobbles<a class="headerlink" href="#recent-scrobbles" title="Permalink to this headline"></a></h3>
+<h3>Recent Scrobbles<a class="headerlink" href="#recent-scrobbles" title="Permalink to this heading"></a></h3>
 <p>Get a QuerySet of the most recent Scrobbles, by one or all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s.  The default quantity returned is 10.</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -253,7 +254,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="top-tracks">
-<h3>Top Tracks<a class="headerlink" href="#top-tracks" title="Permalink to this headline"></a></h3>
+<h3>Top Tracks<a class="headerlink" href="#top-tracks" title="Permalink to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Track</span></code> s with the most-scrobbled first. Can be restricted to: a single <code class="docutils literal notranslate"><span class="pre">Account</span></code>; a single day, week, month or year; tracks by a single <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. By default 10 tracks are returned.</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -295,7 +296,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 <p>Arguments can be in any order.</p>
 </section>
 <section id="top-albums">
-<h3>Top Albums<a class="headerlink" href="#top-albums" title="Permalink to this headline"></a></h3>
+<h3>Top Albums<a class="headerlink" href="#top-albums" title="Permalink to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Album</span></code> s with the most-scrobbled first. This works in exactly the same way as the <code class="docutils literal notranslate"><span class="pre">top_tracks</span></code> template tag, above, with identical arguments. e.g.:</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -312,7 +313,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="top-artists">
-<h3>Top Artists<a class="headerlink" href="#top-artists" title="Permalink to this headline"></a></h3>
+<h3>Top Artists<a class="headerlink" href="#top-artists" title="Permalink to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Artist</span></code> s with the most-scrobbled first. This works in a similar way to the <code class="docutils literal notranslate"><span class="pre">top_tracks</span></code> and <code class="docutils literal notranslate"><span class="pre">top_albums</span></code> template tags, above. The only difference is that results cannot be filtered by <code class="docutils literal notranslate"><span class="pre">artist</span></code>. e.g.:</p>
 <div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
 
@@ -330,10 +331,10 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </section>
 </section>
 <section id="management-commands">
-<span id="lastfm-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this headline"></a></h2>
+<span id="lastfm-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this heading"></a></h2>
 <p>There is only one Last.fm management command.</p>
 <section id="fetch-scrobbles">
-<h3>Fetch Scrobbles<a class="headerlink" href="#fetch-scrobbles" title="Permalink to this headline"></a></h3>
+<h3>Fetch Scrobbles<a class="headerlink" href="#fetch-scrobbles" title="Permalink to this heading"></a></h3>
 <p>Fetches Scrobbles for one or all Accounts.</p>
 <p>To fetch ALL Scrobbles for all Accounts (this could take a long time):</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_lastfm_scrobbles --days<span class="o">=</span>all
@@ -364,7 +365,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2016, Phil Gyford.</p>
+    <p>&#169; Copyright 2016-22, Phil Gyford.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
