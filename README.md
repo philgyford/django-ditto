@@ -2,8 +2,13 @@ Django Ditto
 ============
 
 [![image](https://github.com/philgyford/django-ditto/actions/workflows/tests.yml/badge.svg)](https://github.com/philgyford/django-ditto/actions/workflows/tests.yml "Tests status")
-[![image](https://coveralls.io/repos/github/philgyford/django-ditto/badge.svg?branch=main)](https://coveralls.io/github/philgyford/django-ditto?branch=main "Test coverage")
+[![codecov](https://codecov.io/gh/philgyford/django-ditto/branch/main/graph/badge.svg?token=T7TMMDS64A)](https://codecov.io/gh/philgyford/django-ditto)
 [![image](https://readthedocs.org/projects/django-ditto/badge/?version=stable)](https://django-ditto.readthedocs.io/en/stable/?badge=stable "Documentation status")
+[![Code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+
 
 A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6, 3.7, 3.8, 3.9 and 3.10, and Django 3.2, 4.0 and 4.1.
 
