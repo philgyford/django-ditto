@@ -83,7 +83,7 @@ setup(
     install_requires=[
         "django-imagekit>=4.0,<4.2",
         "django-sortedm2m>=3.0.0,<3.2",
-        "django-taggit>=2.0.0,<2.2",
+        "django-taggit>=3.0.0,<4.0",
         "flickrapi>=2.4,<2.5",
         "pillow>=8.0.0,<10.0",
         "pytz",
@@ -92,7 +92,7 @@ setup(
     ],
     dependency_links=[],
     tests_require=tests_require,
-    extras_require={"dev": dev_require + ["Django>=4.0,<4.3"], "test": tests_require},
+    extras_require={"dev": dev_require + ["Django>=4.1,<4.3"], "test": tests_require},
     include_package_data=True,
     license=get_license(),
     description=(
