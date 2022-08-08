@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
+
+- Nothing
+
+
+## [2.2.0] - 2022-08-08
 
 ### Added
 - Added support for Django 4.1.
@@ -13,8 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `.pre-commit-config.yaml`
 
 ### Changed
-- Update development project depenencies
-- Update included Bootstrap CSS from 4.6.0 to 4.6.1.
+- Update dependencies, including requiring django-taggit >= 3.0.0.
+- Update included Bootstrap CSS from 4.6.0 to 4.6.2.
+- Update development project dependencies
+
+### Fixed
+- Errors related to tags when using Django 4.1 (#238)
 
 
 ## [2.1.1] - 2022-03-25
