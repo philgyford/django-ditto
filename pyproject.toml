@@ -6,7 +6,7 @@ omit = ["*/migrations/*"]
 
 [tool.coverage.run]
 branch = true
-include = ["spectator/*"]
+include = ["ditto/*"]
 omit = ["*/migrations/*.py"]
 
 [tool.isort]
