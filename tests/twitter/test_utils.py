@@ -1,5 +1,6 @@
 # coding: utf-8
 import json
+
 from django.test import TestCase
 
 from ditto.twitter.utils import htmlify_description, htmlify_tweet

@@ -5,8 +5,8 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
-from ditto.lastfm.fetch import ScrobblesMultiAccountFetcher
 from ditto.lastfm.factories import AccountFactory
+from ditto.lastfm.fetch import ScrobblesMultiAccountFetcher
 
 
 class FetchLastfmScrobblesTestCase(TestCase):

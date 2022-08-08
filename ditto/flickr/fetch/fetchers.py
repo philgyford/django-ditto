@@ -4,15 +4,14 @@ import os
 import time
 
 import flickrapi
+from django.core.files import File
 from flickrapi.exceptions import FlickrError
 
-from django.core.files import File
-
-from . import FetchError
-from .savers import UserSaver, PhotoSaver, PhotosetSaver
-from ..models import Account, User
 from ...core.utils import datetime_now
 from ...core.utils.downloader import DownloadException, filedownloader
+from ..models import Account, User
+from . import FetchError
+from .savers import PhotoSaver, PhotosetSaver, UserSaver
 
 # These classes call the Flickr API to fetch data about particular things,
 # from the point of view of a single Account. eg, Photos, Users, Photosets.

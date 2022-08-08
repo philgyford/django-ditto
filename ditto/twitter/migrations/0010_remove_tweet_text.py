@@ -11,5 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="tweet", name="text",),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="text",
+        ),
     ]

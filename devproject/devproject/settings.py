@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-
 from django.core.exceptions import ImproperlyConfigured
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
 def get_env_variable(var_name, default=None):

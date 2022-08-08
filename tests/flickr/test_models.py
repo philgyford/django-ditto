@@ -1,19 +1,15 @@
 import datetime
 import os
-import pytz
 from unittest.mock import Mock, patch
 
+import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
 from ditto.flickr import app_settings
-from ditto.flickr.factories import (
-    AccountFactory,
-    PhotoFactory,
-    PhotosetFactory,
-    UserFactory,
-)
+from ditto.flickr.factories import (AccountFactory, PhotoFactory,
+                                    PhotosetFactory, UserFactory)
 from ditto.flickr.models import Account, Photo, Photoset, User
 
 

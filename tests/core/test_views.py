@@ -2,8 +2,8 @@ import datetime
 from unittest.mock import patch
 
 from django.apps import apps
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from ditto.core.utils import datetime_from_str
 from ditto.flickr import factories as flickrfactories
@@ -22,30 +22,18 @@ class DittoViewTests(TestCase):
 
     def test_home_context(self):
         flickr_accounts = flickrfactories.AccountFactory.create_batch(2)
-        flickrfactories.PhotoFactory.create_batch(
-            2, user=flickr_accounts[0].user
-        )
-        flickrfactories.PhotoFactory.create_batch(
-            2, user=flickr_accounts[1].user
-        )
+        flickrfactories.PhotoFactory.create_batch(2, user=flickr_accounts[0].user)
+        flickrfactories.PhotoFactory.create_batch(2, user=flickr_accounts[1].user)
 
         lastfmfactories.ScrobbleFactory.create_batch(2)
 
         pinboard_accounts = pinboardfactories.AccountFactory.create_batch(2)
-        pinboardfactories.BookmarkFactory.create_batch(
-            2, account=pinboard_accounts[0]
-        )
-        pinboardfactories.BookmarkFactory.create_batch(
-            2, account=pinboard_accounts[1]
-        )
+        pinboardfactories.BookmarkFactory.create_batch(2, account=pinboard_accounts[0])
+        pinboardfactories.BookmarkFactory.create_batch(2, account=pinboard_accounts[1])
 
         twitter_accounts = twitterfactories.AccountFactory.create_batch(2)
-        twitterfactories.TweetFactory.create_batch(
-            2, user=twitter_accounts[0].user
-        )
-        twitterfactories.TweetFactory.create_batch(
-            2, user=twitter_accounts[1].user
-        )
+        twitterfactories.TweetFactory.create_batch(2, user=twitter_accounts[0].user)
+        twitterfactories.TweetFactory.create_batch(2, user=twitter_accounts[1].user)
 
         response = self.client.get(reverse("ditto:home"))
         self.assertTrue("object_list" in response.context)

@@ -1,14 +1,10 @@
 from django.test import TestCase, override_settings
 
 from ditto.core.utils import datetime_from_str
+from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
+                                    ArtistFactory, ScrobbleFactory,
+                                    TrackFactory)
 from ditto.lastfm.templatetags import ditto_lastfm
-from ditto.lastfm.factories import (
-    AccountFactory,
-    AlbumFactory,
-    ArtistFactory,
-    ScrobbleFactory,
-    TrackFactory,
-)
 
 
 class TopAlbumsTestCase(TestCase):

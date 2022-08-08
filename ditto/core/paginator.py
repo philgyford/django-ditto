@@ -1,6 +1,7 @@
 import math
 from functools import reduce
-from django.core.paginator import Paginator, Page, InvalidPage
+
+from django.core.paginator import InvalidPage, Page, Paginator
 
 # From https://djangosnippets.org/snippets/773/
 # Lets us do better pagination, so we don't need to show *every* page.

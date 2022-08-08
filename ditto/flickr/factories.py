@@ -1,10 +1,10 @@
 import datetime
-import factory
 
+import factory
 from taggit import models as taggit_models
 
-from . import models
 from ..core.utils import datetime_now
+from . import models
 
 
 class UserFactory(factory.django.DjangoModelFactory):

@@ -12,5 +12,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="media", name="is_private",),
+        migrations.RemoveField(
+            model_name="media",
+            name="is_private",
+        ),
     ]

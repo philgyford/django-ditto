@@ -6,7 +6,6 @@ from django.test import TestCase
 from ditto.twitter.ingest import Version2TweetIngester
 from ditto.twitter.models import Tweet, User
 
-
 # e.g. /path/to/django-ditto/tests/twitter/fixtures/ingest
 FIXTURES_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "fixtures", "ingest"

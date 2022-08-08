@@ -1,7 +1,8 @@
 import os
 import re
-import requests
 import shutil
+
+import requests
 
 
 class DownloadException(Exception):

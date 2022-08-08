@@ -1,13 +1,9 @@
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
-from ditto.lastfm.factories import (
-    AccountFactory,
-    AlbumFactory,
-    ArtistFactory,
-    ScrobbleFactory,
-    TrackFactory,
-)
+from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
+                                    ArtistFactory, ScrobbleFactory,
+                                    TrackFactory)
 from ditto.lastfm.models import Account, Album, Artist, Scrobble, Track
 
 

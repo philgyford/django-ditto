@@ -5,24 +5,18 @@ from unittest.mock import Mock, patch
 
 import pytz
 import responses
-
-from django.urls import reverse
 from django.db import IntegrityError
 from django.test import TestCase
+from django.urls import reverse
 
 from ditto.core.utils import datetime_from_str
 from ditto.twitter import app_settings
-from ditto.twitter.factories import (
-    AccountFactory,
-    AccountWithCredentialsFactory,
-    PhotoFactory,
-    TweetFactory,
-    UserFactory,
-    VideoFactory,
-    AnimatedGifFactory,
-)
-from ditto.twitter.models import Account, Media, Tweet, User
+from ditto.twitter.factories import (AccountFactory,
+                                     AccountWithCredentialsFactory,
+                                     AnimatedGifFactory, PhotoFactory,
+                                     TweetFactory, UserFactory, VideoFactory)
 from ditto.twitter.fetch.savers import UserSaver
+from ditto.twitter.models import Account, Media, Tweet, User
 
 
 class AccountTestCase(TestCase):
@@ -232,7 +226,12 @@ class PhotoTestCase(TestCase):
         "It should be possible to belong to more than one tweet."
         tweet_1 = TweetFactory(text="1")
         tweet_2 = TweetFactory(text="2")
-        photo = PhotoFactory(tweets=(tweet_1, tweet_2,))
+        photo = PhotoFactory(
+            tweets=(
+                tweet_1,
+                tweet_2,
+            )
+        )
         self.assertEqual(2, photo.tweets.count())
         self.assertEqual(photo.tweets.all()[0], tweet_2)
         self.assertEqual(photo.tweets.all()[1], tweet_1)

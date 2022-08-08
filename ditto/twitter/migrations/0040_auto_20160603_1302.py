@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
-
 # This moves all the data from Media.tweet into Media.tweets.
 # Because we're moving from a ForeignKey field (tweet) to a
 # ManyToManyField (tweets).
@@ -12,8 +11,8 @@ from django.db import migrations
 
 def make_many_tweets(apps, schema_editor):
     """
-        Adds the Tweet object in Media.tweet to the
-        many-to-many relationship in Media.tweets
+    Adds the Tweet object in Media.tweet to the
+    many-to-many relationship in Media.tweets
     """
     Media = apps.get_model("twitter", "Media")
 

@@ -2,15 +2,13 @@ import os
 import time
 
 from django.core.files import File
-
 from twython import Twython, TwythonError
 
-from . import FetchError
-from .savers import TweetSaver, UserSaver
-from ..models import Media, Tweet, User
 from ...core.utils import datetime_now
 from ...core.utils.downloader import DownloadException, filedownloader
-
+from ..models import Media, Tweet, User
+from . import FetchError
+from .savers import TweetSaver, UserSaver
 
 # Classes which fetch data from the Twitter API for a single Account.
 # You're probably not going to call these classes directly - use the classes

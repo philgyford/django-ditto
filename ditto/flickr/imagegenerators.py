@@ -1,7 +1,6 @@
 from imagekit import ImageSpec, register
 from imagekit.processors import Adjust, ResizeToFill, ResizeToFit, Transpose
 
-
 # Info about different Flickr image sizes:
 # https://www.flickr.com/services/api/misc.urls.html
 #

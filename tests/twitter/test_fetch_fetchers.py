@@ -4,41 +4,26 @@ import tempfile
 from unittest.mock import call, patch
 
 import responses
-
 from django.http import QueryDict
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
+
+from ditto.core.utils.downloader import DownloadException, filedownloader
+from ditto.twitter.factories import (AccountFactory,
+                                     AccountWithCredentialsFactory,
+                                     AnimatedGifFactory, PhotoFactory,
+                                     TweetFactory, UserFactory, VideoFactory)
+from ditto.twitter.fetch import FetchError
+from ditto.twitter.fetch.fetch import (FetchFiles, FetchTweets,
+                                       FetchTweetsFavorite, FetchTweetsRecent,
+                                       FetchUsers, FetchVerify)
+from ditto.twitter.fetch.fetchers import (FavoriteTweetsFetcher, FilesFetcher,
+                                          RecentTweetsFetcher, TweetsFetcher,
+                                          TwitterFetcher, UsersFetcher,
+                                          VerifyFetcher)
+from ditto.twitter.fetch.savers import TweetSaver, UserSaver
+from ditto.twitter.models import Account, Tweet, User
 
 from .test_fetch import FetchTwitterTestCase
-from ditto.core.utils.downloader import DownloadException, filedownloader
-from ditto.twitter.factories import (
-    AccountFactory,
-    AccountWithCredentialsFactory,
-    AnimatedGifFactory,
-    PhotoFactory,
-    TweetFactory,
-    UserFactory,
-    VideoFactory,
-)
-from ditto.twitter.fetch import FetchError
-from ditto.twitter.fetch.savers import UserSaver, TweetSaver
-from ditto.twitter.fetch.fetch import (
-    FetchFiles,
-    FetchVerify,
-    FetchUsers,
-    FetchTweets,
-    FetchTweetsRecent,
-    FetchTweetsFavorite,
-)
-from ditto.twitter.fetch.fetchers import (
-    FilesFetcher,
-    TwitterFetcher,
-    VerifyFetcher,
-    UsersFetcher,
-    TweetsFetcher,
-    RecentTweetsFetcher,
-    FavoriteTweetsFetcher,
-)
-from ditto.twitter.models import Account, Tweet, User
 
 
 class TwitterFetcherSetAccountsTestCase(FetchTwitterTestCase):
@@ -676,7 +661,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
                 "@rooreynolds I've read stories of people travelling abroad who were "
                 "mistaken for military/security because of that kind of thing… careful "
                 ":)"
-            )
+            ),
         )
 
     @responses.activate

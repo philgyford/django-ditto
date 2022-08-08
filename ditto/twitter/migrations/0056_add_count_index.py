@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="tweet", options={"ordering": ["-post_time", "-twitter_id"]},
+            name="tweet",
+            options={"ordering": ["-post_time", "-twitter_id"]},
         ),
         migrations.AddIndex(
             model_name="tweet",

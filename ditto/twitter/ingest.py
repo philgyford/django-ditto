@@ -4,9 +4,9 @@ from urllib.parse import urlparse
 
 from django.core.files import File
 
+from ..core.utils import datetime_now
 from .fetch.savers import TweetSaver
 from .models import Media
-from ..core.utils import datetime_now
 
 
 class IngestError(Exception):

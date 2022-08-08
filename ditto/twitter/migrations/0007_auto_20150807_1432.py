@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -11,10 +11,22 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="tweet", name="in_reply_to_status_id_str",),
-        migrations.RemoveField(model_name="tweet", name="in_reply_to_user_id_str",),
-        migrations.RemoveField(model_name="tweet", name="quoted_status_id_str",),
-        migrations.RemoveField(model_name="tweet", name="twitter_id_str",),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="in_reply_to_status_id_str",
+        ),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="in_reply_to_user_id_str",
+        ),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="quoted_status_id_str",
+        ),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="twitter_id_str",
+        ),
         migrations.AlterField(
             model_name="tweet",
             name="favorite_count",

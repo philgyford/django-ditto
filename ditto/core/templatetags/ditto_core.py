@@ -1,11 +1,10 @@
 from django import template
-from django.urls import reverse
 from django.http import QueryDict
+from django.urls import reverse
 from django.utils.html import format_html
 
-from ..apps import ditto_apps
 from .. import app_settings
-
+from ..apps import ditto_apps
 
 register = template.Library()
 

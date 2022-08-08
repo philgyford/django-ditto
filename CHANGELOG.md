@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added support for Django 4.1.
 - Add the latest master branch Django to the tox testing matrix.
+- Added `.pre-commit-config.yaml`
 
 ### Changed
 - Update development project depenencies

@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.apps import apps, AppConfig
+from django.apps import AppConfig, apps
 
 
 class DittoCoreConfig(AppConfig):

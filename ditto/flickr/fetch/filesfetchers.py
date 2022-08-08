@@ -2,10 +2,9 @@ import os
 
 from django.core.files import File
 
-from . import FetchError
-from ..models import Photo
 from ...core.utils.downloader import DownloadException, filedownloader
-
+from ..models import Photo
+from . import FetchError
 
 # A single class that fetches original photo/video files for existing
 # Photo objects. Doesn't use the API.

@@ -12,6 +12,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="user", old_name="favorites_count", new_name="favourites_count",
+            model_name="user",
+            old_name="favorites_count",
+            new_name="favourites_count",
         ),
     ]

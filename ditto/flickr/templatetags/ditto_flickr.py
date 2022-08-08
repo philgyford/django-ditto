@@ -1,12 +1,11 @@
 import datetime
-import pytz
 
+import pytz
 from django import template
 from django.utils.html import format_html
 
-from ..models import Photo, Photoset
 from ...core.utils import get_annual_item_counts
-
+from ..models import Photo, Photoset
 
 register = template.Library()
 

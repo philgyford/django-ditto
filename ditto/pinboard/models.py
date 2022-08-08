@@ -1,13 +1,14 @@
 # coding: utf-8
 import hashlib
+
 from django.core.validators import URLValidator
 from django.db import models
-
 from taggit.managers import TaggableManager
 from taggit.models import GenericTaggedItemBase, TagBase
 
-from .managers import _BookmarkTaggableManager, PublicToreadManager, ToreadManager
 from ..core.models import DittoItemModel, TimeStampedModelMixin
+from .managers import (PublicToreadManager, ToreadManager,
+                       _BookmarkTaggableManager)
 
 
 class Account(TimeStampedModelMixin, models.Model):

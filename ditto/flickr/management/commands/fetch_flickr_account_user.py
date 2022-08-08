@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch.fetchers import UserIdFetcher, UserFetcher
+from ...fetch.fetchers import UserFetcher, UserIdFetcher
 from ...models import Account, User
 
 

@@ -1,13 +1,9 @@
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
-from ditto.lastfm.factories import (
-    AccountFactory,
-    AlbumFactory,
-    ArtistFactory,
-    ScrobbleFactory,
-    TrackFactory,
-)
+from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
+                                    ArtistFactory, ScrobbleFactory,
+                                    TrackFactory)
 from ditto.lastfm.models import Album, Artist, Track
 
 
@@ -325,9 +321,7 @@ class TrackManagersWithScrobbleCountsTestCase(TestCase):
     def test_args_account(self):
         "Should only return Scrobbles by supplied Account"
         account = AccountFactory()
-        ScrobbleFactory(
-            account=account, track=self.track, artist=self.artist
-        )
+        ScrobbleFactory(account=account, track=self.track, artist=self.artist)
         tracks = Track.objects.with_scrobble_counts(account=account)
         self.assertEqual(len(tracks), 1)
         self.assertEqual(tracks[0], self.track)

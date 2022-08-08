@@ -1,14 +1,12 @@
 import datetime
 import json
+
 import pytz
-
 from django.db.utils import IntegrityError
-
 from taggit.models import Tag
 
-from . import FetchError
 from ..models import Photo, Photoset, User
-
+from . import FetchError
 
 # These classes are passed JSON data from the Flickr API and create/update
 # objects based on that.
@@ -92,7 +90,7 @@ class UserSaver(SaveUtilsMixin, object):
         if "iconfarm" in user:
             defaults["iconfarm"] = user["iconfarm"]
         if "ispro" in user:
-            defaults["is_pro"] = (int(user["ispro"]) == 1)
+            defaults["is_pro"] = int(user["ispro"]) == 1
         if "description" in user:
             defaults["description"] = user["description"]["_content"]
         if "photosurl" in user:

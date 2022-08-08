@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterUniqueTogether(
-            name="bookmark", unique_together=set([("account", "url")]),
+            name="bookmark",
+            unique_together=set([("account", "url")]),
         ),
     ]

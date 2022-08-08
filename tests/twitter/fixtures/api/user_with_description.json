@@ -1,42 +1,39 @@
-{  
-  "id_str":"2030131",
-  "notifications":false,
-  "protected":false,
-  "favourites_count":0,
-  "created_at":"Fri Mar 23 16:56:52 +0000 2007",
-  "statuses_count":456,
-  "location":"",
-  "friends_count":18,
-  "time_zone":"London",
-  "profile_image_url_https":"https://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
-  "description":"Testing #testing https://t.co/FsYzXrATit $IBM #test @philgyford",
-  "followers_count":10,
-  "listed_count":4,
-  "id":2030131,
-  "entities":{  
-    "description":{  
-      "urls":[  
-        {  
-          "expanded_url":"http://www.gyford.com",
-          "display_url":"gyford.com",
-          "indices":[  
-            17,
-            40
-          ],
-          "url":"https://t.co/FsYzXrATit"
+{
+  "id_str": "2030131",
+  "notifications": false,
+  "protected": false,
+  "favourites_count": 0,
+  "created_at": "Fri Mar 23 16:56:52 +0000 2007",
+  "statuses_count": 456,
+  "location": "",
+  "friends_count": 18,
+  "time_zone": "London",
+  "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_5_normal.png",
+  "description": "Testing #testing https://t.co/FsYzXrATit $IBM #test @philgyford",
+  "followers_count": 10,
+  "listed_count": 4,
+  "id": 2030131,
+  "entities": {
+    "description": {
+      "urls": [
+        {
+          "expanded_url": "http://www.gyford.com",
+          "display_url": "gyford.com",
+          "indices": [17, 40],
+          "url": "https://t.co/FsYzXrATit"
         }
       ]
     }
   },
-  "name":"Phil Gyford Test",
-  "following":true,
-  "verified":false,
-  "is_translator":false,
-  "default_profile_image":true,
-  "default_profile":false,
-  "contributors_enabled":false,
-  "url":null,
-  "screen_name":"philgyfordtest",
-  "utc_offset":3600,
-  "follow_request_sent":false
+  "name": "Phil Gyford Test",
+  "following": true,
+  "verified": false,
+  "is_translator": false,
+  "default_profile_image": true,
+  "default_profile": false,
+  "contributors_enabled": false,
+  "url": null,
+  "screen_name": "philgyfordtest",
+  "utc_offset": 3600,
+  "follow_request_sent": false
 }

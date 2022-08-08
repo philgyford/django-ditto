@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -22,9 +22,12 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RenameField(
-            model_name="tweet", old_name="created_at", new_name="post_time",
+            model_name="tweet",
+            old_name="created_at",
+            new_name="post_time",
         ),
         migrations.AlterModelOptions(
-            name="tweet", options={"ordering": ["-post_time"]},
+            name="tweet",
+            options={"ordering": ["-post_time"]},
         ),
     ]

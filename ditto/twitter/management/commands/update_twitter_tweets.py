@@ -1,5 +1,5 @@
-from . import UpdateTwitterCommand
 from ...fetch.fetchers import TweetsFetcher
+from . import UpdateTwitterCommand
 
 
 class Command(UpdateTwitterCommand):

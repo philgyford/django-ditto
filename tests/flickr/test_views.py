@@ -1,17 +1,12 @@
 from datetime import timedelta
 
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
-from ditto.flickr.factories import (
-    AccountFactory,
-    PhotoFactory,
-    PhotosetFactory,
-    TagFactory,
-    TaggedPhotoFactory,
-    UserFactory,
-)
 from ditto.core.utils import datetime_now
+from ditto.flickr.factories import (AccountFactory, PhotoFactory,
+                                    PhotosetFactory, TagFactory,
+                                    TaggedPhotoFactory, UserFactory)
 
 
 class HomeViewTests(TestCase):
@@ -299,9 +294,7 @@ class TagViewTests(TestCase):
         self.dog_photo = PhotoFactory(title="Dog")
         mammal_tag = TagFactory(slug="mammal")
         dog_tag = TagFactory(slug="dog")
-        TaggedPhotoFactory(
-            content_object=self.dog_photo, tag=mammal_tag
-        )
+        TaggedPhotoFactory(content_object=self.dog_photo, tag=mammal_tag)
         TaggedPhotoFactory(content_object=self.dog_photo, tag=dog_tag)
 
     # TAG LIST

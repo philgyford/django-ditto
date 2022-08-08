@@ -1,7 +1,7 @@
-from . import FetchError
-from .fetchers import RecentPhotosFetcher, PhotosetsFetcher
-from .filesfetchers import OriginalFilesFetcher
 from ..models import Account, User
+from . import FetchError
+from .fetchers import PhotosetsFetcher, RecentPhotosFetcher
+from .filesfetchers import OriginalFilesFetcher
 
 # Classes for fetching data from the API for ONE OR MORE Accounts.
 # These are wrappers for other classes which do the heavy lifting.

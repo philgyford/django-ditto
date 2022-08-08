@@ -12,7 +12,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="account", options={"ordering": ["-time_created"]},
+            name="account",
+            options={"ordering": ["-time_created"]},
         ),
-        migrations.RemoveField(model_name="account", name="screen_name",),
+        migrations.RemoveField(
+            model_name="account",
+            name="screen_name",
+        ),
     ]

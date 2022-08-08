@@ -8,17 +8,14 @@ try:
 except ImportError:
     # For Django 1.8
     from django.urls import reverse
+
 from django.db import models
 from django.templatetags.static import static
-
 from imagekit.cachefiles import ImageCacheFile
 
-from . import app_settings
-from . import imagegenerators
-from . import managers
-from .utils import htmlify_description, htmlify_tweet
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
-
+from . import app_settings, imagegenerators, managers
+from .utils import htmlify_description, htmlify_tweet
 
 logger = logging.getLogger("ditto")
 

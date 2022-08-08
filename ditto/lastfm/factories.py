@@ -1,7 +1,7 @@
 import factory
 
-from . import models
 from ..core.utils import datetime_now
+from . import models
 
 
 class AccountFactory(factory.django.DjangoModelFactory):

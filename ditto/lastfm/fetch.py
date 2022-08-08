@@ -1,16 +1,17 @@
 import calendar
-from datetime import datetime, timedelta
 import json
-import pytz
-import requests
 import time
 import urllib
+from datetime import datetime, timedelta
+
+import pytz
+import requests
 
 from ditto import TITLE, VERSION
+
+from ..core.utils import datetime_now
 from .models import Account, Album, Artist, Scrobble, Track
 from .utils import slugify_name
-from ..core.utils import datetime_now
-
 
 LASTFM_API_ENDPOINT = "http://ws.audioscrobbler.com/2.0/"
 

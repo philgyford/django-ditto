@@ -1,78 +1,78 @@
-{  
-  "recenttracks":{  
-    "@attr":{  
-      "user":"gyford",
-      "page":"1",
-      "perPage":"200",
-      "totalPages":"1",
-      "total":"3"
+{
+  "recenttracks": {
+    "@attr": {
+      "user": "gyford",
+      "page": "1",
+      "perPage": "200",
+      "totalPages": "1",
+      "total": "3"
     },
-    "track":[  
-      {  
-        "artist":{  
-          "#text":"K.Flay",
-          "mbid":"d1fc999f-6184-41a6-bcb1-7c59bf74a6e1"
+    "track": [
+      {
+        "artist": {
+          "#text": "K.Flay",
+          "mbid": "d1fc999f-6184-41a6-bcb1-7c59bf74a6e1"
         },
-        "name":"You Felt Right",
-        "mbid":"",
-        "album":{  
-          "#text":"Crush Me",
-          "mbid":""
+        "name": "You Felt Right",
+        "mbid": "",
+        "album": {
+          "#text": "Crush Me",
+          "mbid": ""
         },
-        "url":"https://www.last.fm/music/K.Flay/_/You+Felt+Right",
-        "@attr":{  
-          "nowplaying":"true"
+        "url": "https://www.last.fm/music/K.Flay/_/You+Felt+Right",
+        "@attr": {
+          "nowplaying": "true"
         }
       },
-      {  
-        "artist":{  
-          "#text":"Mothers",
-          "mbid":""
+      {
+        "artist": {
+          "#text": "Mothers",
+          "mbid": ""
         },
-        "name":"Fat Chance / No Crying In Baseball – Live From Baby’s All Right",
-        "mbid":"",
-        "album":{  
-          "#text":"Spotify Session",
-          "mbid":""
+        "name": "Fat Chance / No Crying In Baseball – Live From Baby’s All Right",
+        "mbid": "",
+        "album": {
+          "#text": "Spotify Session",
+          "mbid": ""
         },
-        "url":"https://www.last.fm/music/Mothers/_/Fat+Chance+%2F+No+Crying+In+Baseball+%E2%80%93+Live+From+Baby%E2%80%99s+All+Right",
-        "date":{  
-          "uts":"1474559569",
-          "#text":"22 Sep 2016, 15:52"
+        "url": "https://www.last.fm/music/Mothers/_/Fat+Chance+%2F+No+Crying+In+Baseball+%E2%80%93+Live+From+Baby%E2%80%99s+All+Right",
+        "date": {
+          "uts": "1474559569",
+          "#text": "22 Sep 2016, 15:52"
         }
       },
-      {  
-        "artist":{  
-          "#text":"Lou Reed",
-          "mbid":"9d1ebcfe-4c15-4d18-95d3-d919898638a1"
+      {
+        "artist": {
+          "#text": "Lou Reed",
+          "mbid": "9d1ebcfe-4c15-4d18-95d3-d919898638a1"
         },
-        "name":"Make Up",
-        "mbid":"8e73b23a-6a01-4743-b414-047974f66e22",
-        "album":{  
-          "#text":"Transformer",
-          "mbid":"4ee40d97-630c-3f0d-9ea2-d49fa253c354"
+        "name": "Make Up",
+        "mbid": "8e73b23a-6a01-4743-b414-047974f66e22",
+        "album": {
+          "#text": "Transformer",
+          "mbid": "4ee40d97-630c-3f0d-9ea2-d49fa253c354"
         },
-        "url":"https://www.last.fm/music/Lou+Reed/_/Make+Up",
-        "date":{  
-          "uts":"1474536213",
-          "#text":"22 Sep 2016, 09:23"
+        "url": "https://www.last.fm/music/Lou+Reed/_/Make+Up",
+        "date": {
+          "uts": "1474536213",
+          "#text": "22 Sep 2016, 09:23"
         }
       },
-      {  
-        "artist":{  
-          "#text":"[unknown]",
-          "mbid":"5dfdca28-9ddc-4853-933c-8bc97d87beec"
+      {
+        "artist": {
+          "#text": "[unknown]",
+          "mbid": "5dfdca28-9ddc-4853-933c-8bc97d87beec"
         },
-        "name":"The Great Egg Race theme",
-        "mbid":"",
-        "album":{  
-          "#text":"",
-          "mbid":""
+        "name": "The Great Egg Race theme",
+        "mbid": "",
+        "album": {
+          "#text": "",
+          "mbid": ""
         },
-        "url":"https://www.last.fm/music/%5Bunknown%5D/_/The+Great+Egg+Race+theme",
-        "date":{  
-          "uts":"1474534800",
-          "#text":"22 Sep 2016, 09:00"
+        "url": "https://www.last.fm/music/%5Bunknown%5D/_/The+Great+Egg+Race+theme",
+        "date": {
+          "uts": "1474534800",
+          "#text": "22 Sep 2016, 09:00"
         }
       }
     ]

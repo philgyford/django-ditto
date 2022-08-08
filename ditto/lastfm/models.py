@@ -11,7 +11,6 @@ from ..core.models import DittoItemModel, TimeStampedModelMixin
 from ..core.utils import truncate_string
 from . import managers
 
-
 # For generating permalinks.
 LASTFM_URL_ROOT = "http://www.last.fm"
 

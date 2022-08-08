@@ -1,12 +1,12 @@
 import datetime
 import json
+from urllib.parse import quote_plus
+
 import pytz
 import responses
 import six
-from six.moves.urllib.parse import parse_qs
-from urllib.parse import quote_plus
-
 from django.test import TestCase
+from six.moves.urllib.parse import parse_qs
 
 from ditto.flickr.fetch.savers import SaveUtilsMixin
 

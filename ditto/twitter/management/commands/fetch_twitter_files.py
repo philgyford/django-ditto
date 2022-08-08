@@ -27,7 +27,7 @@ class Command(DittoBaseCommand):
             help=(
                 "Fetch ALL files, even if they've been downloaded before. "
                 "Otherwise, only fetch files that haven't already been downloaded."
-            )
+            ),
         )
 
     def handle(self, *args, **options):

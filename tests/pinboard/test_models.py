@@ -1,7 +1,7 @@
 # coding: utf-8
 import datetime
-import pytz
 
+import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -97,9 +97,7 @@ class BookmarkTestCase(TestCase):
         bookmark_1.save()
         account_2 = AccountFactory()
         try:
-            BookmarkFactory(
-                account=account_2, url="http://www.example.com"
-            )
+            BookmarkFactory(account=account_2, url="http://www.example.com")
         except IntegrityError:
             self.fail(
                 "It looks like there's a Unique constraint on Bookmark.url, which "

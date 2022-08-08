@@ -1,5 +1,4 @@
 import responses
-
 from django.test import TestCase
 
 

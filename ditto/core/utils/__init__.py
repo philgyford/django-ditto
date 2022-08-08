@@ -1,15 +1,14 @@
 # coding: utf-8
+import datetime
+
+import pytz
+from django.db.models import Count
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
-import datetime
-import pytz
-
-from django.db.models import Count
-
 
 def truncate_string(
-    text, strip_html=True, chars=255, truncate=u"…", at_word_boundary=False
+    text, strip_html=True, chars=255, truncate="…", at_word_boundary=False
 ):
     """Truncate a string to a certain length, removing line breaks and mutliple
     spaces, optionally removing HTML, and appending a 'truncate' string.

@@ -1,16 +1,16 @@
+import datetime
 from itertools import chain
 from operator import attrgetter
-import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage
-from django.urls import reverse
 from django.http import Http404
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
-from django.views.generic import ListView, TemplateView
 from django.views.generic import DayArchiveView as DjangoDayArchiveView
+from django.views.generic import ListView, TemplateView
 
 from .apps import ditto_apps
 from .paginator import DiggPaginator
@@ -632,6 +632,6 @@ def _date_from_string(
         return datetime.datetime.strptime(force_str(datestr), format).date()
     except ValueError:
         raise Http404(
-            _(u"Invalid date string '%(datestr)s' given format '%(format)s'")
+            _("Invalid date string '%(datestr)s' given format '%(format)s'")
             % {"datestr": datestr, "format": format}
         )

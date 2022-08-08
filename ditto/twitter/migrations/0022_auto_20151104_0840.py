@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -11,9 +11,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="photo", name="tweet",),
-        migrations.RemoveField(model_name="video", name="tweet",),
-        migrations.RemoveField(model_name="tweet", name="photos_count",),
+        migrations.RemoveField(
+            model_name="photo",
+            name="tweet",
+        ),
+        migrations.RemoveField(
+            model_name="video",
+            name="tweet",
+        ),
+        migrations.RemoveField(
+            model_name="tweet",
+            name="photos_count",
+        ),
         migrations.AddField(
             model_name="tweet",
             name="media_count",
@@ -23,6 +32,10 @@ class Migration(migrations.Migration):
                 help_text="Number of Photos/Videos attached to this Tweet",
             ),
         ),
-        migrations.DeleteModel(name="Photo",),
-        migrations.DeleteModel(name="Video",),
+        migrations.DeleteModel(
+            name="Photo",
+        ),
+        migrations.DeleteModel(
+            name="Video",
+        ),
     ]

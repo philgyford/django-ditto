@@ -2,6 +2,7 @@ import codecs
 import os
 import re
 import sys
+
 from setuptools import setup
 
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as readme:

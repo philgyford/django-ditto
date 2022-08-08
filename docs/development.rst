@@ -22,6 +22,13 @@ Then run migrations and start the server:
     (ditto-devproject)$ ./manage.py migrate
     (ditto-devproject)$ ./manage.py runserver
 
+pre-commit will run flake8, black, isort and prettier across all files on commit.
+I think you just need to do this first:
+
+.. code-block:: shell
+
+  $ pre-commit install
+
 *****
 Tests
 *****

@@ -1,19 +1,67 @@
-{ "photosets": {
+{
+  "photosets": {
     "cancreate": 1,
     "page": 1,
     "pages": 1,
     "perpage": "500",
-    "total": 3, 
+    "total": 3,
     "photoset": [
-      { "id": "72157665648859705", "primary": "24990464004", "secret": "751f8dc21b", "server": "1552", "farm": 2, "photos": 5, "videos": 1, 
-        "title": { "_content": "Old Postcards of Walton-on-the-Naze" }, 
-        "description": { "_content": "<b>Some text here<\/b>\n\nAnd new lines!" }, "needs_interstitial": 0, "visibility_can_see_set": 1, "count_views": 7, "count_comments": 3, "can_comment": 1, "date_create": "1457465824", "date_update": "1459180923" },
-      { "id": "72157662491524213", "primary": "25081637936", "secret": "4604d39bfb", "server": "1631", "farm": 2, "photos": 5, "videos": 0, 
-        "title": { "_content": "Capital Radio, 1998-9" }, 
-        "description": { "_content": "Doing internet chats with pop stars" }, "needs_interstitial": 0, "visibility_can_see_set": 1, "count_views": 41, "count_comments": 0, "can_comment": 1, "date_create": "1455804746", "date_update": "1455804781" },
-      { "id": "72157645155015916", "primary": "14458201483", "secret": "771a5e2633", "server": "2933", "farm": 3, "photos": 39, "videos": 0, 
-        "title": { "_content": "Berlin, Amsterdam, Paris, 2014" }, 
-        "description": { "_content": "" }, "needs_interstitial": 0, "visibility_can_see_set": 1, "count_views": 43, "count_comments": 0, "can_comment": 1, "date_create": "1402942963", "date_update": "1444945714" }
+      {
+        "id": "72157665648859705",
+        "primary": "24990464004",
+        "secret": "751f8dc21b",
+        "server": "1552",
+        "farm": 2,
+        "photos": 5,
+        "videos": 1,
+        "title": { "_content": "Old Postcards of Walton-on-the-Naze" },
+        "description": {
+          "_content": "<b>Some text here</b>\n\nAnd new lines!"
+        },
+        "needs_interstitial": 0,
+        "visibility_can_see_set": 1,
+        "count_views": 7,
+        "count_comments": 3,
+        "can_comment": 1,
+        "date_create": "1457465824",
+        "date_update": "1459180923"
+      },
+      {
+        "id": "72157662491524213",
+        "primary": "25081637936",
+        "secret": "4604d39bfb",
+        "server": "1631",
+        "farm": 2,
+        "photos": 5,
+        "videos": 0,
+        "title": { "_content": "Capital Radio, 1998-9" },
+        "description": { "_content": "Doing internet chats with pop stars" },
+        "needs_interstitial": 0,
+        "visibility_can_see_set": 1,
+        "count_views": 41,
+        "count_comments": 0,
+        "can_comment": 1,
+        "date_create": "1455804746",
+        "date_update": "1455804781"
+      },
+      {
+        "id": "72157645155015916",
+        "primary": "14458201483",
+        "secret": "771a5e2633",
+        "server": "2933",
+        "farm": 3,
+        "photos": 39,
+        "videos": 0,
+        "title": { "_content": "Berlin, Amsterdam, Paris, 2014" },
+        "description": { "_content": "" },
+        "needs_interstitial": 0,
+        "visibility_can_see_set": 1,
+        "count_views": 43,
+        "count_comments": 0,
+        "can_comment": 1,
+        "date_create": "1402942963",
+        "date_update": "1444945714"
+      }
     ]
   },
   "stat": "ok"

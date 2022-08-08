@@ -1,8 +1,9 @@
 import datetime
+
 import factory
 
-from . import models
 from ..core.utils import datetime_now
+from . import models
 
 
 class UserFactory(factory.django.DjangoModelFactory):

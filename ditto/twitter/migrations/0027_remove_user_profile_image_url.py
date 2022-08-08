@@ -11,5 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="user", name="profile_image_url",),
+        migrations.RemoveField(
+            model_name="user",
+            name="profile_image_url",
+        ),
     ]

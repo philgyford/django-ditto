@@ -1,14 +1,13 @@
 # coding: utf-8
 import datetime
+
 import pytz
-
-from django.test import TestCase
-
-from freezegun import freeze_time
 import responses
+from django.test import TestCase
+from freezegun import freeze_time
 from requests.exceptions import HTTPError
 
-from ditto.core.utils import datetime_now, datetime_from_str, truncate_string
+from ditto.core.utils import datetime_from_str, datetime_now, truncate_string
 from ditto.core.utils.downloader import DownloadException, filedownloader
 
 
@@ -39,7 +38,7 @@ class TruncateStringTestCase(TestCase):
                     "</b></a>. And more."
                 )
             ),
-            u"Some text. A link. And more.",
+            "Some text. A link. And more.",
         )
 
     def test_truncate_string_strip_html_false(self):
@@ -53,7 +52,7 @@ class TruncateStringTestCase(TestCase):
                 strip_html=False,
             ),
             (
-                u'<p>Some text. <a href="http://www.example.com/"><b>A link'
+                '<p>Some text. <a href="http://www.example.com/"><b>A link'
                 "</b></a>. And more."
             ),
         )
@@ -69,7 +68,7 @@ class TruncateStringTestCase(TestCase):
                 "amet lacus at sem porta porta."
             ),
             (
-                u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget "
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget "
                 "odio eget odio porttitor accumsan in eget elit. Integer gravida "
                 "egestas nunc. Mauris at tortor ornare, blandit eros quis, auctor "
                 "lacus. Fusce ullamcorper nunc vitae tincidunt sodales. Ve…"
@@ -90,9 +89,9 @@ class TruncateStringTestCase(TestCase):
                 chars=100,
             ),
             (
-                u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
                 "eget odio eget odio porttitor accums…"
-            )
+            ),
         )
 
     def test_truncate_string_truncate(self):
@@ -106,14 +105,14 @@ class TruncateStringTestCase(TestCase):
                     "auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales. "
                     "Vestibulum sit amet lacus at sem porta porta."
                 ),
-                truncate=" (cont.)"
+                truncate=" (cont.)",
             ),
             (
-                u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
                 "eget odio eget odio porttitor accumsan in eget elit. Integer "
                 "gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, "
                 "auctor lacus. Fusce ullamcorper nunc vitae tincidunt soda (cont.)"
-            )
+            ),
         )
 
     def test_at_word_boundary(self):
@@ -121,31 +120,31 @@ class TruncateStringTestCase(TestCase):
         self.assertEqual(
             truncate_string(
                 (
-                    u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
                     "eget odio eget odio porttitor accumsan in eget elit. Integer "
                     "gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, "
                     "auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales. "
                     "Vestibulum sit amet lacus at sem porta porta."
                 ),
-                at_word_boundary=True
+                at_word_boundary=True,
             ),
             (
-                u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
                 "eget odio eget odio porttitor accumsan in eget elit. Integer "
                 "gravida egestas nunc. Mauris at tortor ornare, blandit eros quis, "
                 "auctor lacus. Fusce ullamcorper nunc vitae tincidunt sodales.…"
-            )
+            ),
         )
 
     def test_no_truncation(self):
         """Too short to be truncated."""
-        self.assertEqual(truncate_string(u"This is my string."), u"This is my string.")
+        self.assertEqual(truncate_string("This is my string."), "This is my string.")
 
     def test_no_truncation_at_word_boundary(self):
         """Too short to be truncated."""
         self.assertEqual(
-            truncate_string(u"This is my string.", at_word_boundary=True),
-            u"This is my string.",
+            truncate_string("This is my string.", at_word_boundary=True),
+            "This is my string.",
         )
 
     def test_truncate_string_all(self):
@@ -162,7 +161,7 @@ class TruncateStringTestCase(TestCase):
                 truncate="...",
                 at_word_boundary=True,
             ),
-            u"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis,...",  # noqa: E501
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget odio eget odio porttitor accumsan in eget elit. Integer gravida egestas nunc. Mauris at tortor ornare, blandit eros quis,...",  # noqa: E501
         )
 
 

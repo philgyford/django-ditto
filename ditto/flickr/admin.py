@@ -18,11 +18,22 @@ class AccountAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("user", "is_active",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "user",
+                    "is_active",
+                )
+            },
+        ),
         (
             "API",
             {
-                "fields": ("api_key", "api_secret",),
+                "fields": (
+                    "api_key",
+                    "api_secret",
+                ),
                 "description": (
                     "Keys and secrets require creation of an app at "
                     '<a href="https://www.flickr.com/services/apps/create/apply/">'
@@ -32,7 +43,13 @@ class AccountAdmin(admin.ModelAdmin):
         ),
         (
             "Data",
-            {"classes": ("collapse",), "fields": ("time_created", "time_modified",)},
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                ),
+            },
         ),
     )
 
@@ -155,7 +172,12 @@ class PhotosetAdmin(admin.ModelAdmin):
             "Data",
             {
                 "classes": ("collapse",),
-                "fields": ("raw", "fetch_time", "time_created", "time_modified",),
+                "fields": (
+                    "raw",
+                    "fetch_time",
+                    "time_created",
+                    "time_modified",
+                ),
             },
         ),
     )
@@ -260,24 +282,78 @@ class PhotoAdmin(DittoItemModelAdmin):
             {
                 "classes": ("collapse",),
                 "fields": (
-                    ("thumbnail_width", "thumbnail_height",),
-                    ("small_width", "small_height",),
-                    ("small_320_width", "small_320_height",),
-                    ("medium_width", "medium_height",),
-                    ("medium_640_width", "medium_640_height",),
-                    ("medium_800_width", "medium_800_height",),
-                    ("large_width", "large_height",),
-                    ("large_1600_width", "large_1600_height",),
-                    ("large_2048_width", "large_2048_height",),
-                    ("x_large_3k_width", "x_large_3k_height",),
-                    ("x_large_4k_width", "x_large_4k_height",),
-                    ("x_large_5k_width", "x_large_5k_height",),
-                    ("x_large_6k_width", "x_large_6k_height",),
-                    ("original_width", "original_height",),
-                    ("mobile_mp4_width", "mobile_mp4_height",),
-                    ("site_mp4_width", "site_mp4_height",),
-                    ("hd_mp4_width", "hd_mp4_height",),
-                    ("video_original_width", "video_original_height",),
+                    (
+                        "thumbnail_width",
+                        "thumbnail_height",
+                    ),
+                    (
+                        "small_width",
+                        "small_height",
+                    ),
+                    (
+                        "small_320_width",
+                        "small_320_height",
+                    ),
+                    (
+                        "medium_width",
+                        "medium_height",
+                    ),
+                    (
+                        "medium_640_width",
+                        "medium_640_height",
+                    ),
+                    (
+                        "medium_800_width",
+                        "medium_800_height",
+                    ),
+                    (
+                        "large_width",
+                        "large_height",
+                    ),
+                    (
+                        "large_1600_width",
+                        "large_1600_height",
+                    ),
+                    (
+                        "large_2048_width",
+                        "large_2048_height",
+                    ),
+                    (
+                        "x_large_3k_width",
+                        "x_large_3k_height",
+                    ),
+                    (
+                        "x_large_4k_width",
+                        "x_large_4k_height",
+                    ),
+                    (
+                        "x_large_5k_width",
+                        "x_large_5k_height",
+                    ),
+                    (
+                        "x_large_6k_width",
+                        "x_large_6k_height",
+                    ),
+                    (
+                        "original_width",
+                        "original_height",
+                    ),
+                    (
+                        "mobile_mp4_width",
+                        "mobile_mp4_height",
+                    ),
+                    (
+                        "site_mp4_width",
+                        "site_mp4_height",
+                    ),
+                    (
+                        "hd_mp4_width",
+                        "hd_mp4_height",
+                    ),
+                    (
+                        "video_original_width",
+                        "video_original_height",
+                    ),
                 ),
             },
         ),
@@ -287,7 +363,10 @@ class PhotoAdmin(DittoItemModelAdmin):
                 "classes": ("collapse",),
                 "fields": (
                     "geo_is_private",
-                    ("latitude", "longitude",),
+                    (
+                        "latitude",
+                        "longitude",
+                    ),
                     "location_accuracy",
                     "location_context",
                     "location_place_id",

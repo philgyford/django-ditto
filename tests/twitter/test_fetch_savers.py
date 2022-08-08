@@ -1,20 +1,20 @@
 import datetime
-from decimal import Decimal
 import json
 import os
-import pytz
 import tempfile
+from decimal import Decimal
 from unittest.mock import patch
 
+import pytz
+from django.test import override_settings
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
 from ditto.core.utils.downloader import DownloadException, filedownloader
-from django.test import override_settings
-
-from .test_fetch import FetchTwitterTestCase
 from ditto.twitter.fetch.savers import TweetSaver, UserSaver
 from ditto.twitter.models import Media, Tweet, User
+
+from .test_fetch import FetchTwitterTestCase
 
 
 class TweetSaverTestCase(FetchTwitterTestCase):
@@ -86,9 +86,9 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(
             tweet.source,
             (
-                u'<a href="http://tapbots.com/tweetbot" rel="nofollow">Tweetbot '
-                'for iΟS</a>'
-            )
+                '<a href="http://tapbots.com/tweetbot" rel="nofollow">Tweetbot '
+                "for iΟS</a>"
+            ),
         )
 
     def test_saves_private_tweets_correctly(self):
@@ -399,7 +399,7 @@ class UserSaverTestCase(FetchTwitterTestCase):
 
     @patch.object(filedownloader, "download")
     def make_user_object(self, user_data, download):
-        """"Creates/updates a User from API data, then fetches that User from
+        """ "Creates/updates a User from API data, then fetches that User from
         the DB and returns it.
         """
         # Quietly prevents avatar files being fetched:
@@ -444,10 +444,10 @@ class UserSaverTestCase(FetchTwitterTestCase):
 
     def test_handles_missing_expanded_url(self):
         """Test fix for when expanded_url is None, as here:
-            {'indices': [0, 28],
-             'url': 'http://www.benhammersley.com',
-             'expanded_url': None
-            )
+        {'indices': [0, 28],
+         'url': 'http://www.benhammersley.com',
+         'expanded_url': None
+        )
         """
         entities = {
             "url": {

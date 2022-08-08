@@ -12,14 +12,38 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="media", name="mp4_bitrate_1",),
-        migrations.RemoveField(model_name="media", name="mp4_bitrate_2",),
-        migrations.RemoveField(model_name="media", name="mp4_bitrate_3",),
-        migrations.RemoveField(model_name="media", name="mp4_url_1",),
-        migrations.RemoveField(model_name="media", name="mp4_url_2",),
-        migrations.RemoveField(model_name="media", name="mp4_url_3",),
-        migrations.RemoveField(model_name="media", name="webm_bitrate",),
-        migrations.RemoveField(model_name="media", name="webm_url",),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_bitrate_1",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_bitrate_2",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_bitrate_3",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_url_1",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_url_2",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="mp4_url_3",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="webm_bitrate",
+        ),
+        migrations.RemoveField(
+            model_name="media",
+            name="webm_url",
+        ),
         migrations.AddField(
             model_name="media",
             name="mp4_url",

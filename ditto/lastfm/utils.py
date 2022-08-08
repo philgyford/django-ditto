@@ -13,12 +13,12 @@ def slugify_name(name):
     """
 
     # Last.fm doesn't quote certain punctuation characters:
-    name = quote_plus(name, safe='!&(),:;')
+    name = quote_plus(name, safe="!&(),:;")
 
     # Some things need extra encoding for Last.fm's URLs:
     replacements = (
-        ('%2B', '%252B'),   # + has an extra level of quoting.
-        ('%5C', '%5C%5C'),  # \ gets encoded twice.
+        ("%2B", "%252B"),  # + has an extra level of quoting.
+        ("%5C", "%5C%5C"),  # \ gets encoded twice.
     )
 
     for find, repl in replacements:

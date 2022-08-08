@@ -1,13 +1,13 @@
 # coding: utf-8
 import datetime
 import json
-import pytz
-import requests
 import urllib
 
-from .models import Account, Bookmark
-from ..core.utils import datetime_now
+import pytz
+import requests
 
+from ..core.utils import datetime_now
+from .models import Account, Bookmark
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"
 PINBOARD_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"

@@ -12,7 +12,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="photo", old_name="media_url", new_name="url",
+            model_name="photo",
+            old_name="media_url",
+            new_name="url",
         ),
-        migrations.RemoveField(model_name="photo", name="page_url",),
+        migrations.RemoveField(
+            model_name="photo",
+            name="page_url",
+        ),
     ]

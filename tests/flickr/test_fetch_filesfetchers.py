@@ -1,10 +1,10 @@
 import datetime
 import os
-import pytz
 import tempfile
 from unittest.mock import call, patch
 
-from django.test import override_settings, TestCase
+import pytz
+from django.test import TestCase, override_settings
 
 from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory

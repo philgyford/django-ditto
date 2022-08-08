@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -12,7 +12,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="account", old_name="last_fetch_id", new_name="last_recent_id",
+            model_name="account",
+            old_name="last_fetch_id",
+            new_name="last_recent_id",
         ),
         migrations.AddField(
             model_name="account",

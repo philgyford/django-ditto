@@ -1,6 +1,6 @@
 import datetime
-import pytz
 
+import pytz
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str

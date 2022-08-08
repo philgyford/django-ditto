@@ -39,9 +39,7 @@ class FetchPhotosCommand(FetchCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
-        parser.add_argument(
-            "--days", action="store", default=None, help=self.days_help
-        )
+        parser.add_argument("--days", action="store", default=None, help=self.days_help)
 
         parser.add_argument(
             "--start", action="store", default=None, help=self.start_help

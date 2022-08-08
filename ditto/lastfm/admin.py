@@ -19,8 +19,26 @@ class AccountAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("username", "realname", "api_key", "is_active",)}),
-        ("Data", {"fields": ("time_created", "time_modified",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "username",
+                    "realname",
+                    "api_key",
+                    "is_active",
+                )
+            },
+        ),
+        (
+            "Data",
+            {
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     readonly_fields = (
@@ -42,8 +60,26 @@ class ArtistAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("name", "slug", "original_slug", "mbid",)}),
-        ("Data", {"fields": ("time_created", "time_modified",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "original_slug",
+                    "mbid",
+                )
+            },
+        ),
+        (
+            "Data",
+            {
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     readonly_fields = (
@@ -67,8 +103,27 @@ class TrackAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("name", "slug", "original_slug", "artist", "mbid",)}),
-        ("Data", {"fields": ("time_created", "time_modified",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "original_slug",
+                    "artist",
+                    "mbid",
+                )
+            },
+        ),
+        (
+            "Data",
+            {
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     readonly_fields = (
@@ -92,8 +147,27 @@ class AlbumAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("name", "slug", "original_slug", "artist", "mbid",)}),
-        ("Data", {"fields": ("time_created", "time_modified",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "original_slug",
+                    "artist",
+                    "mbid",
+                )
+            },
+        ),
+        (
+            "Data",
+            {
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     readonly_fields = (
@@ -129,7 +203,17 @@ class ScrobbleAdmin(DittoItemModelAdmin):
                 )
             },
         ),
-        ("Data", {"fields": ("raw", "fetch_time", "time_created", "time_modified",)}),
+        (
+            "Data",
+            {
+                "fields": (
+                    "raw",
+                    "fetch_time",
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     raw_id_fields = (

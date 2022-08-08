@@ -1,29 +1,19 @@
 # coding: utf-8
 import datetime
 import json
-
 from unittest.mock import patch
-from freezegun import freeze_time
-import pytz
-from requests.exceptions import (
-    ConnectionError,
-    RequestException,
-    Timeout,
-    TooManyRedirects,
-)
-import responses
 
+import pytz
+import responses
 from django.test import TestCase
+from freezegun import freeze_time
+from requests.exceptions import (ConnectionError, RequestException, Timeout,
+                                 TooManyRedirects)
 
 from ditto.pinboard.factories import AccountFactory, BookmarkFactory
-from ditto.pinboard.fetch import (
-    BookmarksFetcher,
-    AllBookmarksFetcher,
-    DateBookmarksFetcher,
-    RecentBookmarksFetcher,
-    UrlBookmarksFetcher,
-    FetchError,
-)
+from ditto.pinboard.fetch import (AllBookmarksFetcher, BookmarksFetcher,
+                                  DateBookmarksFetcher, FetchError,
+                                  RecentBookmarksFetcher, UrlBookmarksFetcher)
 from ditto.pinboard.models import Account, Bookmark, BookmarkTag
 
 
@@ -424,8 +414,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
 
     @freeze_time("2015-07-01 12:00:00", tz_offset=-8)
     def test_no_update_bookmarks(self):
-        """Ensure that if no values have changed, we don't update a bookmark.
-        """
+        """Ensure that if no values have changed, we don't update a bookmark."""
         account = Account.objects.get(pk=1)
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 

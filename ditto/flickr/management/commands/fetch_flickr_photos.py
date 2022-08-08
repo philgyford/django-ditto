@@ -1,5 +1,5 @@
-from . import FetchPhotosCommand
 from ...fetch.multifetchers import RecentPhotosMultiAccountFetcher
+from . import FetchPhotosCommand
 
 
 class Command(FetchPhotosCommand):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name="is_private",
             field=models.BooleanField(
                 default=False,
-                help_text="If true, this item will not be shown on public-facing pages."
+                help_text="If true, this item will not be shown on public-facing pages.",
             ),
         ),
     ]

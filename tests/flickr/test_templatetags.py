@@ -1,16 +1,12 @@
 import datetime
-import pytz
 
+import pytz
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
+from ditto.flickr.factories import (AccountFactory, PhotoFactory,
+                                    PhotosetFactory, UserFactory)
 from ditto.flickr.templatetags import ditto_flickr
-from ditto.flickr.factories import (
-    AccountFactory,
-    PhotoFactory,
-    PhotosetFactory,
-    UserFactory,
-)
 
 
 class TemplatetagsRecentPhotosTestCase(TestCase):
@@ -124,8 +120,8 @@ class PhotoLicenseTestCase(TestCase):
             (
                 '<a href="https://creativecommons.org/licenses/by-nc-sa/2.0/" '
                 'title="More about permissions">Attribution-NonCommercial-ShareAlike '
-                'License</a>'
-            )
+                "License</a>"
+            ),
         )
 
     def test_license_99(self):

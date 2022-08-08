@@ -1,11 +1,10 @@
 import datetime
-import pytz
 
+import pytz
 from django import template
 
-from ..models import Tweet, User
 from ...core.utils import get_annual_item_counts
-
+from ..models import Tweet, User
 
 register = template.Library()
 

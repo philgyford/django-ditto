@@ -2,7 +2,6 @@ from django.http import Http404
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
-
 from taggit.models import Tag
 
 from ..core.views import PaginatedListView

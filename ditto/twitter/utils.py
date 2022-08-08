@@ -2,7 +2,6 @@
 import re
 
 from django.utils.html import urlize
-
 from ttp import ttp
 from twython import Twython
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="account", options={"ordering": ["user__screen_name"]},
+            name="account",
+            options={"ordering": ["user__screen_name"]},
         ),
         migrations.AlterField(
             model_name="account",

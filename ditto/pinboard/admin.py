@@ -1,9 +1,8 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, TextInput
-
-from taggit.managers import TaggableManager
 from taggit.forms import TagWidget
+from taggit.managers import TaggableManager
 
 from ..core.admin import DittoItemModelAdmin
 from .models import Account, Bookmark
@@ -19,7 +18,16 @@ class AccountAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("username", "url", "is_active",)}),
+        (
+            None,
+            {
+                "fields": (
+                    "username",
+                    "url",
+                    "is_active",
+                )
+            },
+        ),
         (
             "API",
             {
@@ -31,7 +39,15 @@ class AccountAdmin(admin.ModelAdmin):
                 ),
             },
         ),
-        ("Data", {"fields": ("time_created", "time_modified",)}),
+        (
+            "Data",
+            {
+                "fields": (
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
     readonly_fields = (
         "time_created",
@@ -70,8 +86,26 @@ class BookmarkAdmin(DittoItemModelAdmin):
                 )
             },
         ),
-        ("Options", {"fields": ("is_private", "to_read",)}),
-        ("Data", {"fields": ("raw", "fetch_time", "time_created", "time_modified",)}),
+        (
+            "Options",
+            {
+                "fields": (
+                    "is_private",
+                    "to_read",
+                )
+            },
+        ),
+        (
+            "Data",
+            {
+                "fields": (
+                    "raw",
+                    "fetch_time",
+                    "time_created",
+                    "time_modified",
+                )
+            },
+        ),
     )
 
     formfield_overrides = {

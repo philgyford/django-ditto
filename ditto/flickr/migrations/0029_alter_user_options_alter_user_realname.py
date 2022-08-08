@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flickr', '0028_alter_user_iconfarm'),
+        ("flickr", "0028_alter_user_iconfarm"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='user',
-            options={'ordering': ['realname', 'username']},
+            name="user",
+            options={"ordering": ["realname", "username"]},
         ),
         migrations.AlterField(
-            model_name='user',
-            name='realname',
+            model_name="user",
+            name="realname",
             field=models.CharField(blank=True, max_length=255),
         ),
     ]

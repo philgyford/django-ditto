@@ -1,13 +1,12 @@
 import calendar
 import datetime
-import pytz
 
+import pytz
 from django import template
 from django.conf import settings
 
-from ..models import Account, Album, Artist, Scrobble, Track
 from ...core.utils import get_annual_item_counts
-
+from ..models import Account, Album, Artist, Scrobble, Track
 
 register = template.Library()
 

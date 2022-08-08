@@ -1,28 +1,24 @@
 import datetime
 import json
 import os
-import pytz
 import tempfile
 from unittest.mock import call, patch
 
-from freezegun import freeze_time
+import pytz
 from django.test import override_settings
+from freezegun import freeze_time
 
-from .test_fetch import FlickrFetchTestCase
 from ditto.core.utils import datetime_now
 from ditto.core.utils.downloader import filedownloader
 from ditto.flickr.factories import AccountFactory, UserFactory
 from ditto.flickr.fetch import FetchError
-from ditto.flickr.fetch.fetchers import (
-    Fetcher,
-    PhotosFetcher,
-    PhotosetsFetcher,
-    RecentPhotosFetcher,
-    UserFetcher,
-    UserIdFetcher,
-)
-from ditto.flickr.fetch.savers import UserSaver, PhotoSaver, PhotosetSaver
+from ditto.flickr.fetch.fetchers import (Fetcher, PhotosetsFetcher,
+                                         PhotosFetcher, RecentPhotosFetcher,
+                                         UserFetcher, UserIdFetcher)
+from ditto.flickr.fetch.savers import PhotoSaver, PhotosetSaver, UserSaver
 from ditto.flickr.models import User
+
+from .test_fetch import FlickrFetchTestCase
 
 
 class FetcherTestCase(FlickrFetchTestCase):

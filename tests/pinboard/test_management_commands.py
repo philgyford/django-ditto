@@ -6,12 +6,8 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
-from ditto.pinboard.fetch import (
-    AllBookmarksFetcher,
-    DateBookmarksFetcher,
-    RecentBookmarksFetcher,
-    UrlBookmarksFetcher,
-)
+from ditto.pinboard.fetch import (AllBookmarksFetcher, DateBookmarksFetcher,
+                                  RecentBookmarksFetcher, UrlBookmarksFetcher)
 
 
 class FetchPinboardArgs(TestCase):

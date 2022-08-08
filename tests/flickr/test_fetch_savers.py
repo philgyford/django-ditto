@@ -1,25 +1,25 @@
 import datetime
 import json
-import pytz
 from decimal import Decimal
 from unittest.mock import patch
 
+import pytz
 from freezegun import freeze_time
-
 from taggit.models import Tag
 
-from .test_fetch import FlickrFetchTestCase
 from ditto.flickr.factories import PhotoFactory, UserFactory
 from ditto.flickr.fetch import FetchError
-from ditto.flickr.fetch.savers import UserSaver, PhotosetSaver, PhotoSaver
+from ditto.flickr.fetch.savers import PhotoSaver, PhotosetSaver, UserSaver
 from ditto.flickr.models import Photo, Photoset, TaggedPhoto, User
+
+from .test_fetch import FlickrFetchTestCase
 
 
 class UserSaverTestCase(FlickrFetchTestCase):
     """Test creating/updating Users from API data."""
 
     def make_user_object(self, user_data):
-        """"Creates/updates a User from API data, then fetches that User from
+        """ "Creates/updates a User from API data, then fetches that User from
         the DB and returns it.
         """
         fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -90,15 +90,14 @@ class UserSaverTestCase(FlickrFetchTestCase):
 
 class PhotoSaverTestCase(FlickrFetchTestCase):
     def make_photo_object(self, photo_data):
-        """"Creates/updates a Photo from API data, then fetches that Photo from
+        """ "Creates/updates a Photo from API data, then fetches that Photo from
         the DB and returns it.
         """
         PhotoSaver().save_photo(photo_data)
         return Photo.objects.get(flickr_id="26069027966")
 
     def make_photo_data(self):
-        """Makes the dict of data that photo_save() expects, based on API data.
-        """
+        """Makes the dict of data that photo_save() expects, based on API data."""
         return {
             "fetch_time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),
@@ -371,15 +370,14 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
 
 class PhotosetSaverTestCase(FlickrFetchTestCase):
     def make_photoset_object(self, photoset_data):
-        """"Creates/updates a Photo from API data, then fetches that Photo from
+        """ "Creates/updates a Photo from API data, then fetches that Photo from
         the DB and returns it.
         """
         PhotosetSaver().save_photoset(photoset_data)
         return Photoset.objects.get(flickr_id=72157665648859705)
 
     def make_photoset_data(self):
-        """Makes the dict of data that photo_save() expects, based on API data.
-        """
+        """Makes the dict of data that photo_save() expects, based on API data."""
         return {
             "fetch_time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),

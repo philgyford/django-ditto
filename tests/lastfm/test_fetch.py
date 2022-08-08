@@ -1,25 +1,18 @@
 import datetime
 import json
-import pytz
 from unittest.mock import call, patch
 
+import pytz
 import responses
 from django.test import TestCase
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
-from ditto.lastfm.factories import (
-    AccountFactory,
-    AlbumFactory,
-    ArtistFactory,
-    ScrobbleFactory,
-    TrackFactory,
-)
-from ditto.lastfm.fetch import (
-    FetchError,
-    ScrobblesFetcher,
-    ScrobblesMultiAccountFetcher,
-)
+from ditto.lastfm.factories import (AccountFactory, AlbumFactory,
+                                    ArtistFactory, ScrobbleFactory,
+                                    TrackFactory)
+from ditto.lastfm.fetch import (FetchError, ScrobblesFetcher,
+                                ScrobblesMultiAccountFetcher)
 from ditto.lastfm.models import Album, Artist, Scrobble, Track
 
 
@@ -372,9 +365,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         ]
         self.add_recent_tracks_response()
         self.fetcher.fetch()
-        slugify_name.assert_has_calls(
-            [call("Spotify Session"), call("Transformer")]
-        )
+        slugify_name.assert_has_calls([call("Spotify Session"), call("Transformer")])
 
     @responses.activate
     def test_creates_scrobbles(self):
@@ -471,9 +462,7 @@ class ScrobblesMultiAccountFetcherTestCase(TestCase):
     def test_uses_one_account(self):
         "If an account is supplied, only uses that."
         ScrobblesMultiAccountFetcher(username="thelma").fetch()
-        self.ScrobblesFetcher.assert_has_calls(
-            [call(self.account_2), call().fetch()]
-        )
+        self.ScrobblesFetcher.assert_has_calls([call(self.account_2), call().fetch()])
 
     def test_passes_kwargs_to_fetch(self):
         "Passes kwargs to the ScrobbleFetcher.fetch() method"

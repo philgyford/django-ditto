@@ -11,5 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="user", name="twitter_id_str",),
+        migrations.RemoveField(
+            model_name="user",
+            name="twitter_id_str",
+        ),
     ]

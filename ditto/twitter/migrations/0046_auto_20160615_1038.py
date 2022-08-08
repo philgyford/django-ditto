@@ -13,7 +13,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="media", old_name="original_image_file", new_name="image_file",
+            model_name="media",
+            old_name="original_image_file",
+            new_name="image_file",
         ),
         migrations.AlterField(
             model_name="media",

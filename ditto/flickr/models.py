@@ -6,17 +6,15 @@ try:
 except ImportError:
     # For Django 1.8
     from django.urls import reverse
-from django.templatetags.static import static
 
+from django.templatetags.static import static
 from imagekit.cachefiles import ImageCacheFile
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
-from . import app_settings
-from . import imagegenerators
-from . import managers
 from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from . import app_settings, imagegenerators, managers
 
 
 class Account(TimeStampedModelMixin, models.Model):

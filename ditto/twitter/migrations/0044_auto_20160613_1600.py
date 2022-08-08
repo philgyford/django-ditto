@@ -13,6 +13,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="tweet", name="text", field=models.TextField(),
+            model_name="tweet",
+            name="text",
+            field=models.TextField(),
         ),
     ]

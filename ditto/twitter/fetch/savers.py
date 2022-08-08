@@ -1,14 +1,14 @@
 import datetime
 import json
 import os
-import pytz
 
+import pytz
 from django.conf import settings
 from django.core.files import File
 
-from ..models import Media, Tweet, User
 from ...core.utils import truncate_string
 from ...core.utils.downloader import DownloadException, filedownloader
+from ..models import Media, Tweet, User
 
 # Classes that take JSON data from the Twitter API and create or update
 # objects.
@@ -311,7 +311,7 @@ class TweetSaver(SaveUtilsMixin, object):
 
         # titles can only be 255 characters
         title = truncate_string(
-            title, strip_html=True, chars=255, truncate=u"…", at_word_boundary=True
+            title, strip_html=True, chars=255, truncate="…", at_word_boundary=True
         )
 
         defaults = {
@@ -383,17 +383,13 @@ class TweetSaver(SaveUtilsMixin, object):
                 # tweet 2 will have 'quoted_status_id' but not 'quoted_status'.
                 # But the tweet does have quoted_status, we'll create/update
                 # the quoted User object, and quoted Tweet.
-                UserSaver().save_user(
-                    tweet["quoted_status"]["user"], fetch_time
-                )
+                UserSaver().save_user(tweet["quoted_status"]["user"], fetch_time)
                 self.save_tweet(tweet["quoted_status"], fetch_time)
 
         if "retweeted_status" in tweet:
             defaults["retweeted_status_id"] = tweet["retweeted_status"]["id"]
 
-            UserSaver().save_user(
-                tweet["retweeted_status"]["user"], fetch_time
-            )
+            UserSaver().save_user(tweet["retweeted_status"]["user"], fetch_time)
             self.save_tweet(tweet["retweeted_status"], fetch_time)
 
         tweet_obj, created = Tweet.objects.update_or_create(
