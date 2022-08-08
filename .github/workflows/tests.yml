@@ -56,17 +56,15 @@ jobs:
       - name: Install python packages
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade coveralls tox tox-gh-actions
+          python -m pip install --upgrade coverage[toml] tox tox-gh-actions
 
       - name: Test with Tox
         run: tox -v
         env:
           DJANGO: ${{ matrix.django-version }}
 
-      - name: Run coveralls
-        run: coveralls --service=github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
 
   # The flake8 test in tox.ini won't run with the test job so we need to add it here.
   lint:

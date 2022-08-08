@@ -73,7 +73,7 @@ tests_require = dev_require + [
     "factory-boy>=2.12.0,<4.0",
     "freezegun>=0.3.12,<2.0",
     "responses>=0.10.7,<1.0",
-    "coverage",
+    "coverage[toml]",
 ]
 
 setup(

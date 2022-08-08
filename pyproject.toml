@@ -1,0 +1,13 @@
+[tool.black]
+target-version = ["py310"]
+
+[tool.coverage.report]
+omit = ["*/migrations/*"]
+
+[tool.coverage.run]
+branch = true
+include = ["spectator/*"]
+omit = ["*/migrations/*.py"]
+
+[tool.isort]
+profile = "black"
