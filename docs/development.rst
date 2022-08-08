@@ -10,9 +10,17 @@ installed):
 .. code-block:: shell
 
     $ cd devproject
-    $ pipenv install
-    $ pipenv run ./manage.py migrate
-    $ pipenv run ./manage.py runserver
+    $ virtualenv --prompt ditto-devproject venv
+    $ source venv/bin/activate
+    (ditto-devproject)$ pyenv local 3.10.5
+    (ditto-devproject)$ python -m pip install -r requirements.txt
+
+Then run migrations and start the server:
+
+.. code-block:: shell
+
+    (ditto-devproject)$ ./manage.py migrate
+    (ditto-devproject)$ ./manage.py runserver
 
 *****
 Tests
@@ -35,7 +43,7 @@ Django 1.9:
 
 .. code-block:: shell
 
-    $ tox -e py35-django19
+    $ tox -e py310-django41
 
 To run a specific test, add its path after ``--``, eg:
 
