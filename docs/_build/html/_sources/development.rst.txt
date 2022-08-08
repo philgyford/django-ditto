@@ -37,6 +37,13 @@ read in `devproject/devproject/settings.py`. e.g.:
     DJANGO_SECRET_KEY="your-secret-key"
     DJANGO_LOG_LEVEL="INFO"
 
+pre-commit will run flake8, black, isort and prettier across all files on commit.
+I think you just need to do this first:
+
+.. code-block:: shell
+
+    $ pre-commit install
+
 
 *****
 Tests

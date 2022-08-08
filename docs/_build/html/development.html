@@ -122,6 +122,11 @@ read in <cite>devproject/devproject/settings.py</cite>. e.g.:</p>
 <span class="nv">DJANGO_LOG_LEVEL</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
 </pre></div>
 </div>
+<p>pre-commit will run flake8, black, isort and prettier across all files on commit.
+I think you just need to do this first:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pre-commit install
+</pre></div>
+</div>
 <section id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading"></a></h2>
 <p>Run tests with tox. Install it with:</p>
