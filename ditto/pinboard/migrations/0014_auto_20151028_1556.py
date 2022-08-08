@@ -20,7 +20,10 @@ class Migration(migrations.Migration):
             name="is_private",
             field=models.BooleanField(
                 default=False,
-                help_text="If true, this item will not be shown on public-facing pages.",
+                help_text=(
+                    "If true, this item will not be "
+                    "shown on public-facing pages."
+                ),
             ),
         ),
     ]
