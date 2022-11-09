@@ -139,6 +139,10 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        if "update_fields" in kwargs:
+            # Needed to ensure summary and post_year are also saved
+            kwargs["update_fields"].add("summary")
+            kwargs["update_fields"].add("post_year")
         self.summary = self._make_summary()
         if self.post_time:
             self.post_year = self.post_time.year
