@@ -6,8 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Remove black version requirements
+- None
+
+
+## [2.3.0] - 2022-11-28
+
+### Added
+
 - Add migration for `pinboard.BookmarkTag.slug` that addes `allow_unicode=True`. (It's the default in django-taggit and suddenly it's generating a new migration.)
+
+### Changed
+
+- Remove black version requirements
 
 
 ## [2.2.0] - 2022-08-08
