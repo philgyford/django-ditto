@@ -59,7 +59,7 @@ jobs:
           python -m pip install --upgrade coverage[toml] tox tox-gh-actions
 
       - name: Test with Tox
-        run: tox -v
+        run: tox --verbose --parallel auto
         env:
           DJANGO: ${{ matrix.django-version }}
 
