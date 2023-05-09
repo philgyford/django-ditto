@@ -18,7 +18,16 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        django-version: ["3.2", "4.1", "4.2", "main"]
+        exclude:
+          # Django 4.0+ aren't compatible with python 3.6 and 3.7:
+          - python-version: "3.7"
+            django-version: "4.1"
+          - python-version: "3.7"
+            django-version: "4.2"
+          - python-version: "3.7"
+            django-version: "main"
 
     steps:
       - name: Git clone
@@ -39,17 +48,17 @@ jobs:
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key:
-            ${{ matrix.python-version }}-v1-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+            ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
           restore-keys: |
-            ${{ matrix.python-version }}-v1-
+            ${{ matrix.python-version }}-v2-
 
-      - name: Install python dependencies
+      - name: Install python packages
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade coverage[toml] tox tox-gh-actions
 
-      - name: Test with tox
-        run: tox
+      - name: Test with Tox
+        run: tox --verbose --parallel auto
         env:
           DJANGO: ${{ matrix.django-version }}
 
@@ -62,7 +71,6 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
         toxenv:
           - flake8
@@ -86,9 +94,9 @@ jobs:
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key:
-            ${{ matrix.python-version }}-v1-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+            ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
           restore-keys: |
-            ${{ matrix.python-version }}-v1-
+            ${{ matrix.python-version }}-v2-
 
       - name: Install dependencies
         run: |
