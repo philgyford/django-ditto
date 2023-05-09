@@ -147,4 +147,4 @@ class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
         """Show all the public Bookmarks associated with this account."""
         return Bookmark.public_objects.filter(
             account=self.object, tags__slug__in=[self.kwargs["tag_slug"]]
-        )
+        ).prefetch_related("account")
