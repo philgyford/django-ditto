@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- None
+### Added
+- Added support for Django 4.2. (Nothing changed, but added to tests.)
+
+### Removed
+- Dropped support for Django 4.0. (Nothing changed, but removed from tests.)
 
 
 ## [2.3.0] - 2022-11-28

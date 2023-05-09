@@ -10,7 +10,7 @@ Django Ditto
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
-A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6 to 3.11, and Django 3.2, 4.0 or 4.1.
+A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6 to 3.11, and Django 3.2, 4.1, or 4.2.
 
 [Read the documentation.](http://django-ditto.readthedocs.io/en/latest/)
 
@@ -20,7 +20,9 @@ Install using [pip](https://pip.pypa.io/en/stable/):
 
     $ pip install django-ditto
 
-NOTE: It will install [Pillow](http://pillow.readthedocs.io/en/latest/), among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
+NOTE 1: It will install [Pillow](http://pillow.readthedocs.io/en/latest/), among other things, which has prerequisites of its own, such as libjpeg and zlib. Sorry.
+
+NOTE 2: As of 2023 I'm unsure how well the Twitter integration still works given the state of its API etc.
 
 Currently, Ditto can copy these things from these services:
 
