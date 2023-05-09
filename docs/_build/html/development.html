@@ -137,13 +137,13 @@ I think you just need to do this first:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox
 </pre></div>
 </div>
-<p>To run tests in only one environment, specify it. In this case, Python 3.5 and
-Django 1.9:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py310-django41
+<p>To run tests in only one environment, specify it. In this case, Python 3.11 and
+Django 4.2:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py311-django42
 </pre></div>
 </div>
 <p>To run a specific test, add its path after <code class="docutils literal notranslate"><span class="pre">--</span></code>, eg:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py35-django19 -- tests.flickr.test_views.HomeViewTests.test_home_templates
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py311-django42 -- tests.flickr.test_views.HomeViewTests.test_home_templates
 </pre></div>
 </div>
 <p>Running the tests in all environments will generate coverage output. There will
