@@ -4,17 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
 
-### Added
-- Added support for Django 4.2. (Nothing changed, but added to tests.)
+- None
+
+
+## [3.0.0] - 2023-05-09
 
 ### Removed
 - Dropped support for Python 3.7 and 3.8. (A bit eager but hopefully it's not a problem.)
 - Dropped support for Django 4.0. (Nothing changed, but removed from tests.)
 
+### Added
+- Added support for Django 4.2. (Nothing changed, but added to tests.)
+
 ### Changed
 - No longer requires pytz as a dependency.
+- Update dependencies including allowing for django-taggit 4.0
 
 
 ## [2.3.0] - 2022-11-28
