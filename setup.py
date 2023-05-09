@@ -69,8 +69,8 @@ if sys.argv[-1] == "testpublish":
     sys.exit()
 
 dev_require = [
-    "django-debug-toolbar>=2.0,<4.0",
-    "flake8>=3.8,<5.0",
+    "django-debug-toolbar>=2.0,<5.0",
+    "flake8>=4.0,<7.0",
     "black",
     "python-dotenv",
 ]
@@ -89,7 +89,7 @@ setup(
     install_requires=[
         "django-imagekit>=4.0,<4.2",
         "django-sortedm2m>=3.0.0,<3.2",
-        "django-taggit>=3.0.0,<4.0",
+        "django-taggit>=3.0.0,<5.0",
         "flickrapi>=2.4,<2.5",
         "pillow>=8.0.0,<10.0",
         "twitter-text-python>=1.1.1,<1.2",
