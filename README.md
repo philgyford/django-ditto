@@ -10,7 +10,7 @@ Django Ditto
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
-A collection of Django apps for copying things from third-party sites and services. Requires Python 3.6 to 3.11, and Django 3.2, 4.1, or 4.2.
+A collection of Django apps for copying things from third-party sites and services. Requires Python 3.9 to 3.11, and Django 3.2, 4.1, or 4.2.
 
 [Read the documentation.](http://django-ditto.readthedocs.io/en/latest/)
 
