@@ -108,7 +108,7 @@ jobs:
           python -m pip install --upgrade tox tox-gh-actions
 
       - name: Run ${{ matrix.toxenv }}
-        run: python -m tox -v -e ${{ matrix.toxenv }}
+        run: python -m tox -e ${{ matrix.toxenv }}
 
   slack:
     # https://github.com/8398a7/action-slack/issues/72#issuecomment-649910353
