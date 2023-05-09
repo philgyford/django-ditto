@@ -16,43 +16,40 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-        django-version: ["3.2", "4.1", "4.2", "main"]
-        exclude:
-          # Django 4.0+ aren't compatible with python 3.6 and 3.7:
-          - python-version: "3.7"
-            django-version: "4.1"
-          - python-version: "3.7"
-            django-version: "4.2"
-          - python-version: "3.7"
-            django-version: "main"
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Pip cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key:
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-v1-${{ hashFiles('tox.ini', 'setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-v1-
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
 
-      - name: Install python packages
+      - name: Pip cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key:
+            ${{ matrix.python-version }}-v1-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+          restore-keys: |
+            ${{ matrix.python-version }}-v1-
+
+      - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade coverage[toml] tox tox-gh-actions
 
-      - name: Test with Tox
-        run: tox --verbose --parallel auto
+      - name: Test with tox
+        run: tox
         env:
           DJANGO: ${{ matrix.django-version }}
 
@@ -65,27 +62,33 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         toxenv:
           - flake8
 
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python ${{ env.default_python }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ env.default_python }}
 
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+
       - name: Pip cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
+          path: ${{ steps.pip-cache.outputs.dir }}
           key:
-            ${{ runner.os }}-pip-${{ matrix.toxenv }}-v1-${{ hashFiles('tox.ini', 'setup.py') }}
+            ${{ matrix.python-version }}-v1-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.toxenv }}-v1-
+            ${{ matrix.python-version }}-v1-
 
       - name: Install dependencies
         run: |
