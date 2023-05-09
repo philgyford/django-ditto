@@ -1,8 +1,7 @@
-import datetime
 import json
 import os
+from datetime import datetime, timezone
 
-import pytz
 from django.conf import settings
 from django.core.files import File
 
@@ -30,9 +29,7 @@ class SaveUtilsMixin(object):
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like 'Wed Nov 15 16:55:59 +0000 2006'.
         """
-        return datetime.datetime.strptime(api_time, time_format).replace(
-            tzinfo=pytz.utc
-        )
+        return datetime.strptime(api_time, time_format).replace(tzinfo=timezone.utc)
 
 
 class UserSaver(SaveUtilsMixin, object):

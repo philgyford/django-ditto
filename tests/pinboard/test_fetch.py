@@ -1,9 +1,8 @@
 # coding: utf-8
-import datetime
 import json
+from datetime import datetime, timezone
 from unittest.mock import patch
 
-import pytz
 import responses
 from django.test import TestCase
 from freezegun import freeze_time
@@ -282,9 +281,9 @@ class FetchTypesSaveTestCase(FetchTestCase):
         # Check time has been turned into an object.
         self.assertEqual(
             bookmarks_data[0]["time"],
-            datetime.datetime.strptime(
-                "2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc
+            ),
         )
 
         # Check 'yes'/'no' have been turned into booleans:
@@ -311,7 +310,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         Bookmark objects.
         """
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
 
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json["bookmarks"]
@@ -332,9 +331,9 @@ class FetchTypesSaveTestCase(FetchTestCase):
 
         self.assertEqual(
             bookmarks[1].fetch_time,
-            datetime.datetime.strptime(
-                "2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             bookmarks[1].summary,
@@ -348,9 +347,9 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(bookmarks[1].url, "http://fontello.com/")
         self.assertEqual(
             bookmarks[1].post_time,
-            datetime.datetime.strptime(
-                "2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             bookmarks[1].description,
@@ -375,7 +374,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         """Ensure that when saving a Bookmark that already exists, we update
         it."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
         bookmark = BookmarkFactory(
@@ -412,9 +411,9 @@ class FetchTypesSaveTestCase(FetchTestCase):
         # This should be updated to now, as we've changed things:
         self.assertEqual(
             bookmarks[1].fetch_time,
-            datetime.datetime.strptime(
-                "2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
 
         self.assertEqual(len(bookmarks[1].tags.all()), 4)
@@ -425,7 +424,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
     def test_no_update_bookmarks(self):
         """Ensure that if no values have changed, we don't update a bookmark."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
         BookmarkFactory(

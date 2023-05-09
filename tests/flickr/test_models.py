@@ -1,8 +1,7 @@
-import datetime
 import os
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
-import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -135,15 +134,15 @@ class PhotosetTestCase(TestCase):
         "Latest photoset should come first by default."
         PhotosetFactory(
             title="Earliest",
-            flickr_created_time=datetime.datetime.strptime(
+            flickr_created_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         PhotosetFactory(
             title="Latest",
-            flickr_created_time=datetime.datetime.strptime(
+            flickr_created_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         photosets = Photoset.objects.all()
         self.assertEqual(photosets[0].title, "Latest")
@@ -213,15 +212,15 @@ class PhotoTestCase(TestCase):
         "Latest photo (uploaded) should come first by default."
         PhotoFactory(
             title="Earliest",
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         PhotoFactory(
             title="Latest",
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         photos = Photo.objects.all()
         self.assertEqual(photos[0].title, "Latest")
@@ -477,9 +476,9 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
 
         self.photo = PhotoFactory(
             user=UserFactory(nsid="123456@N01"),
-            taken_time=datetime.datetime.strptime(
+            taken_time=datetime.strptime(
                 "2015-08-14 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
 
     def tearDown(self):
@@ -566,31 +565,31 @@ class PhotoNextPrevTestCase(TestCase):
         AccountFactory(user=user)
         self.photo_1 = PhotoFactory(
             user=user,
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         self.private_photo = PhotoFactory(
             user=user,
             is_private=True,
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-09 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         # Photo by a different user:
         user_2 = UserFactory()
         AccountFactory(user=user_2)
         self.other_photo = PhotoFactory(
             user=user_2,
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-10 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
         self.photo_2 = PhotoFactory(
             user=user,
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2016-04-11 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            ).replace(tzinfo=timezone.utc),
         )
 
     def test_next_public_by_post_time(self):

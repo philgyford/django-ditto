@@ -1,11 +1,10 @@
-import datetime
 import json
 import os
 import tempfile
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import patch
 
-import pytz
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -69,9 +68,9 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(tweet.twitter_id, 300)
         self.assertEqual(
             tweet.post_time,
-            datetime.datetime.strptime(
-                "2015-08-06 19:42:59", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2015-08-06 19:42:59", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(tweet.favorite_count, 2)
         self.assertEqual(tweet.retweet_count, 1)
@@ -421,9 +420,9 @@ class UserSaverTestCase(FetchTwitterTestCase):
         self.assertFalse(user.is_verified)
         self.assertEqual(
             user.created_at,
-            datetime.datetime.strptime(
-                "2006-11-15 16:55:59", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2006-11-15 16:55:59", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(user.description, "Good. Good to Firm in places.")
         self.assertEqual(user.location, "London, UK")

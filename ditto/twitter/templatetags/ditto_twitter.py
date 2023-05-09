@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime, time, timezone
 
-import pytz
 from django import template
 
 from ...core.utils import get_annual_item_counts
@@ -58,8 +57,8 @@ def day_tweets(date, screen_name=None):
     screen_name -- A Twitter user's screen_name. If not supplied, we fetch
                     all public Tweets.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
-    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
+    start = datetime.combine(date, time.min).replace(tzinfo=timezone.utc)
+    end = datetime.combine(date, time.max).replace(tzinfo=timezone.utc)
     tweets = Tweet.public_tweet_objects.filter(post_time__range=[start, end])
     if screen_name is not None:
         tweets = tweets.filter(user__screen_name=screen_name)
@@ -82,8 +81,8 @@ def day_favorites(date, screen_name=None):
     screen_name -- A Twitter user's screen_name. If not supplied, we fetch
                     all public Tweets.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
-    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
+    start = datetime.combine(date, time.min).replace(tzinfo=timezone.utc)
+    end = datetime.combine(date, time.max).replace(tzinfo=timezone.utc)
     if screen_name is None:
         tweets = Tweet.public_favorite_objects.filter(post_time__range=[start, end])
     else:

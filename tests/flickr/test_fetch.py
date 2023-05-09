@@ -1,8 +1,8 @@
-import datetime
 import json
+from datetime import datetime, timezone
 from urllib.parse import quote_plus
+from zoneinfo import ZoneInfo
 
-import pytz
 import responses
 import six
 from django.test import TestCase
@@ -17,8 +17,8 @@ class SaveUtilsMixinTestCase(TestCase):
     def test_api_datetime_to_datetime_default_tz(self):
         api_time = "1998-07-22 13:15:23"
         time1 = SaveUtilsMixin()._api_datetime_to_datetime(api_time)
-        time2 = datetime.datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=pytz.timezone("Etc/UTC")
+        time2 = datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=ZoneInfo("Etc/UTC")
         )
         self.assertEqual(time1, time2)
 
@@ -27,17 +27,15 @@ class SaveUtilsMixinTestCase(TestCase):
         time1 = SaveUtilsMixin()._api_datetime_to_datetime(
             api_time, "America/Los_Angeles"
         )
-        time2 = datetime.datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=pytz.timezone("America/Los_Angeles")
+        time2 = datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=ZoneInfo("America/Los_Angeles")
         )
         self.assertEqual(time1, time2)
 
     def test_unixtime_to_datetime(self):
         api_time = "1093459273"
         time1 = SaveUtilsMixin()._unixtime_to_datetime(api_time)
-        time2 = datetime.datetime.utcfromtimestamp(int(api_time)).replace(
-            tzinfo=pytz.utc
-        )
+        time2 = datetime.utcfromtimestamp(int(api_time)).replace(tzinfo=timezone.utc)
         self.assertEqual(time1, time2)
 
 

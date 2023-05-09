@@ -1,7 +1,6 @@
 import calendar
 import datetime
 
-import pytz
 from django import template
 from django.conf import settings
 
@@ -61,10 +60,10 @@ def get_period_times(date, period):
         # `date` is a datetime.date
         min_time = datetime.datetime.combine(
             date, datetime.datetime.min.time()
-        ).replace(tzinfo=pytz.utc)
+        ).replace(tzinfo=datetime.timezone.utc)
         max_time = datetime.datetime.combine(
             date, datetime.datetime.max.time()
-        ).replace(tzinfo=pytz.utc)
+        ).replace(tzinfo=datetime.timezone.utc)
 
     if period == "week":
         # Default is Sunday (0):

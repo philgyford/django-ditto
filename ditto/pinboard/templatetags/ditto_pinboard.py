@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime, time, timezone
 
-import pytz
 from django import template
 
 from ...core.utils import get_annual_item_counts
@@ -35,8 +34,8 @@ def day_bookmarks(date, account=None):
     Keyword arguments:
     account -- An account username, 'philgyford', or None to fetch for all.
     """
-    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
-    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
+    start = datetime.combine(date, time.min).replace(tzinfo=timezone.utc)
+    end = datetime.combine(date, time.max).replace(tzinfo=timezone.utc)
     bookmarks = Bookmark.public_objects.filter(post_time__range=[start, end])
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)

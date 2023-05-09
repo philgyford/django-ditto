@@ -1,9 +1,8 @@
 # coding: utf-8
-import datetime
 import os
+from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 
-import pytz
 import responses
 from django.db import IntegrityError
 from django.test import TestCase
@@ -196,8 +195,8 @@ class PhotoTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple accounts are sorted by time_created ascending"""
-        time_now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        photo_1 = PhotoFactory(time_created=time_now - datetime.timedelta(minutes=1))
+        time_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        photo_1 = PhotoFactory(time_created=time_now - timedelta(minutes=1))
         PhotoFactory(time_created=time_now)
         photos = Media.objects.all()
         self.assertEqual(photos[0].pk, photo_1.pk)
@@ -415,8 +414,8 @@ class TweetTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple tweets are sorted by post_time descending"""
-        time_now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        TweetFactory(post_time=time_now - datetime.timedelta(minutes=1))
+        time_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        TweetFactory(post_time=time_now - timedelta(minutes=1))
         tweet_2 = TweetFactory(post_time=time_now)
         tweets = Tweet.objects.all()
         self.assertEqual(tweets[0].pk, tweet_2.pk)
@@ -629,9 +628,9 @@ class TweetTestCase(TestCase):
 
 class TweetNextPrevTestCase(TestCase):
     def setUp(self):
-        dt = datetime.datetime.strptime(
-            "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=pytz.utc)
+        dt = datetime.strptime("2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone.utc
+        )
 
         user = UserFactory()
         AccountFactory(user=user)
@@ -640,19 +639,15 @@ class TweetNextPrevTestCase(TestCase):
         private_user = UserFactory(is_private=True)
         AccountFactory(user=private_user)
         self.private_tweeet = TweetFactory(
-            user=private_user, post_time=dt + datetime.timedelta(days=1)
+            user=private_user, post_time=dt + timedelta(days=1)
         )
 
         # Tweet by a different user:
         user_2 = UserFactory()
         AccountFactory(user=user_2)
-        self.other_tweet = TweetFactory(
-            user=user_2, post_time=dt + datetime.timedelta(days=2)
-        )
+        self.other_tweet = TweetFactory(user=user_2, post_time=dt + timedelta(days=2))
 
-        self.tweet_2 = TweetFactory(
-            user=user, post_time=dt + datetime.timedelta(days=3)
-        )
+        self.tweet_2 = TweetFactory(user=user, post_time=dt + timedelta(days=3))
 
     def test_next_public_by_post_time(self):
         self.assertEqual(self.tweet_1.get_next_public_by_post_time(), self.tweet_2)

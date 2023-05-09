@@ -1,9 +1,8 @@
-import datetime
 import os
 import tempfile
+from datetime import datetime, timezone
 from unittest.mock import call, patch
 
-import pytz
 from django.test import TestCase, override_settings
 
 from ditto.core.utils.downloader import DownloadException, filedownloader
@@ -20,8 +19,8 @@ class FilesFetcherTestCase(TestCase):
 
         self.photo_1 = PhotoFactory(title="p1", original_file="p1.jpg", user=user)
 
-        the_time = datetime.datetime.strptime("2015-08-14", "%Y-%m-%d").replace(
-            tzinfo=pytz.utc
+        the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(
+            tzinfo=timezone.utc
         )
 
         # Needs a taken_time for testing file save path:

@@ -1,9 +1,9 @@
-import datetime
 import json
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
-import pytz
 from freezegun import freeze_time
 from taggit.models import Tag
 
@@ -22,7 +22,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         """ "Creates/updates a User from API data, then fetches that User from
         the DB and returns it.
         """
-        fetch_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
         UserSaver().save_user(user_data, fetch_time)
         return User.objects.get(nsid="35034346050@N01")
 
@@ -34,7 +34,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         user = self.make_user_object(user_data["person"])
 
         self.assertEqual(
-            user.fetch_time, datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+            user.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
         )
         self.assertEqual(user.raw, json.dumps(user_data["person"]))
         self.assertEqual(user.nsid, "35034346050@N01")
@@ -50,13 +50,13 @@ class UserSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(user.photos_count, 2876)
         self.assertEqual(
             user.photos_first_date,
-            datetime.datetime.utcfromtimestamp(1093459273).replace(tzinfo=pytz.utc),
+            datetime.utcfromtimestamp(1093459273).replace(tzinfo=timezone.utc),
         )
         self.assertEqual(
             user.photos_first_date_taken,
-            datetime.datetime.strptime(
-                "1956-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("1956-01-01 00:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(user.photos_views, 227227)
         self.assertEqual(user.timezone_id, "Europe/London")
@@ -99,7 +99,7 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
     def make_photo_data(self):
         """Makes the dict of data that photo_save() expects, based on API data."""
         return {
-            "fetch_time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+            "fetch_time": datetime.utcnow().replace(tzinfo=timezone.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),
             "info": self.load_fixture("photos.getInfo")["photo"],
             "exif": self.load_fixture("photos.getExif")["photo"],
@@ -122,13 +122,13 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertFalse(photo.is_private)
         self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
         self.assertEqual(
-            photo.fetch_time, datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+            photo.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
         )
         self.assertEqual(
             photo.post_time,
-            datetime.datetime.strptime(
-                "2016-03-28 16:05:05", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2016-03-28 16:05:05", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(photo.latitude, Decimal("51.967930000"))
         self.assertEqual(photo.longitude, Decimal("-2.894419000"))
@@ -151,15 +151,15 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         self.assertFalse(photo.has_people)
         self.assertEqual(
             photo.last_update_time,
-            datetime.datetime.strptime(
-                "2016-04-04 13:21:11", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2016-04-04 13:21:11", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             photo.taken_time,
-            datetime.datetime.strptime(
-                "2016-03-17 16:25:15", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.timezone("America/Los_Angeles")),
+            datetime.strptime("2016-03-17 16:25:15", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=ZoneInfo("America/Los_Angeles")
+            ),
         )
         self.assertEqual(photo.taken_granularity, 0)
         self.assertFalse(photo.taken_unknown)
@@ -379,7 +379,7 @@ class PhotosetSaverTestCase(FlickrFetchTestCase):
     def make_photoset_data(self):
         """Makes the dict of data that photo_save() expects, based on API data."""
         return {
-            "fetch_time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+            "fetch_time": datetime.utcnow().replace(tzinfo=timezone.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),
             "photoset": self.load_fixture("photosets.getList")["photosets"]["photoset"][
                 0
@@ -389,12 +389,11 @@ class PhotosetSaverTestCase(FlickrFetchTestCase):
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_saves_correct_photoset_data(self):
-
         photoset_data = self.make_photoset_data()
         photoset = self.make_photoset_object(photoset_data)
 
         self.assertEqual(
-            photoset.fetch_time, datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+            photoset.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
         )
         self.assertEqual(photoset.user, photoset_data["user_obj"])
 
@@ -409,15 +408,15 @@ class PhotosetSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(photoset.comment_count, 3)
         self.assertEqual(
             photoset.last_update_time,
-            datetime.datetime.strptime(
-                "2016-03-28 16:02:03", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2016-03-28 16:02:03", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             photoset.flickr_created_time,
-            datetime.datetime.strptime(
-                "2016-03-08 19:37:04", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2016-03-08 19:37:04", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(photoset.raw, json.dumps(photoset_data["photoset"]))
         self.assertEqual(photoset.photos_raw, json.dumps(photoset_data["photos"]))

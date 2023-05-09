@@ -1,10 +1,9 @@
-import datetime
 import json
 import os
 import tempfile
+from datetime import datetime, timezone
 from unittest.mock import call, patch
 
-import pytz
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -214,9 +213,9 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(user.username, "deleted_user_35034346050@N01")
         self.assertEqual(user.photos_count, 0)
 
-        dt = datetime.datetime.strptime(
-            "1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=pytz.utc)
+        dt = datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone.utc
+        )
         self.assertEqual(user.photos_first_date, dt)
         self.assertEqual(user.photos_first_date_taken, dt)
 

@@ -1,7 +1,7 @@
-import datetime
 import json
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
-import pytz
 from django.db.utils import IntegrityError
 from taggit.models import Tag
 
@@ -35,18 +35,14 @@ class SaveUtilsMixin(object):
         """
         if timezone_id is None or timezone_id == "":
             timezone_id = "Etc/UTC"
-        tz = pytz.timezone(timezone_id)
-        return datetime.datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=tz
-        )
+        tz = ZoneInfo(timezone_id)
+        return datetime.strptime(api_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=tz)
 
     def _unixtime_to_datetime(self, api_time):
         """Change a text unixtime from the API to a datetime with timezone.
         api_time is a string or int like "1093459273".
         """
-        return datetime.datetime.utcfromtimestamp(int(api_time)).replace(
-            tzinfo=pytz.utc
-        )
+        return datetime.utcfromtimestamp(int(api_time)).replace(tzinfo=timezone.utc)
 
 
 class UserSaver(SaveUtilsMixin, object):

@@ -2,9 +2,8 @@ import calendar
 import json
 import time
 import urllib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-import pytz
 import requests
 
 from ditto import TITLE, VERSION
@@ -259,7 +258,7 @@ class ScrobblesFetcher(object):
 
         # Unixtime to datetime object:
         scrobble_time = datetime.utcfromtimestamp(int(scrobble["date"]["uts"])).replace(
-            tzinfo=pytz.utc
+            tzinfo=timezone.utc
         )
 
         scrobble_obj, created = Scrobble.objects.update_or_create(

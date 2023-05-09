@@ -1,7 +1,6 @@
 # coding: utf-8
-import datetime
+from datetime import datetime, timedelta, timezone
 
-import pytz
 from django.db import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -107,12 +106,12 @@ class BookmarkTestCase(TestCase):
     def test_ordering(self):
         "Bookmarks are ordered correctly, most-recently-posted first"
         account = AccountFactory(username="billy")
-        post_time = datetime.datetime.strptime(
+        post_time = datetime.strptime(
             "2015-01-01 12:00:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=pytz.utc)
+        ).replace(tzinfo=timezone.utc)
         bookmark_1 = BookmarkFactory(account=account, post_time=post_time)
         bookmark_2 = BookmarkFactory(
-            account=account, post_time=(post_time + datetime.timedelta(days=1))
+            account=account, post_time=(post_time + timedelta(days=1))
         )
         bookmarks = Bookmark.objects.all()
         # Should be most recent first:
@@ -196,25 +195,25 @@ class BookmarkTestCase(TestCase):
 
 class BookmarkNextPrevTestCase(TestCase):
     def setUp(self):
-        dt = datetime.datetime.strptime(
-            "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=pytz.utc)
+        dt = datetime.strptime("2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone.utc
+        )
 
         account = AccountFactory()
         self.bookmark_1 = BookmarkFactory(account=account, post_time=dt)
 
         self.private_bookmark = BookmarkFactory(
-            account=account, is_private=True, post_time=dt + datetime.timedelta(days=1)
+            account=account, is_private=True, post_time=dt + timedelta(days=1)
         )
 
         # Bookmark by a different user:
         account_2 = AccountFactory()
         self.other_bookmark = BookmarkFactory(
-            account=account_2, post_time=dt + datetime.timedelta(days=2)
+            account=account_2, post_time=dt + timedelta(days=2)
         )
 
         self.bookmark_2 = BookmarkFactory(
-            account=account, post_time=dt + datetime.timedelta(days=3)
+            account=account, post_time=dt + timedelta(days=3)
         )
 
     def test_next_public_by_post_time(self):

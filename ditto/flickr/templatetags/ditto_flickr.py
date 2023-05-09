@@ -1,6 +1,7 @@
-import datetime
+from datetime import datetime
+from datetime import time as datetime_time
+from datetime import timezone
 
-import pytz
 from django import template
 from django.utils.html import format_html
 
@@ -44,8 +45,8 @@ def day_photos(date, nsid=None, time="post_time"):
             "`time` must be either 'post_time' or " "'taken_time', not '%s'." % time
         )
 
-    start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=pytz.utc)
-    end = datetime.datetime.combine(date, datetime.time.max).replace(tzinfo=pytz.utc)
+    start = datetime.combine(date, datetime_time.min).replace(tzinfo=timezone.utc)
+    end = datetime.combine(date, datetime_time.max).replace(tzinfo=timezone.utc)
     photos = Photo.public_photo_objects
 
     if time == "taken_time":

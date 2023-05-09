@@ -1,8 +1,7 @@
-import datetime
 import json
+from datetime import datetime, timezone
 from unittest.mock import call, patch
 
-import pytz
 import responses
 from django.test import TestCase
 from freezegun import freeze_time
@@ -214,9 +213,9 @@ class ScrobblesFetcherSendTestCase(TestCase):
         "Sends the correct min time to API if we only want recent results."
         # We should fetch results from this scrobble's post_time onwards:
         ScrobbleFactory(
-            post_time=datetime.datetime.strptime(
+            post_time=datetime.strptime(
                 "2015-08-11 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc)
+            ).replace(tzinfo=timezone.utc)
         )
         # Timestamp for 2015-08-11 12:00:00 UTC:
         self.add_recent_tracks_response(from_time=1439294400)
@@ -389,9 +388,9 @@ class ScrobblesFetcherSendTestCase(TestCase):
         # Make our existing scrobble:
         artist = ArtistFactory(slug="lou+reed")
         track = TrackFactory(artist=artist, slug="make+up")
-        post_time = datetime.datetime.strptime(
+        post_time = datetime.strptime(
             "2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=pytz.utc)
+        ).replace(tzinfo=timezone.utc)
         scrobble = ScrobbleFactory(
             account=self.account, track=track, post_time=post_time
         )
@@ -418,9 +417,9 @@ class ScrobblesFetcherSendTestCase(TestCase):
         self.assertEqual(scrobble.album.slug, "transformer")
         self.assertEqual(
             scrobble.post_time,
-            datetime.datetime.strptime(
-                "2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=pytz.utc),
+            datetime.strptime("2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         json_data = self.load_fixture("user_getrecenttracks")
         scrobble_json = json_data["recenttracks"]["track"][2]

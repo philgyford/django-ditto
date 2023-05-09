@@ -1,6 +1,5 @@
-import datetime
+from datetime import date, datetime, timedelta, timezone
 
-import pytz
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
@@ -97,34 +96,30 @@ class TemplatetagsDayTweetsTestCase(TestCase):
         self.tweets_2 = TweetFactory.create_batch(2, user=user_2)
         self.tweets_3 = TweetFactory.create_batch(2, user=user_3)
 
-        post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=pytz.utc)
+        post_time = datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=timezone.utc)
         self.tweets_1[0].post_time = post_time
         self.tweets_1[0].save()
-        self.tweets_2[1].post_time = post_time + datetime.timedelta(hours=1)
+        self.tweets_2[1].post_time = post_time + timedelta(hours=1)
         self.tweets_2[1].save()
-        self.tweets_3[0].post_time = post_time + datetime.timedelta(hours=2)
+        self.tweets_3[0].post_time = post_time + timedelta(hours=2)
         self.tweets_3[0].save()
 
     def test_day_tweets(self):
         "Returns only public Tweets from the date"
-        tweets = ditto_twitter.day_tweets(datetime.date(2015, 3, 18))
+        tweets = ditto_twitter.day_tweets(date(2015, 3, 18))
         self.assertEqual(2, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets_2[1].pk)
         self.assertEqual(tweets[1].pk, self.tweets_1[0].pk)
 
     def test_day_tweets_public_account(self):
         "Returns only Tweets from the day if it's a public account"
-        tweets = ditto_twitter.day_tweets(
-            datetime.date(2015, 3, 18), screen_name="terry"
-        )
+        tweets = ditto_twitter.day_tweets(date(2015, 3, 18), screen_name="terry")
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets_1[0].pk)
 
     def test_day_tweets_private_account(self):
         "Doesn't return Tweets from the day if it's a private account"
-        tweets = ditto_twitter.day_tweets(
-            datetime.date(2015, 3, 18), screen_name="thelma"
-        )
+        tweets = ditto_twitter.day_tweets(date(2015, 3, 18), screen_name="thelma")
         self.assertEqual(0, len(tweets))
 
 
@@ -142,12 +137,12 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
         self.tweets[0].user.is_private = True
         self.tweets[0].user.save()
 
-        post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=pytz.utc)
+        post_time = datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=timezone.utc)
         self.tweets[0].post_time = post_time
         self.tweets[0].save()
-        self.tweets[1].post_time = post_time + datetime.timedelta(hours=1)
+        self.tweets[1].post_time = post_time + timedelta(hours=1)
         self.tweets[1].save()
-        self.tweets[5].post_time = post_time + datetime.timedelta(hours=2)
+        self.tweets[5].post_time = post_time + timedelta(hours=2)
         self.tweets[5].save()
 
         account_1.user.favorites.add(self.tweets[0])  # private tweet
@@ -159,23 +154,19 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
 
     def test_day_favorites(self):
         "Returns only favorited Tweets from the date, favorited by public Accounts"
-        tweets = ditto_twitter.day_favorites(datetime.date(2015, 3, 18))
+        tweets = ditto_twitter.day_favorites(date(2015, 3, 18))
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_public_account(self):
         "Returns only favorited Tweets from the date, favorited by one public Account"
-        tweets = ditto_twitter.day_favorites(
-            datetime.date(2015, 3, 18), screen_name="terry"
-        )
+        tweets = ditto_twitter.day_favorites(date(2015, 3, 18), screen_name="terry")
         self.assertEqual(1, len(tweets))
         self.assertEqual(tweets[0].pk, self.tweets[1].pk)
 
     def test_day_favorites_private_account(self):
         "Doesn't return Tweets favorited by a private Account"
-        tweets = ditto_twitter.day_favorites(
-            datetime.date(2015, 3, 18), screen_name="thelma"
-        )
+        tweets = ditto_twitter.day_favorites(date(2015, 3, 18), screen_name="thelma")
         self.assertEqual(0, len(tweets))
 
 

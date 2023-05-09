@@ -1,7 +1,6 @@
 # coding: utf-8
-import datetime
+from datetime import date, datetime, timedelta, timezone
 
-import pytz
 from django.test import TestCase
 
 from ditto.core.utils import datetime_from_str
@@ -44,32 +43,30 @@ class TemplatetagsDayBookmarksTestCase(TestCase):
         self.bookmarks_1 = BookmarkFactory.create_batch(6, account=account_1)
         self.bookmarks_2 = BookmarkFactory.create_batch(6, account=account_2)
 
-        post_time = datetime.datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=pytz.utc)
+        post_time = datetime(2015, 3, 18, 12, 0, 0).replace(tzinfo=timezone.utc)
         self.bookmarks_1[3].post_time = post_time
         self.bookmarks_1[3].save()
         self.bookmarks_1[5].is_private = True
-        self.bookmarks_1[5].post_time = post_time + datetime.timedelta(hours=1)
+        self.bookmarks_1[5].post_time = post_time + timedelta(hours=1)
         self.bookmarks_1[5].save()
-        self.bookmarks_2[4].post_time = post_time + datetime.timedelta(hours=2)
+        self.bookmarks_2[4].post_time = post_time + timedelta(hours=2)
         self.bookmarks_2[4].save()
 
     def test_day_bookmarks(self):
         "Returns public bookmarks from all accounts."
-        bookmarks = ditto_pinboard.day_bookmarks(datetime.date(2015, 3, 18))
+        bookmarks = ditto_pinboard.day_bookmarks(date(2015, 3, 18))
         self.assertEqual(2, len(bookmarks))
         self.assertEqual(bookmarks[1].pk, self.bookmarks_1[3].pk)
 
     def test_day_bookmarks_account(self):
         "Only fetches public bookmarks from the named account."
-        bookmarks = ditto_pinboard.day_bookmarks(
-            datetime.date(2015, 3, 18), account="terry"
-        )
+        bookmarks = ditto_pinboard.day_bookmarks(date(2015, 3, 18), account="terry")
         self.assertEqual(1, len(bookmarks))
         self.assertEqual(bookmarks[0].pk, self.bookmarks_1[3].pk)
 
     def test_day_bookmarks_none(self):
         "Fetches no bookmarks when there aren't any on supplied date."
-        bookmarks = ditto_pinboard.recent_bookmarks(datetime.date(2015, 3, 19))
+        bookmarks = ditto_pinboard.recent_bookmarks(date(2015, 3, 19))
         self.assertEqual(0, len(bookmarks))
 
 
