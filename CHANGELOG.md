@@ -12,16 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Dropped support for Django 4.0. (Nothing changed, but removed from tests.)
 
+### Changed
+- No longer requires pytz as a dependency.
+
 
 ## [2.3.0] - 2022-11-28
 
 ### Added
-
 - Add migration for `pinboard.BookmarkTag.slug` that addes `allow_unicode=True`. (It's the default in django-taggit and suddenly it's generating a new migration.)
 - Add support for python 3.11. (Nothing changed, but added to tests.)
 
 ### Changed
-
 - Remove black version requirements
 
 
