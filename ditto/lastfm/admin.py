@@ -13,9 +13,8 @@ class AccountAdmin(admin.ModelAdmin):
         "time_created",
     )
     search_fields = (
-        "name",
-        "artist",
-        "mbid",
+        "username",
+        "realname",
     )
 
     fieldsets = (
