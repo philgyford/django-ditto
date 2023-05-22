@@ -73,6 +73,7 @@ dev_require = [
     "flake8>=4.0,<7.0",
     "black",
     "python-dotenv",
+    "unittest-parametrize",
 ]
 
 tests_require = dev_require + [
