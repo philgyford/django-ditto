@@ -18,22 +18,20 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12-dev"]
         django-version: ["3.2", "4.1", "4.2", "main"]
         exclude:
-          # Django 4.x aren't compatible with python 3.6 and 3.7:
-          - python-version: "3.7"
-            django-version: "4.1"
-          - python-version: "3.7"
-            django-version: "4.2"
-
           # Django 5.0 isn't compatible with python < 3.10
-          - python-version: "3.7"
-            django-version: "main"
-          - python-version: "3.8"
-            django-version: "main"
           - python-version: "3.9"
             django-version: "main"
+
+          - python-version: "3.11"
+            django-version: "3.2"
+
+          - python-version: "3.12-dev"
+            django-version: "3.2"
+          - python-version: "3.12-dev"
+            django-version: "4.1"
 
     steps:
       - name: Git clone
