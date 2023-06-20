@@ -16,7 +16,7 @@ class DittoViewTests(TestCase):
     def test_home_templates(self):
         "Overall home page uses the correct templates"
         response = self.client.get(reverse("ditto:home"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "ditto/home.html")
         self.assertTemplateUsed(response, "ditto/base.html")
 
@@ -140,7 +140,7 @@ class DittoViewTests(TestCase):
     # def test_tag_list_templates(self):
     # "Uses the correct templates"
     # response = self.client.get(reverse('ditto:tag_list'))
-    # self.assertEquals(response.status_code, 200)
+    # self.assertEqual(response.status_code, 200)
     # self.assertTemplateUsed(response, 'ditto/tag_list.html')
     # self.assertTemplateUsed(response, 'ditto/base.html')
 
@@ -150,7 +150,7 @@ class DittoViewTests(TestCase):
     # bookmark.tags.set(['fish'])
     # response = self.client.get(reverse('ditto:tag_detail',
     # kwargs={'slug': 'fish'}))
-    # self.assertEquals(response.status_code, 200)
+    # self.assertEqual(response.status_code, 200)
     # self.assertTemplateUsed(response, 'ditto/tag_detail.html')
     # self.assertTemplateUsed(response, 'ditto/base.html')
 
@@ -238,23 +238,23 @@ class DittoDayArchiveTestCase(TestCase):
 
     def test_success_flickr_photos(self):
         response = self.client.get(self.make_url("flickr", "photos"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_lastfm(self):
         response = self.client.get(self.make_url("lastfm", "listens"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_pinboard(self):
         response = self.client.get(self.make_url("pinboard", "bookmarks"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_twitter_tweets(self):
         response = self.client.get(self.make_url("twitter", "tweets"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_twitter_favorites(self):
         response = self.client.get(self.make_url("twitter", "likes"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_day_templates(self):
         "Day archive page uses the correct templates"

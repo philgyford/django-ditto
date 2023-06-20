@@ -8,7 +8,7 @@ class ViewTests(TestCase):
     def test_home_templates(self):
         "The Twitter home page uses the correct templates"
         response = self.client.get(reverse("twitter:home"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "twitter/home.html")
         self.assertTemplateUsed(response, "twitter/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -53,7 +53,7 @@ class ViewTests(TestCase):
     def test_favorite_list_templates(self):
         "The Twitter favorites page uses the correct templates"
         response = self.client.get(reverse("twitter:favorite_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "twitter/favorite_list.html")
         self.assertTemplateUsed(response, "twitter/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -124,7 +124,7 @@ class ViewTests(TestCase):
                 "twitter:user_detail", kwargs={"screen_name": account.user.screen_name}
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "twitter/user_detail.html")
         self.assertTemplateUsed(response, "twitter/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -196,7 +196,7 @@ class ViewTests(TestCase):
                 kwargs={"screen_name": account.user.screen_name},
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "twitter/account_favorite_list.html")
         self.assertTemplateUsed(response, "twitter/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -288,7 +288,7 @@ class ViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "twitter/tweet_detail.html")
         self.assertTemplateUsed(response, "twitter/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")

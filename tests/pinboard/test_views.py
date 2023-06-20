@@ -8,7 +8,7 @@ class PinboardViewTests(TestCase):
     def test_home_templates(self):
         "The Pinboard home page uses the correct templates"
         response = self.client.get(reverse("pinboard:home"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/home.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -49,7 +49,7 @@ class PinboardViewTests(TestCase):
     def test_to_read_templates(self):
         "The Pinboard 'to read' page uses the correct templates"
         response = self.client.get(reverse("pinboard:toread"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/toread_list.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -88,7 +88,7 @@ class PinboardViewTests(TestCase):
         response = self.client.get(
             reverse("pinboard:account_detail", kwargs={"username": account.username})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/account_detail.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -127,7 +127,7 @@ class PinboardViewTests(TestCase):
         response = self.client.get(
             reverse("pinboard:account_detail", kwargs={"username": "doesnotexist"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     # ACCOUNT TO READ
 
@@ -137,7 +137,7 @@ class PinboardViewTests(TestCase):
         response = self.client.get(
             reverse("pinboard:account_toread", kwargs={"username": account.username})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/account_toread.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -180,7 +180,7 @@ class PinboardViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/bookmark_detail.html")
 
     def test_bookmark_detail_context(self):
@@ -210,7 +210,7 @@ class PinboardViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_bookmark_detail_tag_privacy(self):
         "Does not display private tags"
@@ -239,7 +239,7 @@ class PinboardViewTests(TestCase):
                 kwargs={"username": bookmark.account.username, "hash": "1234567890ab"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     # TAG LIST
 
@@ -247,7 +247,7 @@ class PinboardViewTests(TestCase):
         "Uses the correct templates"
         # Shouldn't need any bookmarks to exist.
         response = self.client.get(reverse("pinboard:tag_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/tag_list.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -295,7 +295,7 @@ class PinboardViewTests(TestCase):
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/tag_detail.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -330,14 +330,14 @@ class PinboardViewTests(TestCase):
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_tag_detail_fails(self):
         "Returns a 404 if a non-existent tag's page is requested"
         response = self.client.get(
             reverse("pinboard:tag_detail", kwargs={"slug": "fish"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     # ACCOUNT TAG DETAIL
 
@@ -352,7 +352,7 @@ class PinboardViewTests(TestCase):
                 kwargs={"username": account.username, "tag_slug": "fish"},
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "pinboard/account_tag_detail.html")
         self.assertTemplateUsed(response, "pinboard/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -396,7 +396,7 @@ class PinboardViewTests(TestCase):
                 kwargs={"username": bookmark.account.username, "tag_slug": "fish"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_account_tag_detail_fails_1(self):
         "Returns a 404 if a non-existent account is requested"
@@ -409,7 +409,7 @@ class PinboardViewTests(TestCase):
                 kwargs={"username": "doesntexist", "tag_slug": "fish"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_account_tag_detail_fails_2(self):
         "Returns a 404 if a non-existent tag is requested"
@@ -423,4 +423,4 @@ class PinboardViewTests(TestCase):
                 kwargs={"username": account.username, "tag_slug": "mammals"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)

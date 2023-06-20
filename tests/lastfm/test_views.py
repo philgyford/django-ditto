@@ -30,7 +30,7 @@ class AlbumDetailViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/album_detail.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -57,14 +57,14 @@ class AlbumDetailViewTests(TestCase):
                 kwargs={"artist_slug": self.artist.slug, "album_slug": "Transformer"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class AlbumListViewTests(TestCase):
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("lastfm:album_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/album_list.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -149,7 +149,7 @@ class ArtistAlbumsViewTests(TestCase):
         response = self.client.get(
             reverse("lastfm:artist_albums", kwargs={"artist_slug": self.artist.slug})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/artist_albums.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -167,7 +167,7 @@ class ArtistAlbumsViewTests(TestCase):
         response = self.client.get(
             reverse("lastfm:artist_albums", kwargs={"artist_slug": "Looper"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class ArtistDetailViewTests(TestCase):
@@ -179,7 +179,7 @@ class ArtistDetailViewTests(TestCase):
         response = self.client.get(
             reverse("lastfm:artist_detail", kwargs={"artist_slug": self.artist.slug})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/artist_detail.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -197,14 +197,14 @@ class ArtistDetailViewTests(TestCase):
         response = self.client.get(
             reverse("lastfm:artist_detail", kwargs={"artist_slug": "Looper"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class ArtistListViewTests(TestCase):
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("lastfm:artist_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/artist_list.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -284,7 +284,7 @@ class HomeViewTests(TestCase):
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("lastfm:home"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/home.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -306,7 +306,7 @@ class ScrobbleListViewTests(TestCase):
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("lastfm:scrobble_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/scrobble_list.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -336,7 +336,7 @@ class TrackDetailViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/track_detail.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -363,14 +363,14 @@ class TrackDetailViewTests(TestCase):
                 kwargs={"artist_slug": self.artist.slug, "track_slug": "Viscious"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class TrackListViewTests(TestCase):
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("lastfm:track_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/track_list.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -491,7 +491,7 @@ class UserCommonTests(object):
         response = self.client.get(
             reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lastfm/%s.html" % self.view_name)
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -514,7 +514,7 @@ class UserCommonTests(object):
         response = self.client.get(
             reverse("lastfm:%s" % self.view_name, kwargs={"username": "thelma"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class UserDetailViewTestCase(UserCommonTests, TestCase):

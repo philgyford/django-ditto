@@ -18,7 +18,7 @@ class HomeViewTests(TestCase):
     def test_home_templates(self):
         "The Flickr home page uses the correct templates"
         response = self.client.get(reverse("flickr:home"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/home.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -95,7 +95,7 @@ class UserDetailViewTests(TestCase):
         response = self.client.get(
             reverse("flickr:user_detail", kwargs={"nsid": account.user.nsid})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/user_detail.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -210,7 +210,7 @@ class PhotoDetailViewTests(TestCase):
                 kwargs={"nsid": account.user.nsid, "flickr_id": photos[1].flickr_id},
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/photo_detail.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -308,7 +308,7 @@ class TagViewTests(TestCase):
         "Uses the correct templates"
         # Shouldn't need any photos to exist.
         response = self.client.get(reverse("flickr:tag_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/tag_list.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -335,7 +335,7 @@ class TagViewTests(TestCase):
         response = self.client.get(
             reverse("flickr:tag_detail", kwargs={"slug": "fish"})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/tag_detail.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -398,12 +398,12 @@ class TagViewTests(TestCase):
         response = self.client.get(
             reverse("flickr:tag_detail", kwargs={"slug": "carp"})
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_tag_detail_fails(self):
         "Returns a 404 if a non-existent tag's page is requested"
         response = self.client.get(reverse("flickr:tag_detail", kwargs={"slug": "bob"}))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     # USER TAG DETAIL
 
@@ -415,7 +415,7 @@ class TagViewTests(TestCase):
                 kwargs={"nsid": self.carp_photo.user.nsid, "tag_slug": "fish"},
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/user_tag_detail.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -498,7 +498,7 @@ class TagViewTests(TestCase):
                 kwargs={"nsid": self.carp_photo.user.nsid, "tag_slug": "carp"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_user_tag_detail_fails_1(self):
         "Returns a 404 if a non-existent user is requested"
@@ -508,7 +508,7 @@ class TagViewTests(TestCase):
                 kwargs={"nsid": "99999999999@N99", "tag_slug": "fish"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_user_tag_detail_fails_2(self):
         "Returns a 404 if a non-existent tag is requested"
@@ -518,7 +518,7 @@ class TagViewTests(TestCase):
                 kwargs={"nsid": self.carp_photo.user.nsid, "tag_slug": "mammal"},
             )
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class PhotosetViewTests(TestCase):
@@ -551,7 +551,7 @@ class PhotosetViewTests(TestCase):
     def test_photoset_list_templates(self):
         "Uses the correct templates"
         response = self.client.get(reverse("flickr:photoset_list"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/photoset_list.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -571,7 +571,7 @@ class PhotosetViewTests(TestCase):
         response = self.client.get(
             reverse("flickr:user_photoset_list", kwargs={"nsid": self.user_1.nsid})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/user_photoset_list.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
@@ -597,7 +597,7 @@ class PhotosetViewTests(TestCase):
                 },
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "flickr/photoset_detail.html")
         self.assertTemplateUsed(response, "flickr/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")

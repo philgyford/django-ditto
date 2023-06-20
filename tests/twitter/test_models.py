@@ -267,16 +267,16 @@ class PhotoLocalTestCase(TestCase):
         url = "http://www.example.org/image.jpg"
         photo = PhotoFactory(image_url=url)
         self.assertEqual(photo.large_url, photo.image_file.url)
-        self.assertRegexpMatches(
+        self.assertRegex(
             photo.medium_url, r"CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg"
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             photo.small_url, r"CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg"
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             photo.thumb_url, r"CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg"
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             photo.thumbnail_url, r"CACHE/images/twitter/media/mp/le/example.[^\.]+\.jpg"
         )
 

@@ -508,7 +508,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
 
     def test_medium_url(self):
         "Has a different format to most other image sizes."
-        self.assertRegexpMatches(
+        self.assertRegex(
             self.photo.medium_url,
             r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",  # noqa: E501
         )
@@ -516,7 +516,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
     def test_image_urls(self):
         """Test all but the Original and Medium image URL properties."""
         for size, prop in self.photo_sizes.items():
-            self.assertRegexpMatches(
+            self.assertRegex(
                 getattr(self.photo, prop),
                 r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",  # noqa: E501
             )
