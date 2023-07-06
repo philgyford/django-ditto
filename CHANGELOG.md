@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- None
+- Allow usage of Pillow v10
 
 
 ## [3.1.0] - 2023-06-20
