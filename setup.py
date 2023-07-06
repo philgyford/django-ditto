@@ -92,7 +92,7 @@ setup(
         "django-sortedm2m>=3.0.0,<3.2",
         "django-taggit>=3.0.0,<5.0",
         "flickrapi>=2.4,<2.5",
-        "pillow>=8.0.0,<11.0",
+        "pillow>=8.0.0,<10.0",
         "twitter-text-python>=1.1.1,<1.2",
         "twython>=3.7.0,<3.10",
     ],
