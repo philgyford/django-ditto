@@ -6,7 +6,7 @@ app_name = "lastfm"
 
 
 # The pattern for matching an Album/Artist/Track slug:
-slug_chars = r"[\w.,:;=@&+%()$!°’~-]+"  # noqa: W605
+slug_chars = r"[\w.,:;=@&+%()$!°’~-]+"
 
 
 urlpatterns = [
@@ -38,12 +38,12 @@ urlpatterns = [
         name="artist_albums",
     ),
     re_path(
-        r"^music/(?P<artist_slug>%s)/(?P<album_slug>%s)/$" % (slug_chars, slug_chars),
+        rf"^music/(?P<artist_slug>{slug_chars})/(?P<album_slug>{slug_chars})/$",
         view=views.AlbumDetailView.as_view(),
         name="album_detail",
     ),
     re_path(
-        r"^music/(?P<artist_slug>%s)/_/(?P<track_slug>%s)/$" % (slug_chars, slug_chars),
+        rf"^music/(?P<artist_slug>{slug_chars})/_/(?P<track_slug>{slug_chars})/$",
         view=views.TrackDetailView.as_view(),
         name="track_detail",
     ),

@@ -15,7 +15,6 @@ class DittoBaseCommand(BaseCommand):
 
     def add_arguments(self, parser):
         "We may add stuff for handling verbosity here."
-        pass
 
     def output_results(self, results, verbosity=1):
         """results should be a list of dicts.
@@ -46,12 +45,11 @@ class DittoBaseCommand(BaseCommand):
                 noun = (
                     self.singular_noun if result["fetched"] == 1 else self.plural_noun
                 )
-                self.stdout.write("%sFetched %s %s" % (prefix, result["fetched"], noun))
+                self.stdout.write(f"{prefix}Fetched {result['fetched']} {noun}")
 
             if result["success"] is False:
                 self.stderr.write(
-                    "%sFailed to fetch %s: %s"
-                    % (
+                    "{}Failed to fetch {}: {}".format(
                         prefix,
                         self.plural_noun,
                         self.format_messages(result["messages"]),
@@ -63,4 +61,4 @@ class DittoBaseCommand(BaseCommand):
             return messages[0]
         else:
             # On separate lines, and start a newline first.
-            return "%s%s" % ("\n", "\n".join(messages))
+            return "{}{}".format("\n", "\n".join(messages))

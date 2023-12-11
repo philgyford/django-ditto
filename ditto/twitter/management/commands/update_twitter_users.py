@@ -1,4 +1,5 @@
-from ...fetch.fetchers import UsersFetcher
+from ditto.twitter.fetch.fetchers import UsersFetcher
+
 from . import UpdateTwitterCommand
 
 

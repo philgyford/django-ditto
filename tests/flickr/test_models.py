@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import Mock, patch
 
 from django.db import IntegrityError
@@ -136,13 +136,13 @@ class PhotosetTestCase(TestCase):
             title="Earliest",
             flickr_created_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         PhotosetFactory(
             title="Latest",
             flickr_created_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         photosets = Photoset.objects.all()
         self.assertEqual(photosets[0].title, "Latest")
@@ -214,13 +214,13 @@ class PhotoTestCase(TestCase):
             title="Earliest",
             post_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         PhotoFactory(
             title="Latest",
             post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         photos = Photo.objects.all()
         self.assertEqual(photos[0].title, "Latest")
@@ -439,7 +439,7 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
 
     def test_image_url_with_invalid_size(self):
         with self.assertRaises(AttributeError):
-            self.photo.an_invalid_url
+            _url = self.photo.an_invalid_url
 
     def test_video_urls_video(self):
         "Videos should return the correct URLs from the video url properties."
@@ -448,20 +448,15 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
             media="video", permalink=permalink, secret=9876, original_secret="7777"
         )
         for size, prop in self.video_sizes.items():
-            if size == "orig":
-                secret = 7777
-            else:
-                secret = 9876
+            secret = 7777 if size == "orig" else 9876
 
-            self.assertEqual(
-                getattr(photo, prop), "%splay/%s/%s/" % (permalink, size, secret)
-            )
+            self.assertEqual(getattr(photo, prop), f"{permalink}play/{size}/{secret}/")
 
     def test_video_urls_photo(self):
         "Photos should have None for all video URLs."
         photo = PhotoFactory(media="photo")
 
-        for size, prop in self.video_sizes.items():
+        for _size, prop in self.video_sizes.items():
             self.assertIsNone(getattr(photo, prop))
 
 
@@ -478,7 +473,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
             user=UserFactory(nsid="123456@N01"),
             taken_time=datetime.strptime(
                 "2015-08-14 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
 
     def tearDown(self):
@@ -510,20 +505,20 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
         "Has a different format to most other image sizes."
         self.assertRegex(
             self.photo.medium_url,
-            r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",  # noqa: E501
+            r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",
         )
 
     def test_image_urls(self):
         """Test all but the Original and Medium image URL properties."""
-        for size, prop in self.photo_sizes.items():
+        for _size, prop in self.photo_sizes.items():
             self.assertRegex(
                 getattr(self.photo, prop),
-                r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",  # noqa: E501
+                r"CACHE/images/flickr/34/56/123456N01/photos/2015/08/14/example.[^\.]+\.jpg",
             )
 
     def test_image_url_with_invalid_size(self):
         with self.assertRaises(AttributeError):
-            self.photo.an_invalid_url
+            _url = self.photo.an_invalid_url
 
     def test_video_urls_video(self):
         "Should currently return the remote URL for videos."
@@ -532,14 +527,8 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
             media="video", permalink=permalink, secret=9876, original_secret="7777"
         )
         for size, prop in self.video_sizes.items():
-            if size == "orig":
-                secret = 7777
-            else:
-                secret = 9876
-
-            self.assertEqual(
-                getattr(photo, prop), "%splay/%s/%s/" % (permalink, size, secret)
-            )
+            secret = 7777 if size == "orig" else 9876
+            self.assertEqual(getattr(photo, prop), f"{permalink}play/{size}/{secret}/")
 
     def test_image_url_when_original_missing(self):
         "If we have no original file, we should use the 'missing' image."
@@ -567,14 +556,14 @@ class PhotoNextPrevTestCase(TestCase):
             user=user,
             post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         self.private_photo = PhotoFactory(
             user=user,
             is_private=True,
             post_time=datetime.strptime(
                 "2016-04-09 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         # Photo by a different user:
         user_2 = UserFactory()
@@ -583,13 +572,13 @@ class PhotoNextPrevTestCase(TestCase):
             user=user_2,
             post_time=datetime.strptime(
                 "2016-04-10 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
         self.photo_2 = PhotoFactory(
             user=user,
             post_time=datetime.strptime(
                 "2016-04-11 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc),
+            ).replace(tzinfo=UTC),
         )
 
     def test_next_public_by_post_time(self):

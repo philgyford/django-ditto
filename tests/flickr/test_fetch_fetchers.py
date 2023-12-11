@@ -1,7 +1,7 @@
 import json
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import call, patch
 
 from django.test import override_settings
@@ -103,7 +103,7 @@ class FetcherTestCase(FlickrFetchTestCase):
 
 class UserIdFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(UserIdFetcherTestCase, self).setUp()
+        super().setUp()
         self.account = AccountFactory(api_key="1234", api_secret="9876")
 
     def test_inherits_from_fetcher(self):
@@ -128,7 +128,7 @@ class UserIdFetcherTestCase(FlickrFetchTestCase):
 
 class UserFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(UserFetcherTestCase, self).setUp()
+        super().setUp()
         self.account = AccountFactory(api_key="1234", api_secret="9876")
 
     def test_inherits_from_fetcher(self):
@@ -214,7 +214,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(user.photos_count, 0)
 
         dt = datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=timezone.utc
+            tzinfo=UTC
         )
         self.assertEqual(user.photos_first_date, dt)
         self.assertEqual(user.photos_first_date_taken, dt)
@@ -225,7 +225,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
     photos."""
 
     def setUp(self):
-        super(PhotosFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(api_key="1234", api_secret="9876")
         self.fetcher = PhotosFetcher(account=account)
 
@@ -367,7 +367,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
 
 class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(RecentPhotosFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(
             api_key="1234", api_secret="9876", user=UserFactory(nsid="35034346050@N01")
         )
@@ -456,7 +456,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
 class PhotosetsFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(PhotosetsFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(
             api_key="1234", api_secret="9876", user=UserFactory(nsid="35034346050@N01")
         )

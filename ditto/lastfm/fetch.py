@@ -2,13 +2,13 @@ import calendar
 import json
 import time
 import urllib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import requests
 
 from ditto import TITLE, VERSION
+from ditto.core.utils import datetime_now
 
-from ..core.utils import datetime_now
 from .models import Account, Album, Artist, Scrobble, Track
 from .utils import slugify_name
 
@@ -19,7 +19,7 @@ class FetchError(Exception):
     pass
 
 
-class ScrobblesFetcher(object):
+class ScrobblesFetcher:
     """
     Fetches scrobbles from the API for one Account.
 
@@ -36,7 +36,6 @@ class ScrobblesFetcher(object):
     items_per_page = 200
 
     def __init__(self, account):
-
         # Will be an Account object, passed into init()
         self.account = None
 
@@ -55,7 +54,8 @@ class ScrobblesFetcher(object):
         if isinstance(account, Account):
             self.return_value["account"] = str(account)
         else:
-            raise ValueError("An Account object is required")
+            msg = "An Account object is required"
+            raise ValueError(msg)
 
         if account.has_credentials():
             self.account = account
@@ -95,8 +95,9 @@ class ScrobblesFetcher(object):
         if fetch_type == "days":
             try:
                 test = days + 1  # noqa: F841
-            except TypeError:
-                raise ValueError("days argument should be an integer")
+            except TypeError as err:
+                msg = "days argument should be an integer"
+                raise ValueError(msg) from err
 
             self.min_datetime = datetime_now() - timedelta(days=days)
 
@@ -145,10 +146,9 @@ class ScrobblesFetcher(object):
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""
-        if "success" not in self.return_value or self.return_value["success"] is True:
-            return True
-        else:
-            return False
+        return (
+            "success" not in self.return_value or self.return_value["success"] is True
+        )
 
     def _api_method(self):
         "The name of the API method."
@@ -180,28 +180,27 @@ class ScrobblesFetcher(object):
         """
         query_string = urllib.parse.urlencode(self._api_args())
 
-        url = "{}?{}".format(LASTFM_API_ENDPOINT, query_string)
+        url = f"{LASTFM_API_ENDPOINT}?{query_string}"
 
         try:
             response = requests.get(
-                url, headers={"User-Agent": "Mozilla/5.0 (%s v%s)" % (TITLE, VERSION)}
+                url,
+                headers={"User-Agent": f"Mozilla/5.0 ({TITLE} v{VERSION})"},
             )
             response.raise_for_status()  # Raises an exception on HTTP error.
-        except requests.exceptions.RequestException as e:
-            raise FetchError(
-                "Error when fetching Scrobbles (page %s): %s"
-                % (self.page_number, str(e))
-            )
+        except requests.exceptions.RequestException as err:
+            msg = "Error when fetching Scrobbles (page {self.page_number}): {err}"
+            raise FetchError(msg) from err
 
         response.encoding = "utf-8"
 
         results = json.loads(response.text)
 
         if "error" in results:
-            raise FetchError(
-                "Error %s when fetching Scrobbles (page %s): %s"
-                % (results["error"], self.page_number, results["message"])
+            msg = "Error {} when fetching Scrobbles (page {}): {}".format(
+                results["error"], self.page_number, results["message"]
             )
+            raise FetchError(msg)
 
         # Set total number of pages first time round:
         attr = results["recenttracks"]["@attr"]
@@ -257,9 +256,7 @@ class ScrobblesFetcher(object):
             )
 
         # Unixtime to datetime object:
-        scrobble_time = datetime.utcfromtimestamp(int(scrobble["date"]["uts"])).replace(
-            tzinfo=timezone.utc
-        )
+        scrobble_time = datetime.fromtimestamp(int(scrobble["date"]["uts"]), tz=UTC)
 
         scrobble_obj, created = Scrobble.objects.update_or_create(
             account=self.account,
@@ -304,7 +301,7 @@ class ScrobblesFetcher(object):
         return artist_slug, track_slug
 
 
-class ScrobblesMultiAccountFetcher(object):
+class ScrobblesMultiAccountFetcher:
     """
     For fetching Scrobbles for ALL or ONE account(s).
 
@@ -334,20 +331,20 @@ class ScrobblesMultiAccountFetcher(object):
             # Get all active Accounts.
             self.accounts = list(Account.objects.filter(is_active=True))
             if len(self.accounts) == 0:
-                raise FetchError("No active Accounts were found to fetch.")
+                msg = "No active Accounts were found to fetch."
+                raise FetchError(msg)
         else:
             # Find the Account associated with username.
             try:
                 account = Account.objects.get(username=username)
-            except Account.DoesNotExist:
-                raise FetchError(
-                    "There is no Account with the username '%s'" % username
-                )
+            except Account.DoesNotExist as err:
+                msg = f"There is no Account with the username '{username}'"
+                raise FetchError(msg) from err
             if account.is_active is False:
-                raise FetchError(
-                    "The Account with the username '%s' is marked as inactive."
-                    % username
+                msg = (
+                    "The Account with the username '{username}' is marked as inactive."
                 )
+                raise FetchError(msg)
             self.accounts = [account]
 
     def fetch(self, **kwargs):

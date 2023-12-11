@@ -446,7 +446,7 @@ class TrackListViewTests(TestCase):
         self.assertEqual(response.context["track_list"][0].scrobble_count, 1)
 
 
-class UserCommonTests(object):
+class UserCommonTests:
     """Parent for all user-specific views.
     Doesn't inherit from TestCase because we don't want the tests in this class
     to run, only in its child classes.
@@ -518,12 +518,10 @@ class UserCommonTests(object):
 
 
 class UserDetailViewTestCase(UserCommonTests, TestCase):
-
     view_name = "user_detail"
 
 
 class UserAlbumListViewTestCase(UserCommonTests, TestCase):
-
     view_name = "user_album_list"
 
     def test_context_albums(self):
@@ -539,7 +537,6 @@ class UserAlbumListViewTestCase(UserCommonTests, TestCase):
 
 
 class UserArtistListViewTestCase(UserCommonTests, TestCase):
-
     view_name = "user_artist_list"
 
     def test_context_albums(self):
@@ -557,7 +554,6 @@ class UserArtistListViewTestCase(UserCommonTests, TestCase):
 
 
 class UserScrobbleListViewTestCase(UserCommonTests, TestCase):
-
     view_name = "user_scrobble_list"
 
     def test_context_scrobbles(self):
@@ -571,7 +567,6 @@ class UserScrobbleListViewTestCase(UserCommonTests, TestCase):
 
 
 class UserTrackListViewTestCase(UserCommonTests, TestCase):
-
     view_name = "user_track_list"
 
     def test_context_tracks(self):

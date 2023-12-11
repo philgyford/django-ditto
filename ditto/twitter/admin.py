@@ -3,7 +3,8 @@ from django.db import models
 from django.forms import Textarea, TextInput
 from django.utils.safestring import mark_safe
 
-from ..core.admin import DittoItemModelAdmin
+from ditto.core.admin import DittoItemModelAdmin
+
 from .models import Account, Media, Tweet, User
 
 
@@ -77,7 +78,6 @@ class TweetsMediaInline(admin.TabularInline):
 
 @admin.register(Media)
 class MediaAdmin(admin.ModelAdmin):
-
     list_display = (
         "show_thumb",
         "media_type",
@@ -155,33 +155,29 @@ class MediaAdmin(admin.ModelAdmin):
 
     def show_thumb(self, instance):
         return mark_safe(
-            '<img src="%(url)s" width="%(w)s" height="%(h)s" />'
-            % {
-                "url": instance.thumbnail_url,
-                "w": instance.thumbnail_w,
-                "h": instance.thumbnail_h,
-            }
+            '<img src="{}" width="{}" height="{}" />'.format(
+                instance.thumbnail_url,
+                instance.thumbnail_w,
+                instance.thumbnail_h,
+            )
         )
 
     show_thumb.short_description = ""
 
     def show_image(self, instance):
         if instance.media_type == "photo":
-            html = '<img src="%(url)s" width="%(w)s" height="%(h)s" />' % {
-                "url": instance.small_url,
-                "w": instance.small_w,
-                "h": instance.small_h,
-            }
+            html = '<img src="{}" width="{}" height="{}" />'.format(
+                instance.small_url,
+                instance.small_w,
+                instance.small_h,
+            )
         else:
-            html = (
-                '<video width="%(w)s" height="%(h)s" poster="%(img)s" controls preload="metadata"><source src="%(video)s" type="%(mime)s"></video>'  # noqa: E501
-                % {
-                    "w": instance.small_w,
-                    "h": instance.small_h,
-                    "img": instance.small_url,
-                    "video": instance.video_url,
-                    "mime": instance.video_mime_type,
-                }
+            html = '<video width="{}" height="{}" poster="{}" controls preload="metadata"><source src="{}" type="{}"></video>'.format(  # noqa: E501
+                instance.small_w,
+                instance.small_h,
+                instance.small_url,
+                instance.video_url,
+                instance.video_mime_type,
             )
         return mark_safe(html)
 

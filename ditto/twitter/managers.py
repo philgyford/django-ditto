@@ -1,6 +1,6 @@
 from django.db import models
 
-from ..core.managers import PublicItemManager
+from ditto.core.managers import PublicItemManager
 
 
 class PublicFavoritesManager(models.Manager):

@@ -4,7 +4,8 @@ from django.forms import Textarea, TextInput
 from taggit.forms import TagWidget
 from taggit.managers import TaggableManager
 
-from ..core.admin import DittoItemModelAdmin
+from ditto.core.admin import DittoItemModelAdmin
+
 from .models import Account, Bookmark
 
 

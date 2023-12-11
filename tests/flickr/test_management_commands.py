@@ -93,7 +93,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         self.out_err = StringIO()
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_sends_all_true_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_originals", "--all", account="99999999999@N99")
@@ -101,7 +101,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with(fetch_all=True)
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_sends_all_true_to_fetcher_no_account(self, fetcher):
         call_command("fetch_flickr_originals", "--all")
@@ -109,7 +109,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with(fetch_all=True)
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_sends_all_false_to_fetcher(self, fetcher):
         call_command("fetch_flickr_originals")
@@ -117,7 +117,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with(fetch_all=False)
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_success_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -127,7 +127,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         self.assertIn("Phil Gyford: Fetched 33 Files", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_success_output_verbosity_0(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -137,7 +137,7 @@ class FetchFlickrOriginalsTestCase(TestCase):
         self.assertEqual("", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_originals.OriginalFilesMultiAccountFetcher"
     )
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -179,7 +179,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     # Sending --days argument
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_days_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photos", account="99999999999@N99", days="4")
@@ -187,7 +187,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with(days=4, start=None, end=None)
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_days_to_fetcher_no_account(self, fetcher):
         call_command("fetch_flickr_photos", days="4")
@@ -195,7 +195,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with(days=4, start=None, end=None)
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_all_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photos", account="99999999999@N99", days="all")
@@ -205,7 +205,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     # Sending --start argument
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_start_to_fetcher_with_account(self, fetcher):
         call_command(
@@ -217,7 +217,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         )
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_start_to_fetcher_with_no_account(self, fetcher):
         call_command("fetch_flickr_photos", start="2022-01-31")
@@ -229,7 +229,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     # Sending --end argument
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_end_to_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photos", account="99999999999@N99", end="2022-01-31")
@@ -239,7 +239,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         )
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_end_to_fetcher_with_no_account(self, fetcher):
         call_command("fetch_flickr_photos", end="2022-01-31")
@@ -251,7 +251,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     # Sending --start and --end arguments
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_start_and_end_to_fetcher_with_account(self, fetcher):
         call_command(
@@ -266,7 +266,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         )
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_sends_start_and_end_to_fetcher_with_no_account(self, fetcher):
         call_command("fetch_flickr_photos", start="2022-01-31", end="2022-02-14")
@@ -278,7 +278,7 @@ class FetchFlickrPhotosTestCase(TestCase):
     # Outputs
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_success_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -288,7 +288,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         self.assertIn("Phil Gyford: Fetched 40 Photos", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_success_output_verbosity_0(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -298,7 +298,7 @@ class FetchFlickrPhotosTestCase(TestCase):
         self.assertEqual("", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photos.RecentPhotosMultiAccountFetcher"
     )
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -318,7 +318,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         self.out_err = StringIO()
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"
     )
     def test_calls_fetcher_with_account(self, fetcher):
         call_command("fetch_flickr_photosets", account="99999999999@N99")
@@ -326,7 +326,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with()
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"
     )
     def test_calls_fetcher_with_no_account(self, fetcher):
         call_command("fetch_flickr_photosets")
@@ -334,7 +334,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         fetcher.return_value.fetch.assert_called_with()
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"
     )
     def test_success_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -344,7 +344,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         self.assertIn("Phil Gyford: Fetched 40 Photosets", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"
     )
     def test_success_output_verbosity_0(self, fetcher):
         fetcher.return_value.fetch.return_value = [
@@ -354,7 +354,7 @@ class FetchFlickrPhotosetsTestCase(TestCase):
         self.assertEqual("", self.out.getvalue())
 
     @patch(
-        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"  # noqa: E501
+        "ditto.flickr.management.commands.fetch_flickr_photosets.PhotosetsMultiAccountFetcher"
     )
     def test_error_output(self, fetcher):
         fetcher.return_value.fetch.return_value = [

@@ -1,8 +1,7 @@
-# coding: utf-8
 from django.core.management.base import CommandError
 
-from ....core.management.commands import DittoBaseCommand
-from ...fetch import (
+from ditto.core.management.commands import DittoBaseCommand
+from ditto.pinboard.fetch import (
     AllBookmarksFetcher,
     DateBookmarksFetcher,
     RecentBookmarksFetcher,
@@ -66,7 +65,6 @@ class Command(DittoBaseCommand):
         )
 
     def handle(self, *args, **options):
-
         # We might be fetching for a specific account or all (None).
         account = options["account"] if options["account"] else None
 
@@ -87,10 +85,10 @@ class Command(DittoBaseCommand):
             results = UrlBookmarksFetcher().fetch(url=options["url"], username=account)
 
         elif options["account"]:
-            raise CommandError(
-                "Specify --all, --recent, --date= or --url= as well as --account."
-            )
+            msg = "Specify --all, --recent, --date= or --url= as well as --account."
+            raise CommandError(msg)
         else:
-            raise CommandError("Specify --all, --recent, --date= or --url=")
+            msg = "Specify --all, --recent, --date= or --url="
+            raise CommandError(msg)
 
         self.output_results(results, options.get("verbosity", 1))

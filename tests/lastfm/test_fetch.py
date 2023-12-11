@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import call, patch
 
 import responses
@@ -131,9 +131,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
         fixture_name -- eg 'messages' to load 'messages.json'.
         Returns the JSON text.
         """
-        json_file = open("%s%s.json" % (self.fixture_path, fixture_name))
-        json_data = json_file.read()
-        json_file.close()
+        with open(f"{self.fixture_path}{fixture_name}.json") as f:
+            json_data = f.read()
         return json_data
 
     def load_fixture(self, fixture_name):
@@ -215,7 +214,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         ScrobbleFactory(
             post_time=datetime.strptime(
                 "2015-08-11 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc)
+            ).replace(tzinfo=UTC)
         )
         # Timestamp for 2015-08-11 12:00:00 UTC:
         self.add_recent_tracks_response(from_time=1439294400)
@@ -390,7 +389,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         track = TrackFactory(artist=artist, slug="make+up")
         post_time = datetime.strptime(
             "2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=timezone.utc)
+        ).replace(tzinfo=UTC)
         scrobble = ScrobbleFactory(
             account=self.account, track=track, post_time=post_time
         )
@@ -418,7 +417,7 @@ class ScrobblesFetcherSendTestCase(TestCase):
         self.assertEqual(
             scrobble.post_time,
             datetime.strptime("2016-09-22 09:23:33", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             ),
         )
         json_data = self.load_fixture("user_getrecenttracks")

@@ -1,4 +1,3 @@
-# coding: utf-8
 import re
 
 from django.utils.html import urlize
@@ -128,8 +127,9 @@ def htmlify_tweet(json_data):
         # the page. All being well.
         for item in ents["media"]:
             html = html.replace(
-                '<a href="%s" rel="external">%s</a>'
-                % (item["url"], item["display_url"]),
+                '<a href="{}" rel="external">{}</a>'.format(
+                    item["url"], item["display_url"]
+                ),
                 "",
             )
 

@@ -1,13 +1,13 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from django.conf import settings
 from django.core.files import File
 
-from ...core.utils import truncate_string
-from ...core.utils.downloader import DownloadException, filedownloader
-from ..models import Media, Tweet, User
+from ditto.core.utils import truncate_string
+from ditto.core.utils.downloader import DownloadException, filedownloader
+from ditto.twitter.models import Media, Tweet, User
 
 # Classes that take JSON data from the Twitter API and create or update
 # objects.
@@ -21,7 +21,7 @@ from ..models import Media, Tweet, User
 # TweetSaver
 
 
-class SaveUtilsMixin(object):
+class SaveUtilsMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -29,16 +29,16 @@ class SaveUtilsMixin(object):
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like 'Wed Nov 15 16:55:59 +0000 2006'.
         """
-        return datetime.strptime(api_time, time_format).replace(tzinfo=timezone.utc)
+        return datetime.strptime(api_time, time_format).replace(tzinfo=UTC)
 
 
-class UserSaver(SaveUtilsMixin, object):
+class UserSaver(SaveUtilsMixin):
     "Provides a method for creating/updating a User using data from the API."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def save_user(self, user, fetch_time, download_avatar=True):
+    def save_user(self, user, fetch_time, *, download_avatar=True):
         """With Twitter user data from the API, it creates or updates the User
         and returns the User object.
 
@@ -135,16 +135,15 @@ class UserSaver(SaveUtilsMixin, object):
                 ["image/jpeg", "image/jpg", "image/png", "image/gif"],
             )
 
-            user.avatar.save(
-                os.path.basename(avatar_filepath), File(open(avatar_filepath, "rb"))
-            )
+            with open(avatar_filepath, "rb") as f:
+                user.avatar.save(os.path.basename(avatar_filepath), File(f))
         except DownloadException:
             pass
 
         return user
 
 
-class TweetSaver(SaveUtilsMixin, object):
+class TweetSaver(SaveUtilsMixin):
     """Provides a method for creating/updating a Tweet (and its User) using
     data from the API. Also used by ingest.TweetIngester()
     """
@@ -202,11 +201,10 @@ class TweetSaver(SaveUtilsMixin, object):
 
             # Adding things ony used for videos and animated GIFs:
             if "video_info" in item:
-
                 info = item["video_info"]
 
                 # eg, '16:9'
-                defaults["aspect_ratio"] = "%s:%s" % (
+                defaults["aspect_ratio"] = "{}:{}".format(
                     info["aspect_ratio"][0],
                     info["aspect_ratio"][1],
                 )
@@ -289,7 +287,8 @@ class TweetSaver(SaveUtilsMixin, object):
             if "user" in tweet:
                 user_data = tweet["user"]
             else:
-                raise ValueError("No user data found to save tweets with")
+                msg = "No user data found to save tweets with"
+                raise ValueError(msg)
 
         user = UserSaver().save_user(user_data, fetch_time)
 
@@ -317,8 +316,9 @@ class TweetSaver(SaveUtilsMixin, object):
             "user": user,
             "is_private": user.is_private,
             "post_time": created_at,
-            "permalink": "https://twitter.com/%s/status/%s"
-            % (user.screen_name, tweet["id"]),
+            "permalink": "https://twitter.com/{}/status/{}".format(
+                user.screen_name, tweet["id"]
+            ),
             "title": title.replace("\n", " ").replace("\r", " "),
             "text": text,
             "twitter_id": tweet["id"],
@@ -338,7 +338,7 @@ class TweetSaver(SaveUtilsMixin, object):
         if "lang" in tweet:
             defaults["language"] = tweet["lang"]
 
-        if (
+        if (  # noqa: SIM102
             "coordinates" in tweet
             and tweet["coordinates"]
             and "type" in tweet["coordinates"]

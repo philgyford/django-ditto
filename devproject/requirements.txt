@@ -1,1 +1,1 @@
--e file:./..[dev]
+-e file:./..[test]

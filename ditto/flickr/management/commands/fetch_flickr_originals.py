@@ -1,4 +1,5 @@
-from ...fetch.multifetchers import OriginalFilesMultiAccountFetcher
+from ditto.flickr.fetch.multifetchers import OriginalFilesMultiAccountFetcher
+
 from . import FetchCommand
 
 
@@ -39,5 +40,5 @@ class Command(FetchCommand):
         results = self.fetch_files(nsid, options["all"])
         self.output_results(results, options.get("verbosity", 1))
 
-    def fetch_files(self, nsid, fetch_all=False):
+    def fetch_files(self, nsid, *, fetch_all=False):
         return OriginalFilesMultiAccountFetcher(nsid=nsid).fetch(fetch_all=fetch_all)

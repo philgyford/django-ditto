@@ -302,10 +302,9 @@ class RecentTweetsFetcherTestCase(TwitterFetcherTestCase):
         qs["count"] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch.object(FetchTweetsRecent, "_save_results"):
-            with patch("time.sleep"):
-                RecentTweetsFetcher(screen_name="jill").fetch(count=700)
-                self.assertEqual(4, len(responses.calls))
+        with patch.object(FetchTweetsRecent, "_save_results"), patch("time.sleep"):
+            RecentTweetsFetcher(screen_name="jill").fetch(count=700)
+            self.assertEqual(4, len(responses.calls))
 
 
 class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
@@ -497,14 +496,12 @@ class FavoriteTweetsFetcherTestCase(TwitterFetcherTestCase):
         qs["count"] = 100
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch.object(FetchTweetsFavorite, "_save_results"):
-            with patch("time.sleep"):
-                FavoriteTweetsFetcher(screen_name="jill").fetch(count=700)
-                self.assertEqual(4, len(responses.calls))
+        with patch.object(FetchTweetsFavorite, "_save_results"), patch("time.sleep"):
+            FavoriteTweetsFetcher(screen_name="jill").fetch(count=700)
+            self.assertEqual(4, len(responses.calls))
 
 
 class UsersFetcherTestCase(TwitterFetcherTestCase):
-
     api_fixture = "users_lookup.json"
 
     api_call = "users/lookup"
@@ -587,14 +584,12 @@ class UsersFetcherTestCase(TwitterFetcherTestCase):
         qs["user_id"] = "%2C".join(map(str, ids[-50:]))
         self.add_response(body=body, querystring=qs, match_querystring=True)
 
-        with patch.object(FetchUsers, "_save_results"):
-            with patch("time.sleep"):
-                UsersFetcher(screen_name="jill").fetch(ids)
-                self.assertEqual(4, len(responses.calls))
+        with patch.object(FetchUsers, "_save_results"), patch("time.sleep"):
+            UsersFetcher(screen_name="jill").fetch(ids)
+            self.assertEqual(4, len(responses.calls))
 
 
 class TweetsFetcherTestCase(TwitterFetcherTestCase):
-
     api_fixture = "tweets.json"
 
     api_call = "statuses/lookup"
@@ -689,7 +684,7 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
         ids = [id for id in range(1, 351)]
         body = json.dumps([{"id": id} for id in range(1, 100)])
 
-        for n in range(3):
+        for _n in range(3):
             # First time, add ids 1-100. Then 101-200. Then 201-300.
             # start = n * 100
             # end = (n + 1) * 100
@@ -704,14 +699,12 @@ class TweetsFetcherTestCase(TwitterFetcherTestCase):
         # qs['id'] = ','.join(map(str, ids[-50:]))
         self.add_response(body=body, method="POST")
 
-        with patch.object(FetchTweets, "_save_results"):
-            with patch("time.sleep"):
-                TweetsFetcher(screen_name="jill").fetch(ids)
-                self.assertEqual(4, len(responses.calls))
+        with patch.object(FetchTweets, "_save_results"), patch("time.sleep"):
+            TweetsFetcher(screen_name="jill").fetch(ids)
+            self.assertEqual(4, len(responses.calls))
 
 
 class VerifyFetcherTestCase(TwitterFetcherTestCase):
-
     api_fixture = "verify_credentials.json"
 
     api_call = "account/verify_credentials"
@@ -783,7 +776,6 @@ class VerifyFetcherTestCase(TwitterFetcherTestCase):
 
 
 class FetchVerifyTestCase(FetchTwitterTestCase):
-
     api_fixture = "verify_credentials.json"
 
     api_call = "account/verify_credentials"
@@ -807,7 +799,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
         self.assertEqual(new_user.screen_name, "philgyford")
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
 
@@ -831,7 +823,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
         self.assertEqual(updated_user.screen_name, "philgyford")
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
 
@@ -849,7 +841,7 @@ class FetchVerifyTestCase(FetchTwitterTestCase):
         self.assertEqual(result["account"], "Unsaved Account")
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
         self.assertTrue("Could not authenticate you" in result["messages"][0])
@@ -876,7 +868,7 @@ class FilesFetcherTestCase(TestCase):
 
         self.video = VideoFactory(
             twitter_id=66666666,
-            image_url="https://pbs.twimg.com/ext_tw_video_thumb/740282905369444352/pu/img/zyxwvutsrqponml.jpg",  # noqa: E501
+            image_url="https://pbs.twimg.com/ext_tw_video_thumb/740282905369444352/pu/img/zyxwvutsrqponml.jpg",
             image_file="",
             mp4_file="",
         )
@@ -984,8 +976,7 @@ class FilesFetcherTestCase(TestCase):
         FetchFiles()._fetch_and_save_file(self.image, "image")
         self.assertEqual(
             self.image.image_file.name,
-            "twitter/media/%s/%s/%s"
-            % (
+            "twitter/media/{}/{}/{}".format(
                 temp_filepath[-4:-2],
                 temp_filepath[-2:],
                 os.path.basename(temp_filepath),
@@ -1003,8 +994,7 @@ class FilesFetcherTestCase(TestCase):
         FetchFiles()._fetch_and_save_file(self.animated_gif, "mp4")
         self.assertEqual(
             self.animated_gif.mp4_file.name,
-            "twitter/media/%s/%s/%s"
-            % (
+            "twitter/media/{}/{}/{}".format(
                 temp_filepath[-4:-2],
                 temp_filepath[-2:],
                 os.path.basename(temp_filepath),

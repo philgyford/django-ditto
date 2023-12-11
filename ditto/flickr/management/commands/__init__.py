@@ -1,6 +1,6 @@
 from django.core.management.base import CommandError
 
-from ....core.management.commands import DittoBaseCommand
+from ditto.core.management.commands import DittoBaseCommand
 
 
 class FetchCommand(DittoBaseCommand):
@@ -25,7 +25,6 @@ class FetchCommand(DittoBaseCommand):
 
 
 class FetchPhotosCommand(FetchCommand):
-
     # What we're fetching:
     singular_noun = "Photo"
     plural_noun = "Photos"
@@ -47,20 +46,20 @@ class FetchPhotosCommand(FetchCommand):
         parser.add_argument("--end", action="store", default=None, help=self.end_help)
 
     def handle(self, *args, **options):
-
         # We might be fetching for a specific account or all (None).
         nsid = options["account"] if options["account"] else None
 
         if options["days"] and (options["start"] or options["end"]):
-            raise CommandError("You can't use --days with --start or --end")
+            msg = "You can't use --days with --start or --end"
+            raise CommandError(msg)
 
         if options["days"]:
-
             # Will be either 'all' or a number; make the number an int.
             if options["days"].isdigit():
                 options["days"] = int(options["days"])
             elif options["days"] != "all":
-                raise CommandError("--days should be an integer or 'all'.")
+                msg = "--days should be an integer or 'all'."
+                raise CommandError(msg)
 
             results = self.fetch_photos(nsid=nsid, days=options["days"])
             self.output_results(results, options.get("verbosity", 1))
@@ -72,12 +71,12 @@ class FetchPhotosCommand(FetchCommand):
             self.output_results(results, options.get("verbosity", 1))
 
         elif options["account"]:
-            raise CommandError(
-                "Specify --days, or --start and/or --end as well as --account."
-            )
+            msg = "Specify --days, or --start and/or --end as well as --account."
+            raise CommandError(msg)
 
         else:
-            raise CommandError("Specify --days, or --start and/or --end.")
+            msg = "Specify --days, or --start and/or --end."
+            raise CommandError(msg)
 
     def fetch_photos(self, nsid, days=None, start=None, end=None):
         """Child classes should override this method to call a method that

@@ -1,12 +1,11 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from datetime import time as datetime_time
-from datetime import timezone
 
 from django import template
 from django.utils.html import format_html
 
-from ...core.utils import get_annual_item_counts
-from ..models import Photo, Photoset
+from ditto.core.utils import get_annual_item_counts
+from ditto.flickr.models import Photo, Photoset
 
 register = template.Library()
 
@@ -45,8 +44,8 @@ def day_photos(date, nsid=None, time="post_time"):
             "`time` must be either 'post_time' or " "'taken_time', not '%s'." % time
         )
 
-    start = datetime.combine(date, datetime_time.min).replace(tzinfo=timezone.utc)
-    end = datetime.combine(date, datetime_time.max).replace(tzinfo=timezone.utc)
+    start = datetime.combine(date, datetime_time.min).replace(tzinfo=UTC)
+    end = datetime.combine(date, datetime_time.max).replace(tzinfo=UTC)
     photos = Photo.public_photo_objects
 
     if time == "taken_time":
@@ -81,13 +80,14 @@ def photo_license(n):
     """Returns the text value of the Photo's license, indicated by the number n.
     Will probably be an HTML link to more info.
     """
-    licenses = dict((x, y) for x, y in Photo.LICENSES)
+    licenses = {x: y for x, y in Photo.LICENSES}
 
     if n in licenses:
         if n in Photo.LICENSE_URLS and Photo.LICENSE_URLS[n] != "":
             return format_html(
-                '<a href="%(url)s" title="More about permissions">%(name)s</a>'
-                % {"url": Photo.LICENSE_URLS[n], "name": licenses[n]}
+                '<a href="{}" title="More about permissions">{}</a>'.format(
+                    Photo.LICENSE_URLS[n], licenses[n]
+                )
             )
         else:
             return licenses[n]
@@ -118,9 +118,6 @@ def annual_photo_counts(nsid=None, count_by="post_time"):
     if nsid is not None:
         qs = qs.filter(user__nsid=nsid)
 
-    if count_by == "taken_time":
-        field_name = "taken_year"
-    else:
-        field_name = "post_year"
+    field_name = "taken_year" if count_by == "taken_time" else "post_year"
 
     return get_annual_item_counts(qs, field_name)

@@ -1,4 +1,3 @@
-# coding: utf-8
 from django.db import models
 from django.forms.models import model_to_dict
 
@@ -8,6 +7,7 @@ from .utils import truncate_string
 
 class TimeStampedModelMixin(models.Model):
     "Should be mixed in to all models."
+
     time_created = models.DateTimeField(
         auto_now_add=True, help_text="The time this item was created in the database."
     )
@@ -19,7 +19,7 @@ class TimeStampedModelMixin(models.Model):
         abstract = True
 
 
-class DiffModelMixin(object):
+class DiffModelMixin:
     """A model mixin that tracks model fields' values and provide some useful
     api to know what fields have been changed.
 

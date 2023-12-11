@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from ...fetch.fetchers import UserFetcher, UserIdFetcher
-from ...models import Account, User
+from ditto.flickr.fetch.fetchers import UserFetcher, UserIdFetcher
+from ditto.flickr.models import Account, User
 
 
 class Command(BaseCommand):
@@ -25,7 +25,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["id"] is False:
-            raise CommandError("Specify an Account ID like --id=1")
+            msg = "Specify an Account ID like --id=1"
+            raise CommandError(msg)
 
         # First we need the Account object we're fetching for.
         account = False
@@ -57,8 +58,9 @@ class Command(BaseCommand):
                 else:
                     if options.get("verbosity", 1) > 0:
                         self.stderr.write(
-                            "Failed to fetch a user using Flickr ID '%s': %s"
-                            % (id_result["id"], result["messages"][0])
+                            "Failed to fetch a user using Flickr ID '{}': {}".format(
+                                id_result["id"], result["messages"][0]
+                            )
                         )
             else:
                 if options.get("verbosity", 1) > 0:

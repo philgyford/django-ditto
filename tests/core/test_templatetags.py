@@ -99,7 +99,7 @@ class DisplayTimeTestCase(TestCase):
     def test_returns_time_with_link(self, reverse):
         reverse.return_value = "/2015/08/14/"
         self.assertEqual(
-            display_time(datetime_now(), True),
+            display_time(datetime_now(), link_to_day=True),
             (
                 '<time datetime="2015-08-14 13:34:56">13:34 on <a href="/2015/08/14/" '
                 'title="All items from this day">14 Aug 2015</a></time>'
@@ -171,7 +171,6 @@ class DisplayTimeTestCase(TestCase):
     @override_app_settings(CORE_DATE_FORMAT="%B %d, %Y")
     @freeze_time("2015-08-14 13:34:56")
     def test_returns_time_with_no_link_custom_date_and_time(self):
-
         self.assertEqual(
             display_time(datetime_now()),
             '<time datetime="2015-08-14 13:34:56">1.34 PM on August 14, 2015</time>',
@@ -180,7 +179,6 @@ class DisplayTimeTestCase(TestCase):
     @override_app_settings(CORE_DATETIME_FORMAT="[time] on the day [date]")
     @freeze_time("2015-08-14 13:34:56")
     def test_returns_time_with_no_link_custom_date_time(self):
-
         self.assertEqual(
             display_time(datetime_now()),
             '<time datetime="2015-08-14 13:34:56">13:34 on the day 14 Aug 2015</time>',

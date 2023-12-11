@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from ..core.admin import DittoItemModelAdmin
+from ditto.core.admin import DittoItemModelAdmin
+
 from .models import Account, Album, Artist, Scrobble, Track
 
 

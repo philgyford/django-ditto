@@ -1,12 +1,10 @@
 import json
-from datetime import datetime, timezone
-from urllib.parse import quote_plus
+from datetime import UTC, datetime
+from urllib.parse import parse_qs, quote_plus
 from zoneinfo import ZoneInfo
 
 import responses
-import six
 from django.test import TestCase
-from six.moves.urllib.parse import parse_qs
 
 from ditto.flickr.fetch.savers import SaveUtilsMixin
 
@@ -35,7 +33,7 @@ class SaveUtilsMixinTestCase(TestCase):
     def test_unixtime_to_datetime(self):
         api_time = "1093459273"
         time1 = SaveUtilsMixin()._unixtime_to_datetime(api_time)
-        time2 = datetime.utcfromtimestamp(int(api_time)).replace(tzinfo=timezone.utc)
+        time2 = datetime.fromtimestamp(int(api_time), tz=UTC)
         self.assertEqual(time1, time2)
 
 
@@ -58,23 +56,22 @@ class FlickrFetchTestCase(TestCase):
     }
 
     def setUp(self):
-        super(FlickrFetchTestCase, self).setUp()
+        super().setUp()
         self.mock = responses.RequestsMock(assert_all_requests_are_fired=True)
         self.mock.start()
 
     def tearDown(self):
         self.mock.stop()
         self.mock.reset()
-        super(FlickrFetchTestCase, self).tearDown()
+        super().tearDown()
 
     def load_raw_fixture(self, method):
         """Makes the JSON response to a call to the API.
         method -- Method name used in self.flickr_fixtures.
         Returns the JSON text.
         """
-        json_file = open("%s%s" % (self.fixture_path, self.flickr_fixtures[method]))
-        json_data = json_file.read()
-        json_file.close()
+        with open(f"{self.fixture_path}{self.flickr_fixtures[method]}") as f:
+            json_data = f.read()
         return json_data
 
     def load_fixture(self, method):
@@ -84,6 +81,7 @@ class FlickrFetchTestCase(TestCase):
 
     def expect(
         self,
+        *,
         params=None,
         body="",
         status=200,
@@ -92,7 +90,7 @@ class FlickrFetchTestCase(TestCase):
         match_querystring=True,
     ):
         """Mocks an expected HTTP query with Responses.
-        Mostly copied from https://github.com/sybrenstuvel/flickrapi/blob/master/tests/test_flickrapi.py  # noqa: E501
+        Mostly copied from https://github.com/sybrenstuvel/flickrapi/blob/master/tests/test_flickrapi.py
         """
         urlbase = "https://api.flickr.com/services/rest/"
 
@@ -108,11 +106,11 @@ class FlickrFetchTestCase(TestCase):
             # The parameters should be on the URL.
             qp = quote_plus
             qs = "&".join(
-                "%s=%s" % (qp(key), qp(six.text_type(value).encode("utf-8")))
+                "{}={}".format(qp(key), qp(str(value).encode("utf-8")))
                 for key, value in sorted(params.items())
             )
             if qs:
-                url = "%s?%s" % (urlbase, qs)
+                url = f"{urlbase}?{qs}"
 
             self.mock.add(
                 method=method,
@@ -197,6 +195,6 @@ class FlickrFetchTestCase(TestCase):
             params.setdefault(k, v)
 
         # Add the param specifying the API method:
-        params.setdefault("method", "flickr.{}".format(method))
+        params.setdefault("method", f"flickr.{method}")
 
         self.expect(params=params, body=body)

@@ -1,9 +1,9 @@
-from datetime import datetime, time, timezone
+from datetime import UTC, datetime, time
 
 from django import template
 
-from ...core.utils import get_annual_item_counts
-from ..models import Bookmark
+from ditto.core.utils import get_annual_item_counts
+from ditto.pinboard.models import Bookmark
 
 register = template.Library()
 
@@ -34,8 +34,8 @@ def day_bookmarks(date, account=None):
     Keyword arguments:
     account -- An account username, 'philgyford', or None to fetch for all.
     """
-    start = datetime.combine(date, time.min).replace(tzinfo=timezone.utc)
-    end = datetime.combine(date, time.max).replace(tzinfo=timezone.utc)
+    start = datetime.combine(date, time.min).replace(tzinfo=UTC)
+    end = datetime.combine(date, time.max).replace(tzinfo=UTC)
     bookmarks = Bookmark.public_objects.filter(post_time__range=[start, end])
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)

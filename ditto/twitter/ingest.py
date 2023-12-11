@@ -4,7 +4,8 @@ from urllib.parse import urlparse
 
 from django.core.files import File
 
-from ..core.utils import datetime_now
+from ditto.core.utils import datetime_now
+
 from .fetch.savers import TweetSaver
 from .models import Media
 
@@ -13,7 +14,7 @@ class IngestError(Exception):
     pass
 
 
-class TweetIngester(object):
+class TweetIngester:
     """For importing a downloaded archive of tweets.
     Request yours from https://twitter.com/settings/account
 
@@ -83,10 +84,11 @@ class TweetIngester(object):
         And it should set self.file_count to be the number of JS files
         we import the data from.
         """
-        raise NotImplementedError(
+        msg = (
             "Child classes of TweetImporter must implement their own "
             "_load_data() method."
         )
+        raise NotImplementedError(msg)
 
     def _save_tweets(self, directory):
         """Go through the list of dicts that is self.tweets_data and
@@ -103,7 +105,6 @@ class TweetIngester(object):
         """Save media files.
         Not doing anything by default.
         """
-        pass
 
 
 class Version1TweetIngester(TweetIngester):
@@ -134,11 +135,11 @@ class Version1TweetIngester(TweetIngester):
         try:
             for file in os.listdir(directory):
                 if file.endswith(".js"):
-                    filepath = "%s/%s" % (directory, file)
+                    filepath = f"{directory}/{file}"
                     self._get_data_from_file(filepath)
                     self.file_count += 1
-        except OSError as e:
-            raise IngestError(e)
+        except OSError as err:
+            raise IngestError(err) from err
 
         if self.file_count == 0:
             raise IngestError("No .js files found in %s" % directory)
@@ -150,17 +151,17 @@ class Version1TweetIngester(TweetIngester):
         Arguments:
         filespath -- Absolute path to the file.
         """
-        f = open(filepath, "r")
-        lines = f.readlines()
-        # Remove first line, that contains JavaScript:
-        lines = lines[1:]
-        try:
-            tweets_data = json.loads("".join(lines))
-        except ValueError as e:
-            raise IngestError(f"Could not load JSON from {filepath}: {e}")
-        else:
-            self.tweets_data.extend(tweets_data)
-        f.close()
+        with open(filepath) as f:
+            lines = f.readlines()
+            # Remove first line, that contains JavaScript:
+            lines = lines[1:]
+            try:
+                tweets_data = json.loads("".join(lines))
+            except ValueError as err:
+                msg = f"Could not load JSON from {filepath}: {err}"
+                raise IngestError(msg) from err
+            else:
+                self.tweets_data.extend(tweets_data)
 
 
 class Version2TweetIngester(TweetIngester):
@@ -249,17 +250,17 @@ class Version2TweetIngester(TweetIngester):
                                     directory, "tweet_media", local_filename
                                 )
 
-                                django_file = File(open(filepath, "rb"))
-
-                                if media_obj.media_type == "animated_gif":
-                                    # When we fetch GIFs we also fetch an image file for
-                                    # them. But their images aren't included in the
-                                    # downloaded archive so we'll make do without here.
-                                    media_obj.mp4_file.save(filename, django_file)
-                                    self.media_count += 1
-                                elif media_obj.media_type == "photo":
-                                    media_obj.image_file.save(filename, django_file)
-                                    self.media_count += 1
+                                with File(open(filepath, "rb")) as django_file:
+                                    if media_obj.media_type == "animated_gif":
+                                        # When we fetch GIFs we also fetch an image file
+                                        # for them. But their images aren't included in
+                                        # the downloaded archive so we'll make do
+                                        # without here.
+                                        media_obj.mp4_file.save(filename, django_file)
+                                        self.media_count += 1
+                                    elif media_obj.media_type == "photo":
+                                        media_obj.image_file.save(filename, django_file)
+                                        self.media_count += 1
 
     def _construct_user_data(self, directory):
         """
@@ -289,17 +290,18 @@ class Version2TweetIngester(TweetIngester):
                     "downloaded twitter archive by Django Ditto"
                 ),
             }
-        except KeyError as e:
-            raise ImportError(f"Error creating user data: {e}")
+        except KeyError as err:
+            msg = f"Error creating user data: {err}"
+            raise ImportError(msg) from err
 
         return user_data
 
     def _get_json_from_file(self, directory, filepath):
         filepath = os.path.join(directory, filepath)
         try:
-            f = open(filepath)
-        except OSError as e:
-            raise ImportError(e)
+            f = open(filepath)  # noqa: SIM115
+        except OSError as err:
+            raise ImportError(err) from err
 
         lines = f.readlines()
         # Remove first line, that contains JavaScript:
@@ -307,8 +309,9 @@ class Version2TweetIngester(TweetIngester):
 
         try:
             data = json.loads("".join(lines))
-        except ValueError as e:
-            raise IngestError(f"Could not load JSON from {filepath}: {e}")
+        except ValueError as err:
+            msg = f"Could not load JSON from {filepath}: {err}"
+            raise IngestError(msg) from err
         else:
             f.close()
             return data

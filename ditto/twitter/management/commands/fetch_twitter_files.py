@@ -1,6 +1,5 @@
-# coding: utf-8
-from ....core.management.commands import DittoBaseCommand
-from ...fetch.fetchers import FilesFetcher
+from ditto.core.management.commands import DittoBaseCommand
+from ditto.twitter.fetch.fetchers import FilesFetcher
 
 
 class Command(DittoBaseCommand):

@@ -1,11 +1,11 @@
-# coding: utf-8
 import json
 import urllib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
-from ..core.utils import datetime_now
+from ditto.core.utils import datetime_now
+
 from .models import Account, Bookmark
 
 PINBOARD_API_ENDPOINT = "https://api.pinboard.in/v1/"
@@ -18,17 +18,16 @@ class FetchError(Exception):
     pass
 
 
-class BookmarksFetcher(object):
+class BookmarksFetcher:
     """The parent class containing common methods.
     Use one of the child classes to fetch a particular set of Bookmarks.
     """
 
     def fetch(self):
-        raise FetchError(
-            "Call a child class like AllBookmarksFetcher or RecentBookmarksFetcher"
-        )
+        msg = "Call a child class like AllBookmarksFetcher or RecentBookmarksFetcher"
+        raise FetchError(msg)
 
-    def _fetch(self, fetch_type, params={}, username=None):
+    def _fetch(self, fetch_type, params=None, username=None):
         """The main method for making all types of Bookmark requests, and
         saving the data.
 
@@ -38,6 +37,7 @@ class BookmarksFetcher(object):
                     These will be used directly with the Pinboard API.
         username -- the username of the one Account to fetch (or None for all).
         """
+        params = {} if params is None else params
         # Each element will be a dict, like:
         # {'account':'philgyford', 'success':True, 'fetched':12}
         result = []
@@ -78,7 +78,8 @@ class BookmarksFetcher(object):
         if username is None:
             accounts = Account.objects.filter(is_active=True)
             if len(accounts) == 0:
-                raise FetchError("No active accounts were found to fetch.")
+                msg = "No active accounts were found to fetch."
+                raise FetchError(msg)
         else:
             account = Account.objects.get(username=username)
             if account.is_active:
@@ -116,7 +117,7 @@ class BookmarksFetcher(object):
         params["auth_token"] = account.api_token
         query_string = urllib.parse.urlencode(params)
 
-        final_url = "{}?{}".format(url, query_string)
+        final_url = f"{url}?{query_string}"
 
         error_message = ""
 
@@ -167,10 +168,7 @@ class BookmarksFetcher(object):
         response = json.loads(json_text)
 
         # The JSON has different formats depending on what we fetched:
-        if fetch_type == "all":
-            posts = response
-        else:
-            posts = response["posts"]
+        posts = response if fetch_type == "all" else response["posts"]
 
         for bookmark in posts:
             # Before we do anything to it, we give the bookmark a 'json'
@@ -179,10 +177,10 @@ class BookmarksFetcher(object):
             # Time string to object:
             bookmark["time"] = datetime.strptime(
                 bookmark["time"], "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=timezone.utc)
+            ).replace(tzinfo=UTC)
             # 'yes'/'no' to booleans:
-            bookmark["shared"] = True if bookmark["shared"] == "yes" else False
-            bookmark["toread"] = True if bookmark["toread"] == "yes" else False
+            bookmark["shared"] = bookmark["shared"] == "yes"
+            bookmark["toread"] = bookmark["toread"] == "yes"
             # String into an array of strings:
             bookmark["tags"] = bookmark["tags"].split()
 
@@ -251,9 +249,9 @@ class DateBookmarksFetcher(BookmarksFetcher):
         FetchError if the date format is invalid.
         """
         try:
-            dt = datetime.strptime(post_date, "%Y-%m-%d")
-        except ValueError:
-            raise FetchError("Invalid date format ('%s')" % post_date)
+            dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(UTC)
+        except ValueError as err:
+            raise FetchError("Invalid date format ('%s')" % post_date) from err
         else:
             return self._fetch(fetch_type="date", params={"dt": dt}, username=username)
 

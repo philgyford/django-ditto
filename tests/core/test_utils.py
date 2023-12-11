@@ -1,5 +1,4 @@
-# coding: utf-8
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import responses
 from django.test import TestCase
@@ -13,7 +12,7 @@ from ditto.core.utils.downloader import DownloadException, filedownloader
 class DatetimeNowTestCase(TestCase):
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_datetime_now(self):
-        self.assertEqual(datetime_now(), datetime.utcnow().replace(tzinfo=timezone.utc))
+        self.assertEqual(datetime_now(), datetime.now(tz=UTC))
 
 
 class DatetimeFromStrTestCase(TestCase):
@@ -21,7 +20,7 @@ class DatetimeFromStrTestCase(TestCase):
         s = "2015-08-12 12:00:00"
         self.assertEqual(
             datetime_from_str(s),
-            datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc),
+            datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC),
         )
 
 
@@ -30,10 +29,8 @@ class TruncateStringTestCase(TestCase):
         "By default, strips HTML"
         self.assertEqual(
             truncate_string(
-                (
-                    '<p>Some text. <a href="http://www.example.com/"><b>A link'
-                    "</b></a>. And more."
-                )
+                '<p>Some text. <a href="http://www.example.com/"><b>A link'
+                "</b></a>. And more."
             ),
             "Some text. A link. And more.",
         )
@@ -170,7 +167,6 @@ class FileDownloaderTestCase(TestCase):
         "Mocks requests and calls filedownloader.download()"
         # Open the image we're going to pretend we're fetching from the URL:
         with open("tests/core/fixtures/images/marmite.jpg", "rb") as img1:
-
             responses.add(
                 responses.GET,
                 self.url,
@@ -227,7 +223,7 @@ class FileDownloaderTestCase(TestCase):
     def test_make_filename_from_content_disposition(self):
         "If URL has no filename, should use the Content-Disposition filename."
         filename = filedownloader.make_filename(
-            "https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/",  # noqa: E501
+            "https://www.flickr.com/photos/philgyford/26348530105/play/orig/2b5f3e0919/",
             {"Content-Disposition": "attachment; filename=26348530105.mov"},
         )
         self.assertEqual(filename, "26348530105.mov")

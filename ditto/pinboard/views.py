@@ -3,12 +3,14 @@ from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
-from ..core.views import PaginatedListView
+from ditto.core.views import PaginatedListView
+
 from .models import Account, Bookmark, BookmarkTag
 
 
 class SingleAccountMixin(SingleObjectMixin):
     "For views which list bookmarks and also need an Account object."
+
     slug_field = "username"
     slug_url_kwarg = "username"
 
@@ -24,6 +26,7 @@ class SingleAccountMixin(SingleObjectMixin):
 
 class HomeView(PaginatedListView):
     "List all recent Bookmarks and all Accounts"
+
     template_name = "pinboard/home.html"
     queryset = Bookmark.public_objects.all().prefetch_related("account")
 
@@ -45,6 +48,7 @@ class ToreadListView(PaginatedListView):
 
 class AccountDetailView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its Bookmarks."
+
     template_name = "pinboard/account_detail.html"
 
     def get_context_data(self, **kwargs):
@@ -61,6 +65,7 @@ class AccountDetailView(SingleAccountMixin, PaginatedListView):
 
 class AccountToreadView(SingleAccountMixin, PaginatedListView):
     "A single Pinboard Account and its 'to read' Bookmarks."
+
     template_name = "pinboard/account_toread.html"
 
     def get_context_data(self, **kwargs):
@@ -77,6 +82,7 @@ class AccountToreadView(SingleAccountMixin, PaginatedListView):
 
 class BookmarkDetailView(DetailView):
     "A single Bookmark, from one Account"
+
     model = Bookmark
     # Only display public bookmarks; private ones will 404.
     queryset = Bookmark.public_objects.all()
@@ -99,6 +105,7 @@ class TagListView(ListView):
 
 class TagDetailView(SingleObjectMixin, PaginatedListView):
     "All Bookmarks with a certain tag from all Accounts"
+
     template_name = "pinboard/tag_detail.html"
     allow_empty = False
 
@@ -122,6 +129,7 @@ class TagDetailView(SingleObjectMixin, PaginatedListView):
 
 class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
     "All Bookmarks with a certain Tag from one Account"
+
     template_name = "pinboard/account_tag_detail.html"
     allow_empty = False
 
@@ -133,8 +141,8 @@ class AccountTagDetailView(SingleAccountMixin, PaginatedListView):
         """Custom method for fetching the Tag."""
         try:
             obj = BookmarkTag.objects.get(slug=self.kwargs["tag_slug"])
-        except BookmarkTag.DoesNotExist:
-            raise Http404(_("No Tags found matching the query"))
+        except BookmarkTag.DoesNotExist as err:
+            raise Http404(_("No Tags found matching the query")) from err
         return obj
 
     def get_context_data(self, **kwargs):

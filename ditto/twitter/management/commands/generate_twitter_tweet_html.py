@@ -1,7 +1,6 @@
-# coding: utf-8
 from django.core.management.base import BaseCommand, CommandError
 
-from ...models import Account, Tweet
+from ditto.twitter.models import Account, Tweet
 
 
 class Command(BaseCommand):
@@ -33,10 +32,10 @@ class Command(BaseCommand):
             screen_name = options["account"]
             try:
                 Account.objects.get(user__screen_name=screen_name)
-            except Account.DoesNotExist:
+            except Account.DoesNotExist as err:
                 raise CommandError(
                     "There's no Account with a screen name of '%s'" % screen_name
-                )
+                ) from err
             tweets = tweets.filter(user__screen_name=screen_name)
 
         for tweet in tweets:

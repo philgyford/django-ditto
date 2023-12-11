@@ -49,7 +49,7 @@ class Version2TweetIngesterTestCase(TestCase):
                 "id_str": "12552",
                 "screen_name": "philgyford",
                 "name": "Phil Gyford",
-                "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300.jpg",  # NOQA: E501
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/1167616130/james_200208_300x300.jpg",
                 "verified": False,
                 "ditto_note": (
                     "This user data was compiled from separate parts of a "

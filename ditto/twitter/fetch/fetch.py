@@ -4,9 +4,10 @@ import time
 from django.core.files import File
 from twython import Twython, TwythonError
 
-from ...core.utils import datetime_now
-from ...core.utils.downloader import DownloadException, filedownloader
-from ..models import Media, Tweet, User
+from ditto.core.utils import datetime_now
+from ditto.core.utils.downloader import DownloadException, filedownloader
+from ditto.twitter.models import Media, Tweet, User
+
 from . import FetchError
 from .savers import TweetSaver, UserSaver
 
@@ -28,7 +29,7 @@ from .savers import TweetSaver, UserSaver
 # FetchFiles
 
 
-class Fetch(object):
+class Fetch:
     """Parent class for children that will call the Twitter API to fetch data
     for a single Account.
 
@@ -128,9 +129,8 @@ class Fetch(object):
         Should call self.api.a_function_name() and set self.results with the
         results.
         """
-        raise FetchError(
-            "Children of the Fetch class should define their own _call_api() method."
-        )
+        msg = "Children of the Fetch class should define their own _call_api() method."
+        raise FetchError(msg)
 
     def _save_results(self):
         """Define in child classes.
@@ -143,13 +143,11 @@ class Fetch(object):
         """Can optionally be defined in child classes.
         Do any extra things that need to be done after saving a page of data.
         """
-        pass
 
     def _post_fetch(self):
         """Can optionally be defined in child classes.
         Do any extra things that need to be done after we've fetched all data.
         """
-        pass
 
 
 class FetchVerify(Fetch):
@@ -189,7 +187,7 @@ class FetchLookup(Fetch):
     # Maxmum number of requests allowed per 15 minute window:
     max_requests = 60
 
-    def fetch(self, ids=[]):
+    def fetch(self, ids=None):
         """
         Keyword arguments:
         ids -- A list of Twitter user/tweet IDs to fetch. Optional. If not
@@ -198,6 +196,7 @@ class FetchLookup(Fetch):
         allows 100 per query, and 60 queries per 15 minute window. So 6000
         ids would be the maximum.
         """
+        ids = [] if ids is None else ids
         self._set_initial_ids(ids)
         return super().fetch()
 
@@ -228,10 +227,7 @@ class FetchLookup(Fetch):
             self._fetch_pages()
 
     def _more_to_fetch(self):
-        if len(self.ids_remaining_to_fetch) > 0:
-            return True
-        else:
-            return False
+        return len(self.ids_remaining_to_fetch) > 0
 
     def _ids_to_fetch_in_query(self):
         """
@@ -343,15 +339,9 @@ class FetchNewTweets(Fetch):
 
     def _more_to_fetch(self):
         if self.fetch_type == "new":
-            if self._since_id() is None or self.max_id > self._since_id():
-                return True
-            else:
-                return False
+            return self._since_id() is None or self.max_id > self._since_id()
         elif self.fetch_type == "number":
-            if self.remaining_to_fetch > 0:
-                return True
-            else:
-                return False
+            return self.remaining_to_fetch > 0
         return False
 
     def _tweets_to_fetch_in_query(self):
@@ -450,7 +440,7 @@ class FetchTweetsFavorite(FetchNewTweets):
             self.objects.append(tw)
 
 
-class FetchFiles(object):
+class FetchFiles:
     """
     For fetching image files and Animated GIFs' MP4 files.
 
@@ -475,7 +465,7 @@ class FetchFiles(object):
     # When fetching Tweets or Users this will be the total amount fetched.
     results_count = 0
 
-    def fetch(self, fetch_all=False):
+    def fetch(self, *, fetch_all=False):
         """
         Download and save original images for all Media objects
         (or just those that don't already have them).
@@ -551,19 +541,20 @@ class FetchFiles(object):
                 "image/gif",
             ]
         else:
-            raise FetchError('media_type should be "image" or "mp4"')
+            msg = 'media_type should be "image" or "mp4"'
+            raise FetchError(msg)
 
         filepath = False
         try:
             # Saves the file to /tmp/:
             filepath = filedownloader.download(url, acceptable_content_types)
-        except DownloadException as e:
-            raise FetchError(e)
+        except DownloadException as err:
+            raise FetchError(err) from err
 
         if filepath:
             # Reopen file and save to the Media object:
-            reopened_file = open(filepath, "rb")
-            django_file = File(reopened_file)
+            with open(filepath, "rb") as reopened_file:
+                django_file = File(reopened_file)
 
             if media_type == "mp4":
                 media_obj.mp4_file.save(os.path.basename(filepath), django_file)

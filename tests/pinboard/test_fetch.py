@@ -1,6 +1,5 @@
-# coding: utf-8
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import responses
@@ -64,10 +63,9 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         `method` is 'get' or 'recent' or 'all'.
         """
         posts = []
-        for n in range(0, num_posts):
+        for n in range(num_posts):
             posts.append(
-                '{"href":"http:\\/\\/example%s.com\\/","description":"My description %s","extended":"My extended %s.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"%sT09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}'  # noqa: E501
-                % (n, n, n, post_date)
+                f'{"href":"http:\\/\\/example{n}.com\\/","description":"My description {n}","extended":"My extended {n}.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"{post_date}T09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}'  # noqa: E501
             )
 
         posts_json = "[%s]\t\n" % (",".join(posts))
@@ -75,11 +73,7 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         if method == "all":
             return posts_json
         else:
-            return '{"date":"%sT09:48:31Z","user":"%s","posts":%s}\t\n' % (
-                post_date,
-                username,
-                posts_json,
-            )
+            return f'{"date":"{post_date}T09:48:31Z","user":"{username}","posts":{posts_json}}\t\n'  # noqa: E501
 
     # Check that all interface methods return expected results on success.
 
@@ -209,11 +203,11 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         It didn't until June 2020 when Pinboard upgraded the server
         and something happened to add a BOM to API responses.
         """
-        json_file = open("tests/pinboard/fixtures/api/bookmarks_no_bom.json")
-        self.add_response(body=json_file.read())
-        result = DateBookmarksFetcher().fetch(
-            post_date="2015-06-18", username="philgyford"
-        )
+        with open("tests/pinboard/fixtures/api/bookmarks_no_bom.json") as f:
+            self.add_response(body=f.read())
+            result = DateBookmarksFetcher().fetch(
+                post_date="2015-06-18", username="philgyford"
+            )
         self.assertEqual(result[0]["account"], "philgyford")
         self.assertTrue(result[0]["success"])
         self.assertEqual(result[0]["fetched"], 1)
@@ -224,11 +218,11 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         It didn't until June 2020 when Pinboard upgraded the server
         and something happened to add a BOM to API responses.
         """
-        json_file = open("tests/pinboard/fixtures/api/bookmarks_bom.json")
-        self.add_response(body=json_file.read())
-        result = DateBookmarksFetcher().fetch(
-            post_date="2015-06-18", username="philgyford"
-        )
+        with open("tests/pinboard/fixtures/api/bookmarks_bom.json") as f:
+            self.add_response(body=f.read())
+            result = DateBookmarksFetcher().fetch(
+                post_date="2015-06-18", username="philgyford"
+            )
         self.assertEqual(result[0]["account"], "philgyford")
         self.assertTrue(result[0]["success"])
         self.assertEqual(result[0]["fetched"], 1)
@@ -262,10 +256,9 @@ class FetchTypesSaveTestCase(FetchTestCase):
         what should be a list of correctly-parsed data about Bookmarks, ready
         to make Bookmark objects out of.
         """
-        json_file = open(self.api_fixture)
-        json_data = json_file.read()
-        bookmarks_data = BookmarksFetcher()._parse_response("date", json_data)
-        json_file.close()
+        with open(self.api_fixture) as f:
+            json_data = f.read()
+            bookmarks_data = BookmarksFetcher()._parse_response("date", json_data)
 
         return {"json": json_data, "bookmarks": bookmarks_data}
 
@@ -282,7 +275,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks_data[0]["time"],
             datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             ),
         )
 
@@ -310,7 +303,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         Bookmark objects.
         """
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
+        fetch_time = datetime.now(tz=UTC)
 
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json["bookmarks"]
@@ -332,7 +325,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].fetch_time,
             datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             ),
         )
         self.assertEqual(
@@ -348,7 +341,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].post_time,
             datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             ),
         )
         self.assertEqual(
@@ -374,7 +367,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         """Ensure that when saving a Bookmark that already exists, we update
         it."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
+        fetch_time = datetime.now(tz=UTC)
 
         # Add a Bookmark into the DB before we fetch anything.
         bookmark = BookmarkFactory(
@@ -412,7 +405,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].fetch_time,
             datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             ),
         )
 
@@ -424,7 +417,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
     def test_no_update_bookmarks(self):
         """Ensure that if no values have changed, we don't update a bookmark."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
+        fetch_time = datetime.now(tz=UTC)
 
         # Add a Bookmark into the DB before we fetch anything.
         BookmarkFactory(

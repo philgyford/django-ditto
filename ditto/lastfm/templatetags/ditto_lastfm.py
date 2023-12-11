@@ -4,8 +4,8 @@ import datetime
 from django import template
 from django.conf import settings
 
-from ...core.utils import get_annual_item_counts
-from ..models import Account, Album, Artist, Scrobble, Track
+from ditto.core.utils import get_annual_item_counts
+from ditto.lastfm.models import Account, Album, Artist, Scrobble, Track
 
 register = template.Library()
 
@@ -27,7 +27,8 @@ def check_top_kwargs(**kwargs):
         )
 
     if limit != "all" and isinstance(limit, int) is False:
-        raise ValueError("`limit` must be an integer or 'all'")
+        msg = "`limit` must be an integer or 'all'"
+        raise ValueError(msg)
 
     if (
         date is not None
@@ -60,10 +61,10 @@ def get_period_times(date, period):
         # `date` is a datetime.date
         min_time = datetime.datetime.combine(
             date, datetime.datetime.min.time()
-        ).replace(tzinfo=datetime.timezone.utc)
+        ).replace(tzinfo=datetime.UTC)
         max_time = datetime.datetime.combine(
             date, datetime.datetime.max.time()
-        ).replace(tzinfo=datetime.timezone.utc)
+        ).replace(tzinfo=datetime.UTC)
 
     if period == "week":
         # Default is Sunday (0):
@@ -116,9 +117,7 @@ def top_albums(account=None, artist=None, limit=10, date=None, period="day"):
     period -- A String: 'day', 'week', 'month', or 'year'.
     """
 
-    check_top_kwargs(
-        **{"account": account, "limit": limit, "date": date, "period": period}
-    )
+    check_top_kwargs(account=account, limit=limit, date=date, period=period)
 
     if artist is not None and not isinstance(artist, Artist):
         raise TypeError("artist must be an Artist instance, " "not a %s" % type(artist))
@@ -161,9 +160,7 @@ def top_artists(account=None, limit=10, date=None, period="day"):
     date -- A datetime or date, for getting Artists from a single time period.
     period -- A String: 'day', 'week', 'month', or 'year'.
     """
-    check_top_kwargs(
-        **{"account": account, "limit": limit, "date": date, "period": period}
-    )
+    check_top_kwargs(account=account, limit=limit, date=date, period=period)
 
     qs_kwargs = {}
 
@@ -208,9 +205,7 @@ def top_tracks(
     period -- A String: 'day', 'week', 'month', or 'year'.
     """
 
-    check_top_kwargs(
-        **{"account": account, "limit": limit, "date": date, "period": period}
-    )
+    check_top_kwargs(account=account, limit=limit, date=date, period=period)
 
     if album is not None and type(album) is not Album:
         raise TypeError("album must be an Album instance, " "not a %s" % type(album))
@@ -257,7 +252,8 @@ def recent_scrobbles(account=None, limit=10):
         )
 
     if isinstance(limit, int) is False:
-        raise ValueError("`limit` must be an integer")
+        msg = "`limit` must be an integer"
+        raise ValueError(msg)
 
     if type(account) is Account:
         return account.get_recent_scrobbles(limit)

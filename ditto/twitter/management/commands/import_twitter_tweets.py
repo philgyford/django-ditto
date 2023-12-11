@@ -1,9 +1,8 @@
-# coding: utf-8
 import os
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...ingest import Version1TweetIngester, Version2TweetIngester
+from ditto.twitter.ingest import Version1TweetIngester, Version2TweetIngester
 
 
 class Command(BaseCommand):
@@ -11,7 +10,8 @@ class Command(BaseCommand):
     Request your archive from https://twitter.com/settings/account
 
     Usage:
-    ./manage.py import_tweets --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66  # noqa: E501
+    ./manage.py import_tweets \
+        --path=/Users/phil/Downloads/12552_dbeb4be9b8ff5f76d7d486c005cc21c9faa61f66
     """
 
     help = "Imports a complete history of tweets from a downloaded archive"
@@ -49,29 +49,29 @@ class Command(BaseCommand):
                 ingester_class = Version1TweetIngester
 
             elif options["archive_version"] != "v2":
-                raise CommandError(
-                    f"version should be v1 or v2, not '{options['archive_version']}"
-                )
+                msg = f"version should be v1 or v2, not '{options['archive_version']}"
+                raise CommandError(msg)
 
         if options["path"]:
             if os.path.isdir(options["path"]):
-                js_dir = "%s%s" % (options["path"], subpath)
+                js_dir = f"{options['path']}{subpath}"
                 if os.path.isdir(js_dir):
                     result = ingester_class().ingest(directory=js_dir)
                 else:
-                    raise CommandError(
+                    msg = (
                         f"Expected to find a directory at '{js_dir}' "
                         "containing .js file(s)"
                     )
+                    raise CommandError(msg)
             else:
-                raise CommandError(f"Can't find a directory at '{options['path']}'")
+                msg = f"Can't find a directory at '{options['path']}'"
+                raise CommandError(msg)
         else:
-            raise CommandError(
-                (
-                    "Specify the location of the archive directory, "
-                    "e.g. --path=/path/to/twitter-2022-01-31-abcdef123456"
-                )
+            msg = (
+                "Specify the location of the archive directory, "
+                "e.g. --path=/path/to/twitter-2022-01-31-abcdef123456"
             )
+            raise CommandError(msg)
 
         if options.get("verbosity", 1) > 0:
             if result["success"]:
@@ -85,5 +85,4 @@ class Command(BaseCommand):
                     f"and {result['media']} media {mediafilenoun}"
                 )
             else:
-
                 self.stderr.write(f"Failed to import tweets: {result['messages'][0]}")

@@ -1,6 +1,6 @@
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import call, patch
 
 from django.test import TestCase, override_settings
@@ -19,9 +19,7 @@ class FilesFetcherTestCase(TestCase):
 
         self.photo_1 = PhotoFactory(title="p1", original_file="p1.jpg", user=user)
 
-        the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(
-            tzinfo=timezone.utc
-        )
+        the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(tzinfo=UTC)
 
         # Needs a taken_time for testing file save path:
         # post_time will put them in order.
@@ -158,8 +156,7 @@ class FilesFetcherTestCase(TestCase):
         nsid = nsid[: nsid.index("@")]
         self.assertEqual(
             self.photo_2.original_file.name,
-            "flickr/%s/%s/%s/photos/2015/08/14/%s"
-            % (
+            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
                 nsid[-4:-2],
                 nsid[-2:],
                 self.photo_2.user.nsid.replace("@", ""),
@@ -180,8 +177,7 @@ class FilesFetcherTestCase(TestCase):
         nsid = nsid[: nsid.index("@")]
         self.assertEqual(
             self.video_2.video_original_file.name,
-            "flickr/%s/%s/%s/photos/2015/08/14/%s"
-            % (
+            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
                 nsid[-4:-2],
                 nsid[-2:],
                 self.video_2.user.nsid.replace("@", ""),

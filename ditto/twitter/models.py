@@ -1,19 +1,15 @@
-# coding: utf-8
+import contextlib
 import json
 import logging
 import os
 
-try:
-    from django.urls import reverse
-except ImportError:
-    # For Django 1.8
-    from django.urls import reverse
-
 from django.db import models
 from django.templatetags.static import static
+from django.urls import reverse
 from imagekit.cachefiles import ImageCacheFile
 
-from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ditto.core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+
 from . import app_settings, imagegenerators, managers
 from .utils import htmlify_description, htmlify_tweet
 
@@ -61,27 +57,8 @@ class Account(TimeStampedModelMixin, models.Model):
         help_text="If false, new Tweets won't be fetched.",
     )
 
-    def save(self, *args, **kwargs):
-        if self.user is None:
-            result = self.updateUserFromTwitter()
-
-            # It would be nice to make this more visible, but not sure how to
-            # given we don't have access to a request at this point.
-            if (
-                type(result) is dict
-                and "success" in result
-                and result["success"] is False
-            ):
-                if "messages" in result:
-                    messages = ", ".join(result["messages"])
-                else:
-                    messages = ""
-                logger.error(
-                    "There was an error while trying to update the User data from "
-                    f"the Twitter API: {messages}"
-                )
-
-        super().save(*args, **kwargs)
+    class Meta:
+        ordering = ["user__screen_name"]
 
     def __str__(self):
         if self.user:
@@ -89,8 +66,25 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return "%d" % self.pk
 
-    class Meta:
-        ordering = ["user__screen_name"]
+    def save(self, *args, **kwargs):
+        if self.user is None:
+            result = self.update_user_from_twitter()
+
+            # It would be nice to make this more visible, but not sure how to
+            # given we don't have access to a request at this point.
+            if (
+                isinstance(result, dict)
+                and "success" in result
+                and result["success"] is False
+            ):
+                messages = ", ".join(result["messages"]) if "messages" in result else ""
+                logger.error(
+                    "There was an error while trying to update the User data from "
+                    "the Twitter API: %s",
+                    messages,
+                )
+
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         if self.user:
@@ -100,7 +94,7 @@ class Account(TimeStampedModelMixin, models.Model):
         else:
             return ""
 
-    def updateUserFromTwitter(self):
+    def update_user_from_twitter(self):
         """Calls the Twitter API to fetch the user details for this account.
         If the user object doesn't exist yet, it is created.
         But its relationship with this Account isn't saved here, only assigned.
@@ -126,15 +120,25 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
-        if (
+        return (
             self.consumer_key
             and self.consumer_secret
             and self.access_token
             and self.access_token_secret
-        ):
-            return True
-        else:
-            return False
+        )
+
+
+def media_upload_path(obj, filename):
+    "Make path under MEDIA_ROOT where original files will be saved."
+
+    # eg get '12345678' from '12345678.jpg':
+    name = os.path.splitext(filename)[0]
+
+    # If filename is '12345678.jpg':
+    # 'twitter/media/56/78/12345678.jpg'
+    return "/".join(
+        [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
+    )
 
 
 class Media(TimeStampedModelMixin, models.Model):
@@ -218,23 +222,11 @@ class Media(TimeStampedModelMixin, models.Model):
     )
     # END VIDEO-ONLY PROPERTIES
 
-    def upload_path(self, filename):
-        "Make path under MEDIA_ROOT where original files will be saved."
-
-        # eg get '12345678' from '12345678.jpg':
-        name = os.path.splitext(filename)[0]
-
-        # If filename is '12345678.jpg':
-        # 'twitter/media/56/78/12345678.jpg'
-        return "/".join(
-            [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
-        )
-
     image_file = models.ImageField(
-        upload_to=upload_path, null=False, blank=True, default=""
+        upload_to=media_upload_path, null=False, blank=True, default=""
     )
     mp4_file = models.FileField(
-        upload_to=upload_path,
+        upload_to=media_upload_path,
         null=False,
         blank=True,
         default="",
@@ -247,21 +239,18 @@ class Media(TimeStampedModelMixin, models.Model):
     # There is no Public manager for media, as we don't have the concept of
     # private/public Media items.
 
-    def __str__(self):
-        return "%s %d" % (self.get_media_type_display(), self.id)
-
     class Meta:
         ordering = ["time_created"]
         verbose_name = "Media item"
         verbose_name_plural = "Media items"
 
+    def __str__(self):
+        return "%s %d" % (self.get_media_type_display(), self.id)
+
     @property
     def has_file(self):
         "Do we have a file saved at all?"
-        if self.image_file.name or self.mp4_file.name:
-            return True
-        else:
-            return False
+        return self.image_file.name or self.mp4_file.name
 
     @property
     def thumbnail_w(self):
@@ -368,7 +357,7 @@ class Media(TimeStampedModelMixin, models.Model):
                     image_generator = generator(source=self.image_file)
                     result = ImageCacheFile(image_generator)
                     return result.url
-                except Exception:
+                except Exception:  # noqa: BLE001
                     # We have an original file but something's wrong with it.
                     # Might be 0 bytes or something.
                     return static("ditto-core/img/original_error.jpg")
@@ -381,7 +370,7 @@ class Media(TimeStampedModelMixin, models.Model):
         Generate the URL of an image of a particular size, at Twitter.
         size -- one of 'large', 'medium', 'small', or 'thumbnail'.
         """
-        return "%s:%s" % (self.image_url, size)
+        return f"{self.image_url}:{size}"
 
     def _video_type(self):
         """
@@ -585,7 +574,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
                 .order_by("post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     def get_previous_public_by_post_time(self):
@@ -599,7 +588,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
                 .order_by("-post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     # Shortcuts:
@@ -611,16 +600,13 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     @property
     def is_reply(self):
-        if self.in_reply_to_screen_name == "":
-            return False
-        else:
-            return True
+        return self.in_reply_to_screen_name == ""
 
     @property
     def in_reply_to_url(self):
         "If it's a reply, the link to the tweet replied to."
         if self.is_reply:
-            return "https://twitter.com/%s/status/%s" % (
+            return "https://twitter.com/{}/status/{}".format(
                 self.in_reply_to_screen_name,
                 self.in_reply_to_status_id,
             )
@@ -666,10 +652,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
         tweet = None
         if self.quoted_status_id:
-            try:
+            with contextlib.suppress(Tweet.DoesNotExist):
                 tweet = Tweet.public_objects.get(twitter_id=self.quoted_status_id)
-            except Tweet.DoesNotExist:
-                pass
 
         # Save for later:
         self._quoted_tweet = tweet
@@ -682,10 +666,8 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
         tweet = None
         if self.retweeted_status_id:
-            try:
+            with contextlib.suppress(Tweet.DoesNotExist):
                 tweet = Tweet.public_objects.get(twitter_id=self.retweeted_status_id)
-            except Tweet.DoesNotExist:
-                pass
 
         # Save for later:
         self._retweeted_tweet = tweet
@@ -694,6 +676,35 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     def _summary_source(self):
         "Used to make the `summary` property."
         return self.title
+
+
+def avatar_upload_path(obj, filename):
+    """
+    Make path under MEDIA_ROOT where avatar file will be saved.
+
+    eg, if twitter_id is 12345678:
+        twitter/avatars/56/78/12345678/avatar_name.jpg
+    """
+
+    # We can't just join all these parts in one go, because if the ID
+    # isn't long enough to have two numbered directories, (ie, it's only
+    # 1 or 2 digits) then Django 1.8 creates a path with '//' rather than
+    # just ignoring that directory.
+
+    # So this is a bit laborious:
+
+    # 'twitter/avatars':
+    start = "/".join([app_settings.TWITTER_DIR_BASE, "avatars"])
+    # '/78/12345678/avatar_name.jpg':
+    end = "/".join([str(obj.twitter_id)[-2:], str(obj.twitter_id), str(filename)])
+    # The bit that will be empty for 1-2 digit IDs:
+    # '56':
+    middle = str(obj.twitter_id)[-4:-2]
+
+    if middle:
+        return "/".join([start, middle, end])
+    else:
+        return "/".join([start, end])
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -782,34 +793,6 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         null=False, blank=True, help_text="eg, the raw JSON from the API."
     )
 
-    def avatar_upload_path(self, filename):
-        """
-        Make path under MEDIA_ROOT where avatar file will be saved.
-
-        eg, if twitter_id is 12345678:
-            twitter/avatars/56/78/12345678/avatar_name.jpg
-        """
-
-        # We can't just join all these parts in one go, because if the ID
-        # isn't long enough to have two numbered directories, (ie, it's only
-        # 1 or 2 digits) then Django 1.8 creates a path with '//' rather than
-        # just ignoring that directory.
-
-        # So this is a bit laborious:
-
-        # 'twitter/avatars':
-        start = "/".join([app_settings.TWITTER_DIR_BASE, "avatars"])
-        # '/78/12345678/avatar_name.jpg':
-        end = "/".join([str(self.twitter_id)[-2:], str(self.twitter_id), str(filename)])
-        # The bit that will be empty for 1-2 digit IDs:
-        # '56':
-        middle = str(self.twitter_id)[-4:-2]
-
-        if middle:
-            return "/".join([start, middle, end])
-        else:
-            return "/".join([start, end])
-
     avatar = models.ImageField(
         upload_to=avatar_upload_path, null=False, blank=True, default=""
     )
@@ -820,11 +803,11 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # All Users that have Accounts:
     objects_with_accounts = managers.WithAccountsManager()
 
-    def __str__(self):
-        return "@%s" % self.screen_name
-
     class Meta:
         ordering = ["screen_name"]
+
+    def __str__(self):
+        return "@%s" % self.screen_name
 
     def save(self, *args, **kwargs):
         """If the user's privacy status has changed, we need to change the

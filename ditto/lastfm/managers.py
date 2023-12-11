@@ -67,13 +67,16 @@ class WithScrobbleCountsManager(models.Manager):
         track = kwargs.get("track", None)
 
         if album and not self.is_filterable_by_album:
-            raise ValueError("This is not filterable by album")
+            msg = "This is not filterable by album"
+            raise ValueError(msg)
 
         if artist and not self.is_filterable_by_artist:
-            raise ValueError("This is not filterable by artist")
+            msg = "This is not filterable by artist"
+            raise ValueError(msg)
 
         if track and not self.is_filterable_by_track:
-            raise ValueError("This is not filterable by track")
+            msg = "This is not filterable by track"
+            raise ValueError(msg)
 
         if account is not None and account.__class__.__name__ != "Account":
             raise TypeError(
@@ -144,11 +147,7 @@ class TracksManager(WithScrobbleCountsManager):
 
     def with_scrobble_counts(self, **kwargs):
         "Pre-fetch all the Tracks' Artists."
-        qs = (
-            super(TracksManager, self)
-            .with_scrobble_counts(**kwargs)
-            .prefetch_related("artist")
-        )
+        qs = super().with_scrobble_counts(**kwargs).prefetch_related("artist")
         return qs
 
 
@@ -163,11 +162,7 @@ class AlbumsManager(WithScrobbleCountsManager):
 
     def with_scrobble_counts(self, **kwargs):
         "Pre-fetch all the Albums' Artists."
-        qs = (
-            super(AlbumsManager, self)
-            .with_scrobble_counts(**kwargs)
-            .prefetch_related("artist")
-        )
+        qs = super().with_scrobble_counts(**kwargs).prefetch_related("artist")
         return qs
 
 

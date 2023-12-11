@@ -21,9 +21,9 @@ def get_entity(package, entity):
     eg, get_entity('ditto', 'version') returns `__version__` value in
     `__init__.py`.
     """
-    init_py = open(os.path.join(package, "__init__.py")).read()
-    find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
-    return re.search(find, init_py).group(1)
+    with open(os.path.join(package, "__init__.py")).read() as init_py:
+        find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
+        return re.search(find, init_py).group(1)
 
 
 def get_version():
