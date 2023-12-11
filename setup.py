@@ -44,7 +44,7 @@ def get_author_email():
 
 # Do `python setup.py tag` to tag with the current version number.
 if sys.argv[-1] == "tag":
-    os.system("git tag -a %s -m 'version %s'" % (get_version(), get_version()))
+    os.system(f"git tag -a {get_version()} -m 'version {get_version()}'")
     os.system("git push --tags")
     sys.exit()
 
@@ -70,9 +70,8 @@ if sys.argv[-1] == "testpublish":
 
 dev_require = [
     "django-debug-toolbar>=2.0,<5.0",
-    "flake8>=4.0,<7.0",
-    "black",
     "python-dotenv",
+    "ruff",
     "unittest-parametrize",
 ]
 
