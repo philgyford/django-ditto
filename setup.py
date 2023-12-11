@@ -97,7 +97,7 @@ setup(
     ],
     dependency_links=[],
     tests_require=tests_require,
-    extras_require={"dev": dev_require + ["Django>=4.1,<4.3"], "test": tests_require},
+    extras_require={"dev": dev_require + ["Django>=4.1,<5.0"], "test": tests_require},
     include_package_data=True,
     license=get_license(),
     description=(
@@ -116,6 +116,7 @@ setup(
         "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.1",
         "Framework :: Django :: 4.2",
+        "Framework :: Django :: 5.0",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
