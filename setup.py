@@ -100,7 +100,7 @@ setup(
     ],
     dependency_links=[],
     tests_require=tests_require,
-    extras_require={"dev": dev_require + ["Django>=4.1,<5.0"], "test": tests_require},
+    extras_require={"dev": dev_require + ["Django>=4.1,<=5.0"], "test": tests_require},
     include_package_data=True,
     license=get_license(),
     description=(
@@ -123,7 +123,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
