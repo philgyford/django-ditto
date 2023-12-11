@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.db import IntegrityError
 from django.test import TestCase
@@ -107,7 +107,7 @@ class BookmarkTestCase(TestCase):
         account = AccountFactory(username="billy")
         post_time = datetime.strptime(
             "2015-01-01 12:00:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=UTC)
+        ).replace(tzinfo=timezone.UTC)
         bookmark_1 = BookmarkFactory(account=account, post_time=post_time)
         bookmark_2 = BookmarkFactory(
             account=account, post_time=(post_time + timedelta(days=1))
@@ -195,7 +195,7 @@ class BookmarkTestCase(TestCase):
 class BookmarkNextPrevTestCase(TestCase):
     def setUp(self):
         dt = datetime.strptime("2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=UTC
+            tzinfo=timezone.UTC
         )
 
         account = AccountFactory()

@@ -1,5 +1,5 @@
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 from django.db import IntegrityError
@@ -136,13 +136,13 @@ class PhotosetTestCase(TestCase):
             title="Earliest",
             flickr_created_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         PhotosetFactory(
             title="Latest",
             flickr_created_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         photosets = Photoset.objects.all()
         self.assertEqual(photosets[0].title, "Latest")
@@ -214,13 +214,13 @@ class PhotoTestCase(TestCase):
             title="Earliest",
             post_time=datetime.strptime(
                 "2016-04-07 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         PhotoFactory(
             title="Latest",
             post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         photos = Photo.objects.all()
         self.assertEqual(photos[0].title, "Latest")
@@ -473,7 +473,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
             user=UserFactory(nsid="123456@N01"),
             taken_time=datetime.strptime(
                 "2015-08-14 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
 
     def tearDown(self):
@@ -556,14 +556,14 @@ class PhotoNextPrevTestCase(TestCase):
             user=user,
             post_time=datetime.strptime(
                 "2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         self.private_photo = PhotoFactory(
             user=user,
             is_private=True,
             post_time=datetime.strptime(
                 "2016-04-09 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         # Photo by a different user:
         user_2 = UserFactory()
@@ -572,13 +572,13 @@ class PhotoNextPrevTestCase(TestCase):
             user=user_2,
             post_time=datetime.strptime(
                 "2016-04-10 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
         self.photo_2 = PhotoFactory(
             user=user,
             post_time=datetime.strptime(
                 "2016-04-11 12:00:00", "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=UTC),
+            ).replace(tzinfo=timezone.UTC),
         )
 
     def test_next_public_by_post_time(self):

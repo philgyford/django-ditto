@@ -1,6 +1,6 @@
 import contextlib
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from django.db.utils import IntegrityError
@@ -44,7 +44,7 @@ class SaveUtilsMixin:
         """Change a text unixtime from the API to a datetime with timezone.
         api_time is a string or int like "1093459273".
         """
-        return datetime.fromtimestamp(int(api_time), tz=UTC)
+        return datetime.fromtimestamp(int(api_time), tz=timezone.UTC)
 
 
 class UserSaver(SaveUtilsMixin):

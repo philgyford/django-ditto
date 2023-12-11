@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from django.test import TestCase
 
@@ -96,7 +96,7 @@ class TemplatetagsDayTweetsTestCase(TestCase):
         self.tweets_2 = TweetFactory.create_batch(2, user=user_2)
         self.tweets_3 = TweetFactory.create_batch(2, user=user_3)
 
-        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=UTC)
+        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.UTC)
         self.tweets_1[0].post_time = post_time
         self.tweets_1[0].save()
         self.tweets_2[1].post_time = post_time + timedelta(hours=1)
@@ -137,7 +137,7 @@ class TemplatetagsDayFavoritesTestCase(TestCase):
         self.tweets[0].user.is_private = True
         self.tweets[0].user.save()
 
-        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=UTC)
+        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.UTC)
         self.tweets[0].post_time = post_time
         self.tweets[0].save()
         self.tweets[1].post_time = post_time + timedelta(hours=1)

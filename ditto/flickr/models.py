@@ -813,25 +813,6 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
         return self.photos.filter(is_private=False)
 
 
-def avatar_upload_path(obj, filename):
-    "Make path under MEDIA_ROOT where avatar file will be saved."
-    # If NSID is '35034346050@N01', get '35034346050'
-    nsid = obj.nsid[: obj.nsid.index("@")]
-
-    # If NSID is '35034346050@N01'
-    # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
-    return "/".join(
-        [
-            app_settings.FLICKR_DIR_BASE,
-            nsid[-4:-2],
-            nsid[-2:],
-            obj.nsid.replace("@", ""),
-            "avatars",
-            filename,
-        ]
-    )
-
-
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     nsid = models.CharField(
         null=False,
@@ -876,7 +857,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     )
 
     avatar = models.ImageField(
-        upload_to=avatar_upload_path, null=False, blank=True, default=""
+        upload_to="avatar_upload_path", null=False, blank=True, default=""
     )
 
     objects = models.Manager()
@@ -918,3 +899,21 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
             )
         else:
             return "https://www.flickr.com/images/buddyicon.gif"
+
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        # If NSID is '35034346050@N01', get '35034346050'
+        nsid = self.nsid[: self.nsid.index("@")]
+
+        # If NSID is '35034346050@N01'
+        # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
+        return "/".join(
+            [
+                app_settings.FLICKR_DIR_BASE,
+                nsid[-4:-2],
+                nsid[-2:],
+                self.nsid.replace("@", ""),
+                "avatars",
+                filename,
+            ]
+        )

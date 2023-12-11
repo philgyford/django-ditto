@@ -1,7 +1,7 @@
 import json
 import os
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from unittest.mock import call, patch
 
 from django.test import override_settings
@@ -214,7 +214,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(user.photos_count, 0)
 
         dt = datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=UTC
+            tzinfo=timezone.UTC
         )
         self.assertEqual(user.photos_first_date, dt)
         self.assertEqual(user.photos_first_date_taken, dt)

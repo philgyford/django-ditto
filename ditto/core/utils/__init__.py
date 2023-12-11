@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from django.db.models import Count
 from django.utils.html import strip_tags
@@ -34,14 +34,14 @@ def datetime_now():
     """Just returns a datetime object for now in UTC, with UTC timezone.
     Because I was doing this a lot in various places.
     """
-    return datetime.now(tz=UTC)
+    return datetime.now(tz=timezone.UTC)
 
 
 def datetime_from_str(s):
     """A shortcut for making a UTC datetime from a string like
     '2015-08-11 12:00:00'.
     """
-    return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
+    return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.UTC)
 
 
 def get_annual_item_counts(qs, field_name="post_year"):

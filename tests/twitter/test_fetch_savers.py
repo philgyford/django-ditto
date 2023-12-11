@@ -1,7 +1,7 @@
 import json
 import os
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -69,7 +69,7 @@ class TweetSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(
             tweet.post_time,
             datetime.strptime("2015-08-06 19:42:59", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=UTC
+                tzinfo=timezone.UTC
             ),
         )
         self.assertEqual(tweet.favorite_count, 2)
@@ -420,7 +420,7 @@ class UserSaverTestCase(FetchTwitterTestCase):
         self.assertEqual(
             user.created_at,
             datetime.strptime("2006-11-15 16:55:59", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=UTC
+                tzinfo=timezone.UTC
             ),
         )
         self.assertEqual(user.description, "Good. Good to Firm in places.")

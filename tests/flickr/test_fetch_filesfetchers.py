@@ -1,6 +1,6 @@
 import os
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from unittest.mock import call, patch
 
 from django.test import TestCase, override_settings
@@ -19,7 +19,9 @@ class FilesFetcherTestCase(TestCase):
 
         self.photo_1 = PhotoFactory(title="p1", original_file="p1.jpg", user=user)
 
-        the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(tzinfo=UTC)
+        the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(
+            tzinfo=timezone.UTC
+        )
 
         # Needs a taken_time for testing file save path:
         # post_time will put them in order.

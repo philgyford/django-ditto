@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from datetime import time as datetime_time
 
 from django import template
@@ -44,8 +44,8 @@ def day_photos(date, nsid=None, time="post_time"):
             "`time` must be either 'post_time' or " "'taken_time', not '%s'." % time
         )
 
-    start = datetime.combine(date, datetime_time.min).replace(tzinfo=UTC)
-    end = datetime.combine(date, datetime_time.max).replace(tzinfo=UTC)
+    start = datetime.combine(date, datetime_time.min).replace(tzinfo=timezone.UTC)
+    end = datetime.combine(date, datetime_time.max).replace(tzinfo=timezone.UTC)
     photos = Photo.public_photo_objects
 
     if time == "taken_time":

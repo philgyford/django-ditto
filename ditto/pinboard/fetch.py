@@ -1,6 +1,6 @@
 import json
 import urllib
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -177,7 +177,7 @@ class BookmarksFetcher:
             # Time string to object:
             bookmark["time"] = datetime.strptime(
                 bookmark["time"], "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=UTC)
+            ).replace(tzinfo=timezone.UTC)
             # 'yes'/'no' to booleans:
             bookmark["shared"] = bookmark["shared"] == "yes"
             bookmark["toread"] = bookmark["toread"] == "yes"
@@ -249,7 +249,7 @@ class DateBookmarksFetcher(BookmarksFetcher):
         FetchError if the date format is invalid.
         """
         try:
-            dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(UTC)
+            dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(timezone.UTC)
         except ValueError as err:
             raise FetchError("Invalid date format ('%s')" % post_date) from err
         else:

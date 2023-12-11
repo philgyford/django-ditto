@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import responses
 from django.test import TestCase
@@ -12,7 +12,7 @@ from ditto.core.utils.downloader import DownloadException, filedownloader
 class DatetimeNowTestCase(TestCase):
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_datetime_now(self):
-        self.assertEqual(datetime_now(), datetime.now(tz=UTC))
+        self.assertEqual(datetime_now(), datetime.now(tz=timezone.UTC))
 
 
 class DatetimeFromStrTestCase(TestCase):
@@ -20,7 +20,7 @@ class DatetimeFromStrTestCase(TestCase):
         s = "2015-08-12 12:00:00"
         self.assertEqual(
             datetime_from_str(s),
-            datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC),
+            datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.UTC),
         )
 
 

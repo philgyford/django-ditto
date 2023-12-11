@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, time
+from datetime import datetime, time, timezone
 
 from django import template
 
@@ -34,8 +34,8 @@ def day_bookmarks(date, account=None):
     Keyword arguments:
     account -- An account username, 'philgyford', or None to fetch for all.
     """
-    start = datetime.combine(date, time.min).replace(tzinfo=UTC)
-    end = datetime.combine(date, time.max).replace(tzinfo=UTC)
+    start = datetime.combine(date, time.min).replace(tzinfo=timezone.UTC)
+    end = datetime.combine(date, time.max).replace(tzinfo=timezone.UTC)
     bookmarks = Bookmark.public_objects.filter(post_time__range=[start, end])
     if account is not None:
         bookmarks = bookmarks.filter(account__username=account)

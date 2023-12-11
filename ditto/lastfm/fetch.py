@@ -2,7 +2,7 @@ import calendar
 import json
 import time
 import urllib
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -256,7 +256,9 @@ class ScrobblesFetcher:
             )
 
         # Unixtime to datetime object:
-        scrobble_time = datetime.fromtimestamp(int(scrobble["date"]["uts"]), tz=UTC)
+        scrobble_time = datetime.fromtimestamp(
+            int(scrobble["date"]["uts"]), tz=timezone.UTC
+        )
 
         scrobble_obj, created = Scrobble.objects.update_or_create(
             account=self.account,

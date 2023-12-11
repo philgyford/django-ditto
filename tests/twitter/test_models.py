@@ -1,5 +1,5 @@
 import os
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 
 import responses
@@ -192,7 +192,7 @@ class PhotoTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple accounts are sorted by time_created ascending"""
-        time_now = datetime.now(tz=UTC)
+        time_now = datetime.now(tz=timezone.UTC)
         photo_1 = PhotoFactory(time_created=time_now - timedelta(minutes=1))
         PhotoFactory(time_created=time_now)
         photos = Media.objects.all()
@@ -411,7 +411,7 @@ class TweetTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple tweets are sorted by post_time descending"""
-        time_now = datetime.now(tz=UTC)
+        time_now = datetime.now(tz=timezone.UTC)
         TweetFactory(post_time=time_now - timedelta(minutes=1))
         tweet_2 = TweetFactory(post_time=time_now)
         tweets = Tweet.objects.all()
@@ -626,7 +626,7 @@ class TweetTestCase(TestCase):
 class TweetNextPrevTestCase(TestCase):
     def setUp(self):
         dt = datetime.strptime("2016-04-08 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=UTC
+            tzinfo=timezone.UTC
         )
 
         user = UserFactory()
