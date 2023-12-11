@@ -128,19 +128,6 @@ class Account(TimeStampedModelMixin, models.Model):
         )
 
 
-def media_upload_path(obj, filename):
-    "Make path under MEDIA_ROOT where original files will be saved."
-
-    # eg get '12345678' from '12345678.jpg':
-    name = os.path.splitext(filename)[0]
-
-    # If filename is '12345678.jpg':
-    # 'twitter/media/56/78/12345678.jpg'
-    return "/".join(
-        [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
-    )
-
-
 class Media(TimeStampedModelMixin, models.Model):
     """A photo, video or animated GIF attached to a Tweet.
 
@@ -223,10 +210,10 @@ class Media(TimeStampedModelMixin, models.Model):
     # END VIDEO-ONLY PROPERTIES
 
     image_file = models.ImageField(
-        upload_to=media_upload_path, null=False, blank=True, default=""
+        upload_to="upload_path", null=False, blank=True, default=""
     )
     mp4_file = models.FileField(
-        upload_to=media_upload_path,
+        upload_to="upload_path",
         null=False,
         blank=True,
         default="",
@@ -330,6 +317,18 @@ class Media(TimeStampedModelMixin, models.Model):
                 mime_type = "application/dash+xml"
 
         return mime_type
+
+    def upload_path(self, filename):
+        "Make path under MEDIA_ROOT where original files will be saved."
+
+        # eg get '12345678' from '12345678.jpg':
+        name = os.path.splitext(filename)[0]
+
+        # If filename is '12345678.jpg':
+        # 'twitter/media/56/78/12345678.jpg'
+        return "/".join(
+            [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
+        )
 
     def _image_url(self, size):
         """
@@ -678,35 +677,6 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
         return self.title
 
 
-def avatar_upload_path(obj, filename):
-    """
-    Make path under MEDIA_ROOT where avatar file will be saved.
-
-    eg, if twitter_id is 12345678:
-        twitter/avatars/56/78/12345678/avatar_name.jpg
-    """
-
-    # We can't just join all these parts in one go, because if the ID
-    # isn't long enough to have two numbered directories, (ie, it's only
-    # 1 or 2 digits) then Django 1.8 creates a path with '//' rather than
-    # just ignoring that directory.
-
-    # So this is a bit laborious:
-
-    # 'twitter/avatars':
-    start = "/".join([app_settings.TWITTER_DIR_BASE, "avatars"])
-    # '/78/12345678/avatar_name.jpg':
-    end = "/".join([str(obj.twitter_id)[-2:], str(obj.twitter_id), str(filename)])
-    # The bit that will be empty for 1-2 digit IDs:
-    # '56':
-    middle = str(obj.twitter_id)[-4:-2]
-
-    if middle:
-        return "/".join([start, middle, end])
-    else:
-        return "/".join([start, end])
-
-
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     """A Twitter user.
     We don't replicate all of the possible User attributes here, only enough
@@ -794,7 +764,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     )
 
     avatar = models.ImageField(
-        upload_to=avatar_upload_path, null=False, blank=True, default=""
+        upload_to="avatar_upload_path", null=False, blank=True, default=""
     )
 
     favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
@@ -821,6 +791,34 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     def get_absolute_url(self):
         return reverse("twitter:user_detail", kwargs={"screen_name": self.screen_name})
+
+    def avatar_upload_path(self, filename):
+        """
+        Make path under MEDIA_ROOT where avatar file will be saved.
+
+        eg, if twitter_id is 12345678:
+            twitter/avatars/56/78/12345678/avatar_name.jpg
+        """
+
+        # We can't just join all these parts in one go, because if the ID
+        # isn't long enough to have two numbered directories, (ie, it's only
+        # 1 or 2 digits) then Django 1.8 creates a path with '//' rather than
+        # just ignoring that directory.
+
+        # So this is a bit laborious:
+
+        # 'twitter/avatars':
+        start = "/".join([app_settings.TWITTER_DIR_BASE, "avatars"])
+        # '/78/12345678/avatar_name.jpg':
+        end = "/".join([str(self.twitter_id)[-2:], str(self.twitter_id), str(filename)])
+        # The bit that will be empty for 1-2 digit IDs:
+        # '56':
+        middle = str(self.twitter_id)[-4:-2]
+
+        if middle:
+            return "/".join([start, middle, end])
+        else:
+            return "/".join([start, end])
 
     def make_description_html(self):
         """Uses the raw JSON for the user to set self.description_html to a nice
