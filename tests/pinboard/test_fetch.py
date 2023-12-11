@@ -275,7 +275,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks_data[0]["time"],
             datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=timezone.UTC
+                tzinfo=timezone.utc
             ),
         )
 
@@ -303,7 +303,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         Bookmark objects.
         """
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.now(tz=timezone.UTC)
+        fetch_time = datetime.now(tz=timezone.utc)
 
         bookmarks_from_json = self.get_bookmarks_from_json()
         bookmarks_data = bookmarks_from_json["bookmarks"]
@@ -325,7 +325,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].fetch_time,
             datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.UTC
+                tzinfo=timezone.utc
             ),
         )
         self.assertEqual(
@@ -341,7 +341,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].post_time,
             datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=timezone.UTC
+                tzinfo=timezone.utc
             ),
         )
         self.assertEqual(
@@ -367,7 +367,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         """Ensure that when saving a Bookmark that already exists, we update
         it."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.now(tz=timezone.UTC)
+        fetch_time = datetime.now(tz=timezone.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
         bookmark = BookmarkFactory(
@@ -405,7 +405,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(
             bookmarks[1].fetch_time,
             datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.UTC
+                tzinfo=timezone.utc
             ),
         )
 
@@ -417,7 +417,7 @@ class FetchTypesSaveTestCase(FetchTestCase):
     def test_no_update_bookmarks(self):
         """Ensure that if no values have changed, we don't update a bookmark."""
         account = Account.objects.get(pk=1)
-        fetch_time = datetime.now(tz=timezone.UTC)
+        fetch_time = datetime.now(tz=timezone.utc)
 
         # Add a Bookmark into the DB before we fetch anything.
         BookmarkFactory(

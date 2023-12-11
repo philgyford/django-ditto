@@ -29,7 +29,7 @@ class SaveUtilsMixin:
         """Change a text datetime from the API to a datetime with timezone.
         api_time is a string like 'Wed Nov 15 16:55:59 +0000 2006'.
         """
-        return datetime.strptime(api_time, time_format).replace(tzinfo=timezone.UTC)
+        return datetime.strptime(api_time, time_format).replace(tzinfo=timezone.utc)
 
 
 class UserSaver(SaveUtilsMixin):

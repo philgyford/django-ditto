@@ -20,7 +20,7 @@ class FilesFetcherTestCase(TestCase):
         self.photo_1 = PhotoFactory(title="p1", original_file="p1.jpg", user=user)
 
         the_time = datetime.strptime("2015-08-14", "%Y-%m-%d").replace(
-            tzinfo=timezone.UTC
+            tzinfo=timezone.utc
         )
 
         # Needs a taken_time for testing file save path:

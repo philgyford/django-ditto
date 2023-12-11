@@ -257,7 +257,7 @@ class ScrobblesFetcher:
 
         # Unixtime to datetime object:
         scrobble_time = datetime.fromtimestamp(
-            int(scrobble["date"]["uts"]), tz=timezone.UTC
+            int(scrobble["date"]["uts"]), tz=timezone.utc
         )
 
         scrobble_obj, created = Scrobble.objects.update_or_create(

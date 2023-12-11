@@ -33,7 +33,7 @@ class SaveUtilsMixinTestCase(TestCase):
     def test_unixtime_to_datetime(self):
         api_time = "1093459273"
         time1 = SaveUtilsMixin()._unixtime_to_datetime(api_time)
-        time2 = datetime.fromtimestamp(int(api_time), tz=timezone.UTC)
+        time2 = datetime.fromtimestamp(int(api_time), tz=timezone.utc)
         self.assertEqual(time1, time2)
 
 

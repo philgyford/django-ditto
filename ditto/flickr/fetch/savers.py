@@ -44,7 +44,7 @@ class SaveUtilsMixin:
         """Change a text unixtime from the API to a datetime with timezone.
         api_time is a string or int like "1093459273".
         """
-        return datetime.fromtimestamp(int(api_time), tz=timezone.UTC)
+        return datetime.fromtimestamp(int(api_time), tz=timezone.utc)
 
 
 class UserSaver(SaveUtilsMixin):

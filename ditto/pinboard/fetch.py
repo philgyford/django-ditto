@@ -177,7 +177,7 @@ class BookmarksFetcher:
             # Time string to object:
             bookmark["time"] = datetime.strptime(
                 bookmark["time"], "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=timezone.UTC)
+            ).replace(tzinfo=timezone.utc)
             # 'yes'/'no' to booleans:
             bookmark["shared"] = bookmark["shared"] == "yes"
             bookmark["toread"] = bookmark["toread"] == "yes"

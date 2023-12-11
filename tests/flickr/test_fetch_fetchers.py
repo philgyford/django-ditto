@@ -214,7 +214,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         self.assertEqual(user.photos_count, 0)
 
         dt = datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S").replace(
-            tzinfo=timezone.UTC
+            tzinfo=timezone.utc
         )
         self.assertEqual(user.photos_first_date, dt)
         self.assertEqual(user.photos_first_date_taken, dt)

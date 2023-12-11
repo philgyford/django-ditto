@@ -42,7 +42,7 @@ class TemplatetagsDayBookmarksTestCase(TestCase):
         self.bookmarks_1 = BookmarkFactory.create_batch(6, account=account_1)
         self.bookmarks_2 = BookmarkFactory.create_batch(6, account=account_2)
 
-        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.UTC)
+        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.utc)
         self.bookmarks_1[3].post_time = post_time
         self.bookmarks_1[3].save()
         self.bookmarks_1[5].is_private = True

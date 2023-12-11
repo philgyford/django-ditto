@@ -34,14 +34,14 @@ def datetime_now():
     """Just returns a datetime object for now in UTC, with UTC timezone.
     Because I was doing this a lot in various places.
     """
-    return datetime.now(tz=timezone.UTC)
+    return datetime.now(tz=timezone.utc)
 
 
 def datetime_from_str(s):
     """A shortcut for making a UTC datetime from a string like
     '2015-08-11 12:00:00'.
     """
-    return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.UTC)
+    return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
 
 def get_annual_item_counts(qs, field_name="post_year"):

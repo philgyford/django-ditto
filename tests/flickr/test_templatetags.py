@@ -73,8 +73,8 @@ class TemplatetagsDayPhotosTestCase(TestCase):
         self.photos_1 = PhotoFactory.create_batch(2, user=user_1)
         self.photos_2 = PhotoFactory.create_batch(3, user=user_2)
 
-        taken_time = datetime(2014, 3, 18, 12, 0, 0, tzinfo=timezone.UTC)
-        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.UTC)
+        taken_time = datetime(2014, 3, 18, 12, 0, 0, tzinfo=timezone.utc)
+        post_time = datetime(2015, 3, 18, 12, 0, 0, tzinfo=timezone.utc)
         self.photos_1[0].taken_time = taken_time
         self.photos_1[0].post_time = post_time
         self.photos_1[0].save()
