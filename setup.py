@@ -69,16 +69,16 @@ if sys.argv[-1] == "testpublish":
     sys.exit()
 
 dev_require = [
-    "django-debug-toolbar>=2.0,<5.0",
+    "django-debug-toolbar",
     "python-dotenv",
     "ruff",
     "unittest-parametrize",
 ]
 
 tests_require = dev_require + [
-    "factory-boy>=2.12.0,<4.0",
-    "freezegun>=0.3.12,<2.0",
-    "responses>=0.10.7,<1.0",
+    "factory-boy",
+    "freezegun",
+    "responses",
     "coverage[toml]",
 ]
 
@@ -87,11 +87,13 @@ setup(
     version=get_version(),
     packages=["ditto"],
     install_requires=[
-        "django-imagekit>=4.0,<4.2",
+        "django-imagekit>=4.0,<6.0",
         "django-sortedm2m>=3.0.0,<3.2",
+        # django-taggit 5.0 removes support for Django 3.2, so update this when we
+        # drop Django 3.2:
         "django-taggit>=3.0.0,<5.0",
         "flickrapi>=2.4,<2.5",
-        "pillow>=8.0.0,<10.0",
+        "pillow>=9.0.0,<11.0",
         "twitter-text-python>=1.1.1,<1.2",
         "twython>=3.7.0,<3.10",
     ],

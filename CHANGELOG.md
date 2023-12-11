@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Allowed use of Pillow v10 and django-imagekit v5.0
 - Switched from using flake8 and black for linting and formatting to ruff
 
 ## [3.1.0] - 2023-06-20
