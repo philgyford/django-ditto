@@ -765,35 +765,6 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         null=False, blank=True, help_text="eg, the raw JSON from the API."
     )
 
-    avatar = models.ImageField(
-        upload_to="avatar_upload_path", null=False, blank=True, default=""
-    )
-
-    favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
-
-    objects = models.Manager()
-    # All Users that have Accounts:
-    objects_with_accounts = managers.WithAccountsManager()
-
-    class Meta:
-        ordering = ["screen_name"]
-
-    def __str__(self):
-        return "@%s" % self.screen_name
-
-    def save(self, *args, **kwargs):
-        """If the user's privacy status has changed, we need to change the
-        privacy of all their tweets
-        And we also HTMLify their description.
-        """
-        if self.get_field_diff("is_private") is not None:
-            Tweet.objects.filter(user=self).update(is_private=self.is_private)
-        self.make_description_html()
-        super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse("twitter:user_detail", kwargs={"screen_name": self.screen_name})
-
     def avatar_upload_path(self, filename):
         """
         Make path under MEDIA_ROOT where avatar file will be saved.
@@ -821,6 +792,35 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
             return "/".join([start, middle, end])
         else:
             return "/".join([start, end])
+
+    avatar = models.ImageField(
+        upload_to=avatar_upload_path, null=False, blank=True, default=""
+    )
+
+    favorites = models.ManyToManyField(Tweet, related_name="favoriting_users")
+
+    objects = models.Manager()
+    # All Users that have Accounts:
+    objects_with_accounts = managers.WithAccountsManager()
+
+    class Meta:
+        ordering = ["screen_name"]
+
+    def __str__(self):
+        return "@%s" % self.screen_name
+
+    def save(self, *args, **kwargs):
+        """If the user's privacy status has changed, we need to change the
+        privacy of all their tweets
+        And we also HTMLify their description.
+        """
+        if self.get_field_diff("is_private") is not None:
+            Tweet.objects.filter(user=self).update(is_private=self.is_private)
+        self.make_description_html()
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("twitter:user_detail", kwargs={"screen_name": self.screen_name})
 
     def make_description_html(self):
         """Uses the raw JSON for the user to set self.description_html to a nice
