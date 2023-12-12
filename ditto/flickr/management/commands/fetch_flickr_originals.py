@@ -37,7 +37,7 @@ class Command(FetchCommand):
         # We might be fetching for a specific account or all (None).
         nsid = options["account"] if options["account"] else None
 
-        results = self.fetch_files(nsid, options["all"])
+        results = self.fetch_files(nsid, fetch_all=options["all"])
         self.output_results(results, options.get("verbosity", 1))
 
     def fetch_files(self, nsid, *, fetch_all=False):

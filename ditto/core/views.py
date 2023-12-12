@@ -628,7 +628,7 @@ def _date_from_string(
     try:
         return (
             datetime.datetime.strptime(force_str(datestr), format)
-            .astimezone(datetime.UTC)
+            .astimezone(datetime.timezone.utc)
             .date()
         )
     except ValueError as err:

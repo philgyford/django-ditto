@@ -206,10 +206,10 @@
             <div class="card mb-3 flickr-user">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item text-muted">
-                        <small>Last updated on Flickr at {% display_time photo.last_update_time True %}</small>
+                        <small>Last updated on Flickr at {% display_time photo.last_update_time link_to_day=True %}</small>
                     </li>
                     <li class="list-group-item text-muted">
-                        <small>As of {% display_time photo.fetch_time True %}</small>
+                        <small>As of {% display_time photo.fetch_time link_to_day=True %}</small>
                     </li>
                 </ul>
             </div>

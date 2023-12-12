@@ -40,9 +40,9 @@ Expects:
             {% load ditto_core %}
             Posted at
             {% if view == 'day' %}
-                {% display_time bookmark.post_time False %}
+                {% display_time bookmark.post_time link_to_day=False %}
             {% else %}
-                {% display_time bookmark.post_time True %}
+                {% display_time bookmark.post_time link_to_day=True %}
             {% endif %}
 
             {% if view != 'detail' %}

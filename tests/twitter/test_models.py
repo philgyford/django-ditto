@@ -153,7 +153,7 @@ class AccountTestCase(TestCase):
         result = account.update_user_from_twitter()
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            f"{self.api_url}/account/verify_credentials.json.json",
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
         self.assertFalse(result["success"])

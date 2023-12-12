@@ -90,7 +90,7 @@ class FileDownloader:
                 # Could be like 'attachment; filename=26897200312.avi'
                 headers["Content-Disposition"]
                 m = re.search(r"filename\=(.*?)$", headers["Content-Disposition"])
-                with contextlib.suppess(AttributeError, IndexError):
+                with contextlib.suppress(AttributeError, IndexError):
                     filename = m.group(1)
             except KeyError:
                 pass

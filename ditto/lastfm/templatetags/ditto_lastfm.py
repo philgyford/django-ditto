@@ -61,10 +61,10 @@ def get_period_times(date, period):
         # `date` is a datetime.date
         min_time = datetime.datetime.combine(
             date, datetime.datetime.min.time()
-        ).replace(tzinfo=datetime.UTC)
+        ).replace(tzinfo=datetime.timezone.utc)
         max_time = datetime.datetime.combine(
             date, datetime.datetime.max.time()
-        ).replace(tzinfo=datetime.UTC)
+        ).replace(tzinfo=datetime.timezone.utc)
 
     if period == "week":
         # Default is Sunday (0):

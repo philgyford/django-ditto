@@ -385,7 +385,7 @@ class RecentPhotosFetcher(PhotosFetcher):
         # Maximum date of photos to return, if days or start are passed in:
         # By default, set it before Flickr so we get everything.
         self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d").astimezone(
-            datetime.UTC
+            datetime.timezone.utc
         )
 
         # Maximum date of photos to return, if end is passed in:
@@ -415,12 +415,12 @@ class RecentPhotosFetcher(PhotosFetcher):
                 if start:
                     self.min_date = datetime.datetime.strptime(
                         f"{start} 00:00:00", "%Y-%m-%d %H:%M:%S"
-                    ).astimezone(datetime.UTC)
+                    ).astimezone(datetime.timezone.utc)
 
                 if end:
                     self.max_date = datetime.datetime.strptime(
                         f"{end} 23:59:59", "%Y-%m-%d %H:%M:%S"
-                    ).astimezone(datetime.UTC)
+                    ).astimezone(datetime.timezone.utc)
 
                 if (start and end) and (start > end):
                     msg = "Start date must be before the end date."

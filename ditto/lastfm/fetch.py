@@ -189,7 +189,7 @@ class ScrobblesFetcher:
             )
             response.raise_for_status()  # Raises an exception on HTTP error.
         except requests.exceptions.RequestException as err:
-            msg = "Error when fetching Scrobbles (page {self.page_number}): {err}"
+            msg = f"Error when fetching Scrobbles (page {self.page_number}): {err}"
             raise FetchError(msg) from err
 
         response.encoding = "utf-8"

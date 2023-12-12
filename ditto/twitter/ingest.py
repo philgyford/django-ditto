@@ -250,7 +250,8 @@ class Version2TweetIngester(TweetIngester):
                                     directory, "tweet_media", local_filename
                                 )
 
-                                with File(open(filepath, "rb")) as django_file:
+                                with open(filepath, "rb") as f:
+                                    django_file = File(f)
                                     if media_obj.media_type == "animated_gif":
                                         # When we fetch GIFs we also fetch an image file
                                         # for them. But their images aren't included in

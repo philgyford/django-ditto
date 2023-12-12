@@ -141,7 +141,9 @@ class OriginalFilesFetcher:
             with open(filepath, "rb") as reopened_file:
                 django_file = File(reopened_file)
 
-            if media_type == "video":
-                photo.video_original_file.save(os.path.basename(filepath), django_file)
-            else:
-                photo.original_file.save(os.path.basename(filepath), django_file)
+                if media_type == "video":
+                    photo.video_original_file.save(
+                        os.path.basename(filepath), django_file
+                    )
+                else:
+                    photo.original_file.save(os.path.basename(filepath), django_file)

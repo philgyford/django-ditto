@@ -430,7 +430,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     def test_fetches_recent_days(self, save_photo, fetch_extra):
         "Should only ask for photos from recent days, if number of days is set."
         self.expect_response(
-            "people.getPhotos", params={"min_upload_date": "1439294400"}
+            "people.getPhotos", params={"min_upload_date": "1439265600"}
         )
 
         with patch("time.sleep"):

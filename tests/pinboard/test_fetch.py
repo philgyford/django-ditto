@@ -65,7 +65,8 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         posts = []
         for n in range(num_posts):
             posts.append(
-                f'{"href":"http:\\/\\/example{n}.com\\/","description":"My description {n}","extended":"My extended {n}.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"{post_date}T09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}'  # noqa: E501
+                '{"href":"http:\\/\\/example%s.com\\/","description":"My description %s","extended":"My extended %s.","meta":"abcdef1234567890abcdef1234567890","hash":"1234567890abcdef1234567890abcdef","time":"%sT09:48:31Z","shared":"yes","toread":"no","tags":"tag1 tag2 tag3"}'  # noqa: E501, UP031
+                % (n, n, n, post_date)
             )
 
         posts_json = "[%s]\t\n" % (",".join(posts))
@@ -73,7 +74,11 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         if method == "all":
             return posts_json
         else:
-            return f'{"date":"{post_date}T09:48:31Z","user":"{username}","posts":{posts_json}}\t\n'  # noqa: E501
+            return '{{"date":"{}T09:48:31Z","user":"{}","posts":{}}}\t\n'.format(
+                post_date,
+                username,
+                posts_json,
+            )
 
     # Check that all interface methods return expected results on success.
 
@@ -324,8 +329,8 @@ class FetchTypesSaveTestCase(FetchTestCase):
 
         self.assertEqual(
             bookmarks[1].fetch_time,
-            datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.utc
+            datetime.strptime("2015-07-01 04:00:00", "%Y-%m-%d %H:%M:%S").astimezone(
+                timezone.utc
             ),
         )
         self.assertEqual(
@@ -340,8 +345,8 @@ class FetchTypesSaveTestCase(FetchTestCase):
         self.assertEqual(bookmarks[1].url, "http://fontello.com/")
         self.assertEqual(
             bookmarks[1].post_time,
-            datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=timezone.utc
+            datetime.strptime("2015-06-18T09:48:31Z", "%Y-%m-%dT%H:%M:%SZ").astimezone(
+                timezone.utc
             ),
         )
         self.assertEqual(
@@ -404,8 +409,8 @@ class FetchTypesSaveTestCase(FetchTestCase):
         # This should be updated to now, as we've changed things:
         self.assertEqual(
             bookmarks[1].fetch_time,
-            datetime.strptime("2015-07-01 12:00:00", "%Y-%m-%d %H:%M:%S").replace(
-                tzinfo=timezone.utc
+            datetime.strptime("2015-07-01 04:00:00", "%Y-%m-%d %H:%M:%S").astimezone(
+                timezone.utc
             ),
         )
 

@@ -71,9 +71,9 @@ class Version1TweetIngesterTestCase(TestCase):
                 ingester.ingest(directory="/good/dir")
         m.assert_has_calls(
             [
-                call("/good/dir/2015_01.js", "r"),
-                call("/good/dir/2015_02.js", "r"),
-                call("/good/dir/2015_03.js", "r"),
+                call("/good/dir/2015_01.js"),
+                call("/good/dir/2015_02.js"),
+                call("/good/dir/2015_03.js"),
             ],
             any_order=True,
         )

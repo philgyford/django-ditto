@@ -556,7 +556,7 @@ class FetchFiles:
             with open(filepath, "rb") as reopened_file:
                 django_file = File(reopened_file)
 
-            if media_type == "mp4":
-                media_obj.mp4_file.save(os.path.basename(filepath), django_file)
-            else:
-                media_obj.image_file.save(os.path.basename(filepath), django_file)
+                if media_type == "mp4":
+                    media_obj.mp4_file.save(os.path.basename(filepath), django_file)
+                else:
+                    media_obj.image_file.save(os.path.basename(filepath), django_file)

@@ -249,7 +249,7 @@ class DateBookmarksFetcher(BookmarksFetcher):
         FetchError if the date format is invalid.
         """
         try:
-            dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(timezone.UTC)
+            dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(timezone.utc)
         except ValueError as err:
             raise FetchError("Invalid date format ('%s')" % post_date) from err
         else:

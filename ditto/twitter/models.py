@@ -251,7 +251,7 @@ class Media(TimeStampedModelMixin, models.Model):
     @property
     def has_file(self):
         "Do we have a file saved at all?"
-        return self.image_file.name or self.mp4_file.name
+        return bool(self.image_file.name or self.mp4_file.name)
 
     @property
     def thumbnail_w(self):
@@ -601,7 +601,7 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
 
     @property
     def is_reply(self):
-        return self.in_reply_to_screen_name == ""
+        return self.in_reply_to_screen_name != ""
 
     @property
     def in_reply_to_url(self):
