@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for Django 5.0
 
+### Removed
+
+- Dropped support for Django 3.2.
+
 ### Changed
 
 - Allowed use of Pillow v10 and django-imagekit v5.0

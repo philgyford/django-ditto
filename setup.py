@@ -90,9 +90,7 @@ setup(
     install_requires=[
         "django-imagekit>=4.0,<6.0",
         "django-sortedm2m>=3.0.0,<3.2",
-        # django-taggit 5.0 removes support for Django 3.2, so update this when we
-        # drop Django 3.2:
-        "django-taggit>=3.0.0,<5.0",
+        "django-taggit>=4.0.0,<6.0",
         "flickrapi>=2.4,<2.5",
         "pillow>=9.0.0,<11.0",
         "twitter-text-python>=1.1.1,<1.2",
@@ -100,7 +98,7 @@ setup(
     ],
     dependency_links=[],
     tests_require=tests_require,
-    extras_require={"dev": dev_require + ["Django>=4.1,<=5.0"], "test": tests_require},
+    extras_require={"dev": dev_require + ["Django>=4.2,<=5.0"], "test": tests_require},
     include_package_data=True,
     license=get_license(),
     description=(
@@ -116,7 +114,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Django",
-        "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.1",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
