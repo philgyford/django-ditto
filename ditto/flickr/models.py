@@ -1,3 +1,5 @@
+# Because at this stage, don't want to move the upload_to methods around:
+# ruff: noqa: DJ012
 from django.db import models
 from django.templatetags.static import static
 from django.urls import reverse
@@ -856,8 +858,26 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         null=False, blank=False, max_length=50, help_text="eg, 'Europe/London'."
     )
 
+    def avatar_upload_path(self, filename):
+        "Make path under MEDIA_ROOT where avatar file will be saved."
+        # If NSID is '35034346050@N01', get '35034346050'
+        nsid = self.nsid[: self.nsid.index("@")]
+
+        # If NSID is '35034346050@N01'
+        # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
+        return "/".join(
+            [
+                app_settings.FLICKR_DIR_BASE,
+                nsid[-4:-2],
+                nsid[-2:],
+                self.nsid.replace("@", ""),
+                "avatars",
+                filename,
+            ]
+        )
+
     avatar = models.ImageField(
-        upload_to="avatar_upload_path", null=False, blank=True, default=""
+        upload_to=avatar_upload_path, null=False, blank=True, default=""
     )
 
     objects = models.Manager()
@@ -899,21 +919,3 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
             )
         else:
             return "https://www.flickr.com/images/buddyicon.gif"
-
-    def avatar_upload_path(self, filename):
-        "Make path under MEDIA_ROOT where avatar file will be saved."
-        # If NSID is '35034346050@N01', get '35034346050'
-        nsid = self.nsid[: self.nsid.index("@")]
-
-        # If NSID is '35034346050@N01'
-        # then, 'flickr/60/50/35034346050/avatars/avatar_name.jpg'
-        return "/".join(
-            [
-                app_settings.FLICKR_DIR_BASE,
-                nsid[-4:-2],
-                nsid[-2:],
-                self.nsid.replace("@", ""),
-                "avatars",
-                filename,
-            ]
-        )

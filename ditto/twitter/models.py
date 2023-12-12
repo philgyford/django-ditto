@@ -1,3 +1,5 @@
+# Because at this stage, don't want to move the upload_to methods around:
+# ruff: noqa: DJ012
 import contextlib
 import json
 import logging
@@ -209,11 +211,23 @@ class Media(TimeStampedModelMixin, models.Model):
     )
     # END VIDEO-ONLY PROPERTIES
 
+    def upload_path(self, filename):
+        "Make path under MEDIA_ROOT where original files will be saved."
+
+        # eg get '12345678' from '12345678.jpg':
+        name = os.path.splitext(filename)[0]
+
+        # If filename is '12345678.jpg':
+        # 'twitter/media/56/78/12345678.jpg'
+        return "/".join(
+            [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
+        )
+
     image_file = models.ImageField(
-        upload_to="upload_path", null=False, blank=True, default=""
+        upload_to=upload_path, null=False, blank=True, default=""
     )
     mp4_file = models.FileField(
-        upload_to="upload_path",
+        upload_to=upload_path,
         null=False,
         blank=True,
         default="",
@@ -317,18 +331,6 @@ class Media(TimeStampedModelMixin, models.Model):
                 mime_type = "application/dash+xml"
 
         return mime_type
-
-    def upload_path(self, filename):
-        "Make path under MEDIA_ROOT where original files will be saved."
-
-        # eg get '12345678' from '12345678.jpg':
-        name = os.path.splitext(filename)[0]
-
-        # If filename is '12345678.jpg':
-        # 'twitter/media/56/78/12345678.jpg'
-        return "/".join(
-            [app_settings.TWITTER_DIR_BASE, "media", name[-4:-2], name[-2:], filename]
-        )
 
     def _image_url(self, size):
         """
