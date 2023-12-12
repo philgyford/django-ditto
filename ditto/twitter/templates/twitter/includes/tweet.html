@@ -19,9 +19,9 @@ Expects:
                 •
                 {% load ditto_core %}
                 {% if view == 'day' %}
-                    {% display_time tweet.post_time False %}
+                    {% display_time tweet.post_time link_to_day=False %}
                 {% else %}
-                    {% display_time tweet.post_time True %}
+                    {% display_time tweet.post_time link_to_day=True %}
                 {% endif %}
 
                 {% if tweet.is_reply %}

@@ -131,9 +131,8 @@ class ScrobblesFetcherSendTestCase(TestCase):
         fixture_name -- eg 'messages' to load 'messages.json'.
         Returns the JSON text.
         """
-        json_file = open("%s%s.json" % (self.fixture_path, fixture_name))
-        json_data = json_file.read()
-        json_file.close()
+        with open(f"{self.fixture_path}{fixture_name}.json") as f:
+            json_data = f.read()
         return json_data
 
     def load_fixture(self, fixture_name):

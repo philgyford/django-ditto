@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Django Ditto documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun 20 17:02:21 2016.
@@ -68,9 +67,9 @@ def get_entity(package, entity):
     `__init__.py`.
     """
     path = os.path.join(os.path.dirname(__file__), "..", "ditto", "__init__.py")
-    init_py = open(path).read()
-    find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
-    return re.search(find, init_py).group(1)
+    with open(path).read() as init_py:
+        find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
+        return re.search(find, init_py).group(1)
 
 
 def get_version():

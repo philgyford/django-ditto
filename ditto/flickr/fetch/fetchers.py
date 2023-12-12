@@ -7,9 +7,10 @@ import flickrapi
 from django.core.files import File
 from flickrapi.exceptions import FlickrError
 
-from ...core.utils import datetime_now
-from ...core.utils.downloader import DownloadException, filedownloader
-from ..models import Account, User
+from ditto.core.utils import datetime_now
+from ditto.core.utils.downloader import DownloadException, filedownloader
+from ditto.flickr.models import Account, User
+
 from . import FetchError
 from .savers import PhotoSaver, PhotosetSaver, UserSaver
 
@@ -29,7 +30,7 @@ from .savers import PhotoSaver, PhotosetSaver, UserSaver
 #   PhotosetsFetcher
 
 
-class Fetcher(object):
+class Fetcher:
     """Parent class for children that will call the Flickr API to fetch data.
 
     Depending on the child classes, it would be used something like:
@@ -77,7 +78,8 @@ class Fetcher(object):
             else:
                 self.return_value["account"] = "Unsaved Account"
         else:
-            raise ValueError("An Account object is required")
+            msg = "An Account object is required"
+            raise ValueError(msg)
 
         if account.has_credentials():
             self.account = account
@@ -136,30 +138,28 @@ class Fetcher(object):
 
     def _not_failed(self):
         """Has everything gone smoothly so far? ie, no failure registered?"""
-        if "success" not in self.return_value or self.return_value["success"] is True:
-            return True
-        else:
-            return False
+        return (
+            "success" not in self.return_value or self.return_value["success"] is True
+        )
 
     def _call_api(self, **kwargs):
         """
         Should call self.api.a_function() and set self.results with the results.
         """
-        raise FetchError("Subclasess of Fetcher should define their own _call_api().")
+        msg = "Subclasess of Fetcher should define their own _call_api()."
+        raise FetchError(msg)
 
     def _fetch_extra(self):
         """Can be defined in subclasses to fetch extra data to add to
         self.results before we save the data in the DB."""
-        pass
 
     def _save_results(self, **kwargs):
         """
         Should go through self.results and create/update things in the DB based
         on its contents.
         """
-        raise FetchError(
-            "Subclasses of Fetcher should define their own _save_results()."
-        )
+        msg = "Subclasses of Fetcher should define their own _save_results()."
+        raise FetchError(msg)
 
 
 class UserIdFetcher(Fetcher):
@@ -185,8 +185,9 @@ class UserIdFetcher(Fetcher):
         """
         try:
             info = self.api.test.login()
-        except FlickrError as e:
-            raise FetchError("Error when calling test.login(): %s'" % e)
+        except FlickrError as err:
+            msg = f"Error when calling test.login(): {err}'"
+            raise FetchError(msg) from err
 
         self.results = [{"id": info["user"]["id"]}]
 
@@ -204,7 +205,8 @@ class UserFetcher(Fetcher):
         nsid -- A Flickr ID for a user.
         """
         if nsid is None:
-            raise FetchError("UserFetcher().fetch() requires a Flickr id (NSID)")
+            msg = "UserFetcher().fetch() requires a Flickr id (NSID)"
+            raise FetchError(msg)
 
         return super().fetch(nsid=nsid)
 
@@ -212,9 +214,9 @@ class UserFetcher(Fetcher):
         "nsid -- A Flickr ID for a user."
         try:
             info = self.api.people.getInfo(user_id=nsid)
-        except FlickrError as e:
+        except FlickrError as err:
             # User has deleted their account, so create a dummy result
-            if e.code == 5:
+            if err.code == 5:
                 self.results = [
                     {
                         "raw": "{}",
@@ -229,9 +231,8 @@ class UserFetcher(Fetcher):
                 ]
                 return
 
-            raise FetchError(
-                "Error when getting info about User with Flickr ID '%s': %s" % (nsid, e)
-            )
+            msg = f"Error when getting info about User with Flickr ID '{nsid}': {err}"
+            raise FetchError(msg) from err
 
         # info has 'person' and 'stat' elements.
         self.results = [info["person"]]
@@ -253,9 +254,8 @@ class UserFetcher(Fetcher):
                 ["image/jpeg", "image/jpg", "image/png", "image/gif"],
             )
 
-            user.avatar.save(
-                os.path.basename(avatar_filepath), File(open(avatar_filepath, "rb"))
-            )
+            with open(avatar_filepath, "rb") as f:
+                user.avatar.save(os.path.basename(avatar_filepath), File(f))
         except DownloadException:
             pass
 
@@ -276,9 +276,8 @@ class PhotosFetcher(Fetcher):
         """
         Should call self.api.a_function() and set self.results with the results.
         """
-        raise FetchError(
-            "Subclasess of PhotosFetcher should define their own _call_api()."
-        )
+        msg = "Subclasess of PhotosFetcher should define their own _call_api()."
+        raise FetchError(msg)
 
     def _fetch_extra(self):
         """Before saving we need to go through the big list of photos we've
@@ -286,8 +285,7 @@ class PhotosFetcher(Fetcher):
         """
         extra_results = []
 
-        for i, photo in enumerate(self.results):
-
+        for _i, photo in enumerate(self.results):
             self._fetch_user_if_missing(photo["owner"])
 
             extra_results.append(
@@ -327,10 +325,9 @@ class PhotosFetcher(Fetcher):
         """
         try:
             results = self.api.photos.getInfo(photo_id=photo_id)
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching photo info (photo %s): %s" % (photo_id, e)
-            )
+        except FlickrError as err:
+            msg = f"Error when fetching photo info (photo {photo_id}): {err}"
+            raise FetchError(msg) from err
 
         # Each tag on the photo is added by a specific Flickr user.
         # (Usually, but not always, the photo owner.)
@@ -348,10 +345,9 @@ class PhotosFetcher(Fetcher):
         """
         try:
             results = self.api.photos.getSizes(photo_id=photo_id)
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching photo sizes (photo %s): %s" % (photo_id, e)
-            )
+        except FlickrError as err:
+            msg = f"Error when fetching photo sizes (photo {photo_id}): {err}"
+            raise FetchError(msg) from err
         return results["sizes"]
 
     def _fetch_photo_exif(self, photo_id):
@@ -362,10 +358,9 @@ class PhotosFetcher(Fetcher):
         """
         try:
             results = self.api.photos.getExif(photo_id=photo_id)
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching photo EXIF data (photo %s): %s" % (photo_id, e)
-            )
+        except FlickrError as err:
+            msg = f"Error when fetching photo EXIF data (photo {photo_id}): {err}"
+            raise FetchError(msg) from err
         return results["photo"]
 
     def _save_results(self):
@@ -389,7 +384,9 @@ class RecentPhotosFetcher(PhotosFetcher):
 
         # Maximum date of photos to return, if days or start are passed in:
         # By default, set it before Flickr so we get everything.
-        self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
+        self.min_date = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d").astimezone(
+            datetime.timezone.utc
+        )
 
         # Maximum date of photos to return, if end is passed in:
         self.max_date = None
@@ -403,36 +400,41 @@ class RecentPhotosFetcher(PhotosFetcher):
         """
 
         if days and (start or end):
-            raise ValueError("You can't use --days with --start or --end")
+            msg = "You can't use --days with --start or --end"
+            raise ValueError(msg)
 
         if days:
             try:
                 self.min_date = datetime_now() - datetime.timedelta(days=days)
-            except TypeError:
+            except TypeError as err:
                 if days != "all":
-                    raise FetchError("days should be an integer or 'all'.")
+                    msg = "days should be an integer or 'all'."
+                    raise FetchError(msg) from err
         elif start or end:
             try:
                 if start:
                     self.min_date = datetime.datetime.strptime(
                         f"{start} 00:00:00", "%Y-%m-%d %H:%M:%S"
-                    )
+                    ).astimezone(datetime.timezone.utc)
 
                 if end:
                     self.max_date = datetime.datetime.strptime(
                         f"{end} 23:59:59", "%Y-%m-%d %H:%M:%S"
-                    )
+                    ).astimezone(datetime.timezone.utc)
 
                 if (start and end) and (start > end):
-                    raise ValueError("Start date must be before the end date.")
+                    msg = "Start date must be before the end date."
+                    raise ValueError(msg)
 
-            except TypeError:
-                raise FetchError(
+            except TypeError as err:
+                msg = (
                     "Something went wrong with start or end. Please check the date "
                     "format. It should be YYYY-MM-DD"
                 )
+                raise FetchError(msg) from err
         else:
-            raise FetchError("Either set days or start and/or end.")
+            msg = "Either set days or start and/or end."
+            raise FetchError(msg)
 
         return super().fetch()
 
@@ -459,11 +461,9 @@ class RecentPhotosFetcher(PhotosFetcher):
 
         try:
             results = self.api.people.getPhotos(**api_args)
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching recent photos (page %s): %s"
-                % (self.page_number, e)
-            )
+        except FlickrError as err:
+            msg = f"Error when fetching recent photos (page {self.page_number}: {err}"
+            raise FetchError(msg) from err
 
         if (
             self.page_number == 1
@@ -490,10 +490,9 @@ class PhotosetsFetcher(Fetcher):
                 per_page=self.items_per_page,
                 page=self.page_number,
             )
-        except FlickrError as e:
-            raise FetchError(
-                "Error when fetching photosets (page %s): %s" % (self.page_number, e)
-            )
+        except FlickrError as err:
+            msg = f"Error when fetching photosets (page {self.page_number}): {err}"
+            raise FetchError(msg) from err
 
         if (
             self.page_number == 1
@@ -511,8 +510,7 @@ class PhotosetsFetcher(Fetcher):
 
         extra_results = []
 
-        for i, photoset in enumerate(self.results):
-
+        for _i, photoset in enumerate(self.results):
             photos = self._fetch_photos_in_photoset(photoset["id"])
 
             extra_results.append(
@@ -552,11 +550,11 @@ class PhotosetsFetcher(Fetcher):
                     per_page=self.items_per_page,
                     page=page_number,
                 )
-            except FlickrError as e:
-                raise FetchError(
-                    "Error when fetching photos in photoset %s (page %s): %s"
-                    % (photoset_id, page_number, e)
+            except FlickrError as err:
+                msg = "Error when fetching photos in photoset {} (page {}): {}".format(
+                    photoset_id, page_number, err
                 )
+                raise FetchError(msg) from err
 
             if "photoset" in results and "photo" in results["photoset"]:
                 total_pages = results["photoset"]["pages"]

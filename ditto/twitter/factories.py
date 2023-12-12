@@ -2,7 +2,8 @@ import datetime
 
 import factory
 
-from ..core.utils import datetime_now
+from ditto.core.utils import datetime_now
+
 from . import models
 
 
@@ -92,7 +93,6 @@ class MediaFactory(factory.django.DjangoModelFactory):
 
 
 class PhotoFactory(MediaFactory):
-
     media_type = "photo"
 
     large_w = 938
@@ -109,7 +109,6 @@ class PhotoFactory(MediaFactory):
 
 
 class VideoFactory(MediaFactory):
-
     media_type = "video"
 
     image_url = factory.Sequence(
@@ -130,7 +129,6 @@ class VideoFactory(MediaFactory):
 
 
 class AnimatedGifFactory(MediaFactory):
-
     media_type = "animated_gif"
 
     image_url = factory.Sequence(

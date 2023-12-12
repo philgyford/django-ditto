@@ -2,8 +2,8 @@ from datetime import datetime, time, timezone
 
 from django import template
 
-from ...core.utils import get_annual_item_counts
-from ..models import Bookmark
+from ditto.core.utils import get_annual_item_counts
+from ditto.pinboard.models import Bookmark
 
 register = template.Library()
 

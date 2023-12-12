@@ -1,5 +1,5 @@
-# coding: utf-8
-from ...fetch.fetchers import FavoriteTweetsFetcher
+from ditto.twitter.fetch.fetchers import FavoriteTweetsFetcher
+
 from . import FetchTwitterCommand
 
 

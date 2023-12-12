@@ -103,7 +103,7 @@ class FetcherTestCase(FlickrFetchTestCase):
 
 class UserIdFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(UserIdFetcherTestCase, self).setUp()
+        super().setUp()
         self.account = AccountFactory(api_key="1234", api_secret="9876")
 
     def test_inherits_from_fetcher(self):
@@ -128,7 +128,7 @@ class UserIdFetcherTestCase(FlickrFetchTestCase):
 
 class UserFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(UserFetcherTestCase, self).setUp()
+        super().setUp()
         self.account = AccountFactory(api_key="1234", api_secret="9876")
 
     def test_inherits_from_fetcher(self):
@@ -225,7 +225,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
     photos."""
 
     def setUp(self):
-        super(PhotosFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(api_key="1234", api_secret="9876")
         self.fetcher = PhotosFetcher(account=account)
 
@@ -367,7 +367,7 @@ class PhotosFetcherTestCase(FlickrFetchTestCase):
 
 class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(RecentPhotosFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(
             api_key="1234", api_secret="9876", user=UserFactory(nsid="35034346050@N01")
         )
@@ -430,7 +430,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
     def test_fetches_recent_days(self, save_photo, fetch_extra):
         "Should only ask for photos from recent days, if number of days is set."
         self.expect_response(
-            "people.getPhotos", params={"min_upload_date": "1439294400"}
+            "people.getPhotos", params={"min_upload_date": "1439265600"}
         )
 
         with patch("time.sleep"):
@@ -456,7 +456,7 @@ class RecentPhotosFetcherTestCase(FlickrFetchTestCase):
 
 class PhotosetsFetcherTestCase(FlickrFetchTestCase):
     def setUp(self):
-        super(PhotosetsFetcherTestCase, self).setUp()
+        super().setUp()
         account = AccountFactory(
             api_key="1234", api_secret="9876", user=UserFactory(nsid="35034346050@N01")
         )

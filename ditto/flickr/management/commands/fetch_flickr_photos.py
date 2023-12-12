@@ -1,4 +1,5 @@
-from ...fetch.multifetchers import RecentPhotosMultiAccountFetcher
+from ditto.flickr.fetch.multifetchers import RecentPhotosMultiAccountFetcher
+
 from . import FetchPhotosCommand
 
 

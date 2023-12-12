@@ -32,7 +32,7 @@ def override_app_settings(**test_settings):
 
             result = func(*args, **kwargs)
 
-            for key, value in test_settings.items():
+            for key, _value in test_settings.items():
                 setattr(app_settings, key, old_values[key])
 
             return result

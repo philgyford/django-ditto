@@ -17,13 +17,18 @@ class FetchTwitterTestCase(TestCase):
 
     def make_response_body(self):
         "Makes the JSON response to a call to the API"
-        json_file = open("%s%s" % ("tests/twitter/fixtures/api/", self.api_fixture))
-        json_data = json_file.read()
-        json_file.close()
-        return json_data
+        with open(f"tests/twitter/fixtures/api/{self.api_fixture}") as f:
+            json_data = f.read()
+            return json_data
 
     def add_response(
-        self, body, status=200, querystring={}, match_querystring=False, method="GET"
+        self,
+        body,
+        *,
+        status=200,
+        querystring=None,
+        match_querystring=False,
+        method="GET",
     ):
         """Add a Twitter API response.
 
@@ -35,13 +40,12 @@ class FetchTwitterTestCase(TestCase):
                              a querystring.
         method -- 'GET' or 'POST'.
         """
-        url = "%s/%s.json" % (self.api_url, self.api_call)
+        querystring = {} if querystring is None else querystring
+        url = f"{self.api_url}/{self.api_call}.json"
 
         if len(querystring):
-            qs = "&".join(
-                "%s=%s" % (key, querystring[key]) for key in querystring.keys()
-            )
-            url = "%s?%s" % (url, qs)
+            qs = "&".join(f"{key}={querystring[key]}" for key in querystring)
+            url = f"{url}?{qs}"
 
         method = responses.POST if method == "POST" else responses.GET
 

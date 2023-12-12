@@ -16,16 +16,16 @@ from .apps import ditto_apps
 from .paginator import DiggPaginator
 
 if ditto_apps.is_installed("flickr"):
-    from ..flickr.models import Photo
+    from ditto.flickr.models import Photo
 
 if ditto_apps.is_installed("lastfm"):
-    from ..lastfm.models import Scrobble
+    from ditto.lastfm.models import Scrobble
 
 if ditto_apps.is_installed("pinboard"):
-    from ..pinboard.models import Bookmark
+    from ditto.pinboard.models import Bookmark
 
 if ditto_apps.is_installed("twitter"):
-    from ..twitter.models import Tweet
+    from ditto.twitter.models import Tweet
 
 
 class PaginatedListView(ListView):
@@ -72,21 +72,18 @@ class PaginatedListView(ListView):
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
-        except ValueError:
+        except ValueError as err:
             if page == "last":
                 page_number = paginator.num_pages
             else:
-                raise Http404(
-                    _("Page is not 'last', nor can it be converted to an int.")
-                )
+                msg = _("Page is not 'last', nor can it be converted to an int.")
+                raise Http404(msg) from err
         try:
             page = paginator.page(page_number, softlimit=True)
             return (paginator, page, page.object_list, page.has_other_pages())
-        except InvalidPage as e:
-            raise Http404(
-                _("Invalid page (%(page_number)s): %(message)s")
-                % {"page_number": page_number, "message": str(e)}
-            )
+        except InvalidPage as err:
+            msg = _("Invalid page ({}): {}").format(page_number, str(err))
+            raise Http404(msg) from err
 
 
 class DittoAppsMixin:
@@ -113,7 +110,6 @@ class DittoAppsMixin:
     apps = None
 
     def __init__(self, *args, **kwargs):
-
         self.apps = []
 
         enabled_apps = ditto_apps.enabled()
@@ -244,10 +240,10 @@ class DittoAppsMixin:
                     app_slug, variety_slug
                 )
             elif variety_slug:
-                raise Http404(
-                    "'%s' is not a valid variety slug for the '%s' app slug."
-                    % (variety_slug, app_slug)
+                msg = "'{}' is not a valid variety slug for the '{}' app slug.".format(
+                    variety_slug, app_slug
                 )
+                raise Http404(msg)
         elif app_slug:
             raise Http404("'%s' is not a valid app slug." % app_slug)
 
@@ -272,11 +268,12 @@ class DittoAppsMixin:
         queryset = self.get_queryset_for_app_variety(self.app_name, self.variety_name)
 
         if queryset is None:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing a QuerySet. "
-                "%(cls)s.get_queryset() can't find the correct "
-                "queryset for this app and variety." % {"cls": self.__class__.__name__}
+            class_name = self.__class__.__name__
+            msg = (
+                f"{class_name} is missing a QuerySet. {class_name}.get_queryset() "
+                "can't find the correct queryset for this app and variety."
             )
+            raise ImproperlyConfigured(msg)
 
         return queryset
 
@@ -422,7 +419,7 @@ class HomeView(DittoAppsMixin, TemplateView):
         for app_name, variety_name in self.get_app_varieties_to_display():
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
 
-            if self.include_twitter_replies is False:
+            if self.include_twitter_replies is False:  # noqa: SIM102
                 # Don't want to include Tweets that are replies on the home page.
                 if app_name == "twitter" and variety_name == "tweet":
                     qs = qs.filter(in_reply_to_screen_name__exact="")
@@ -629,9 +626,11 @@ def _date_from_string(
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
     try:
-        return datetime.datetime.strptime(force_str(datestr), format).date()
-    except ValueError:
-        raise Http404(
-            _("Invalid date string '%(datestr)s' given format '%(format)s'")
-            % {"datestr": datestr, "format": format}
+        return (
+            datetime.datetime.strptime(force_str(datestr), format)
+            .astimezone(datetime.timezone.utc)
+            .date()
         )
+    except ValueError as err:
+        msg = f"Invalid date string '{datestr}' given format '{format}'"
+        raise Http404(msg) from err

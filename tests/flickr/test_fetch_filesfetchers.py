@@ -158,8 +158,7 @@ class FilesFetcherTestCase(TestCase):
         nsid = nsid[: nsid.index("@")]
         self.assertEqual(
             self.photo_2.original_file.name,
-            "flickr/%s/%s/%s/photos/2015/08/14/%s"
-            % (
+            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
                 nsid[-4:-2],
                 nsid[-2:],
                 self.photo_2.user.nsid.replace("@", ""),
@@ -180,8 +179,7 @@ class FilesFetcherTestCase(TestCase):
         nsid = nsid[: nsid.index("@")]
         self.assertEqual(
             self.video_2.video_original_file.name,
-            "flickr/%s/%s/%s/photos/2015/08/14/%s"
-            % (
+            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
                 nsid[-4:-2],
                 nsid[-2:],
                 self.video_2.user.nsid.replace("@", ""),

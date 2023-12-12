@@ -2,9 +2,10 @@ from django import template
 from django.http import QueryDict
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
-from .. import app_settings
-from ..apps import ditto_apps
+from ditto.core import app_settings
+from ditto.core.apps import ditto_apps
 
 register = template.Library()
 
@@ -64,11 +65,11 @@ def width_height(w, h, max_w, max_h):
     width = int(round(w * ratio))
     height = int(round(h * ratio))
 
-    return format_html('width="%s" height="%s"' % (width, height))
+    return format_html('width="{}" height="{}"', width, height)
 
 
 @register.simple_tag
-def display_time(dt, link_to_day=False, granularity=0, case=None):
+def display_time(dt, *, link_to_day=False, granularity=0, case=None):
     """Return the HTML to display the time a Photo, Tweet, etc.
 
     dt -- The datetime.
@@ -126,9 +127,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
             # Replace the [date] token with the date format wrapped in <a> tag:
             dt_fmt = dt_fmt.replace(
                 "[date]",
-                '<a href="{}" title="All items from this day">{}</a>'.format(
-                    url, d_fmt
-                ),
+                f'<a href="{url}" title="All items from this day">{d_fmt}</a>',
             )
         else:
             dt_fmt = dt_fmt.replace("[date]", d_fmt)
@@ -144,10 +143,7 @@ def display_time(dt, link_to_day=False, granularity=0, case=None):
     elif case == "capfirst":
         visible_time = visible_time[0].upper() + visible_time[1:]
 
-    return format_html(
-        '<time datetime="%(stamp)s">%(visible)s</time>'
-        % {"stamp": stamp, "visible": visible_time}
-    )
+    return format_html('<time datetime="{}">{}</time>', stamp, mark_safe(visible_time))
 
 
 @register.simple_tag(takes_context=True)

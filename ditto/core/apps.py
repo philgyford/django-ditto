@@ -1,4 +1,3 @@
-# coding: utf-8
 from django.apps import AppConfig, apps
 
 
@@ -11,7 +10,7 @@ class DittoCoreConfig(AppConfig):
     default_auto_field = "django.db.models.AutoField"
 
 
-class Apps(object):
+class Apps:
     """Methods for seeing which Ditto apps are installed/enabled.
     At the moment installed is the same as enabled, but in future we may add
     conditions that mean an installed app can be disabled.

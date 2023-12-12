@@ -1,4 +1,3 @@
-# coding: utf-8
 import hashlib
 
 from django.core.validators import URLValidator
@@ -6,7 +5,8 @@ from django.db import models
 from taggit.managers import TaggableManager
 from taggit.models import GenericTaggedItemBase, TagBase
 
-from ..core.models import DittoItemModel, TimeStampedModelMixin
+from ditto.core.models import DittoItemModel, TimeStampedModelMixin
+
 from .managers import PublicToreadManager, ToreadManager, _BookmarkTaggableManager
 
 
@@ -42,11 +42,11 @@ class Account(TimeStampedModelMixin, models.Model):
         help_text="If false, new Bookmarks won't be fetched.",
     )
 
-    def __str__(self):
-        return self.username
-
     class Meta:
         ordering = ["username"]
+
+    def __str__(self):
+        return self.username
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -141,7 +141,6 @@ class TaggedBookmark(TimeStampedModelMixin, GenericTaggedItemBase):
 
 
 class Bookmark(DittoItemModel, ExtraBookmarkManagers):
-
     ditto_item_name = "pinboard_bookmark"
 
     # Properties inherited from DittoItemModel:
@@ -224,7 +223,7 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
                 .order_by("post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     def get_previous_public_by_post_time(self):
@@ -238,7 +237,7 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
                 .order_by("-post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     # Shortcuts:

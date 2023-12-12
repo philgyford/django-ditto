@@ -17,14 +17,13 @@ def check_taggit_is_installed(app_configs=None, **kwargs):
             )
         )
 
-    if len(checks) == 0:
-        if "taggit" not in settings.INSTALLED_APPS:
-            checks.append(
-                Error(
-                    "The django-taggit app must be in INSTALLED_APPS",
-                    hint=("Add 'taggit' to INSTALLED_APPS in your settings file."),
-                    id="ditto.flickr.E002",
-                )
+    if len(checks) == 0 and "taggit" not in settings.INSTALLED_APPS:
+        checks.append(
+            Error(
+                "The django-taggit app must be in INSTALLED_APPS",
+                hint=("Add 'taggit' to INSTALLED_APPS in your settings file."),
+                id="ditto.flickr.E002",
             )
+        )
 
     return checks

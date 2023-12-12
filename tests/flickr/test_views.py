@@ -294,7 +294,7 @@ class TagViewTests(TestCase):
         TaggedPhotoFactory(content_object=self.cod_photo, tag=fish_tag)
         TaggedPhotoFactory(content_object=self.cod_photo, tag=cod_tag)
 
-    def createDogPhoto(self):
+    def create_dog_photo(self):
         "Creates a photo tagged with 'dog' and 'mammal'."
         self.dog_photo = PhotoFactory(title="Dog")
         mammal_tag = TagFactory(slug="mammal")
@@ -344,7 +344,7 @@ class TagViewTests(TestCase):
         "Sends the correct data to the templates"
         AccountFactory.create_batch(2)
         # The 'fish' tag page shouldn't include this dog photo:
-        self.createDogPhoto()
+        self.create_dog_photo()
         response = self.client.get(
             reverse("flickr:tag_detail", kwargs={"slug": "fish"})
         )
@@ -422,7 +422,7 @@ class TagViewTests(TestCase):
 
     def test_user_tag_detail_context(self):
         "Sends the correct data to templates"
-        self.createDogPhoto()
+        self.create_dog_photo()
 
         # Ensure the cod, carp and dog photos are all owned by the same user.
         # Only the carp and cod pics should show up on the user's 'fish' page.
@@ -523,7 +523,6 @@ class TagViewTests(TestCase):
 
 class PhotosetViewTests(TestCase):
     def setUp(self):
-
         self.user_1 = UserFactory(nsid="1234567890@N01")
         self.account_1 = AccountFactory(user=self.user_1)
         # Three photos, one of which is private.

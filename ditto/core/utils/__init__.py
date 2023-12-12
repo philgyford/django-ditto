@@ -1,4 +1,3 @@
-# coding: utf-8
 from datetime import datetime, timezone
 
 from django.db.models import Count
@@ -7,7 +6,7 @@ from django.utils.text import Truncator
 
 
 def truncate_string(
-    text, strip_html=True, chars=255, truncate="…", at_word_boundary=False
+    text, *, strip_html=True, chars=255, truncate="…", at_word_boundary=False
 ):
     """Truncate a string to a certain length, removing line breaks and mutliple
     spaces, optionally removing HTML, and appending a 'truncate' string.
@@ -35,7 +34,7 @@ def datetime_now():
     """Just returns a datetime object for now in UTC, with UTC timezone.
     Because I was doing this a lot in various places.
     """
-    return datetime.utcnow().replace(tzinfo=timezone.utc)
+    return datetime.now(tz=timezone.utc)
 
 
 def datetime_from_str(s):
@@ -86,7 +85,7 @@ def get_annual_item_counts(qs, field_name="post_year"):
         return []
 
     # Make a set of years like {2015, 2016, 2018}:
-    years_with_counts = set(y[field_name] for y in qs)
+    years_with_counts = {y[field_name] for y in qs}
 
     # Make a set of years with no gaps like {2015, 2016, 2017, 2018}:
     all_years = sorted(set(range(min(years_with_counts), max(years_with_counts) + 1)))

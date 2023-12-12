@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# ruff: noqa: T201
 import flickrapi
 
 # Put your API Key and Secret here:
@@ -9,7 +10,6 @@ flickr = flickrapi.FlickrAPI(api_key, api_secret)
 
 # Only do this if we don't have a valid token already
 if not flickr.token_valid(perms="read"):
-
     # Get a request token
     flickr.get_request_token(oauth_callback="oob")
 

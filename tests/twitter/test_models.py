@@ -1,4 +1,3 @@
-# coding: utf-8
 import os
 from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
@@ -24,17 +23,15 @@ from ditto.twitter.models import Account, Media, Tweet, User
 
 
 class AccountTestCase(TestCase):
-
     api_url = "https://api.twitter.com/1.1"
 
     api_fixture = "tests/twitter/fixtures/api/verify_credentials.json"
 
     def make_verify_credentials_body(self):
         "Makes the JSON response to a call to verify_credentials"
-        json_file = open(self.api_fixture)
-        json_data = json_file.read()
-        json_file.close()
-        return json_data
+        with open(self.api_fixture) as f:
+            json_data = f.read()
+            return json_data
 
     def add_response(self, body, call, status=200):
         """Add a Twitter API response.
@@ -47,7 +44,7 @@ class AccountTestCase(TestCase):
         """
         responses.add(
             responses.GET,
-            "%s/%s.json" % (self.api_url, call),
+            f"{self.api_url}/{call}.json",
             status=status,
             match_querystring=False,
             body=body,
@@ -89,7 +86,7 @@ class AccountTestCase(TestCase):
         self.assertEqual(account.user.screen_name, "philgyford")
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
 
@@ -114,7 +111,7 @@ class AccountTestCase(TestCase):
         )
         # Not saving (as that generates another request):
         account = AccountFactory.build(user=None)
-        result = account.updateUserFromTwitter()
+        result = account.update_user_from_twitter()
         self.assertEqual(result, False)
         self.assertEqual(0, len(responses.calls))
 
@@ -131,14 +128,14 @@ class AccountTestCase(TestCase):
         # Not saving (as that generates another request):
         account = AccountWithCredentialsFactory.build(user=None)
 
-        result = account.updateUserFromTwitter()
+        result = account.update_user_from_twitter()
         self.assertTrue(result["success"])
         self.assertIsInstance(result["user"], User)
         self.assertIsInstance(account.user, User)
         self.assertEqual(account.user.screen_name, "philgyford")
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
 
@@ -153,10 +150,10 @@ class AccountTestCase(TestCase):
         # Not saving (as that generates another request):
         account = AccountWithCredentialsFactory.build(user=None)
 
-        result = account.updateUserFromTwitter()
+        result = account.update_user_from_twitter()
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(
-            "%s/%s.json" % (self.api_url, "account/verify_credentials"),
+            f"{self.api_url}/account/verify_credentials.json",
             responses.calls[0].request.url,
         )
         self.assertFalse(result["success"])
@@ -195,7 +192,7 @@ class PhotoTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple accounts are sorted by time_created ascending"""
-        time_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        time_now = datetime.now(tz=timezone.utc)
         photo_1 = PhotoFactory(time_created=time_now - timedelta(minutes=1))
         PhotoFactory(time_created=time_now)
         photos = Media.objects.all()
@@ -414,7 +411,7 @@ class TweetTestCase(TestCase):
 
     def test_ordering(self):
         """Multiple tweets are sorted by post_time descending"""
-        time_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        time_now = datetime.now(tz=timezone.utc)
         TweetFactory(post_time=time_now - timedelta(minutes=1))
         tweet_2 = TweetFactory(post_time=time_now)
         tweets = Tweet.objects.all()

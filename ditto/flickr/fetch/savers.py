@@ -1,3 +1,4 @@
+import contextlib
 import json
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -5,7 +6,8 @@ from zoneinfo import ZoneInfo
 from django.db.utils import IntegrityError
 from taggit.models import Tag
 
-from ..models import Photo, Photoset, User
+from ditto.flickr.models import Photo, Photoset, User
+
 from . import FetchError
 
 # These classes are passed JSON data from the Flickr API and create/update
@@ -22,7 +24,7 @@ from . import FetchError
 # PhotosetSave
 
 
-class SaveUtilsMixin(object):
+class SaveUtilsMixin:
     """Handy utility methods used by the *Saver classes."""
 
     def __init__(self, *args, **kwargs):
@@ -42,10 +44,10 @@ class SaveUtilsMixin(object):
         """Change a text unixtime from the API to a datetime with timezone.
         api_time is a string or int like "1093459273".
         """
-        return datetime.utcfromtimestamp(int(api_time)).replace(tzinfo=timezone.utc)
+        return datetime.fromtimestamp(int(api_time), tz=timezone.utc)
 
 
-class UserSaver(SaveUtilsMixin, object):
+class UserSaver(SaveUtilsMixin):
     """For creating/updating an individual User based on data from the API.
 
     Use like:
@@ -115,7 +117,7 @@ class UserSaver(SaveUtilsMixin, object):
         return user_obj
 
 
-class PhotoSaver(SaveUtilsMixin, object):
+class PhotoSaver(SaveUtilsMixin):
     """For creating/updating an individual Photo based on data from the API.
 
     Use like:
@@ -291,8 +293,8 @@ class PhotoSaver(SaveUtilsMixin, object):
         # The existing tag-photo relationships.
         tagged_photos = Photo.tags.through.objects.filter(content_object=photo_obj)
 
-        local_flickr_ids = set([])
-        remote_flickr_ids = set([])
+        local_flickr_ids = set()
+        remote_flickr_ids = set()
 
         # Get the Flickr IDs of all the current tag-photo relationships.
         for tagged_photo in tagged_photos:
@@ -302,7 +304,6 @@ class PhotoSaver(SaveUtilsMixin, object):
             remote_flickr_ids.add(tag["id"])
 
             if tag["id"] not in local_flickr_ids:
-
                 # This tag isn't currently on the photo, so add it.
                 try:
                     tag_obj, tag_created = Tag.objects.get_or_create(
@@ -325,11 +326,12 @@ class PhotoSaver(SaveUtilsMixin, object):
                     # data.
                     try:
                         user = User.objects.get(nsid=tag["author"])
-                    except User.DoesNotExist:
-                        raise FetchError(
+                    except User.DoesNotExist as err:
+                        msg = (
                             "Tried to add a Tag authored by a Flickr user "
-                            "with NSID %s who doesn't exist in the DB." % tag["author"]
+                            f"with NSID {tag['author']} who doesn't exist in the DB."
                         )
+                        raise FetchError(msg) from err
 
                 pt_obj = Photo.tags.through(
                     flickr_id=tag["id"],
@@ -349,7 +351,7 @@ class PhotoSaver(SaveUtilsMixin, object):
                 tagged_photo.delete()
 
 
-class PhotosetSaver(SaveUtilsMixin, object):
+class PhotosetSaver(SaveUtilsMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -389,10 +391,8 @@ class PhotosetSaver(SaveUtilsMixin, object):
             "photos_raw": json.dumps(photoset["photos"]),
         }
 
-        try:
+        with contextlib.suppress(Photo.DoesNotExist):
             defaults["primary_photo"] = Photo.objects.get(flickr_id=ps["primary"])
-        except Photo.DoesNotExist:
-            pass
 
         photoset_obj, created = Photoset.objects.update_or_create(
             flickr_id=ps["id"], defaults=defaults
@@ -403,10 +403,8 @@ class PhotosetSaver(SaveUtilsMixin, object):
             # photoset object.
             photos = []
             for photo in photoset["photos"]:
-                try:
+                with contextlib.suppress(Photo.DoesNotExist):
                     photos.append(Photo.objects.get(flickr_id=photo["id"]))
-                except Photo.DoesNotExist:
-                    pass
 
             # Sets/updates the SortedManyToMany field of the photoset's photos:
             photoset_obj.photos.set(photos)

@@ -1,7 +1,6 @@
-# coding: utf-8
 from django.core.management.base import BaseCommand
 
-from ...fetch.fetchers import VerifyFetcher
+from ditto.twitter.fetch.fetchers import VerifyFetcher
 
 
 class Command(BaseCommand):
@@ -45,6 +44,7 @@ class Command(BaseCommand):
                     self.stdout.write("Fetched @%s" % result["account"])
                 else:
                     self.stderr.write(
-                        "Could not fetch @%s: %s"
-                        % (result["account"], result["messages"][0])
+                        "Could not fetch @{}: {}".format(
+                            result["account"], result["messages"][0]
+                        )
                     )

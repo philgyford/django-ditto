@@ -1,12 +1,10 @@
-# coding: utf-8
 from django.core.management.base import CommandError
 
-from ....core.management.commands import DittoBaseCommand
-from ...models import Account
+from ditto.core.management.commands import DittoBaseCommand
+from ditto.twitter.models import Account
 
 
 class FetchTwitterCommand(DittoBaseCommand):
-
     # What we're fetching:
     singular_noun = "Tweet"
     plural_noun = "Tweets"
@@ -28,7 +26,6 @@ class FetchTwitterCommand(DittoBaseCommand):
         )
 
     def handle(self, *args, **options):
-
         # We might be fetching for a specific account or all (None).
         account = options["account"] if options["account"] else None
 
@@ -40,9 +37,11 @@ class FetchTwitterCommand(DittoBaseCommand):
             results = self.fetch_tweets(account, options["recent"])
             self.output_results(results, options.get("verbosity", 1))
         elif options["account"]:
-            raise CommandError("Specify --recent as well as --account.")
+            msg = "Specify --recent as well as --account."
+            raise CommandError(msg)
         else:
-            raise CommandError("Specify --recent, eg --recent=100 or --recent=new.")
+            msg = "Specify --recent, eg --recent=100 or --recent=new."
+            raise CommandError(msg)
 
     def fetch_tweets(self, screen_name, count):
         """Child classes should override this method to call a method that
@@ -73,12 +72,13 @@ class UpdateTwitterCommand(DittoBaseCommand):
             screen_name = options["account"]
             try:
                 Account.objects.get(user__screen_name=screen_name)
-            except Account.DoesNotExist:
+            except Account.DoesNotExist as err:
                 raise CommandError(
                     "There's no Account with a screen name of '%s'" % screen_name
-                )
+                ) from err
         else:
-            raise CommandError("Specify --account, eg --account=philgyford.")
+            msg = "Specify --account, eg --account=philgyford."
+            raise CommandError(msg)
 
         results = self.fetch(screen_name)
         self.output_results(results, options.get("verbosity", 1))

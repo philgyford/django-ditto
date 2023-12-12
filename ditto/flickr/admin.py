@@ -3,7 +3,8 @@ from django.db import models
 from django.forms import TextInput
 from django.utils.safestring import mark_safe
 
-from ..core.admin import DittoItemModelAdmin
+from ditto.core.admin import DittoItemModelAdmin
+
 from .models import Account, Photo, Photoset, User
 
 
@@ -440,8 +441,7 @@ class PhotoAdmin(DittoItemModelAdmin):
 
     def show_thumb(self, instance):
         return mark_safe(
-            '<img src="%s" width="%s" height="%s" />'
-            % (
+            '<img src="{}" width="{}" height="{}" />'.format(
                 instance.thumbnail_url,
                 instance.thumbnail_width,
                 instance.thumbnail_height,
@@ -452,8 +452,9 @@ class PhotoAdmin(DittoItemModelAdmin):
 
     def show_image(self, instance):
         return mark_safe(
-            '<img src="%s" width="%s" height="%s" />'
-            % (instance.small_url, instance.small_width, instance.small_height)
+            '<img src="{}" width="{}" height="{}" />'.format(
+                instance.small_url, instance.small_width, instance.small_height
+            )
         )
 
     show_image.short_description = "Small image"

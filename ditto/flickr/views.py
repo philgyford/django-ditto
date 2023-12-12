@@ -4,11 +4,12 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from taggit.models import Tag
 
-from ..core.views import PaginatedListView
+from ditto.core.views import PaginatedListView
+
 from .models import Account, Photo, Photoset, User
 
 
-class PhotosOrderMixin(object):
+class PhotosOrderMixin:
     """
     For pages which list Photos and can change the order they're viewed in.
     Can have 'order' in the GET string, with values of 'uploaded' or 'taken'.
@@ -41,14 +42,11 @@ class PhotosOrderMixin(object):
         # wasn't ordering by taken_time without this.
         ordering = self.get_ordering()
         if ordering:
-
             if ordering == "-taken_time":
                 # Exclude where we don't know the taken time.
                 queryset = queryset.filter(taken_unknown=False)
 
-            import six
-
-            if isinstance(ordering, six.string_types):
+            if isinstance(ordering, str):
                 ordering = (ordering,)
             queryset = queryset.order_by(*ordering)
 
@@ -173,6 +171,7 @@ class TagListView(ListView):
 
 class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
     "All Photos with a certain tag from all Accounts"
+
     template_name = "flickr/tag_detail.html"
     allow_empty = False
     queryset = Photo.public_objects.prefetch_related("user")
@@ -196,6 +195,7 @@ class TagDetailView(PhotosOrderMixin, SingleObjectMixin, PaginatedListView):
 
 class UserTagDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
     "All Photos with a certain Tag from one User"
+
     template_name = "flickr/user_tag_detail.html"
     allow_empty = False
     queryset = Photo.public_objects.prefetch_related("user")
@@ -208,8 +208,8 @@ class UserTagDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
         """Custom method for fetching the Tag."""
         try:
             obj = Tag.objects.get(slug=self.kwargs["tag_slug"])
-        except Tag.DoesNotExist:
-            raise Http404(_("No Tags found matching the query"))
+        except Tag.DoesNotExist as err:
+            raise Http404(_("No Tags found matching the query")) from err
         return obj
 
     def get_context_data(self, **kwargs):
@@ -263,6 +263,6 @@ class PhotosetDetailView(PhotosOrderMixin, SingleUserMixin, PaginatedListView):
             obj = Photoset.objects.get(
                 user=self.object, flickr_id=self.kwargs["flickr_id"]
             )
-        except Photoset.DoesNotExist:
-            raise Http404(_("No Photosets found matching the query"))
+        except Photoset.DoesNotExist as err:
+            raise Http404(_("No Photosets found matching the query")) from err
         return obj

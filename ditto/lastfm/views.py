@@ -5,12 +5,13 @@ from django.utils.translation import gettext as _
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 
-from ..core.utils import datetime_now
-from ..core.views import PaginatedListView
+from ditto.core.utils import datetime_now
+from ditto.core.views import PaginatedListView
+
 from .models import Account, Album, Artist, Scrobble, Track
 
 
-class AccountsMixin(object):
+class AccountsMixin:
     """
     View Mixin for adding an `account_list` to context, with all Accounts in.
     And the total counts of Scrobbles, Albums, Artists and Tracks.
@@ -30,17 +31,19 @@ class AccountsMixin(object):
 
 class HomeView(AccountsMixin, TemplateView):
     "Uses template tags to display charts, recent Scrobbles, etc."
+
     template_name = "lastfm/home.html"
 
 
 class ScrobbleListView(AccountsMixin, PaginatedListView):
     "A multi-page list of Scrobbles, most recent first."
+
     template_name = "lastfm/scrobble_list.html"
     model = Scrobble
 
     def get_queryset(self):
         "Pre-fetch Artists and Tracks to reduce number of queries."
-        qs = super(ScrobbleListView, self).get_queryset()
+        qs = super().get_queryset()
         return qs.prefetch_related("artist", "track")
 
 
@@ -124,24 +127,28 @@ class ChartPaginatedListView(PaginatedListView):
 
 class AlbumListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
+
     template_name = "lastfm/album_list.html"
     model = Album
 
 
 class ArtistListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
+
     template_name = "lastfm/artist_list.html"
     model = Artist
 
 
 class TrackListView(AccountsMixin, ChartPaginatedListView):
     "A multi-page chart of most-scrobbled Tracks."
+
     template_name = "lastfm/track_list.html"
     model = Track
 
 
 class AlbumDetailView(DetailView):
     "A single Album by a particular Artist."
+
     model = Album
 
     def get_object(self, queryset=None):
@@ -159,9 +166,8 @@ class AlbumDetailView(DetailView):
         album_slug = self.kwargs.get("album_slug")
 
         if artist_slug is None or album_slug is None:
-            raise AttributeError(
-                "AlbumDetailView must be called with " "artist_slug and album_slug"
-            )
+            msg = "AlbumDetailView must be called with " "artist_slug and album_slug"
+            raise AttributeError(msg)
 
         artist = Artist.objects.get(slug=artist_slug)
         queryset = queryset.filter(artist=artist, slug=album_slug)
@@ -169,22 +175,24 @@ class AlbumDetailView(DetailView):
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
-        except queryset.model.DoesNotExist:
+        except queryset.model.DoesNotExist as err:
             raise Http404(
                 _("No %(verbose_name)s found matching the query")
                 % {"verbose_name": queryset.model._meta.verbose_name}
-            )
+            ) from err
         return obj
 
 
 class ArtistDetailView(DetailView):
     "One Artist. Uses a template tag to display a chart of their Tracks."
+
     model = Artist
     slug_url_kwarg = "artist_slug"
 
 
 class ArtistAlbumsView(DetailView):
     "One Artist. Uses a template tag to display a chart of their Albums."
+
     model = Artist
     slug_url_kwarg = "artist_slug"
     template_name = "lastfm/artist_albums.html"
@@ -192,6 +200,7 @@ class ArtistAlbumsView(DetailView):
 
 class TrackDetailView(DetailView):
     "One Track by a particular Artist."
+
     model = Track
 
     def get_object(self, queryset=None):
@@ -209,9 +218,8 @@ class TrackDetailView(DetailView):
         track_slug = self.kwargs.get("track_slug")
 
         if artist_slug is None or track_slug is None:
-            raise AttributeError(
-                "TrackDetailView must be called with " "artist_slug and track_slug"
-            )
+            msg = "TrackDetailView must be called with " "artist_slug and track_slug"
+            raise AttributeError(msg)
 
         artist = Artist.objects.get(slug=artist_slug)
         queryset = queryset.filter(artist=artist, slug=track_slug)
@@ -219,11 +227,11 @@ class TrackDetailView(DetailView):
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
-        except queryset.model.DoesNotExist:
+        except queryset.model.DoesNotExist as err:
             raise Http404(
                 _("No %(verbose_name)s found matching the query")
                 % {"verbose_name": queryset.model._meta.verbose_name}
-            )
+            ) from err
         return obj
 
 
@@ -259,12 +267,14 @@ class SingleAccountMixin(SingleObjectMixin):
 
 class UserDetailView(SingleAccountMixin, DetailView):
     "Overview of the user; top 10s of everything."
+
     template_name = "lastfm/user_detail.html"
     model = Account
 
 
 class UserAlbumListView(SingleAccountMixin, ChartPaginatedListView):
     "Chart of Albums scrobbled by one user."
+
     template_name = "lastfm/user_album_list.html"
     model = Album
 
@@ -279,6 +289,7 @@ class UserAlbumListView(SingleAccountMixin, ChartPaginatedListView):
 
 class UserArtistListView(SingleAccountMixin, ChartPaginatedListView):
     "Chart of Artists scrobbled by one user."
+
     template_name = "lastfm/user_artist_list.html"
     model = Artist
 
@@ -293,6 +304,7 @@ class UserArtistListView(SingleAccountMixin, ChartPaginatedListView):
 
 class UserScrobbleListView(SingleAccountMixin, PaginatedListView):
     "All scrobbles by one user."
+
     template_name = "lastfm/user_scrobble_list.html"
     model = Scrobble
 
@@ -312,6 +324,7 @@ class UserScrobbleListView(SingleAccountMixin, PaginatedListView):
 
 class UserTrackListView(SingleAccountMixin, ChartPaginatedListView):
     "Chart of Tracks scrobbled by one user."
+
     template_name = "lastfm/user_track_list.html"
     model = Track
 

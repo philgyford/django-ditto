@@ -1,11 +1,10 @@
 from django.core.management.base import CommandError
 
-from ....core.management.commands import DittoBaseCommand
-from ...fetch import ScrobblesMultiAccountFetcher
+from ditto.core.management.commands import DittoBaseCommand
+from ditto.lastfm.fetch import ScrobblesMultiAccountFetcher
 
 
 class Command(DittoBaseCommand):
-
     # What we're fetching:
     singular_noun = "Scrobble"
     plural_noun = "Scrobbles"
@@ -47,7 +46,8 @@ class Command(DittoBaseCommand):
                 fetch_type = "all"
 
             else:
-                raise CommandError("--days should be an integer or 'all'.")
+                msg = "--days should be an integer or 'all'."
+                raise CommandError(msg)
 
         fetcher = ScrobblesMultiAccountFetcher(username=username)
 

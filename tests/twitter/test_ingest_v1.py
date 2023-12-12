@@ -8,28 +8,25 @@ from ditto.twitter.models import Tweet
 
 
 class Version1TweetIngesterTestCase(TestCase):
-
     # A sample file of the format we'd get in a Twitter archive.
     ingest_fixture = "tests/twitter/fixtures/ingest/v1/2015_08.js"
 
     def get_tweet_data(self):
         "Returns the JSON tweet data, as text, from the fixture."
-        file = open(self.ingest_fixture)
-        tweet_data = file.read()
-        file.close()
-        return tweet_data
+        with open(self.ingest_fixture) as f:
+            tweet_data = f.read()
+            return tweet_data
 
     def test_raises_error_with_invalid_dir(self):
-        with patch("os.path.isdir", return_value=False):
-            with self.assertRaises(IngestError):
-                Version1TweetIngester().ingest(directory="/bad/dir")
+        with patch("os.path.isdir", return_value=False), self.assertRaises(IngestError):
+            Version1TweetIngester().ingest(directory="/bad/dir")
 
     def test_raises_error_with_empty_dir(self):
         "If no .js files are found, raises IngestError"
-        with patch("os.path.isdir", return_value=True):
-            with patch("ditto.twitter.ingest.Version1TweetIngester", file_count=0):
-                with self.assertRaises(IngestError):
-                    Version1TweetIngester().ingest(directory="/bad/dir")
+        with patch("os.path.isdir", return_value=True), patch(
+            "ditto.twitter.ingest.Version1TweetIngester", file_count=0
+        ), self.assertRaises(IngestError):
+            Version1TweetIngester().ingest(directory="/bad/dir")
 
     # All the below have a similar structure to mock out file-related functions.
     # Here's what's happening:
@@ -74,9 +71,9 @@ class Version1TweetIngesterTestCase(TestCase):
                 ingester.ingest(directory="/good/dir")
         m.assert_has_calls(
             [
-                call("/good/dir/2015_01.js", "r"),
-                call("/good/dir/2015_02.js", "r"),
-                call("/good/dir/2015_03.js", "r"),
+                call("/good/dir/2015_01.js"),
+                call("/good/dir/2015_02.js"),
+                call("/good/dir/2015_03.js"),
             ],
             any_order=True,
         )

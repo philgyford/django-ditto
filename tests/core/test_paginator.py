@@ -1,4 +1,3 @@
-# coding: utf-8
 from django.core import paginator as django_paginator
 from django.test import TestCase
 

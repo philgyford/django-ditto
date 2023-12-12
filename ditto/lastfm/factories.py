@@ -1,6 +1,7 @@
 import factory
 
-from ..core.utils import datetime_now
+from ditto.core.utils import datetime_now
+
 from . import models
 
 

@@ -1,19 +1,15 @@
-# coding: utf-8
+# Because at this stage, don't want to move the upload_to methods around:
+# ruff: noqa: DJ012
 from django.db import models
-
-try:
-    from django.urls import reverse
-except ImportError:
-    # For Django 1.8
-    from django.urls import reverse
-
 from django.templatetags.static import static
+from django.urls import reverse
 from imagekit.cachefiles import ImageCacheFile
 from sortedm2m.fields import SortedManyToManyField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 
-from ..core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+from ditto.core.models import DiffModelMixin, DittoItemModel, TimeStampedModelMixin
+
 from . import app_settings, imagegenerators, managers
 
 
@@ -27,14 +23,14 @@ class Account(TimeStampedModelMixin, models.Model):
         default=True, help_text="If false, new Photos won't be fetched."
     )
 
+    class Meta:
+        ordering = ["user__realname"]
+
     def __str__(self):
         if self.user:
             return str(self.user)
         else:
             return "%d" % self.pk
-
-    class Meta:
-        ordering = ["user__realname"]
 
     def get_absolute_url(self):
         if self.user:
@@ -44,10 +40,7 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
-        if self.api_key and self.api_secret:
-            return True
-        else:
-            return False
+        return self.api_key and self.api_secret
 
 
 class TaggedPhoto(TaggedItemBase):
@@ -94,7 +87,6 @@ class ExtraPhotoManagers(models.Model):
 
 
 class Photo(DittoItemModel, ExtraPhotoManagers):
-
     ditto_item_name = "flickr_photo"
 
     # The keys in this dict are what we use internally, for method names and
@@ -527,7 +519,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 .order_by("post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     def get_previous_public_by_post_time(self):
@@ -541,7 +533,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                 .order_by("-post_time")[:1]
                 .get()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             pass
 
     # Shortcuts:
@@ -562,7 +554,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     @property
     def safety_level_str(self):
         "Returns the text version of the safety_level, eg 'Restricted'."
-        levels = dict((x, y) for x, y in self.SAFETY_LEVELS)
+        levels = {x: y for x, y in self.SAFETY_LEVELS}
 
         try:
             return levels[self.safety_level]
@@ -662,7 +654,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
                     image_generator = generator(source=self.original_file)
                     result = ImageCacheFile(image_generator)
                     return result.url
-                except Exception:
+                except Exception:  # noqa: BLE001
                     # We have an original file but something's wrong with it.
                     # Might be 0 bytes or something.
                     return static("ditto-core/img/original_error.jpg")
@@ -676,7 +668,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         size -- One of the keys from self.PHOTO_SIZES.
         """
         if size == "original":
-            return "https://farm%s.static.flickr.com/%s/%s_%s_%s.%s" % (
+            return "https://farm{}.static.flickr.com/{}/{}_{}_{}.{}".format(
                 self.farm,
                 self.server,
                 self.flickr_id,
@@ -688,8 +680,8 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             size_ext = ""
             # Medium size doesn't have a letter suffix.
             if self.PHOTO_SIZES[size]["suffix"]:
-                size_ext = "_%s" % self.PHOTO_SIZES[size]["suffix"]
-            return "https://farm%s.static.flickr.com/%s/%s_%s%s.jpg" % (
+                size_ext = "_{}".format(self.PHOTO_SIZES[size]["suffix"])
+            return "https://farm{}.static.flickr.com/{}/{}_{}{}.jpg".format(
                 self.farm,
                 self.server,
                 self.flickr_id,
@@ -718,12 +710,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         if self.media == "photo":
             return None
         else:
-            if size == "video_original":
-                secret = self.original_secret
-            else:
-                secret = self.secret
+            secret = self.original_secret if size == "video_original" else self.secret
             url_size = self.VIDEO_SIZES[size]["url_size"]
-            return "%splay/%s/%s/" % (self.permalink, url_size, secret)
+            return f"{self.permalink}play/{url_size}/{secret}/"
 
     def __getattr__(self, name):
         """
@@ -805,15 +794,11 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # Returns ALL photos, public AND private.
     photos = SortedManyToManyField("Photo", related_name="photosets")
 
-    def public_photos(self):
-        "Returns only public photos."
-        return self.photos.filter(is_private=False)
+    class Meta:
+        ordering = ["-flickr_created_time"]
 
     def __str__(self):
         return self.title
-
-    class Meta:
-        ordering = ["-flickr_created_time"]
 
     def get_absolute_url(self):
         return reverse(
@@ -823,10 +808,11 @@ class Photoset(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     @property
     def permalink(self):
-        return "https://www.flickr.com/photos/%s/albums/%s" % (
-            self.user.nsid,
-            self.flickr_id,
-        )
+        return f"https://www.flickr.com/photos/{self.user.nsid}/albums/{self.flickr_id}"
+
+    def public_photos(self):
+        "Returns only public photos."
+        return self.photos.filter(is_private=False)
 
 
 class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
@@ -898,11 +884,11 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     # All Users that have Accounts:
     objects_with_accounts = managers.WithAccountsManager()
 
-    def __str__(self):
-        return self.realname if self.realname else self.username
-
     class Meta:
         ordering = ["realname", "username"]
+
+    def __str__(self):
+        return self.realname if self.realname else self.username
 
     def get_absolute_url(self):
         return reverse("flickr:user_detail", kwargs={"nsid": self.nsid})
@@ -926,7 +912,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def original_icon_url(self):
         """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
-            return "https://farm%s.staticflickr.com/%s/buddyicons/%s.jpg" % (
+            return "https://farm{}.staticflickr.com/{}/buddyicons/{}.jpg".format(
                 self.iconfarm,
                 self.iconserver,
                 self.nsid,

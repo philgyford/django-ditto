@@ -1,4 +1,5 @@
-from ...fetch.multifetchers import PhotosetsMultiAccountFetcher
+from ditto.flickr.fetch.multifetchers import PhotosetsMultiAccountFetcher
+
 from . import FetchCommand
 
 

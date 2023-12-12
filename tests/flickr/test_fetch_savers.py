@@ -22,7 +22,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         """ "Creates/updates a User from API data, then fetches that User from
         the DB and returns it.
         """
-        fetch_time = datetime.utcnow().replace(tzinfo=timezone.utc)
+        fetch_time = datetime.now(tz=timezone.utc)
         UserSaver().save_user(user_data, fetch_time)
         return User.objects.get(nsid="35034346050@N01")
 
@@ -33,9 +33,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         user_data = self.load_fixture("people.getInfo")
         user = self.make_user_object(user_data["person"])
 
-        self.assertEqual(
-            user.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
-        )
+        self.assertEqual(user.fetch_time, datetime.now(tz=timezone.utc))
         self.assertEqual(user.raw, json.dumps(user_data["person"]))
         self.assertEqual(user.nsid, "35034346050@N01")
         self.assertTrue(user.is_pro)
@@ -50,7 +48,7 @@ class UserSaverTestCase(FlickrFetchTestCase):
         self.assertEqual(user.photos_count, 2876)
         self.assertEqual(
             user.photos_first_date,
-            datetime.utcfromtimestamp(1093459273).replace(tzinfo=timezone.utc),
+            datetime.fromtimestamp(1093459273, tz=timezone.utc),
         )
         self.assertEqual(
             user.photos_first_date_taken,
@@ -99,7 +97,7 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
     def make_photo_data(self):
         """Makes the dict of data that photo_save() expects, based on API data."""
         return {
-            "fetch_time": datetime.utcnow().replace(tzinfo=timezone.utc),
+            "fetch_time": datetime.now(tz=timezone.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),
             "info": self.load_fixture("photos.getInfo")["photo"],
             "exif": self.load_fixture("photos.getExif")["photo"],
@@ -121,9 +119,7 @@ class PhotoSaverTestCase(FlickrFetchTestCase):
         )
         self.assertFalse(photo.is_private)
         self.assertEqual(photo.summary, "Some test HTML. And another paragraph.")
-        self.assertEqual(
-            photo.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
-        )
+        self.assertEqual(photo.fetch_time, datetime.now(tz=timezone.utc))
         self.assertEqual(
             photo.post_time,
             datetime.strptime("2016-03-28 16:05:05", "%Y-%m-%d %H:%M:%S").replace(
@@ -379,7 +375,7 @@ class PhotosetSaverTestCase(FlickrFetchTestCase):
     def make_photoset_data(self):
         """Makes the dict of data that photo_save() expects, based on API data."""
         return {
-            "fetch_time": datetime.utcnow().replace(tzinfo=timezone.utc),
+            "fetch_time": datetime.now(tz=timezone.utc),
             "user_obj": UserFactory(nsid="35034346050@N01"),
             "photoset": self.load_fixture("photosets.getList")["photosets"]["photoset"][
                 0
@@ -392,9 +388,7 @@ class PhotosetSaverTestCase(FlickrFetchTestCase):
         photoset_data = self.make_photoset_data()
         photoset = self.make_photoset_object(photoset_data)
 
-        self.assertEqual(
-            photoset.fetch_time, datetime.utcnow().replace(tzinfo=timezone.utc)
-        )
+        self.assertEqual(photoset.fetch_time, datetime.now(tz=timezone.utc))
         self.assertEqual(photoset.user, photoset_data["user_obj"])
 
         self.assertEqual(photoset.flickr_id, 72157665648859705)

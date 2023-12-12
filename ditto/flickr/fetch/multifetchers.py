@@ -1,4 +1,5 @@
-from ..models import Account, User
+from ditto.flickr.models import Account, User
+
 from . import FetchError
 from .fetchers import PhotosetsFetcher, RecentPhotosFetcher
 from .filesfetchers import OriginalFilesFetcher
@@ -16,7 +17,7 @@ from .filesfetchers import OriginalFilesFetcher
 #   OriginalFilesMultiAccountFetcher
 
 
-class MultiAccountFetcher(object):
+class MultiAccountFetcher:
     """Parent class for fetching things from Flickr for ALL or ONE Account(s).
 
     Its child classes are useful for:
@@ -51,32 +52,33 @@ class MultiAccountFetcher(object):
             # Get all active Accounts.
             self.accounts = list(Account.objects.filter(is_active=True))
             if len(self.accounts) == 0:
-                raise FetchError("No active Accounts were found to fetch.")
+                msg = "No active Accounts were found to fetch."
+                raise FetchError(msg)
         else:
             # Find the Account associated with nsid.
             try:
                 user = User.objects.get(nsid=nsid)
-            except User.DoesNotExist:
-                raise FetchError("There is no User with the NSID '%s'" % nsid)
+            except User.DoesNotExist as err:
+                msg = f"There is no User with the NSID '{nsid}'"
+                raise FetchError(msg) from err
             try:
                 account = Account.objects.get(user=user)
-            except Account.DoesNotExist:
-                raise FetchError(
-                    "There is no Account associated with the User with NSID '%s'" % nsid
-                )
+            except Account.DoesNotExist as err:
+                msg = "There is no Account associated with the User with NSID '{nsid}'"
+                raise FetchError(msg) from err
             if account.is_active is False:
-                raise FetchError(
+                msg = (
                     "The Account associated with the User with NSID "
-                    "'%s' is marked as inactive." % nsid
+                    f"'{nsid}' is marked as inactive."
                 )
+                raise FetchError(msg)
 
             self.accounts = [account]
         return super().__init__()
 
     def fetch(self, **kwargs):
-        raise FetchError(
-            "Subclasess of MultiAccountFetcher should define their own fetch()."
-        )
+        msg = "Subclasess of MultiAccountFetcher should define their own fetch()."
+        raise FetchError(msg)
 
 
 class RecentPhotosMultiAccountFetcher(MultiAccountFetcher):
@@ -130,7 +132,7 @@ class OriginalFilesMultiAccountFetcher(MultiAccountFetcher):
     went wrong) for each account.
     """
 
-    def fetch(self, fetch_all=False):
+    def fetch(self, *, fetch_all=False):
         for account in self.accounts:
             self.return_value.append(
                 OriginalFilesFetcher(account).fetch(fetch_all=fetch_all)

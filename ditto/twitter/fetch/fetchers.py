@@ -1,4 +1,5 @@
-from ..models import Account
+from ditto.twitter.models import Account
+
 from . import FetchError
 from .fetch import (
     Fetch,
@@ -31,7 +32,7 @@ from .fetch import (
 # FilesFetcher
 
 
-class TwitterFetcher(object):
+class TwitterFetcher:
     """Parent class for children that will call the Twitter API to fetch data
     for one or several Accounts.
 
@@ -70,8 +71,8 @@ class TwitterFetcher(object):
         success/failure.
         """
         for account in self.accounts:
-            accountFetcher = self._get_account_fetcher(account)
-            return_value = accountFetcher.fetch(**kwargs)
+            account_fetcher = self._get_account_fetcher(account)
+            return_value = account_fetcher.fetch(**kwargs)
             self._add_to_return_values(return_value)
 
         return self.return_values
@@ -102,15 +103,16 @@ class TwitterFetcher(object):
         if screen_name is None:
             accounts = Account.objects.filter(is_active=True)
             if len(accounts) == 0:
-                raise FetchError("No active Accounts were found to fetch.")
+                msg = "No active Accounts were found to fetch."
+                raise FetchError(msg)
         else:
             try:
                 accounts = [Account.objects.get(user__screen_name=screen_name)]
-            except Account.DoesNotExist:
+            except Account.DoesNotExist as err:
                 raise FetchError(
                     "There is no Account in the database with a screen_name of '%s'"
                     % screen_name
-                )
+                ) from err
             else:
                 if accounts[0].is_active is False:
                     raise FetchError(
@@ -150,11 +152,12 @@ class UsersFetcher(TwitterFetcher):
         results = fetcher.fetch(ids=[123456,9876,])
     """
 
-    def fetch(self, ids=[]):
+    def fetch(self, ids=None):
         """
         Keyword arguments:
         ids -- A list of Twitter user IDs to fetch and store data for.
         """
+        ids = [] if ids is None else ids
         return super().fetch(ids=ids)
 
     def _get_account_fetcher(self, account):
@@ -172,11 +175,12 @@ class TweetsFetcher(TwitterFetcher):
         results = fetcher.fetch(ids=[123456,9876,])
     """
 
-    def fetch(self, ids=[]):
+    def fetch(self, ids=None):
         """
         Keyword arguments:
         ids -- A list of Twitter Tweet IDs to fetch and store data for.
         """
+        ids = [] if ids is None else ids
         return super().fetch(ids=ids)
 
     def _get_account_fetcher(self, account):
@@ -230,7 +234,7 @@ class FavoriteTweetsFetcher(TwitterFetcher):
         return FetchTweetsFavorite(account)
 
 
-class FilesFetcher(object):
+class FilesFetcher:
     """
     Use like:
         fetcher = FilesFetcher()
@@ -245,7 +249,7 @@ class FilesFetcher(object):
     def __init__(self):
         self.return_values = []
 
-    def fetch(self, fetch_all=False):
+    def fetch(self, *, fetch_all=False):
         results = FetchFiles().fetch(fetch_all=fetch_all)
 
         # Return a list to behave similar to the other *Fetcher() classes that

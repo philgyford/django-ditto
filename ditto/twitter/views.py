@@ -1,7 +1,8 @@
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 
-from ..core.views import PaginatedListView
+from ditto.core.views import PaginatedListView
+
 from .models import Account, Tweet, User
 
 
@@ -74,6 +75,7 @@ class UserDetailView(SingleUserMixin, PaginatedListView):
 
 class AccountFavoriteListView(SingleUserMixin, PaginatedListView):
     "A single Twitter User associated with an Account, and its Favorites."
+
     template_name = "twitter/account_favorite_list.html"
 
     def get_queryset(self):

@@ -23,7 +23,7 @@ class TweetSaverTestCase(FetchTwitterTestCase):
     # fixture to something much shorter, and easier to test with.
     api_fixture = "tweets.json"
 
-    def make_tweet(self, is_private=False):
+    def make_tweet(self, *, is_private=False):
         self.fetch_time = datetime_now()
 
         # Get the JSON for a single tweet.
@@ -325,7 +325,7 @@ class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(video.twitter_id, 1234567890)
         self.assertEqual(
             video.image_url,
-            "https://pbs.twimg.com/ext_tw_video_thumb/661601811007188992/pu/img/gcxHGl7EA08a-Gps.jpg",  # noqa: E501
+            "https://pbs.twimg.com/ext_tw_video_thumb/661601811007188992/pu/img/gcxHGl7EA08a-Gps.jpg",
         )
         self.assertEqual(video.large_w, 640)
         self.assertEqual(video.large_h, 360)
@@ -340,11 +340,11 @@ class TweetSaverVideosTestCase(TweetSaverMediaTestCase):
         self.assertEqual(video.aspect_ratio, "16:9")
         self.assertEqual(
             video.dash_url,
-            "https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.mpd",  # noqa: E501
+            "https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.mpd",
         )
         self.assertEqual(
             video.xmpeg_url,
-            "https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8",  # noqa: E501
+            "https://video.twimg.com/ext_tw_video/661601811007188992/pu/pl/K0pVjBgnc5BI_4e5.m3u8",
         )
 
 
@@ -382,14 +382,14 @@ class TweetSaverAnimatedGifTestCase(TweetSaverMediaTestCase):
 
 
 class UserSaverTestCase(FetchTwitterTestCase):
-
     api_fixture = "verify_credentials.json"
 
-    def make_user_data(self, custom={}):
+    def make_user_data(self, custom=None):
         """Get the JSON for a single user.
         custom is a dict of attributes to override on the default data.
         eg, {'protected': True}
         """
+        custom = {} if custom is None else custom
         raw_json = self.make_response_body()
         user_data = json.loads(raw_json)
         for key, value in custom.items():
@@ -408,7 +408,6 @@ class UserSaverTestCase(FetchTwitterTestCase):
 
     @freeze_time("2015-08-14 12:00:00", tz_offset=-8)
     def test_saves_correct_user_data(self):
-
         user_data = self.make_user_data()
         user = self.make_user_object(user_data)
 

@@ -2,15 +2,16 @@ import os
 
 from django.core.files import File
 
-from ...core.utils.downloader import DownloadException, filedownloader
-from ..models import Photo
+from ditto.core.utils.downloader import DownloadException, filedownloader
+from ditto.flickr.models import Photo
+
 from . import FetchError
 
 # A single class that fetches original photo/video files for existing
 # Photo objects. Doesn't use the API.
 
 
-class OriginalFilesFetcher(object):
+class OriginalFilesFetcher:
     """
     Fetch the original photo files for a single Account.
 
@@ -45,7 +46,7 @@ class OriginalFilesFetcher(object):
 
         self.account = account
 
-    def fetch(self, fetch_all=False):
+    def fetch(self, *, fetch_all=False):
         """
         Download and save original photos and videos for all Photo objects
         (or just those that don't already have them).
@@ -132,15 +133,17 @@ class OriginalFilesFetcher(object):
         try:
             # Saves the file to /tmp/:
             filepath = filedownloader.download(url, acceptable_content_types)
-        except DownloadException as e:
-            raise FetchError(e)
+        except DownloadException as err:
+            raise FetchError(err) from err
 
         if filepath:
             # Reopen file and save to the Photo:
-            reopened_file = open(filepath, "rb")
-            django_file = File(reopened_file)
+            with open(filepath, "rb") as reopened_file:
+                django_file = File(reopened_file)
 
-            if media_type == "video":
-                photo.video_original_file.save(os.path.basename(filepath), django_file)
-            else:
-                photo.original_file.save(os.path.basename(filepath), django_file)
+                if media_type == "video":
+                    photo.video_original_file.save(
+                        os.path.basename(filepath), django_file
+                    )
+                else:
+                    photo.original_file.save(os.path.basename(filepath), django_file)

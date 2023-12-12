@@ -1,4 +1,3 @@
-# coding: utf-8
 import json
 
 from django.test import TestCase
@@ -7,15 +6,13 @@ from ditto.twitter.utils import htmlify_description, htmlify_tweet
 
 
 class HtmlifyTestCase(TestCase):
-
     # Define in child classes.
     api_fixture = None
 
-    def getJson(self, fixture):
-        json_file = open("%s%s" % ("tests/twitter/fixtures/api/", fixture))
-        json_data = json.loads(json_file.read())
-        json_file.close()
-        return json_data
+    def get_json(self, fixture):
+        with open(f"tests/twitter/fixtures/api/{fixture}") as f:
+            json_data = json.loads(f.read())
+            return json_data
 
 
 class HtmlifyDescriptionTestCase(HtmlifyTestCase):
@@ -24,7 +21,7 @@ class HtmlifyDescriptionTestCase(HtmlifyTestCase):
     api_fixture = "user_with_description.json"
 
     def test_htmlify_description(self):
-        description_html = htmlify_description(self.getJson(self.api_fixture))
+        description_html = htmlify_description(self.get_json(self.api_fixture))
         self.assertEqual(
             description_html,
             (
@@ -42,7 +39,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     def test_links_urls(self):
         "Makes 'urls' entities into clickable links."
         api_fixture = "tweet_with_entities.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 'with <a href="http://www.bbc.co.uk/news/business-34505593" '
@@ -62,7 +59,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     def test_links_users(self):
         "Makes 'user_mentions' entities into clickable @links."
         api_fixture = "tweet_with_entities.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 'for <a href="https://twitter.com/philgyford" '
@@ -81,7 +78,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     def test_links_users_with_entities(self):
         "It was trying to run urlize() on the tweet after linking the user mention."
         api_fixture = "tweet_with_users_no_urls.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertEqual(
             (
                 '<a href="https://twitter.com/genmon" rel="external">'
@@ -93,7 +90,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     def test_links_hashtags(self):
         "Makes 'hashtags' entities into clickable #links."
         api_fixture = "tweet_with_entities.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 ' <a href="https://twitter.com/search?q=%23testing" '
@@ -112,7 +109,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
     def test_links_substringed_hashtags(self):
         "If a hashtag is a substring of another, it should cope OK."
         api_fixture = "tweet_with_substringed_hashtags.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 "@denisewilton</a> "
@@ -126,7 +123,7 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
 
     def test_links_symbols(self):
         api_fixture = "tweet_with_symbols.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertEqual(
             tweet_html,
             (
@@ -141,11 +138,10 @@ class HtmlifyTweetEntitiesTestCase(HtmlifyTestCase):
 
 
 class HtmlifyTweetTestCase(HtmlifyTestCase):
-
     api_fixture = "tweet_with_entities.json"
 
     def setUp(self):
-        self.json_data = self.getJson(self.api_fixture)
+        self.json_data = self.get_json(self.api_fixture)
 
     def test_linebreaks(self):
         "Turns linebreaks into <br>s"
@@ -171,7 +167,7 @@ class HtmlifyTweetStrsNotIntsTestCase(HtmlifyTestCase):
         It should be able to cope with that.
         """
         api_fixture = "tweet_with_display_text_range_str.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertEqual(
             tweet_html,
             (
@@ -191,7 +187,7 @@ class HtmlifyTweetStrsNotIntsTestCase(HtmlifyTestCase):
         It should be able to cope with that.
         """
         api_fixture = "tweet_with_entities_indices_str.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertEqual(
             tweet_html,
             (
@@ -212,7 +208,7 @@ class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
         tweets.
         """
         api_fixture = "tweet_from_archive_2006.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertEqual(
             tweet_html,
             (
@@ -226,7 +222,7 @@ class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
     def test_urls_with_no_media(self):
         """The 'entities' element has no 'media'."""
         api_fixture = "tweet_with_entities_2.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 'created. <a href="http://daveaddey.com/postfiles/ecoatm.jpg" '
@@ -240,7 +236,7 @@ class HtmlifyTweetUrlsTestCase(HtmlifyTestCase):
         user_mentions before adding the full URLs.
         """
         api_fixture = "tweet_with_entities_3.json"
-        tweet_html = htmlify_tweet(self.getJson(api_fixture))
+        tweet_html = htmlify_tweet(self.get_json(api_fixture))
         self.assertTrue(
             (
                 'prototyping!  <a href="https://medium.com/@BuckleyWilliams/'
@@ -257,7 +253,7 @@ class HtmlifyTweetPhotosTestCase(HtmlifyTestCase):
     api_fixture = "tweet_with_photos.json"
 
     def setUp(self):
-        self.json_data = self.getJson(self.api_fixture)
+        self.json_data = self.get_json(self.api_fixture)
 
     def test_removes_photo_links(self):
         tweet_html = htmlify_tweet(self.json_data)

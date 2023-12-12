@@ -1,14 +1,9 @@
-# coding: utf-8
 from django.db import models
+from django.urls import reverse
 
-try:
-    from django.urls import reverse
-except ImportError:
-    # For Django 1.8
-    from django.urls import reverse
+from ditto.core.models import DittoItemModel, TimeStampedModelMixin
+from ditto.core.utils import truncate_string
 
-from ..core.models import DittoItemModel, TimeStampedModelMixin
-from ..core.utils import truncate_string
 from . import managers
 
 # For generating permalinks.
@@ -38,25 +33,22 @@ class Account(TimeStampedModelMixin, models.Model):
         default=True, help_text="If false, new scrobbles won't be fetched."
     )
 
-    def __str__(self):
-        return self.realname
-
     class Meta:
         ordering = ["username"]
+
+    def __str__(self):
+        return self.realname
 
     def get_absolute_url(self):
         return reverse("lastfm:user_detail", kwargs={"username": self.username})
 
     @property
     def permalink(self):
-        return "%s/user/%s" % (LASTFM_URL_ROOT, self.username)
+        return f"{LASTFM_URL_ROOT}/user/{self.username}"
 
     def has_credentials(self):
         "Does this at least have something in its API field? True or False"
-        if self.api_key:
-            return True
-        else:
-            return False
+        return bool(self.api_key)
 
     def get_recent_scrobbles(self, limit=10):
         return self.scrobbles.prefetch_related("artist", "track").order_by(
@@ -103,11 +95,11 @@ class Album(TimeStampedModelMixin, models.Model):
 
     objects = managers.AlbumsManager()
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ["name"]
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         "The Album's URL locally."
@@ -119,7 +111,7 @@ class Album(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         "The Album's URL at Last.fm."
-        return "%s/music/%s/%s" % (
+        return "{}/music/{}/{}".format(
             LASTFM_URL_ROOT,
             self.artist.original_slug,
             self.original_slug,
@@ -128,7 +120,7 @@ class Album(TimeStampedModelMixin, models.Model):
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return "%s/release/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return f"{MUSICBRAINZ_URL_ROOT}/release/{self.mbid}"
         else:
             return None
 
@@ -178,11 +170,11 @@ class Artist(TimeStampedModelMixin, models.Model):
 
     objects = managers.ArtistsManager()
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ["name"]
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         "The Artist's URL locally."
@@ -191,12 +183,12 @@ class Artist(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         "The Artist's URL at Last.fm."
-        return "%s/music/%s" % (LASTFM_URL_ROOT, self.original_slug)
+        return f"{LASTFM_URL_ROOT}/music/{self.original_slug}"
 
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return "%s/artist/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return f"{MUSICBRAINZ_URL_ROOT}/artist/{self.mbid}"
         else:
             return None
 
@@ -281,15 +273,15 @@ class Scrobble(DittoItemModel, models.Model):
         null=True,
     )
 
-    def __str__(self):
-        return "%s (%s)" % (self.title, self.post_time)
-
     class Meta:
         ordering = ["-post_time"]
 
+    def __str__(self):
+        return f"{self.title} ({self.post_time})"
+
     def save(self, *args, **kwargs):
         self.title = truncate_string(
-            "{} – {}".format(self.track.artist.name, self.track.name),
+            f"{self.track.artist.name} – {self.track.name}",
             chars=255,
             truncate="…",
             at_word_boundary=True,
@@ -331,11 +323,11 @@ class Track(TimeStampedModelMixin, models.Model):
 
     objects = managers.TracksManager()
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ["name"]
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         "The track's URL locally."
@@ -347,7 +339,7 @@ class Track(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         "The Track's URL at Last.fm."
-        return "%s/music/%s/_/%s" % (
+        return "{}/music/{}/_/{}".format(
             LASTFM_URL_ROOT,
             self.artist.original_slug,
             self.original_slug,
@@ -356,7 +348,7 @@ class Track(TimeStampedModelMixin, models.Model):
     @property
     def musicbrainz_url(self):
         if self.mbid:
-            return "%s/recording/%s" % (MUSICBRAINZ_URL_ROOT, self.mbid)
+            return f"{MUSICBRAINZ_URL_ROOT}/recording/{self.mbid}"
         else:
             return None
 

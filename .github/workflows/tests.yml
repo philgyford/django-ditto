@@ -1,11 +1,10 @@
-
 name: Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -16,21 +15,19 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 5
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12-dev"]
-        django-version: ["3.2", "4.1", "4.2", "main"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13-dev"]
+        django-version: ["4.1", "4.2", "5.0", "main"]
         exclude:
-          # Django 5.0 isn't compatible with python < 3.10
+          - python-version: "3.9"
+            django-version: "5.0"
           - python-version: "3.9"
             django-version: "main"
 
-          - python-version: "3.11"
-            django-version: "3.2"
+          - python-version: "3.12"
+            django-version: "4.1"
 
-          - python-version: "3.12-dev"
-            django-version: "3.2"
-          - python-version: "3.12-dev"
+          - python-version: "3.13-dev"
             django-version: "4.1"
 
     steps:
@@ -50,8 +47,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key:
-            ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
           restore-keys: |
             ${{ matrix.python-version }}-v2-
 
@@ -68,15 +64,14 @@ jobs:
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
 
-  # The flake8 test in tox.ini won't run with the test job so we need to add it here.
-  lint:
-    name: "Lint: ${{ matrix.toxenv }}"
+  ruff:
+    name: "Run ruff: ${{ matrix.toxenv }}"
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         toxenv:
-          - flake8
+          - ruff
 
     steps:
       - name: Git clone
@@ -85,7 +80,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Get pip cache dir
         id: pip-cache
@@ -95,8 +90,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key:
-            ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
           restore-keys: |
             ${{ matrix.python-version }}-v2-
 
@@ -112,11 +106,11 @@ jobs:
     # https://github.com/8398a7/action-slack/issues/72#issuecomment-649910353
     name: Slack notification
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [test, ruff]
 
     # this is required, otherwise it gets skipped if any needed jobs fail.
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idneeds
-    if: always()  # Pick up events even if the job fails or is cancelled.
+    if: always() # Pick up events even if the job fails or is cancelled.
 
     steps:
       - uses: technote-space/workflow-conclusion-action@v1

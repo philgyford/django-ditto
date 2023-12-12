@@ -1,3 +1,4 @@
+# ruff: noqa
 import math
 from functools import reduce
 

@@ -1,4 +1,3 @@
-# coding: utf-8
 from io import StringIO
 from unittest.mock import patch
 
@@ -25,7 +24,6 @@ class FetchTwitterArgs(TestCase):
 
 
 class FetchTwitterTweetsArgs(FetchTwitterArgs):
-
     fetcher_class_path = (
         "ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher"
     )
@@ -60,7 +58,6 @@ class FetchTwitterTweetsArgs(FetchTwitterArgs):
 
 
 class FetchTwitterFavoritesArgs(FetchTwitterArgs):
-
     fetcher_class_path = "ditto.twitter.management.commands.fetch_twitter_favorites.FavoriteTweetsFetcher"  # noqa: E501
 
     def test_fail_with_no_args(self):
@@ -117,7 +114,6 @@ class FetchTwitterOutput(TestCase):
 
 
 class FetchTwitterTweetsOutput(FetchTwitterOutput):
-
     fetch_method_path = "ditto.twitter.management.commands.fetch_twitter_tweets.RecentTweetsFetcher.fetch"  # noqa: E501
 
     def test_success_output(self):
@@ -152,7 +148,6 @@ class FetchTwitterTweetsOutput(FetchTwitterOutput):
 
 
 class FetchTwitterFavoritesOutput(FetchTwitterOutput):
-
     fetch_method_path = "ditto.twitter.management.commands.fetch_twitter_favorites.FavoriteTweetsFetcher.fetch"  # noqa: E501
 
     def test_success_output(self):
@@ -190,7 +185,6 @@ class FetchTwitterFavoritesOutput(FetchTwitterOutput):
 
 
 class FetchTwitterAccountsOutput(FetchTwitterOutput):
-
     fetch_method_path = (
         "ditto.twitter.management.commands.fetch_twitter_accounts.VerifyFetcher.fetch"
     )
@@ -242,7 +236,7 @@ class ImportTweetsVersion1(TestCase):
 
     def setUp(self):
         self.patcher = patch(
-            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"  # noqa: E501
+            "ditto.twitter.management.commands.import_twitter_tweets.Version1TweetIngester.ingest"
         )
         self.ingest_mock = self.patcher.start()
         self.out = StringIO()
@@ -270,7 +264,7 @@ class ImportTweetsVersion2(TestCase):
 
     def setUp(self):
         self.patcher = patch(
-            "ditto.twitter.management.commands.import_twitter_tweets.Version2TweetIngester.ingest"  # noqa: E501
+            "ditto.twitter.management.commands.import_twitter_tweets.Version2TweetIngester.ingest"
         )
         self.ingest_mock = self.patcher.start()
         self.out = StringIO()
@@ -281,11 +275,12 @@ class ImportTweetsVersion2(TestCase):
 
     def test_fails_with_invalid_directory(self):
         "Test fails with invalid directory"
-        with patch("os.path.isdir", return_value=False):
-            with self.assertRaises(CommandError):
-                call_command(
-                    "import_twitter_tweets", path="/wrong/path", archive_version="v2"
-                )
+        with patch("os.path.isdir", return_value=False), self.assertRaises(
+            CommandError
+        ):
+            call_command(
+                "import_twitter_tweets", path="/wrong/path", archive_version="v2"
+            )
 
     def test_calls_ingest_method(self):
         "Calls correct class and method"
