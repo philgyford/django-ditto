@@ -36,7 +36,7 @@ select = [
   "RUF100", # unused-noqa
   "RUF200", # invalid-pyproject-toml
 ]
-target-version = "3.9"
+target-version = "py39"
 
 [tool.ruff.lint]
 ignore = []
