@@ -978,7 +978,7 @@ class FilesFetcherTestCase(TestCase):
             self.image.image_file.name,
             (
                 f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
-                f"{os.path.basename(temp_filepath)}",
+                f"{os.path.basename(temp_filepath)}"
             ),
         )
 
@@ -995,6 +995,6 @@ class FilesFetcherTestCase(TestCase):
             self.animated_gif.mp4_file.name,
             (
                 f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
-                f"{os.path.basename(temp_filepath)}",
+                f"{os.path.basename(temp_filepath)}"
             ),
         )

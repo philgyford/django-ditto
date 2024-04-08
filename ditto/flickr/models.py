@@ -496,7 +496,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         ordering = ("-post_time",)
 
     def __str__(self):
-        return super().__str_(self)
+        return super().__str__()
 
     def save(self, *args, **kwargs):
         if self.taken_time:
