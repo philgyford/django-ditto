@@ -112,14 +112,12 @@ jobs:
     if: always() # Pick up events even if the job fails or is cancelled.
 
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
-
       - name: Send Slack notification
         uses: 8398a7/action-slack@v3
-        # if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
-          status: ${{ env.WORKFLOW_CONCLUSION }}
+          status: ${{ job.status }}
           # fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
           fields: repo,message,commit,author,action,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.ACTIONS_CI_SLACK_HOOK }}
+        if: always() # Pick up events even if the job fails or is canceled.
