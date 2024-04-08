@@ -111,10 +111,8 @@ class Album(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         "The Album's URL at Last.fm."
-        return "{}/music/{}/{}".format(
-            LASTFM_URL_ROOT,
-            self.artist.original_slug,
-            self.original_slug,
+        return (
+            f"{LASTFM_URL_ROOT}/music/{self.artist.original_slug}/{self.original_slug}"
         )
 
     @property
@@ -339,10 +337,9 @@ class Track(TimeStampedModelMixin, models.Model):
     @property
     def permalink(self):
         "The Track's URL at Last.fm."
-        return "{}/music/{}/_/{}".format(
-            LASTFM_URL_ROOT,
-            self.artist.original_slug,
-            self.original_slug,
+        return (
+            f"{LASTFM_URL_ROOT}/music/{self.artist.original_slug}/_/"
+            f"{self.original_slug}"
         )
 
     @property

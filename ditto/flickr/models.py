@@ -495,6 +495,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     class Meta:
         ordering = ("-post_time",)
 
+    def __str__(self):
+        return super().__str_(self)
+
     def save(self, *args, **kwargs):
         if self.taken_time:
             self.taken_year = self.taken_time.year
@@ -681,12 +684,9 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             # Medium size doesn't have a letter suffix.
             if self.PHOTO_SIZES[size]["suffix"]:
                 size_ext = "_{}".format(self.PHOTO_SIZES[size]["suffix"])
-            return "https://farm{}.static.flickr.com/{}/{}_{}{}.jpg".format(
-                self.farm,
-                self.server,
-                self.flickr_id,
-                self.secret,
-                size_ext,
+            return (
+                f"https://farm{self.farm}.static.flickr.com/{self.server}/"
+                f"{self.flickr_id}_{self.secret}{size_ext}.jpg"
             )
 
     def _video_url(self, size):
@@ -912,10 +912,9 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
     def original_icon_url(self):
         """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
-            return "https://farm{}.staticflickr.com/{}/buddyicons/{}.jpg".format(
-                self.iconfarm,
-                self.iconserver,
-                self.nsid,
+            return (
+                f"https://farm{self.iconfarm}.staticflickr.com/{self.iconserver}"
+                f"/buddyicons/{self.nsid}.jpg"
             )
         else:
             return "https://www.flickr.com/images/buddyicon.gif"

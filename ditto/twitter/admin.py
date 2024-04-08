@@ -155,29 +155,24 @@ class MediaAdmin(admin.ModelAdmin):
 
     def show_thumb(self, instance):
         return mark_safe(
-            '<img src="{}" width="{}" height="{}" />'.format(
-                instance.thumbnail_url,
-                instance.thumbnail_w,
-                instance.thumbnail_h,
-            )
+            f'<img src="{instance.thumbnail_url}" width="{instance.thumbnail_w}" '
+            f'height="{instance.thumbnail_h}" />'
         )
 
     show_thumb.short_description = ""
 
     def show_image(self, instance):
         if instance.media_type == "photo":
-            html = '<img src="{}" width="{}" height="{}" />'.format(
-                instance.small_url,
-                instance.small_w,
-                instance.small_h,
+            html = (
+                f'<img src="{instance.small_url}" width="{instance.small_w}" '
+                f'height="{instance.small_h}" />'
             )
         else:
-            html = '<video width="{}" height="{}" poster="{}" controls preload="metadata"><source src="{}" type="{}"></video>'.format(  # noqa: E501
-                instance.small_w,
-                instance.small_h,
-                instance.small_url,
-                instance.video_url,
-                instance.video_mime_type,
+            html = (
+                f'<video width="{instance.small_w}" height="{instance.small_h}" '
+                f'poster="{instance.small_url}" controls preload="metadata">'
+                f'<source src="{instance.video_url}" type="{instance.video_mime_type}">'
+                "</video>"
             )
         return mark_safe(html)
 

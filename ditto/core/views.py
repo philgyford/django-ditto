@@ -240,8 +240,9 @@ class DittoAppsMixin:
                     app_slug, variety_slug
                 )
             elif variety_slug:
-                msg = "'{}' is not a valid variety slug for the '{}' app slug.".format(
-                    variety_slug, app_slug
+                msg = (
+                    f"'{variety_slug}' is not a valid variety slug for "
+                    f"the '{app_slug}' app slug."
                 )
                 raise Http404(msg)
         elif app_slug:

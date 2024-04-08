@@ -74,10 +74,9 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         if method == "all":
             return posts_json
         else:
-            return '{{"date":"{}T09:48:31Z","user":"{}","posts":{}}}\t\n'.format(
-                post_date,
-                username,
-                posts_json,
+            return (
+                f'{{"date":"{post_date}T09:48:31Z","user":"{username}",'
+                f'"posts":{posts_json}}}\t\n'
             )
 
     # Check that all interface methods return expected results on success.

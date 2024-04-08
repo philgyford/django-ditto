@@ -976,10 +976,9 @@ class FilesFetcherTestCase(TestCase):
         FetchFiles()._fetch_and_save_file(self.image, "image")
         self.assertEqual(
             self.image.image_file.name,
-            "twitter/media/{}/{}/{}".format(
-                temp_filepath[-4:-2],
-                temp_filepath[-2:],
-                os.path.basename(temp_filepath),
+            (
+                f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
+                f"{os.path.basename(temp_filepath)}",
             ),
         )
 
@@ -994,9 +993,8 @@ class FilesFetcherTestCase(TestCase):
         FetchFiles()._fetch_and_save_file(self.animated_gif, "mp4")
         self.assertEqual(
             self.animated_gif.mp4_file.name,
-            "twitter/media/{}/{}/{}".format(
-                temp_filepath[-4:-2],
-                temp_filepath[-2:],
-                os.path.basename(temp_filepath),
+            (
+                f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
+                f"{os.path.basename(temp_filepath)}",
             ),
         )

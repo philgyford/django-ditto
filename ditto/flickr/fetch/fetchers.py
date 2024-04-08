@@ -551,8 +551,9 @@ class PhotosetsFetcher(Fetcher):
                     page=page_number,
                 )
             except FlickrError as err:
-                msg = "Error when fetching photos in photoset {} (page {}): {}".format(
-                    photoset_id, page_number, err
+                msg = (
+                    f"Error when fetching photos in photoset {photoset_id} "
+                    f"(page {page_number}): {err}"
                 )
                 raise FetchError(msg) from err
 

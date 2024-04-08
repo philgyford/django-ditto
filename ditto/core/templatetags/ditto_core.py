@@ -160,8 +160,7 @@ def current_url_name(context):
     """
     url_name = False
     if context.request.resolver_match:
-        url_name = "{}:{}".format(
-            context.request.resolver_match.namespace,
-            context.request.resolver_match.url_name,
-        )
+        namespace = context.request.resolver_match.namespace
+        name = context.request.resolver_match.url_name
+        url_name = f"{namespace}:{name}"
     return url_name

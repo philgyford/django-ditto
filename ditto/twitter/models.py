@@ -607,9 +607,9 @@ class Tweet(DittoItemModel, ExtraTweetManagers):
     def in_reply_to_url(self):
         "If it's a reply, the link to the tweet replied to."
         if self.is_reply:
-            return "https://twitter.com/{}/status/{}".format(
-                self.in_reply_to_screen_name,
-                self.in_reply_to_status_id,
+            return (
+                f"https://twitter.com/{self.in_reply_to_screen_name}/"
+                f"status/{self.in_reply_to_status_id}"
             )
         else:
             return ""

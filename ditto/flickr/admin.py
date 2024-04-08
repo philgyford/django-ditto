@@ -441,20 +441,18 @@ class PhotoAdmin(DittoItemModelAdmin):
 
     def show_thumb(self, instance):
         return mark_safe(
-            '<img src="{}" width="{}" height="{}" />'.format(
-                instance.thumbnail_url,
-                instance.thumbnail_width,
-                instance.thumbnail_height,
-            )
+            f'<img src="{instance.thumbnail_url}" '
+            f'width="{instance.thumbnail_width}" '
+            f'height="{instance.thumbnail_height}" />'
         )
 
     show_thumb.short_description = "Thumbnail"
 
     def show_image(self, instance):
         return mark_safe(
-            '<img src="{}" width="{}" height="{}" />'.format(
-                instance.small_url, instance.small_width, instance.small_height
-            )
+            f'<img src="{instance.small_url}" '
+            f'width="{instance.small_width}" '
+            f'height="{instance.small_height}" />'
         )
 
     show_image.short_description = "Small image"

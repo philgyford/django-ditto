@@ -85,9 +85,8 @@ def photo_license(n):
     if n in licenses:
         if n in Photo.LICENSE_URLS and Photo.LICENSE_URLS[n] != "":
             return format_html(
-                '<a href="{}" title="More about permissions">{}</a>'.format(
-                    Photo.LICENSE_URLS[n], licenses[n]
-                )
+                f'<a href="{Photo.LICENSE_URLs[n]}" title="More about permissions">'
+                f"{licenses[n]}</a>"
             )
         else:
             return licenses[n]
