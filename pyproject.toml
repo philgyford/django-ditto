@@ -12,6 +12,10 @@ extend-exclude = [
   "*/migrations/*",
 ]
 line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+ignore = []
 select = [
   # Reference: https://docs.astral.sh/ruff/rules/
   "B",    # flake8-bugbear
@@ -36,7 +40,3 @@ select = [
   "RUF100", # unused-noqa
   "RUF200", # invalid-pyproject-toml
 ]
-target-version = "py39"
-
-[tool.ruff.lint]
-ignore = []
