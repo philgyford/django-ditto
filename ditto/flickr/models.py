@@ -40,7 +40,7 @@ class Account(TimeStampedModelMixin, models.Model):
 
     def has_credentials(self):
         "Does this at least have something in its API fields? True or False"
-        return self.api_key and self.api_secret
+        return bool(self.api_key and self.api_secret)
 
 
 class TaggedPhoto(TaggedItemBase):

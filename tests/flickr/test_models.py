@@ -30,11 +30,17 @@ class AccountTestCase(TestCase):
         self.assertEqual(accounts[0].user.realname, "Bob")
         self.assertEqual(accounts[1].user.realname, "Terry")
 
-    def test_has_credentials(self):
-        account_1 = AccountFactory(api_key="1234", api_secret="9876")
-        self.assertTrue(account_1.has_credentials())
-        account_2 = AccountFactory(api_key="", api_secret="")
-        self.assertFalse(account_2.has_credentials())
+    def test_has_credentials_both_set(self):
+        account = AccountFactory(api_key="1234", api_secret="9876")
+        self.assertEqual(account.has_credentials(), True)
+
+    def test_has_credentials_neither_set(self):
+        account = AccountFactory(api_key="", api_secret="")
+        self.assertEqual(account.has_credentials(), False)
+
+    def test_has_credentials_one_set(self):
+        account = AccountFactory(api_key="", api_secret="9876")
+        self.assertEqual(account.has_credentials(), False)
 
     def test_get_absolute_url_no_user(self):
         account = AccountFactory(user=None)
