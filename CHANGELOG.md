@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [3.2.1] - 2024-04-08
+
+### Fixed
+
+- Fatal error when viewing Flickr Account list in Django Admin (#245)
+
 ## [3.2.0] - 2023-12-13
 
 ### Added
