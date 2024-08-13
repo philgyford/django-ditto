@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Added support for Django 5.1.
+## [3.3] - 2024-04-08
+
+### Added
+
+- Added support for Django 5.1 (no code changes).
+
+### Removed
+
 - Dropped support for Django 4.1 and 5.0.
+
+### Changed
+
+- Changed python module requirements
 
 ## [3.2.1] - 2024-04-08
 
