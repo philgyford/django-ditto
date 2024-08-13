@@ -118,8 +118,8 @@ def htmlify_tweet(json_data):
     if (urls_count + media_count) > 0 and urls_count > 0:
         for url in ents["urls"]:
             html = html.replace(
-                f'<a href="{url['url']}" class="twython-url">',
-                f'<a href="{url['expanded_url']}" rel="external">',
+                f'<a href="{url["url"]}" class="twython-url">',
+                f'<a href="{url["expanded_url"]}" rel="external">',
             )
 
     if media_count > 0:

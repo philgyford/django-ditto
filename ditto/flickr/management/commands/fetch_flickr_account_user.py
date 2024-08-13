@@ -66,5 +66,5 @@ class Command(BaseCommand):
                 if options.get("verbosity", 1) > 0:
                     self.stderr.write(
                         "Failed to fetch a Flickr ID for this Account: "
-                        f"{id_result["messages"][0]}"
+                        f"{id_result['messages'][0]}"
                     )
