@@ -807,7 +807,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         ordering = ["screen_name"]
 
     def __str__(self):
-        return "@%s" % self.screen_name
+        return f"@{self.screen_name}"
 
     def save(self, *args, **kwargs):
         """If the user's privacy status has changed, we need to change the
@@ -835,7 +835,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
 
     @property
     def permalink(self):
-        return "https://twitter.com/%s" % self.screen_name
+        return f"https://twitter.com/{self.screen_name}"
 
     @property
     def avatar_url(self):

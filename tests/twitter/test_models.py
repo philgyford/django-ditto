@@ -60,7 +60,7 @@ class AccountTestCase(TestCase):
         "Has the correct string represntation when it has a user"
         user = UserFactory()
         account = AccountFactory(user=user)
-        self.assertEqual(account.__str__(), "@%s" % user.screen_name)
+        self.assertEqual(account.__str__(), f"@{user.screen_name}")
 
     def test_ordering(self):
         """Multiple accounts are by user.screen_name time ascending"""
@@ -217,11 +217,11 @@ class PhotoTestCase(TestCase):
     def test_size_urls(self):
         url = "http://www.example.org/image.jpg"
         photo = PhotoFactory(image_url=url)
-        self.assertEqual(photo.large_url, "%s:large" % url)
-        self.assertEqual(photo.medium_url, "%s:medium" % url)
-        self.assertEqual(photo.small_url, "%s:small" % url)
-        self.assertEqual(photo.thumb_url, "%s:thumb" % url)
-        self.assertEqual(photo.thumbnail_url, "%s:thumb" % url)
+        self.assertEqual(photo.large_url, f"{url}:large")
+        self.assertEqual(photo.medium_url, f"{url}:medium")
+        self.assertEqual(photo.small_url, f"{url}:small")
+        self.assertEqual(photo.thumb_url, f"{url}:thumb")
+        self.assertEqual(photo.thumbnail_url, f"{url}:thumb")
 
     def test_tweets(self):
         "It should be possible to belong to more than one tweet."
@@ -392,7 +392,7 @@ class AnimatedGifLocalTestCase(TestCase):
     def test_video_url_mp4(self):
         gif = AnimatedGifFactory(mp4_url="https://example.org/test.mp4")
         filename = os.path.basename(gif.mp4_file.name)
-        self.assertEqual(gif.video_url, "/media/twitter/media/mp/le/%s" % filename)
+        self.assertEqual(gif.video_url, f"/media/twitter/media/mp/le/{filename}")
 
 
 class TweetTestCase(TestCase):

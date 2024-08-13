@@ -12,8 +12,8 @@ class AccountFactory(factory.django.DjangoModelFactory):
         model = models.Account
 
     username = factory.Sequence(lambda n: "user%d" % n)
-    url = factory.LazyAttribute(lambda obj: "https://pinboard.com/%s" % obj.username)
-    api_token = factory.LazyAttribute(lambda obj: "%s:123ABC" % obj.username)
+    url = factory.LazyAttribute(lambda obj: f"https://pinboard.com/{obj.username}")
+    api_token = factory.LazyAttribute(lambda obj: f"{obj.username}:123ABC")
 
 
 class BookmarkFactory(factory.django.DjangoModelFactory):

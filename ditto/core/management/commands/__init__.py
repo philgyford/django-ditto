@@ -40,7 +40,7 @@ class DittoBaseCommand(BaseCommand):
             return
 
         for result in results:
-            prefix = "%s: " % result["account"] if "account" in result else ""
+            prefix = f"{result['account']}: " if "account" in result else ""
             if "fetched" in result:
                 noun = (
                     self.singular_noun if result["fetched"] == 1 else self.plural_noun

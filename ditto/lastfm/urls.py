@@ -28,12 +28,12 @@ urlpatterns = [
         name="track_list",
     ),
     re_path(
-        r"^music/(?P<artist_slug>%s)/$" % slug_chars,
+        rf"^music/(?P<artist_slug>{slug_chars})/$",
         view=views.ArtistDetailView.as_view(),
         name="artist_detail",
     ),
     re_path(
-        r"^music/(?P<artist_slug>%s)/\+albums/$" % slug_chars,
+        rf"^music/(?P<artist_slug>{slug_chars})/\+albums/$",
         view=views.ArtistAlbumsView.as_view(),
         name="artist_albums",
     ),

@@ -33,7 +33,7 @@ class Command(BaseCommand):
         try:
             account = Account.objects.get(id=options["id"])
         except Account.DoesNotExist:
-            self.stderr.write("No Account found with an id of '%s'" % options["id"])
+            self.stderr.write(f"No Account found with an id of '{options['id']}'")
 
         if account:
             # Then get the ID of the Flicker user for this Account's API creds.
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                     account.save()
                     if options.get("verbosity", 1) > 0:
                         self.stdout.write(
-                            "Fetched and saved user '%s'" % result["user"]["name"]
+                            f"Fetched and saved user '{result['user']['name']}'"
                         )
                 else:
                     if options.get("verbosity", 1) > 0:
@@ -65,6 +65,6 @@ class Command(BaseCommand):
             else:
                 if options.get("verbosity", 1) > 0:
                     self.stderr.write(
-                        "Failed to fetch a Flickr ID for this Account: %s"
-                        % id_result["messages"][0]
+                        "Failed to fetch a Flickr ID for this Account: "
+                        f"{id_result["messages"][0]}"
                     )

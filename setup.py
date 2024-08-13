@@ -23,7 +23,7 @@ def get_entity(package, entity):
     """
     with open(os.path.join(package, "__init__.py")) as f:
         init_py = f.read()
-        find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
+        find = f"__{entity}__ = ['\"]([^'\"]+)['\"]"
         return re.search(find, init_py).group(1)
 
 
@@ -53,8 +53,7 @@ if sys.argv[-1] == "tag":
 if sys.argv[-1] == "publish":
     os.system("python setup.py sdist")
     os.system(
-        "twine upload --config-file=.pypirc dist/django-ditto-%s.tar.gz"
-        % (get_version())
+        f"twine upload --config-file=.pypirc dist/django-ditto-{get_version()}.tar.gz"
     )
     sys.exit()
 
@@ -63,8 +62,7 @@ if sys.argv[-1] == "publish":
 if sys.argv[-1] == "testpublish":
     os.system("python setup.py sdist")
     os.system(
-        "twine upload --config-file=.pypirc --repository-url https://test.pypi.org/legacy/ dist/django-ditto-%s.tar.gz"  # noqa: E501
-        % (get_version())
+        f"twine upload --config-file=.pypirc --repository-url https://test.pypi.org/legacy/ dist/django-ditto-{get_version()}.tar.gz"  # noqa: E501
     )
     # os.system("python setup.py bdist_wheel upload")
     sys.exit()

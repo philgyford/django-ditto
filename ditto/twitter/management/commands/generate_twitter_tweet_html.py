@@ -33,9 +33,8 @@ class Command(BaseCommand):
             try:
                 Account.objects.get(user__screen_name=screen_name)
             except Account.DoesNotExist as err:
-                raise CommandError(
-                    "There's no Account with a screen name of '%s'" % screen_name
-                ) from err
+                msg = f"There's no Account with a screen name of '{screen_name}'"
+                raise CommandError(msg) from err
             tweets = tweets.filter(user__screen_name=screen_name)
 
         for tweet in tweets:

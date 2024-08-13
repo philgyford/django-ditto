@@ -22,9 +22,8 @@ def check_top_kwargs(**kwargs):
     period = kwargs["period"]
 
     if account is not None and not isinstance(account, Account):
-        raise TypeError(
-            "`account` must be an Account instance, " "not a %s" % type(account)
-        )
+        msg = f"`account` must be an Account instance, not a {type(account)}"
+        raise TypeError(msg)
 
     if limit != "all" and isinstance(limit, int) is False:
         msg = "`limit` must be an integer or 'all'"
@@ -35,13 +34,15 @@ def check_top_kwargs(**kwargs):
         and not isinstance(date, datetime.datetime)
         and not isinstance(date, datetime.date)
     ):
-        raise TypeError("`date` must be a datetime or date, " "not a %s" % type(date))
+        msg = f"`date` must be a datetime or date, not a {type(date)}"
+        raise TypeError(msg)
 
     if period not in ["day", "week", "month", "year"]:
-        raise TypeError(
+        msg = (
             '`period` must be one of "day", "week", "month" or "year", '
-            "not %s" % type(period)
+            f"not {type(period)}"
         )
+        raise TypeError(msg)
 
 
 def get_period_times(date, period):
@@ -120,7 +121,8 @@ def top_albums(account=None, artist=None, limit=10, date=None, period="day"):
     check_top_kwargs(account=account, limit=limit, date=date, period=period)
 
     if artist is not None and not isinstance(artist, Artist):
-        raise TypeError("artist must be an Artist instance, " "not a %s" % type(artist))
+        msg = f"artist must be an Artist instance, not a {type(artist)}"
+        raise TypeError(msg)
 
     qs_kwargs = {}
 
@@ -208,10 +210,12 @@ def top_tracks(
     check_top_kwargs(account=account, limit=limit, date=date, period=period)
 
     if album is not None and type(album) is not Album:
-        raise TypeError("album must be an Album instance, " "not a %s" % type(album))
+        msg = f"album must be an Album instance, not a {type(album)}"
+        raise TypeError(msg)
 
     if artist is not None and type(artist) is not Artist:
-        raise TypeError("artist must be an Artist instance, " "not a %s" % type(artist))
+        msg = f"artist must be an Artist instance, not a {type(artist)}"
+        raise TypeError(msg)
 
     qs_kwargs = {}
 
@@ -247,9 +251,8 @@ def recent_scrobbles(account=None, limit=10):
     limit -- Maximum number to fetch. Default is 10.
     """
     if account is not None and not isinstance(account, Account):
-        raise TypeError(
-            "account must be an Account instance, " "not a %s" % type(account)
-        )
+        msg = f"account must be an Account instance, not a {type(account)}"
+        raise TypeError(msg)
 
     if isinstance(limit, int) is False:
         msg = "`limit` must be an integer"
@@ -279,12 +282,12 @@ def day_scrobbles(date, account=None):
     account -- An Account object or None (default, Scrobbles by all Accounts).
     """
     if not isinstance(date, datetime.datetime) and not isinstance(date, datetime.date):
-        raise TypeError("date must be a datetime or date, " "not a %s" % type(date))
+        msg = f"date must be a datetime or date, not a {type(date)}"
+        raise TypeError(msg)
 
     if account is not None and not isinstance(account, Account):
-        raise TypeError(
-            "account must be an Account instance, " "not a %s" % type(account)
-        )
+        msg = f"account must be an Account instance, not a {type(account)}"
+        raise TypeError(msg)
 
     qs_kwargs = {}
 
@@ -322,9 +325,8 @@ def annual_scrobble_counts(account=None):
     """
 
     if account is not None and not isinstance(account, Account):
-        raise TypeError(
-            "account must be an Account instance, " "not a %s" % type(account)
-        )
+        msg = f"account must be an Account instance, not a {type(account)}"
+        raise TypeError(msg)
 
     qs = Scrobble.objects
 

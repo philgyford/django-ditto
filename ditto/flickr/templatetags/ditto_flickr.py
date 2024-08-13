@@ -40,9 +40,8 @@ def day_photos(date, nsid=None, time="post_time"):
     time -- A string, either 'post_time' (default) or 'taken_time'.
     """
     if time not in ["post_time", "taken_time"]:
-        raise ValueError(
-            "`time` must be either 'post_time' or " "'taken_time', not '%s'." % time
-        )
+        msg = f"`time` must be either 'post_time' or 'taken_time', not '{time}'."
+        raise ValueError(msg)
 
     start = datetime.combine(date, datetime_time.min).replace(tzinfo=timezone.utc)
     end = datetime.combine(date, datetime_time.max).replace(tzinfo=timezone.utc)
@@ -107,10 +106,10 @@ def annual_photo_counts(nsid=None, count_by="post_time"):
     """
 
     if count_by not in ["post_time", "taken_time"]:
-        raise ValueError(
-            "`count_by` must be either 'post_time' or "
-            "'taken_time', not '%s'." % count_by
+        msg = (
+            f"`count_by` must be either 'post_time' or 'taken_time', not '{count_by}'."
         )
+        raise ValueError(msg)
 
     qs = Photo.public_photo_objects
 

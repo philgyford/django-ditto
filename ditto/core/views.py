@@ -246,7 +246,8 @@ class DittoAppsMixin:
                 )
                 raise Http404(msg)
         elif app_slug:
-            raise Http404("'%s' is not a valid app slug." % app_slug)
+            msg = f"'{app_slug}' is not a valid app slug."
+            raise Http404(msg)
 
         self.app_slug = app_slug
         self.variety_slug = variety_slug
@@ -558,7 +559,10 @@ class DayArchiveView(DittoAppsMixin, DjangoDayArchiveView):
             date_field = self.get_date_field_for_app_variety(app_name, variety_name)
             qs = self.get_queryset_for_app_variety(app_name, variety_name)
             qs = qs.filter(
-                **{"%s__gte" % date_field: since, "%s__lt" % date_field: until}
+                **{
+                    f"{date_field}__gte": since,
+                    f"{date_field}__lt": until,
+                }
             )
             paginate_by = self.get_paginate_by(qs)
             # if not allow_future:

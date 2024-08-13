@@ -41,7 +41,7 @@ class Command(BaseCommand):
         if options.get("verbosity", 1) > 0:
             for result in results:
                 if result["success"]:
-                    self.stdout.write("Fetched @%s" % result["account"])
+                    self.stdout.write(f"Fetched @{result['account']}")
                 else:
                     self.stderr.write(
                         "Could not fetch @{}: {}".format(

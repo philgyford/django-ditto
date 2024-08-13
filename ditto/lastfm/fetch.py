@@ -81,16 +81,15 @@ class ScrobblesFetcher:
         if self.account and self.account.is_active is False:
             self.return_value["success"] = False
             self.return_value["messages"] = [
-                "The Account %s is currently marked as inactive."
-                % self.account.username
+                f"The Account {self.account.username} is currently marked as inactive."
             ]
             return self.return_value
 
         valid_fetch_types = ["all", "days", "recent"]
         if fetch_type not in valid_fetch_types:
-            raise ValueError(
-                "fetch_type should be one of %s" % ", ".join(valid_fetch_types)
-            )
+            types_str = ", ".join(valid_fetch_types)
+            msg = f"fetch_type should be one of {types_str}"
+            raise ValueError(msg)
 
         if fetch_type == "days":
             try:

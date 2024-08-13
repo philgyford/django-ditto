@@ -69,7 +69,7 @@ def get_entity(package, entity):
     path = os.path.join(os.path.dirname(__file__), "..", "ditto", "__init__.py")
     with open(path) as f:
         init_py = f.read()
-        find = "__%s__ = ['\"]([^'\"]+)['\"]" % entity
+        find = f"__{entity}__ = ['\"]([^'\"]+)['\"]"
         return re.search(find, init_py).group(1)
 
 

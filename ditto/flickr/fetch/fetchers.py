@@ -74,7 +74,7 @@ class Fetcher:
             if account.user:
                 self.return_value["account"] = account.user.username
             elif account.pk:
-                self.return_value["account"] = "Account: %s" % str(account)
+                self.return_value["account"] = f"Account: {account}"
             else:
                 self.return_value["account"] = "Unsaved Account"
         else:
@@ -115,14 +115,14 @@ class Fetcher:
             self._call_api(**kwargs)
         except FetchError as e:
             self.return_value["success"] = False
-            self.return_value["messages"] = ["Error when calling Flickr API: %s" % e]
+            self.return_value["messages"] = [f"Error when calling Flickr API: {e}"]
             return
 
         try:
             self._fetch_extra()
         except FetchError as e:
             self.return_value["success"] = False
-            self.return_value["messages"] = ["Error when fetching extra data: %s" % e]
+            self.return_value["messages"] = [f"Error when fetching extra data: {e}"]
             return
 
         try:
@@ -131,7 +131,7 @@ class Fetcher:
             self.results = []
         except FetchError as e:
             self.return_value["success"] = False
-            self.return_value["messages"] = ["Error when saving data: %s" % e]
+            self.return_value["messages"] = [f"Error when saving data: {e}"]
             return
 
         return

@@ -88,19 +88,18 @@ def display_time(dt, *, link_to_day=False, granularity=0, case=None):
     """
 
     if granularity == 8:
-        visible_time = "circa %s" % dt.strftime(app_settings.CORE_DATE_YEAR_FORMAT)
+        year = dt.strftime(app_settings.CORE_DATE_YEAR_FORMAT)
+        visible_time = f"circa {year}"
         stamp = dt.strftime("%Y")
 
     elif granularity == 6:
-        visible_time = "sometime in %s" % dt.strftime(
-            app_settings.CORE_DATE_YEAR_FORMAT
-        )
+        year = dt.strftime(app_settings.CORE_DATE_YEAR_FORMAT)
+        visible_time = f"sometime in {year}"
         stamp = dt.strftime("%Y")
 
     elif granularity == 4:
-        visible_time = "sometime in %s" % dt.strftime(
-            app_settings.CORE_DATE_YEAR_MONTH_FORMAT
-        )
+        year_month = dt.strftime(app_settings.CORE_DATE_YEAR_MONTH_FORMAT)
+        visible_time = f"sometime in {year_month}"
         stamp = dt.strftime("%Y-%m")
 
     else:

@@ -492,10 +492,8 @@ class UserSaverTestCase(FetchTwitterTestCase):
             ["image/jpeg", "image/jpg", "image/png", "image/gif"],
         )
 
-        self.assertEqual(
-            saved_user.avatar,
-            "twitter/avatars/25/52/12552/%s" % os.path.basename(temp_filepath),
-        )
+        path = os.path.basename(temp_filepath)
+        self.assertEqual(saved_user.avatar, f"twitter/avatars/25/52/12552/{path}")
 
     @patch.object(filedownloader, "download")
     @patch.object(os.path, "exists")

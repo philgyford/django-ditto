@@ -440,7 +440,7 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
         for size, prop in self.photo_sizes.items():
             self.assertEqual(
                 getattr(photo, prop),
-                "https://farm3.static.flickr.com/1234/4567_9876_%s.jpg" % size,
+                f"https://farm3.static.flickr.com/1234/4567_9876_{size}.jpg",
             )
 
     def test_image_url_with_invalid_size(self):
@@ -489,7 +489,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
         filename = os.path.basename(self.photo.original_file.name)
         self.assertEqual(
             self.photo.original_url,
-            "/media/flickr/34/56/123456N01/photos/2015/08/14/%s" % filename,
+            f"/media/flickr/34/56/123456N01/photos/2015/08/14/{filename}",
         )
 
     def test_remote_original_url(self):

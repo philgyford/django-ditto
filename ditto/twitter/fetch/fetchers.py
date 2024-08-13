@@ -109,15 +109,15 @@ class TwitterFetcher:
             try:
                 accounts = [Account.objects.get(user__screen_name=screen_name)]
             except Account.DoesNotExist as err:
-                raise FetchError(
-                    "There is no Account in the database with a screen_name of '%s'"
-                    % screen_name
-                ) from err
+                msg = (
+                    "There is no Account in the database with a "
+                    f"screen_name of '{screen_name}'"
+                )
+                raise FetchError(msg) from err
             else:
                 if accounts[0].is_active is False:
-                    raise FetchError(
-                        "The '%s' Account is marked as inactive." % screen_name
-                    )
+                    msg = f"The '{screen_name}' Account is marked as inactive."
+                    raise FetchError(msg)
 
         self.accounts = accounts
 

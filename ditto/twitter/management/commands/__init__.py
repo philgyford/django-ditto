@@ -73,9 +73,8 @@ class UpdateTwitterCommand(DittoBaseCommand):
             try:
                 Account.objects.get(user__screen_name=screen_name)
             except Account.DoesNotExist as err:
-                raise CommandError(
-                    "There's no Account with a screen name of '%s'" % screen_name
-                ) from err
+                msg = "There's no Account with a screen name of '{screen_name}'"
+                raise CommandError(msg) from err
         else:
             msg = "Specify --account, eg --account=philgyford."
             raise CommandError(msg)

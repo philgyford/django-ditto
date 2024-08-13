@@ -184,10 +184,8 @@ class UserFetcherTestCase(FlickrFetchTestCase):
             ["image/jpeg", "image/jpg", "image/png", "image/gif"],
         )
 
-        self.assertEqual(
-            user.avatar,
-            "flickr/60/50/35034346050N01/avatars/%s" % os.path.basename(temp_filepath),
-        )
+        path = os.path.basename(temp_filepath)
+        self.assertEqual(user.avatar, f"flickr/60/50/35034346050N01/avatars/{path}")
 
     def test_returns_correct_success_result(self):
         self.expect_response("people.getInfo")

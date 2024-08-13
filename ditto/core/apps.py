@@ -38,7 +38,7 @@ class Apps:
 
     def is_installed(self, app_name):
         "Is this Ditto app installed?"
-        return apps.is_installed("ditto.%s" % app_name)
+        return apps.is_installed(f"ditto.{app_name}")
 
     def is_enabled(self, app_name):
         """Determine if a particular Ditto app is installed and enabled.
@@ -52,7 +52,7 @@ class Apps:
         Doesn't offer much over apps.is_installed() yet, but would let us add other
         conditions in future, like being able to enable/disable installed apps.
         """
-        return apps.is_installed("ditto.%s" % app_name)
+        return apps.is_installed(f"ditto.{app_name}")
 
 
 ditto_apps = Apps()

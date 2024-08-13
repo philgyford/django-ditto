@@ -118,7 +118,8 @@ class AlbumListViewTests(TestCase):
             album=album,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=all" % reverse("lastfm:album_list"))
+        url = reverse("lastfm:album_list")
+        response = self.client.get(f"{url}?days=all")
         self.assertEqual(response.context["album_list"][0].scrobble_count, 2)
 
     @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
@@ -136,7 +137,8 @@ class AlbumListViewTests(TestCase):
             album=album,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=7" % reverse("lastfm:album_list"))
+        url = reverse("lastfm:album_list")
+        response = self.client.get(f"{url}?days=7")
         self.assertEqual(response.context["album_list"][0].scrobble_count, 1)
 
 
@@ -258,7 +260,8 @@ class ArtistListViewTests(TestCase):
             track=track,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=all" % reverse("lastfm:artist_list"))
+        url = reverse("lastfm:artist_list")
+        response = self.client.get(f"{url}?days=all")
         self.assertEqual(response.context["artist_list"][0].scrobble_count, 2)
 
     @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
@@ -276,7 +279,8 @@ class ArtistListViewTests(TestCase):
             track=track,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=7" % reverse("lastfm:artist_list"))
+        url = reverse("lastfm:artist_list")
+        response = self.client.get(f"{url}?days=7")
         self.assertEqual(response.context["artist_list"][0].scrobble_count, 1)
 
 
@@ -424,7 +428,8 @@ class TrackListViewTests(TestCase):
             track=track,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=all" % reverse("lastfm:track_list"))
+        url = reverse("lastfm:track_list")
+        response = self.client.get(f"{url}?days=all")
         self.assertEqual(response.context["track_list"][0].scrobble_count, 2)
 
     @freeze_time("2016-10-05 12:00:00", tz_offset=-8)
@@ -442,7 +447,8 @@ class TrackListViewTests(TestCase):
             track=track,
             post_time=datetime_from_str("2016-10-01 12:00:00"),
         )
-        response = self.client.get("%s?days=7" % reverse("lastfm:track_list"))
+        url = reverse("lastfm:track_list")
+        response = self.client.get(f"{url}?days=7")
         self.assertEqual(response.context["track_list"][0].scrobble_count, 1)
 
 
@@ -489,10 +495,10 @@ class UserCommonTests:
     def test_templates(self):
         "Uses the correct templates"
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "lastfm/%s.html" % self.view_name)
+        self.assertTemplateUsed(response, f"lastfm/{self.view_name}.html")
         self.assertTemplateUsed(response, "lastfm/base.html")
         self.assertTemplateUsed(response, "ditto/base.html")
 
@@ -501,7 +507,7 @@ class UserCommonTests:
         All user_* views should have these same counts in their context.
         """
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertIn("counts", response.context)
         self.assertEqual(response.context["counts"]["albums"], 1)
@@ -512,7 +518,7 @@ class UserCommonTests:
     def test_404s(self):
         "Responds with 404 if we request a user that doesn't exist."
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "thelma"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "thelma"})
         )
         self.assertEqual(response.status_code, 404)
 
@@ -527,7 +533,7 @@ class UserAlbumListViewTestCase(UserCommonTests, TestCase):
     def test_context_albums(self):
         "Sends the correct album data to the templates"
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertIn("album_list", response.context)
         albums = response.context["album_list"]
@@ -542,7 +548,7 @@ class UserArtistListViewTestCase(UserCommonTests, TestCase):
     def test_context_albums(self):
         "Sends the correct album data to the templates"
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertIn("artist_list", response.context)
         artists = response.context["artist_list"]
@@ -559,7 +565,7 @@ class UserScrobbleListViewTestCase(UserCommonTests, TestCase):
     def test_context_scrobbles(self):
         "Sends the correct scrobble data to the templates"
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertIn("scrobble_list", response.context)
         scrobbles = response.context["scrobble_list"]
@@ -572,7 +578,7 @@ class UserTrackListViewTestCase(UserCommonTests, TestCase):
     def test_context_tracks(self):
         "Sends the correct track data to the templates"
         response = self.client.get(
-            reverse("lastfm:%s" % self.view_name, kwargs={"username": "bob"})
+            reverse(f"lastfm:{self.view_name}", kwargs={"username": "bob"})
         )
         self.assertIn("track_list", response.context)
         tracks = response.context["track_list"]

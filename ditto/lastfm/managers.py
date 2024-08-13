@@ -79,31 +79,30 @@ class WithScrobbleCountsManager(models.Manager):
             raise ValueError(msg)
 
         if account is not None and account.__class__.__name__ != "Account":
-            raise TypeError(
-                "account must be an Account instance, " "not a %s" % type(account)
-            )
+            msg = f"account must be an Account instance, not a {type(account)}"
+            raise TypeError(msg)
 
         if album is not None and album.__class__.__name__ != "Album":
-            raise TypeError(
-                "album must be an Album instance, " "not a %s" % type(album)
-            )
+            msg = f"album must be an Album instance, not a {type(album)}"
+            raise TypeError(msg)
 
         if artist is not None and artist.__class__.__name__ != "Artist":
-            raise TypeError(
-                "artist must be an Artist instance, " "not a %s" % type(account)
-            )
+            msg = f"artist must be an Artist instance, not a {type(account)}"
+            raise TypeError(msg)
 
         if min_post_time is not None and type(min_post_time) is not datetime:
-            raise TypeError(
+            msg = (
                 "min_post_time must be a datetime.datetime, "
-                "not a %s" % type(min_post_time)
+                f"not a {type(min_post_time)}"
             )
+            raise TypeError(msg)
 
         if max_post_time is not None and type(max_post_time) is not datetime:
-            raise TypeError(
+            msg = (
                 "max_post_time must be a datetime.datetime, "
-                "not a %s" % type(max_post_time)
+                f"not a {type(max_post_time)}"
             )
+            raise TypeError(msg)
 
         filter_kwargs = {}
 

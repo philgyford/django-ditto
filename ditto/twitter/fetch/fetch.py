@@ -77,7 +77,7 @@ class Fetch:
         if self.account.user:
             self.return_value["account"] = self.account.user.screen_name
         elif self.account.pk:
-            self.return_value["account"] = "Account: %s" % str(self.account)
+            self.return_value["account"] = f"Account: {self.account}"
         else:
             self.return_value["account"] = "Unsaved Account"
 
@@ -110,7 +110,7 @@ class Fetch:
             self._call_api()
         except TwythonError as e:
             self.return_value["success"] = False
-            self.return_value["messages"] = ["Error when calling API: %s" % e]
+            self.return_value["messages"] = [f"Error when calling API: {e}"]
         else:
             # If we've got to the last 'page' of tweet results, we'll receive
             # an empty list from the API.

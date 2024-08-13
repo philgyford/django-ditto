@@ -50,7 +50,7 @@ class FetchTypesTestRemoteCase(FetchTestCase):
         """
         responses.add(
             responses.GET,
-            "https://api.pinboard.in/v1/posts/%s" % method,
+            f"https://api.pinboard.in/v1/posts/{method}",
             status=status,
             match_querystring=False,
             body=body,
@@ -69,7 +69,8 @@ class FetchTypesTestRemoteCase(FetchTestCase):
                 % (n, n, n, post_date)
             )
 
-        posts_json = "[%s]\t\n" % (",".join(posts))
+        posts_str = ",".join(posts)
+        posts_json = f"[{posts_str}]\t\n"
 
         if method == "all":
             return posts_json

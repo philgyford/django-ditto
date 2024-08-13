@@ -347,8 +347,6 @@ class UserAdmin(admin.ModelAdmin):
     )
 
     def show_avatar(self, instance):
-        return mark_safe(
-            '<img src="%s" width="24" height="24" />' % (instance.avatar_url)
-        )
+        return mark_safe(f'<img src="{instance.avatar_url}" width="24" height="24" />')
 
     show_avatar.short_description = ""

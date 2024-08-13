@@ -171,11 +171,11 @@ class ScrobblesFetcherSendTestCase(TestCase):
 
         url = (
             "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=bob&"
-            "api_key=1234&format=json&page=%s&limit=200" % page
+            f"api_key=1234&format=json&page={page}&limit=200"
         )
 
         if from_time is not None:
-            url += "&from=%s" % from_time
+            url += f"&from={from_time}"
 
         if body is None:
             # Default success response

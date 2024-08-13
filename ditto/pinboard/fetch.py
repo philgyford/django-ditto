@@ -85,9 +85,8 @@ class BookmarksFetcher:
             if account.is_active:
                 accounts = [account]
             else:
-                raise FetchError(
-                    "The account %s is curently marked as inactive." % username
-                )
+                msg = f"The account {username} is curently marked as inactive."
+                raise FetchError(msg)
         return accounts
 
     def _send_request(self, fetch_type, params, account):
@@ -141,7 +140,7 @@ class BookmarksFetcher:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
             # 4xx or 5xx errors:
-            error_message = "HTTP Error: %s" % response.status_code
+            error_message = f"HTTP Error: {response.status_code}"
         except NameError:
             if error_message == "":
                 error_message = "Something unusual went wrong."
@@ -251,7 +250,8 @@ class DateBookmarksFetcher(BookmarksFetcher):
         try:
             dt = datetime.strptime(post_date, "%Y-%m-%d").astimezone(timezone.utc)
         except ValueError as err:
-            raise FetchError("Invalid date format ('%s')" % post_date) from err
+            msg = f"Invalid date format ('{post_date}')"
+            raise FetchError(msg) from err
         else:
             return self._fetch(fetch_type="date", params={"dt": dt}, username=username)
 

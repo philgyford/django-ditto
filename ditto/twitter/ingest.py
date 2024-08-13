@@ -142,7 +142,8 @@ class Version1TweetIngester(TweetIngester):
             raise IngestError(err) from err
 
         if self.file_count == 0:
-            raise IngestError("No .js files found in %s" % directory)
+            msg = f"No .js files found in {directory}"
+            raise IngestError(msg)
 
     def _get_data_from_file(self, filepath):
         """Looks in a file, parses its JSON, and adds a dict of data about
