@@ -12,14 +12,14 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
-    nsid = factory.Sequence(lambda n: "%s@N01" % (n * 10000))
-    username = factory.Sequence(lambda n: "user%04d" % n)
-    realname = factory.Sequence(lambda n: "User Name %04d" % n)
+    nsid = factory.Sequence(lambda n: f"{n * 10000}@N01")
+    username = factory.Sequence(lambda n: f"user{n:04}")
+    realname = factory.Sequence(lambda n: f"User Name {n:04}")
     iconserver = 1234
     iconfarm = 5
     timezone_id = "America/Los_Angeles"
     photos_url = factory.Sequence(
-        lambda n: "https://www.flickr.com/photos/user%04d/" % n
+        lambda n: f"https://www.flickr.com/photos/user{n:04}/"
     )
 
     photos_first_date = factory.LazyAttribute(
@@ -40,7 +40,7 @@ class AccountFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(
         UserFactory,
         username=factory.Sequence(lambda n: n),
-        realname=factory.Sequence(lambda n: "User Name %04d" % n),
+        realname=factory.Sequence(lambda n: f"User Name {n:04}"),
     )
 
 
@@ -51,11 +51,11 @@ class PhotoFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(
         UserFactory,
         username=factory.Sequence(lambda n: n),
-        realname=factory.Sequence(lambda n: "User Name %04d" % n),
+        realname=factory.Sequence(lambda n: f"User Name {n:04}"),
     )
 
     flickr_id = factory.Sequence(lambda n: (n * 1000000))
-    title = factory.Sequence(lambda n: "Photo %d" % n)
+    title = factory.Sequence(lambda n: f"Photo {n}")
     secret = factory.Sequence(lambda n: (n * 10000))
     original_secret = factory.Sequence(lambda n: (n * 10001))
     original_format = "jpg"
@@ -110,7 +110,7 @@ class TagFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = taggit_models.Tag
 
-    slug = factory.Sequence(lambda n: "slug%d" % n)
+    slug = factory.Sequence(lambda n: f"slug{n}")
     name = slug
 
 
@@ -132,9 +132,9 @@ class PhotosetFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(
         UserFactory,
         username=factory.Sequence(lambda n: n),
-        realname=factory.Sequence(lambda n: "User Name %04d" % n),
+        realname=factory.Sequence(lambda n: f"User Name {n:04}"),
     )
     flickr_id = factory.Sequence(lambda n: (n * 1000000))
-    title = factory.Sequence(lambda n: "Photoset %d" % n)
+    title = factory.Sequence(lambda n: f"Photoset {n}")
     flickr_created_time = datetime_now()
     fetch_time = datetime_now()

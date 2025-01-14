@@ -9,27 +9,27 @@ class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
 
-    username = factory.Sequence(lambda n: "user%04d" % n)
-    realname = factory.Sequence(lambda n: "Real Name %04d" % n)
-    api_key = factory.Sequence(lambda n: "api-key-%04d" % n)
+    username = factory.Sequence(lambda n: f"user{n:04}")
+    realname = factory.Sequence(lambda n: f"Real Name {n:04}")
+    api_key = factory.Sequence(lambda n: f"api-key-{n:04}")
 
 
 class ArtistFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Artist
 
-    name = factory.Sequence(lambda n: "Artist %04d" % n)
-    slug = factory.Sequence(lambda n: "artist+%04d" % n)
-    original_slug = factory.Sequence(lambda n: "Artist+%04d" % n)
+    name = factory.Sequence(lambda n: f"Artist {n:04}")
+    slug = factory.Sequence(lambda n: f"artist+{n:04}")
+    original_slug = factory.Sequence(lambda n: f"Artist+{n:04}")
 
 
 class TrackFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Track
 
-    name = factory.Sequence(lambda n: "Track %04d" % n)
-    slug = factory.Sequence(lambda n: "track+%04d" % n)
-    original_slug = factory.Sequence(lambda n: "Track+%04d" % n)
+    name = factory.Sequence(lambda n: f"Track {n:04}")
+    slug = factory.Sequence(lambda n: f"track+{n:04}")
+    original_slug = factory.Sequence(lambda n: f"Track+{n:04}")
     artist = factory.SubFactory(ArtistFactory)
 
 
@@ -37,9 +37,9 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Album
 
-    name = factory.Sequence(lambda n: "Album %04d" % n)
-    slug = factory.Sequence(lambda n: "album+%04d" % n)
-    original_slug = factory.Sequence(lambda n: "Album+%04d" % n)
+    name = factory.Sequence(lambda n: f"Album {n:04}")
+    slug = factory.Sequence(lambda n: f"album+{n:04}")
+    original_slug = factory.Sequence(lambda n: f"Album+{n:04}")
     artist = factory.SubFactory(ArtistFactory)
 
 

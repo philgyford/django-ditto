@@ -30,7 +30,7 @@ class Account(TimeStampedModelMixin, models.Model):
         if self.user:
             return str(self.user)
         else:
-            return "%d" % self.pk
+            return str(self.pk)
 
     def get_absolute_url(self):
         if self.user:

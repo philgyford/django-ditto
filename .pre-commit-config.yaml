@@ -1,11 +1,11 @@
 default_language_version:
-  python: python3.13
+  python: python3.12
 
 exclude: |
   (?x)^(
     dist/.*
     |docs/.*
-    |ditto/core/static/.*
+    |src/ditto/core/static/.*
     |tests/flickr/fixtures/.*
     |tests/lastfm/fixtures/.*
     |tests/pinboard/fixtures/.*

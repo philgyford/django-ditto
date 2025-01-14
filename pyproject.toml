@@ -8,9 +8,7 @@ include = ["ditto/*"]
 omit = ["*/migrations/*.py"]
 
 [tool.ruff]
-extend-exclude = [
-  "*/migrations/*",
-]
+extend-exclude = ["*/migrations/*"]
 line-length = 88
 target-version = "py39"
 
@@ -18,25 +16,25 @@ target-version = "py39"
 ignore = []
 select = [
   # Reference: https://docs.astral.sh/ruff/rules/
-  "B",    # flake8-bugbear
-  "E",    # pycodestyle
-  "F",    # Pyflakes
-  "G",    # flake8-logging-format
-  "I",    # isort
-  "N",    # pip8-naming
-  "Q",    # flake8-quotes
-  "BLE",  # flake8-blind-except
-  "DJ",   # flake8-django
-  "DTZ",  # flake8-datetimez
-  "EM",   # flake8-errmsg
-  "INP",  # flake8-no-pep420
-  "FBT",  # flake8-boolean-trap
-  "PIE",  # flake8-pie
-  "RSE",  # flake-raise
-  "SIM",  # flake8-simplify
-  "T20",  # flake8-print
-  "TID",  # flake8-tidy-imports
-  "UP",   # pyupgrade
+  "B",      # flake8-bugbear
+  "E",      # pycodestyle
+  "F",      # Pyflakes
+  "G",      # flake8-logging-format
+  "I",      # isort
+  "N",      # pip8-naming
+  "Q",      # flake8-quotes
+  "BLE",    # flake8-blind-except
+  "DJ",     # flake8-django
+  "DTZ",    # flake8-datetimez
+  "EM",     # flake8-errmsg
+  "INP",    # flake8-no-pep420
+  "FBT",    # flake8-boolean-trap
+  "PIE",    # flake8-pie
+  "RSE",    # flake-raise
+  "SIM",    # flake8-simplify
+  "T20",    # flake8-print
+  "TID",    # flake8-tidy-imports
+  "UP",     # pyupgrade
   "RUF100", # unused-noqa
   "RUF200", # invalid-pyproject-toml
 ]

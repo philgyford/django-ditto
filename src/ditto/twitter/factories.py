@@ -12,14 +12,14 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = models.User
 
     twitter_id = factory.Sequence(lambda n: (n * 10000))
-    screen_name = factory.Sequence(lambda n: "user%d" % n)
-    name = factory.Sequence(lambda n: "User Name %d" % n)
+    screen_name = factory.Sequence(lambda n: f"user{n}")
+    name = factory.Sequence(lambda n: f"User Name {n}")
 
     created_at = factory.LazyAttribute(
         lambda o: datetime_now() - datetime.timedelta(weeks=52)
     )
 
-    description = factory.Sequence(lambda n: "A description %d" % n)
+    description = factory.Sequence(lambda n: f"A description {n}")
     is_private = False
     fetch_time = datetime_now()
 
@@ -33,7 +33,7 @@ class AccountFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(
         UserFactory,
         twitter_id=factory.Sequence(lambda n: n),
-        screen_name=factory.Sequence(lambda n: "user%d" % n),
+        screen_name=factory.Sequence(lambda n: f"user{n}"),
     )
 
 
@@ -44,7 +44,7 @@ class AccountWithCredentialsFactory(AccountFactory):
 
     consumer_key = "TESTCONSUMERKEY"
     consumer_secret = "TESTCONSUMERSECRET"
-    access_token = factory.Sequence(lambda n: "%d-TESTACCESSTOKEN" % n)
+    access_token = factory.Sequence(lambda n: f"{n}-TESTACCESSTOKEN")
     access_token_secret = "TESTACCESSTOKENSECRET"
 
 
@@ -53,7 +53,7 @@ class TweetFactory(factory.django.DjangoModelFactory):
         model = models.Tweet
 
     user = factory.SubFactory(UserFactory)
-    text = factory.Sequence(lambda n: "The text of tweet %d" % n)
+    text = factory.Sequence(lambda n: f"The text of tweet {n}")
     twitter_id = factory.Sequence(lambda n: (n * 10000000))
     fetch_time = datetime_now()
 
@@ -104,7 +104,7 @@ class PhotoFactory(MediaFactory):
     thumb_w = 150
     thumb_h = 150
 
-    image_url = factory.Sequence(lambda n: "http://pbs.twimg.com/media/%d.jpg" % n)
+    image_url = factory.Sequence(lambda n: f"http://pbs.twimg.com/media/{n}.jpg")
     image_file = factory.django.ImageField(filename="example.jpg")
 
 
@@ -112,14 +112,14 @@ class VideoFactory(MediaFactory):
     media_type = "video"
 
     image_url = factory.Sequence(
-        lambda n: "http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg" % (n, n)
+        lambda n: f"http://pbs.twimg.com/ext_tw_video_thumb/{n}/pu/img/{n}.jpg"
     )
 
     xmpeg_url = factory.Sequence(
-        lambda n: "https://video.twimg.com/ext_tw_video/%d/pu/pl/%d.m3u8" % (n, n)
+        lambda n: f"https://video.twimg.com/ext_tw_video/{n}/pu/pl/{n}.m3u8"
     )
     dash_url = factory.Sequence(
-        lambda n: "https://video.twimg.com/ext_tw_video/%d/pu/pl/%d.mpd" % (n, n)
+        lambda n: f"https://video.twimg.com/ext_tw_video/{n}/pu/pl/{n}.mpd"
     )
 
     aspect_ratio = "16:9"
@@ -132,10 +132,10 @@ class AnimatedGifFactory(MediaFactory):
     media_type = "animated_gif"
 
     image_url = factory.Sequence(
-        lambda n: "http://pbs.twimg.com/ext_tw_video_thumb/%d/pu/img/%d.jpg" % (n, n)
+        lambda n: f"http://pbs.twimg.com/ext_tw_video_thumb/{n}/pu/img/{n}.jpg"
     )
 
-    mp4_url = factory.Sequence(lambda n: "https://pbs.twimg.com/tweet_video/%d.mp4" % n)
+    mp4_url = factory.Sequence(lambda n: f"https://pbs.twimg.com/tweet_video/{n}.mp4")
 
     aspect_ratio = "16:9"
 

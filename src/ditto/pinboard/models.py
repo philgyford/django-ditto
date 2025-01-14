@@ -127,7 +127,7 @@ class BookmarkTag(TimeStampedModelMixin, TagBase):
         # the first will have a slug of "dog" and the second will have "dog_1".
 
         if i is not None:
-            tag += "_%d" % i
+            tag += f"_{i}"
 
         return tag
 

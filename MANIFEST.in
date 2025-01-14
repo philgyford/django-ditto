@@ -2,8 +2,8 @@ include LICENSE
 include README.md
 include runtests.py
 include tox.ini
-recursive-include ditto *.html *.py *.sh
-recursive-include ditto/core/static *
+recursive-include src/ditto *.html *.py *.sh
+recursive-include src/ditto/core/static *
 
 recursive-exclude devproject *
 recursive-exclude docs *
