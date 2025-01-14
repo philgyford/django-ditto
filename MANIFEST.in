@@ -1,10 +1,8 @@
 include LICENSE
 include README.md
-include tox.ini
 recursive-include src/ditto *.html *.py *.sh
 recursive-include src/ditto/core/static *
 
-recursive-exclude devproject *
 recursive-exclude docs *
 recursive-exclude screenshots *
 recursive-exclude tests *
