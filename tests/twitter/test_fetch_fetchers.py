@@ -969,9 +969,9 @@ class FilesFetcherTestCase(TestCase):
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_image_file(self, download):
         # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as jpg:
+            temp_filepath = jpg.name
+            download.return_value = temp_filepath
 
         FetchFiles()._fetch_and_save_file(self.image, "image")
         self.assertEqual(
@@ -986,9 +986,9 @@ class FilesFetcherTestCase(TestCase):
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_mp4_file(self, download):
         # Make a temporary file, like download() would make:
-        mp4 = tempfile.NamedTemporaryFile()
-        temp_filepath = mp4.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as mp4:
+            temp_filepath = mp4.name
+            download.return_value = temp_filepath
 
         FetchFiles()._fetch_and_save_file(self.animated_gif, "mp4")
         self.assertEqual(

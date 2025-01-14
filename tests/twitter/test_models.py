@@ -54,7 +54,7 @@ class AccountTestCase(TestCase):
     def test_str_1(self):
         "Has the correct string represntation when it has no user"
         account = AccountFactory(user=None)
-        self.assertEqual(account.__str__(), "%d" % account.pk)
+        self.assertEqual(account.__str__(), f"{account.pk}")
 
     def test_str_2(self):
         "Has the correct string represntation when it has a user"
@@ -184,7 +184,7 @@ class PhotoTestCase(TestCase):
 
     def test_str(self):
         photo = PhotoFactory()
-        self.assertEqual(photo.__str__(), "Photo %d" % photo.id)
+        self.assertEqual(photo.__str__(), f"Photo {photo.id}")
 
     def test_media_type(self):
         photo = PhotoFactory()
@@ -301,7 +301,7 @@ class VideoTestCase(TestCase):
 
     def test_str(self):
         video = VideoFactory()
-        self.assertEqual(video.__str__(), "Video %d" % video.id)
+        self.assertEqual(video.__str__(), f"Video {video.id}")
 
     def test_media_type(self):
         video = VideoFactory()
@@ -362,7 +362,7 @@ class AnimatedGifTestCase(TestCase):
 
     def test_str(self):
         gif = AnimatedGifFactory()
-        self.assertEqual(gif.__str__(), "Animated GIF %d" % gif.id)
+        self.assertEqual(gif.__str__(), f"Animated GIF {gif.id}")
 
     def test_media_type(self):
         gif = AnimatedGifFactory()

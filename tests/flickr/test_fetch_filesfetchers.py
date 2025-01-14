@@ -149,9 +149,9 @@ class FilesFetcherTestCase(TestCase):
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_photo_file(self, download):
         # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as jpg:
+            temp_filepath = jpg.name
+            download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.photo_2, "photo")
         nsid = self.photo_2.user.nsid
@@ -170,9 +170,9 @@ class FilesFetcherTestCase(TestCase):
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_video_file(self, download):
         # Make a temporary file, like download() would make:
-        video = tempfile.NamedTemporaryFile()
-        temp_filepath = video.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as video:
+            temp_filepath = video.name
+            download.return_value = temp_filepath
 
         self.fetcher._fetch_and_save_file(self.video_2, "video")
         nsid = self.video_2.user.nsid

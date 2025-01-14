@@ -480,9 +480,9 @@ class UserSaverTestCase(FetchTwitterTestCase):
     def test_downloads_and_saves_avatar(self, download):
         "Should call download() and save avatar."
         # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as jpg:
+            temp_filepath = jpg.name
+            download.return_value = temp_filepath
 
         user_data = self.make_user_data()
         saved_user = UserSaver().save_user(user_data, datetime_now())

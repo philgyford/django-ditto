@@ -170,9 +170,9 @@ class UserFetcherTestCase(FlickrFetchTestCase):
     def test_downloads_and_saves_avatar(self, download):
         "Should call download() and save avatar when fetching user."
         # Make a temporary file, like download() would make:
-        jpg = tempfile.NamedTemporaryFile()
-        temp_filepath = jpg.name
-        download.return_value = temp_filepath
+        with tempfile.NamedTemporaryFile() as jpg:
+            temp_filepath = jpg.name
+            download.return_value = temp_filepath
 
         self.expect_response("people.getInfo")
         UserFetcher(account=self.account).fetch(nsid="35034346050@N01")
