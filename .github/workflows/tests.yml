@@ -16,9 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         django-version: ["4.2", "5.1", "main"]
         exclude:
+          - python-version: "3.13"
+            django-version: "4.2"
           - python-version: "3.9"
             django-version: "5.1"
           - python-version: "3.9"
@@ -41,7 +43,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ matrix.python-version }}-v2-
 
@@ -86,7 +88,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/tox.ini') }}
+          key: ${{ matrix.python-version }}-v2-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ matrix.python-version }}-v2-
 
@@ -117,4 +119,3 @@ jobs:
           fields: repo,message,commit,author,action,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.ACTIONS_CI_SLACK_HOOK }}
-        if: always() # Pick up events even if the job fails or is canceled.
