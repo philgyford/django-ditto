@@ -66,7 +66,7 @@ class Account(TimeStampedModelMixin, models.Model):
         if self.user:
             return str(self.user)
         else:
-            return "%d" % self.pk
+            return str(self.pk)
 
     def save(self, *args, **kwargs):
         if self.user is None:
@@ -246,7 +246,7 @@ class Media(TimeStampedModelMixin, models.Model):
         verbose_name_plural = "Media items"
 
     def __str__(self):
-        return "%s %d" % (self.get_media_type_display(), self.id)
+        return f"{self.get_media_type_display()} {self.id}"
 
     @property
     def has_file(self):
@@ -729,7 +729,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         blank=False,
         default=0,
         help_text=(
-            "The number of tweets this user has favorited in " "the account’s lifetime"
+            "The number of tweets this user has favorited in the account’s lifetime"
         ),
     )
     followers_count = models.PositiveIntegerField(

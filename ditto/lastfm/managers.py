@@ -59,12 +59,12 @@ class WithScrobbleCountsManager(models.Manager):
         Include a `min_post_time` to only include Scrobbles after then.
         Include a `max_post_time` to only include Scrobbles before then.
         """
-        account = kwargs.get("account", None)
-        min_post_time = kwargs.get("min_post_time", None)
-        max_post_time = kwargs.get("max_post_time", None)
-        album = kwargs.get("album", None)
-        artist = kwargs.get("artist", None)
-        track = kwargs.get("track", None)
+        account = kwargs.get("account")
+        min_post_time = kwargs.get("min_post_time")
+        max_post_time = kwargs.get("max_post_time")
+        album = kwargs.get("album")
+        artist = kwargs.get("artist")
+        track = kwargs.get("track")
 
         if album and not self.is_filterable_by_album:
             msg = "This is not filterable by album"

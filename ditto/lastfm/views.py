@@ -166,7 +166,7 @@ class AlbumDetailView(DetailView):
         album_slug = self.kwargs.get("album_slug")
 
         if artist_slug is None or album_slug is None:
-            msg = "AlbumDetailView must be called with " "artist_slug and album_slug"
+            msg = "AlbumDetailView must be called with artist_slug and album_slug"
             raise AttributeError(msg)
 
         artist = Artist.objects.get(slug=artist_slug)
@@ -218,7 +218,7 @@ class TrackDetailView(DetailView):
         track_slug = self.kwargs.get("track_slug")
 
         if artist_slug is None or track_slug is None:
-            msg = "TrackDetailView must be called with " "artist_slug and track_slug"
+            msg = "TrackDetailView must be called with artist_slug and track_slug"
             raise AttributeError(msg)
 
         artist = Artist.objects.get(slug=artist_slug)

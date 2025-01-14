@@ -12,6 +12,7 @@ from imagekit.processors import Adjust, ResizeToFill, ResizeToFit, Transpose
 
 class FlickrSpec(ImageSpec):
     "Base class for most specs. Keeps same proportions."
+
     format = "JPEG"
     options = {"quality": 80}
     # If original image is smaller, don't enlarge it:
@@ -28,6 +29,7 @@ class FlickrSpec(ImageSpec):
 
 class FlickrSquareSpec(ImageSpec):
     "Base class for the square specs. Crops to a square."
+
     format = "JPEG"
     options = {"quality": 70}
     # If original image is smaller, enlarge it to fill:

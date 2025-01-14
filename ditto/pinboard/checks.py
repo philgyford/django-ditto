@@ -21,7 +21,7 @@ def check_taggit_is_installed(app_configs=None, **kwargs):
         checks.append(
             Error(
                 "The django-taggit app must be in INSTALLED_APPS",
-                hint=("Add 'taggit' to INSTALLED_APPS " "in your settings file."),
+                hint=("Add 'taggit' to INSTALLED_APPS in your settings file."),
                 id="ditto.pinboard.E002",
             )
         )

@@ -4,6 +4,7 @@ from imagekit.processors import Adjust, ResizeToFill, ResizeToFit, Transpose
 
 class TwitterSpec(ImageSpec):
     "Base class for Medium and Small specs."
+
     format = "JPEG"
     options = {"quality": 80}
     # If original image is smaller, don't enlarge it:

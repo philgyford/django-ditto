@@ -229,8 +229,8 @@ class DittoAppsMixin:
             * self.variety_slug
         So long as the 'app' and 'variety' slugs are valid.
         """
-        app_slug = kwargs.get("app", None)
-        variety_slug = kwargs.get("variety", None)
+        app_slug = kwargs.get("app")
+        variety_slug = kwargs.get("variety")
 
         if self.is_valid_app_slug(app_slug):
             self.app_name = self.get_app_name_from_slug(app_slug)
