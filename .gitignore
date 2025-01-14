@@ -1,10 +1,5 @@
 .coverage
 .pypirc
-devproject/db.sqlite3
-devproject/media
-devproject/static
-devproject/venv/
-devproject/.env
 dist
 docs/venv/
 django_ditto.egg-info

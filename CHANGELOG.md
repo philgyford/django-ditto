@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Removed the `devproject` folder.
+
+### Changed
+
+- Move main code within an `src/` directory
+
 ## [3.3] - 2024--08-13
 
 ### Added
