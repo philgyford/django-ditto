@@ -39,7 +39,7 @@ jobs:
         id: pip-cache
         run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Pip cache
+      - name: Set up pip cache
         uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
@@ -50,7 +50,7 @@ jobs:
       - name: Install python packages
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade coverage[toml] tox tox-gh-actions
+          python -m pip install --upgrade tox tox-gh-actions
 
       - name: Test with Tox
         run: tox --verbose --parallel auto
@@ -60,10 +60,12 @@ jobs:
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
+          flags: ${{ matrix.python-version }}
+          name: Python ${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
   ruff:
-    name: "Run ruff: ${{ matrix.toxenv }}"
+    name: "Run ruff"
     runs-on: ubuntu-latest
 
     strategy:
@@ -97,8 +99,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade tox tox-gh-actions
 
-      - name: Run ${{ matrix.toxenv }}
-        run: python -m tox -e ${{ matrix.toxenv }}
+      - name: Run ruff
+        run: python -m tox -e ruff
 
   slack:
     # https://github.com/8398a7/action-slack/issues/72#issuecomment-649910353
