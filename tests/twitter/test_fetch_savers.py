@@ -1,11 +1,10 @@
 import json
 import os
-import tempfile
 from datetime import datetime, timezone
 from decimal import Decimal
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import patch
 
-from django.test import override_settings
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
@@ -475,25 +474,24 @@ class UserSaverTestCase(FetchTwitterTestCase):
         saved_user = UserSaver().save_user(user_data, datetime_now())
         fetch_avatar.assert_called_once_with(saved_user)
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_downloads_and_saves_avatar(self, download):
         "Should call download() and save avatar."
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as jpg:
-            temp_filepath = jpg.name
-            download.return_value = temp_filepath
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            download.return_value = temp_file.name
 
-        user_data = self.make_user_data()
-        saved_user = UserSaver().save_user(user_data, datetime_now())
+            user_data = self.make_user_data()
+            saved_user = UserSaver().save_user(user_data, datetime_now())
 
-        download.assert_called_once_with(
-            saved_user.profile_image_url_https,
-            ["image/jpeg", "image/jpg", "image/png", "image/gif"],
-        )
+            download.assert_called_once_with(
+                saved_user.profile_image_url_https,
+                ["image/jpeg", "image/jpg", "image/png", "image/gif"],
+            )
 
-        path = os.path.basename(temp_filepath)
-        self.assertEqual(saved_user.avatar, f"twitter/avatars/25/52/12552/{path}")
+            path = os.path.basename(temp_file.name)
+            self.assertEqual(saved_user.avatar, f"twitter/avatars/25/52/12552/{path}")
 
     @patch.object(filedownloader, "download")
     @patch.object(os.path, "exists")

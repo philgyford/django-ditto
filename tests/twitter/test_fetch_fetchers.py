@@ -1,11 +1,11 @@
 import json
 import os
-import tempfile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import call, patch
 
 import responses
 from django.http import QueryDict
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.twitter.factories import (
@@ -965,36 +965,36 @@ class FilesFetcherTestCase(TestCase):
         with self.assertRaises(FetchError):
             FetchFiles()._fetch_and_save_file(self.image, "image")
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_image_file(self, download):
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as jpg:
-            temp_filepath = jpg.name
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
-        FetchFiles()._fetch_and_save_file(self.image, "image")
-        self.assertEqual(
-            self.image.image_file.name,
-            (
-                f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
-                f"{os.path.basename(temp_filepath)}"
-            ),
-        )
+            FetchFiles()._fetch_and_save_file(self.image, "image")
+            self.assertEqual(
+                self.image.image_file.name,
+                (
+                    f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
+                    f"{os.path.basename(temp_filepath)}"
+                ),
+            )
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_mp4_file(self, download):
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as mp4:
-            temp_filepath = mp4.name
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="mp4"))  # noqa: SIM115
+            temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
-        FetchFiles()._fetch_and_save_file(self.animated_gif, "mp4")
-        self.assertEqual(
-            self.animated_gif.mp4_file.name,
-            (
-                f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
-                f"{os.path.basename(temp_filepath)}"
-            ),
-        )
+            FetchFiles()._fetch_and_save_file(self.animated_gif, "mp4")
+            self.assertEqual(
+                self.animated_gif.mp4_file.name,
+                (
+                    f"twitter/media/{temp_filepath[-4:-2]}/{temp_filepath[-2:]}/"
+                    f"{os.path.basename(temp_filepath)}"
+                ),
+            )

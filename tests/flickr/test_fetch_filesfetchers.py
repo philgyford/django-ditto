@@ -1,9 +1,9 @@
 import os
-import tempfile
 from datetime import datetime, timezone
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import call, patch
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from ditto.core.utils.downloader import DownloadException, filedownloader
 from ditto.flickr.factories import AccountFactory, PhotoFactory, UserFactory
@@ -145,44 +145,44 @@ class FilesFetcherTestCase(TestCase):
         with self.assertRaises(FetchError):
             self.fetcher._fetch_and_save_file(self.photo_2, "photo")
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_photo_file(self, download):
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as jpg:
-            temp_filepath = jpg.name
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
-        self.fetcher._fetch_and_save_file(self.photo_2, "photo")
-        nsid = self.photo_2.user.nsid
-        nsid = nsid[: nsid.index("@")]
-        self.assertEqual(
-            self.photo_2.original_file.name,
-            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
-                nsid[-4:-2],
-                nsid[-2:],
-                self.photo_2.user.nsid.replace("@", ""),
-                os.path.basename(temp_filepath),
-            ),
-        )
+            self.fetcher._fetch_and_save_file(self.photo_2, "photo")
+            nsid = self.photo_2.user.nsid
+            nsid = nsid[: nsid.index("@")]
+            self.assertEqual(
+                self.photo_2.original_file.name,
+                "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
+                    nsid[-4:-2],
+                    nsid[-2:],
+                    self.photo_2.user.nsid.replace("@", ""),
+                    os.path.basename(temp_filepath),
+                ),
+            )
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_saves_downloaded_video_file(self, download):
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as video:
-            temp_filepath = video.name
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="mp4"))  # noqa: SIM115
+            temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
-        self.fetcher._fetch_and_save_file(self.video_2, "video")
-        nsid = self.video_2.user.nsid
-        nsid = nsid[: nsid.index("@")]
-        self.assertEqual(
-            self.video_2.video_original_file.name,
-            "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
-                nsid[-4:-2],
-                nsid[-2:],
-                self.video_2.user.nsid.replace("@", ""),
-                os.path.basename(temp_filepath),
-            ),
-        )
+            self.fetcher._fetch_and_save_file(self.video_2, "video")
+            nsid = self.video_2.user.nsid
+            nsid = nsid[: nsid.index("@")]
+            self.assertEqual(
+                self.video_2.video_original_file.name,
+                "flickr/{}/{}/{}/photos/2015/08/14/{}".format(
+                    nsid[-4:-2],
+                    nsid[-2:],
+                    self.video_2.user.nsid.replace("@", ""),
+                    os.path.basename(temp_filepath),
+                ),
+            )

@@ -1,10 +1,9 @@
 import json
 import os
-import tempfile
 from datetime import datetime, timezone
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import call, patch
 
-from django.test import override_settings
 from freezegun import freeze_time
 
 from ditto.core.utils import datetime_now
@@ -165,27 +164,27 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         user_response = self.load_fixture("people.getInfo")
         save_user.assert_called_once_with(user_response["person"], datetime_now())
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch.object(filedownloader, "download")
     def test_downloads_and_saves_avatar(self, download):
         "Should call download() and save avatar when fetching user."
-        # Make a temporary file, like download() would make:
-        with tempfile.NamedTemporaryFile() as jpg:
-            temp_filepath = jpg.name
+        with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
+            # Make a temporary file, like download() would make:
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
-        self.expect_response("people.getInfo")
-        UserFetcher(account=self.account).fetch(nsid="35034346050@N01")
+            self.expect_response("people.getInfo")
+            UserFetcher(account=self.account).fetch(nsid="35034346050@N01")
 
-        user = User.objects.get(nsid="35034346050@N01")
+            user = User.objects.get(nsid="35034346050@N01")
 
-        download.assert_called_once_with(
-            user.original_icon_url,
-            ["image/jpeg", "image/jpg", "image/png", "image/gif"],
-        )
+            download.assert_called_once_with(
+                user.original_icon_url,
+                ["image/jpeg", "image/jpg", "image/png", "image/gif"],
+            )
 
-        path = os.path.basename(temp_filepath)
-        self.assertEqual(user.avatar, f"flickr/60/50/35034346050N01/avatars/{path}")
+            path = os.path.basename(temp_filepath)
+            self.assertEqual(user.avatar, f"flickr/60/50/35034346050N01/avatars/{path}")
 
     def test_returns_correct_success_result(self):
         self.expect_response("people.getInfo")
