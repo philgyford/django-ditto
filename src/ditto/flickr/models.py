@@ -912,7 +912,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
             return (
-                f"https://live.staticflickr.com/{self.iconserver}"
+                f"https://farm{self.iconfarm}.staticflickr.com/{self.iconserver}"
                 f"/buddyicons/{self.nsid}.jpg"
             )
         else:

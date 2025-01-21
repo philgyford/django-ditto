@@ -116,7 +116,7 @@ class UserTestCase(TestCase):
         user = UserFactory(iconfarm=8, iconserver=7420, nsid="35034346050@N01")
         self.assertEqual(
             user.original_icon_url,
-            "https://live.staticflickr.com/7420/buddyicons/35034346050@N01.jpg",
+            "https://farm8.staticflickr.com/7420/buddyicons/35034346050@N01.jpg",
         )
 
     def test_original_icon_url_default(self):
