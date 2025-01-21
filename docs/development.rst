@@ -13,47 +13,47 @@ How I would create a new project to work on django-ditto's code.
 2. Create an empty directory at the same level as django-ditto, like ``django-ditto-devproject``.
 3. On the command line do the following:
 
-.. code-block:: shell
+   .. code-block:: shell
 
-   cd django-ditto-devproject
-   uv init
-   rm hello.py  # Created by uv init but we don't need it
-   uv add --editable ./../django-ditto
-   uv run django-admin startproject devsite .
+      cd django-ditto-devproject
+      uv init
+      rm hello.py  # Created by uv init but we don't need it
+      uv add --editable ./../django-ditto
+      uv run django-admin startproject devsite .
 
 4. In ``devsite/settings.py`` add these to ``INSTALLED_APPS``:
 
-.. code-block:: python
+   .. code-block:: python
 
-    "sortedm2m",
-    "taggit",
-    "ditto.core",
-    "ditto.flickr",
-    "ditto.lastfm",
-    "ditto.pinboard",
-    "ditto.twitter",
+       "sortedm2m",
+       "taggit",
+       "ditto.core",
+       "ditto.flickr",
+       "ditto.lastfm",
+       "ditto.pinboard",
+       "ditto.twitter",
 
 5. On the command line o:
 
-.. code-block:: shell
+   .. code-block:: shell
 
-   uv run manage.py migrate
+      uv run manage.py migrate
 
 6. In ``devproject/urls.py`` add these to ``urlpatterns``:
 
-.. code-block:: python
+   .. code-block:: python
 
-    path(r"flickr/", include("ditto.flickr.urls")),
-    path(r"lastfm/", include("ditto.lastfm.urls")),
-    path(r"pinboard/", include("ditto.pinboard.urls")),
-    path(r"twitter/", include("ditto.twitter.urls")),
-    path(r"", include("ditto.core.urls")),
+       path(r"flickr/", include("ditto.flickr.urls")),
+       path(r"lastfm/", include("ditto.lastfm.urls")),
+       path(r"pinboard/", include("ditto.pinboard.urls")),
+       path(r"twitter/", include("ditto.twitter.urls")),
+       path(r"", include("ditto.core.urls")),
 
 7. On the command line do:
 
-.. code-block:: shell
+   .. code-block:: shell
 
-   uv run manage.py runserver
+      uv run manage.py runserver
 
 8. You can then visit http://127.0.0.1:8000 to view the Django-spectator front page. Use ``uv run manage.py createsuperuser`` as normal with a Django project to create a superuser.
 
@@ -140,6 +140,6 @@ Replace ``4.0.1`` with current version number:
 4. Update ``CHANGELOG.md``.
 5. Commit code.
 6. ``git tag -a 4.0.1 -m 'version 4.0.1'``
-6. ``git push --tags``
-7. ``uv build``
-8. ``uv publish dist/django_ditto-4.0.1*``
+7. ``git push --tags``
+8. ``uv build``
+9. ``uv publish dist/django_ditto-4.0.1*``
