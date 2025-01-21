@@ -20,7 +20,7 @@ Expects:
         {% for photo in photo_list %}
             <div class="flickr-photo col-12 col-sm-6 col-md-4 p-3">
                 <h3 class="h6">
-                    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>
+                    <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">{{ photo.title }}</a>{% if photo.media == 'video' %} (Video){% endif %}
                 </h3>
                 <p class="flickr-photo-img mb-0">
                     <a href="{% url 'flickr:photo_detail' nsid=photo.user.nsid flickr_id=photo.flickr_id %}">

@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Move main code within an `src/` directory
+- Improved Flickr image URLs and videos:
+  - Changed from using the `farm*n*.static.flickr.com` domains to `live.staticflickr.com` domain for the URLs of Flickr-hosted images.
+  - Fixed missing image for videos when viewed in lists.
+  - Added "(Video)" after the title of any Flickr videos when viewed in lists.
 
 ## [3.3] - 2024--08-13
 

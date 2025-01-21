@@ -116,7 +116,7 @@ class UserTestCase(TestCase):
         user = UserFactory(iconfarm=8, iconserver=7420, nsid="35034346050@N01")
         self.assertEqual(
             user.original_icon_url,
-            "https://farm8.staticflickr.com/7420/buddyicons/35034346050@N01.jpg",
+            "https://live.staticflickr.com/7420/buddyicons/35034346050@N01.jpg",
         )
 
     def test_original_icon_url_default(self):
@@ -409,7 +409,7 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
             original_format="gif",
         )
         self.assertEqual(
-            photo.original_url, "https://farm3.static.flickr.com/1234/4567_7777_o.gif"
+            photo.original_url, "https://live.staticflickr.com/1234/4567_7777_o.gif"
         )
 
     def test_remote_original_url(self):
@@ -424,14 +424,14 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
         )
         self.assertEqual(
             photo.remote_original_url,
-            "https://farm3.static.flickr.com/1234/4567_7777_o.gif",
+            "https://live.staticflickr.com/1234/4567_7777_o.gif",
         )
 
     def test_medium_url(self):
         "Has a different format to most other image sizes."
         photo = PhotoFactory(farm=3, server="1234", flickr_id=4567, secret="9876")
         self.assertEqual(
-            photo.medium_url, "https://farm3.static.flickr.com/1234/4567_9876.jpg"
+            photo.medium_url, "https://live.staticflickr.com/1234/4567_9876.jpg"
         )
 
     def test_image_urls(self):
@@ -440,7 +440,7 @@ class PhotoUrlsRemoteTestCase(PhotoUrlsTestCase):
         for size, prop in self.photo_sizes.items():
             self.assertEqual(
                 getattr(photo, prop),
-                f"https://farm3.static.flickr.com/1234/4567_9876_{size}.jpg",
+                f"https://live.staticflickr.com/1234/4567_9876_{size}.jpg",
             )
 
     def test_image_url_with_invalid_size(self):
@@ -504,7 +504,7 @@ class PhotoUrlsLocalTestCase(PhotoUrlsTestCase):
         )
         self.assertEqual(
             photo.remote_original_url,
-            "https://farm3.static.flickr.com/1234/4567_7777_o.gif",
+            "https://live.staticflickr.com/1234/4567_7777_o.gif",
         )
 
     def test_medium_url(self):

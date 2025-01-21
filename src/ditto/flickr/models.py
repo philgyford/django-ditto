@@ -671,8 +671,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
         size -- One of the keys from self.PHOTO_SIZES.
         """
         if size == "original":
-            return "https://farm{}.static.flickr.com/{}/{}_{}_{}.{}".format(
-                self.farm,
+            return "https://live.staticflickr.com/{}/{}_{}_{}.{}".format(
                 self.server,
                 self.flickr_id,
                 self.original_secret,
@@ -685,7 +684,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
             if self.PHOTO_SIZES[size]["suffix"]:
                 size_ext = "_{}".format(self.PHOTO_SIZES[size]["suffix"])
             return (
-                f"https://farm{self.farm}.static.flickr.com/{self.server}/"
+                f"https://live.staticflickr.com/{self.server}/"
                 f"{self.flickr_id}_{self.secret}{size_ext}.jpg"
             )
 
@@ -913,7 +912,7 @@ class User(TimeStampedModelMixin, DiffModelMixin, models.Model):
         """URL of the avatar/profile pic at Flickr."""
         if self.iconserver:
             return (
-                f"https://farm{self.iconfarm}.staticflickr.com/{self.iconserver}"
+                f"https://live.staticflickr.com/{self.iconserver}"
                 f"/buddyicons/{self.nsid}.jpg"
             )
         else:
