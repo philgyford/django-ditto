@@ -10,13 +10,17 @@ on:
 
 jobs:
   test:
-    name: "Python ${{ matrix.python-version }}"
+    name: "Python ${{ matrix.python-version }}, Django ${{ matrix.django-version}}"
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
+        django-version: ["4.2", "5.1", "5.2", "main"]
+        exclude:
+          - python-version: "3.13"
+            django-version: "4.2"
 
     steps:
       - name: Git clone
@@ -46,6 +50,8 @@ jobs:
 
       - name: Test with Tox
         run: tox --verbose --parallel auto
+        env:
+          DJANGO: ${{ matrix.django-version }}
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
