@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed the `devproject` folder.
+- Stop supporting Python 3.9 and 3.10 (might still work, but no longer tested).
 
 ### Changed
 
