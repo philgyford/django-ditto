@@ -7,7 +7,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-A collection of Django apps for copying things from third-party sites and services. Requires Python 3.9 to 3.12, and Django 4.2, 5.0 or 5.1.
+A collection of Django apps for copying things from third-party sites and services. Requires Python 3.9 to 3.13, and Django 4.2, 5.0, 5.1 or 5.2.
 
 [Read the documentation.](http://django-ditto.readthedocs.io/en/latest/)
 

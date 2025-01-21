@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added support for Django 5.2 (no code changes).
+
 ### Removed
 
 - Removed the `devproject` folder.
-- Stop supporting Python 3.9 and 3.10 (might still work, but no longer tested).
+- Stop testing in Python 3.9 and 3.10 (it should still work in both, currently).
 
 ### Changed
 
