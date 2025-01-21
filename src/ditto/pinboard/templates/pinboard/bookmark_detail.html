@@ -11,7 +11,7 @@
 
     <h1 class="my-4">
         {% block title %}
-            Pinboard bookmark by {{ bookmark.account.username }}
+            {{ bookmark.title|truncatewords:10 }}
         {% endblock %}
     </h1>
 
