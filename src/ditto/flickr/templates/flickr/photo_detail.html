@@ -30,9 +30,10 @@
                         {% endif %}
                     </video>
                 {% else %}
-                    <p>[No video found.]</p>
+                    <p class="text-muted"><small>[A video, but no video URL found. <a href="{{ photo.permalink }}">Try on Flickr.com</a>.]</small></p>
                 {% endif %}
-            {% else %}
+            {% endif %}
+            {% if photo.media == 'photo' or not photo.site_mp4_width %}
                 <p class="flickr-photo-img">
                     {% if photo.medium_800_width %}
                         <img src="{{ photo.medium_800_url }}" {% width_height photo.medium_800_width photo.medium_800_height 867 600 %} alt="" class="img-fluid">
