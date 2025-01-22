@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- None
+
+## [3.4] - 2025-01-22
+
 ### Added
 
 - Added support for Django 5.2 (no code changes).
@@ -14,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed the `devproject` folder.
-- Stop testing in Python 3.9 and 3.10 (it should still work in both, currently).
+- Stop testing in Python 3.9 and 3.10 (it will still work in both, currently).
 
 ### Changed
 
@@ -25,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed missing image for videos when viewed in lists.
   - Added "(Video)" after the title of any Flickr videos when viewed in lists.
   - If a video has no current valid video URL, its detail page now displays an
-    an image plus a link to it on Flickr.com.
+    an image plus a link to it on Flickr.com (related to #248).
 
-## [3.3] - 2024--08-13
+## [3.3] - 2024-08-13
 
 ### Added
 
