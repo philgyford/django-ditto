@@ -53,7 +53,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Django Ditto"
-copyright = "2016-23, Phil Gyford"
+copyright = "2016-25, Phil Gyford"
 author = "Phil Gyford"
 
 
