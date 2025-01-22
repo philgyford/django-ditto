@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Last.fm &mdash; Django Ditto 3.2.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Last.fm &mdash; Django Ditto 3.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b0e360d0"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -28,14 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Django Ditto
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Django Ditto
           </a>
-              <div class="version">
-                3.2
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -93,8 +94,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Last.fm</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Last.fm</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/services/lastfm.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -105,15 +106,15 @@
            <div itemprop="articleBody">
              
   <section id="last-fm">
-<h1>Last.fm<a class="headerlink" href="#last-fm" title="Permalink to this heading"></a></h1>
+<h1>Last.fm<a class="headerlink" href="#last-fm" title="Link to this heading"></a></h1>
 <p>You can fetch all your Scrobbles (listens) from one or more <a class="reference external" href="https://www.last.fm/">Last.fm</a> accounts. You can then view: recent Scrobbles; the most popular Artists, Tracks and Albums (for different time periods); number of Scrobbles per year; all Scrobbles for a single day; etc.</p>
 <section id="set-up">
-<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this heading"></a></h2>
+<h2>Set-up<a class="headerlink" href="#set-up" title="Link to this heading"></a></h2>
 <p>In the Django admin, create a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Last.fm app. Enter your Last.fm username, your full name, and a Last.fm API key from <a class="reference external" href="http://www.last.fm/api/account/create">http://www.last.fm/api/account/create</a></p>
 <p>Now you can download your scrobbles. See <a class="reference internal" href="#lastfm-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
 </section>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Link to this heading"></a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.lastfm.models</span></code> are:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Last.fm account with an API key.</p>
@@ -153,7 +154,7 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 <p>See <code class="docutils literal notranslate"><span class="pre">ditto.lastfm.models</span></code> for more useful properties and methods.</p>
 </section>
 <section id="managers">
-<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this heading"></a></h2>
+<h2>Managers<a class="headerlink" href="#managers" title="Link to this heading"></a></h2>
 <p>The default manager for each of <code class="docutils literal notranslate"><span class="pre">Track</span></code>, <code class="docutils literal notranslate"><span class="pre">Album</span></code> and <code class="docutils literal notranslate"><span class="pre">Artist</span></code> has a <code class="docutils literal notranslate"><span class="pre">with_scrobble_counts()</span></code> method. This gives each returned object a <code class="docutils literal notranslate"><span class="pre">scrobble_count</span></code> property which is an aggregated count of the number of times that thing has been scrobbled. These results are also filterable by <code class="docutils literal notranslate"><span class="pre">Account</span></code>, minimum and maximum scrobble time, and (for <code class="docutils literal notranslate"><span class="pre">Track</span></code> and <code class="docutils literal notranslate"><span class="pre">Album</span></code>) by <code class="docutils literal notranslate"><span class="pre">Artist</span></code>.</p>
 <p>By default, the manager behaves as expected, eg:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># A QuerySet of all Track objects:</span>
@@ -196,156 +197,156 @@ that returns a QuerySet of <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this heading"></a></h2>
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Link to this heading"></a></h2>
 <p>There are several template tags for getting common lists of things.</p>
 <section id="annual-scrobble-counts">
-<h3>Annual Scrobble Counts<a class="headerlink" href="#annual-scrobble-counts" title="Permalink to this heading"></a></h3>
+<h3>Annual Scrobble Counts<a class="headerlink" href="#annual-scrobble-counts" title="Link to this heading"></a></h3>
 <p>Get the number of scrobbles per year for all or one <code class="docutils literal notranslate"><span class="pre">Account</span></code>. This fetches totals for all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Both the <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code> in each row are integers.</p>
 <p>To restrict totals to a single <code class="docutils literal notranslate"><span class="pre">Account</span></code> (assuming <code class="docutils literal notranslate"><span class="pre">account</span></code> is an <code class="docutils literal notranslate"><span class="pre">Account</span></code> object):</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_scrobble_counts</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="day-scrobbles">
-<h3>Day Scrobbles<a class="headerlink" href="#day-scrobbles" title="Permalink to this heading"></a></h3>
+<h3>Day Scrobbles<a class="headerlink" href="#day-scrobbles" title="Link to this heading"></a></h3>
 <p>Get a QuerySet of all Scrobbles from a particular day for one or all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s, earliest first. In these examples, <code class="docutils literal notranslate"><span class="pre">today</span></code> can be either a <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> or a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>.</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">day_scrobbles</span> <span class="nv">date</span><span class="o">=</span><span class="nv">today</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">day_scrobbles</span> <span class="nv">date</span><span class="o">=</span><span class="nv">today</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">scrobble</span> <span class="k">in</span> <span class="nv">scrobbles</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">scrobble</span> <span class="k">in</span> <span class="nv">scrobbles</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">scrobble.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">scrobble.track.name</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">scrobble.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">scrobble.track.name</span> <span class="cp">}}</span>
 <span class="x">        (</span><span class="cp">{{</span> <span class="nv">scrobble.post_time</span> <span class="cp">}}</span><span class="x">)</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>To restrict scrobbles to a single <code class="docutils literal notranslate"><span class="pre">Account</span></code> (assuming <code class="docutils literal notranslate"><span class="pre">account</span></code> is an <code class="docutils literal notranslate"><span class="pre">Account</span></code> object):</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_scrobbles</span> <span class="nv">date</span><span class="o">=</span><span class="nv">today</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_scrobbles</span> <span class="nv">date</span><span class="o">=</span><span class="nv">today</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="recent-scrobbles">
-<h3>Recent Scrobbles<a class="headerlink" href="#recent-scrobbles" title="Permalink to this heading"></a></h3>
+<h3>Recent Scrobbles<a class="headerlink" href="#recent-scrobbles" title="Link to this heading"></a></h3>
 <p>Get a QuerySet of the most recent Scrobbles, by one or all <code class="docutils literal notranslate"><span class="pre">Account</span></code> s.  The default quantity returned is 10.</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">recent_scrobbles</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">recent_scrobbles</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span>
 
-<span class="c">{# Then loop as in previous example. #}</span><span class="x"></span>
+<span class="c">{# Then loop as in previous example. #}</span>
 </pre></div>
 </div>
 <p>To restrict scrobbles to a single <code class="docutils literal notranslate"><span class="pre">Account</span></code> (assuming <code class="docutils literal notranslate"><span class="pre">account</span></code> is an <code class="docutils literal notranslate"><span class="pre">Account</span></code> object), and increase the quantity returned to 30:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_scrobbles</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">limit</span><span class="o">=</span><span class="m">30</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_scrobbles</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">limit</span><span class="o">=</span><span class="m">30</span> <span class="k">as</span> <span class="nv">scrobbles</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="top-tracks">
-<h3>Top Tracks<a class="headerlink" href="#top-tracks" title="Permalink to this heading"></a></h3>
+<h3>Top Tracks<a class="headerlink" href="#top-tracks" title="Link to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Track</span></code> s with the most-scrobbled first. Can be restricted to: a single <code class="docutils literal notranslate"><span class="pre">Account</span></code>; a single day, week, month or year; tracks by a single <code class="docutils literal notranslate"><span class="pre">Artist</span></code>. By default 10 tracks are returned.</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">track</span> <span class="k">in</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">track</span> <span class="k">in</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nv">track.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">track.name</span> <span class="cp">}}</span><span class="x">:</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">track.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">track.scrobble_count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Examples of fetching for a single day, month or year, assuming <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is either a <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> or a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;day&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;day&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;week&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;week&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;year&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;year&#39;</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>For month and year, the calendar month/year around the date is used. e.g. if the supplied date was <code class="docutils literal notranslate"><span class="pre">2016-03-24</span></code> then <code class="docutils literal notranslate"><span class="pre">period='month'</span></code> would produce a chart for March 2016, and <code class="docutils literal notranslate"><span class="pre">period='year'</span></code> would produce a chart for all of 2016.</p>
 <p>For week, it uses the Django setting <code class="docutils literal notranslate"><span class="pre">FIRST_DAY_OF_WEEK</span></code>, default being <code class="docutils literal notranslate"><span class="pre">0</span></code> (Sunday).</p>
 <p>Example of only fetching tracks by a single artist, assuming <code class="docutils literal notranslate"><span class="pre">artist</span></code> is an <code class="docutils literal notranslate"><span class="pre">Artist</span></code> object:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Example of only fetching tracks scrobbled by a single <code class="docutils literal notranslate"><span class="pre">Account</span></code>:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Example of fetching only 5 tracks by a single <code class="docutils literal notranslate"><span class="pre">Artist</span></code>, scrobbled by a single <code class="docutils literal notranslate"><span class="pre">Account</span></code>, during a single month:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">top_tracks</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tracks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Arguments can be in any order.</p>
 </section>
 <section id="top-albums">
-<h3>Top Albums<a class="headerlink" href="#top-albums" title="Permalink to this heading"></a></h3>
+<h3>Top Albums<a class="headerlink" href="#top-albums" title="Link to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Album</span></code> s with the most-scrobbled first. This works in exactly the same way as the <code class="docutils literal notranslate"><span class="pre">top_tracks</span></code> template tag, above, with identical arguments. e.g.:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_albums</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_albums</span> <span class="nv">artist</span><span class="o">=</span><span class="nv">artist</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">albums</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">album</span> <span class="k">in</span> <span class="nv">albums</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">album</span> <span class="k">in</span> <span class="nv">albums</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nv">album.artist.name</span> <span class="cp">}}</span><span class="x"> - </span><span class="cp">{{</span> <span class="nv">album.name</span> <span class="cp">}}</span><span class="x">:</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="top-artists">
-<h3>Top Artists<a class="headerlink" href="#top-artists" title="Permalink to this heading"></a></h3>
+<h3>Top Artists<a class="headerlink" href="#top-artists" title="Link to this heading"></a></h3>
 <p>Get a QuerySet of the most-scrobbled <code class="docutils literal notranslate"><span class="pre">Artist</span></code> s with the most-scrobbled first. This works in a similar way to the <code class="docutils literal notranslate"><span class="pre">top_tracks</span></code> and <code class="docutils literal notranslate"><span class="pre">top_albums</span></code> template tags, above. The only difference is that results cannot be filtered by <code class="docutils literal notranslate"><span class="pre">artist</span></code>. e.g.:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_lastfm</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">top_artists</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">artists</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">top_artists</span> <span class="nv">account</span><span class="o">=</span><span class="nv">account</span> <span class="nv">date</span><span class="o">=</span><span class="nv">my_date</span> <span class="nv">period</span><span class="o">=</span><span class="s1">&#39;month&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">artists</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">artist</span> <span class="k">in</span> <span class="nv">artists</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">artist</span> <span class="k">in</span> <span class="nv">artists</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nb">forloop</span><span class="nv">.counter</span> <span class="cp">}}</span><span class="x">.</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nv">artist.name</span> <span class="cp">}}</span><span class="x">:</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">album.scrobble_count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="management-commands">
-<span id="lastfm-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this heading"></a></h2>
+<span id="lastfm-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Link to this heading"></a></h2>
 <p>There is only one Last.fm management command.</p>
 <section id="fetch-scrobbles">
-<h3>Fetch Scrobbles<a class="headerlink" href="#fetch-scrobbles" title="Permalink to this heading"></a></h3>
+<h3>Fetch Scrobbles<a class="headerlink" href="#fetch-scrobbles" title="Link to this heading"></a></h3>
 <p>Fetches Scrobbles for one or all Accounts.</p>
 <p>To fetch ALL Scrobbles for all Accounts (this could take a long time):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_lastfm_scrobbles --days<span class="o">=</span>all
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_lastfm_scrobbles<span class="w"> </span>--days<span class="o">=</span>all
 </pre></div>
 </div>
 <p>To fetch Scrobbles for all Accounts from the past 3 days:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_lastfm_scrobbles --days<span class="o">=</span><span class="m">3</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_lastfm_scrobbles<span class="w"> </span>--days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <p>Both options can be restricted to only fetch for a single Account by adding the Last.fm username. e.g.:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_lastfm_scrobbles --account<span class="o">=</span>gyford --days<span class="o">=</span><span class="m">3</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_lastfm_scrobbles<span class="w"> </span>--account<span class="o">=</span>gyford<span class="w"> </span>--days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <p>It’s safe to re-fetch the same data. Duplicates will only occur if an Artist/Track/Album’s URL slug has changed. A change of case won’t cause duplicates, but anything more will.</p>

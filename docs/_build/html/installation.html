@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Django Ditto 3.2.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Installation &mdash; Django Ditto 3.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=b0e360d0"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -28,14 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Django Ditto
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Django Ditto
           </a>
-              <div class="version">
-                3.2
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -88,8 +89,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -100,20 +101,20 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="pillow">
-<h2>Pillow<a class="headerlink" href="#pillow" title="Permalink to this heading"></a></h2>
+<h2>Pillow<a class="headerlink" href="#pillow" title="Link to this heading"></a></h2>
 <p>Ditto uses <a class="reference external" href="http://pillow.readthedocs.io/en/latest/">Pillow</a> which has some prerequisites of its own. You may need to install libjpeg and zlib. (On a Mac, zlib was installed for me by XCode, and I used <a class="reference external" href="http://brew.sh">Homebrew</a> to install libjpeg.)</p>
 </section>
 <section id="install-django-ditto">
-<h2>Install django-ditto<a class="headerlink" href="#install-django-ditto" title="Permalink to this heading"></a></h2>
+<h2>Install django-ditto<a class="headerlink" href="#install-django-ditto" title="Link to this heading"></a></h2>
 <p>Ditto can be installed using <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install django-ditto
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>django-ditto
 </pre></div>
 </div>
 </section>
 <section id="add-to-installed-apps">
-<h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Permalink to this heading"></a></h2>
+<h2>Add to INSTALLED_APPS<a class="headerlink" href="#add-to-installed-apps" title="Link to this heading"></a></h2>
 <p>To use Ditto in your own project (untested as yet), add the core <code class="docutils literal notranslate"><span class="pre">ditto.core</span></code> application to your project’s <code class="docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code> in your <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>, and add the applications for the services you need. This example includes Flickr, Last.fm, Pinboard and Twitter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># other apps listed here.</span>
@@ -153,10 +154,10 @@ images:</p>
 </div>
 </section>
 <section id="add-to-urls-py">
-<h2>Add to urls.py<a class="headerlink" href="#add-to-urls-py" title="Permalink to this heading"></a></h2>
+<h2>Add to urls.py<a class="headerlink" href="#add-to-urls-py" title="Link to this heading"></a></h2>
 <p>To use Ditto’s supplied views you can include each app’s URLs in your project’s own <code class="docutils literal notranslate"><span class="pre">urls.py</span></code>. Note that each app requires the correct namespace (<code class="docutils literal notranslate"><span class="pre">flickr</span></code>, <code class="docutils literal notranslate"><span class="pre">lastfm</span></code>, <code class="docutils literal notranslate"><span class="pre">pinboard</span></code> or <code class="docutils literal notranslate"><span class="pre">twitter</span></code>), eg:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">include</span><span class="p">,</span> <span class="n">path</span>
-<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">include</span><span class="p">,</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
 
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">path</span><span class="p">(</span><span class="s2">&quot;admin/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
@@ -182,10 +183,10 @@ images:</p>
 </ul>
 </section>
 <section id="settings">
-<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this heading"></a></h2>
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading"></a></h2>
 <p>There are some optional settings that can be placed in your project’s <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>.</p>
 <section id="core-settings">
-<h3>Core settings<a class="headerlink" href="#core-settings" title="Permalink to this heading"></a></h3>
+<h3>Core settings<a class="headerlink" href="#core-settings" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">ditto.core</span></code> app has some optional settings for customing the formats used to display dates and times in the default templates (and the <code class="docutils literal notranslate"><span class="pre">ditto_core.display_time()</span></code> template tag). The formats are those used for <a class="reference external" href="http://strftime.org">strftime</a>. Here they are, with their default values:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># e.g. &quot;07:34&quot;</span>
 <span class="n">DITTO_CORE_TIME_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%H:%M&#39;</span>
@@ -210,7 +211,7 @@ images:</p>
 </div>
 </section>
 <section id="service-specific-settings">
-<h3>Service-specific settings<a class="headerlink" href="#service-specific-settings" title="Permalink to this heading"></a></h3>
+<h3>Service-specific settings<a class="headerlink" href="#service-specific-settings" title="Link to this heading"></a></h3>
 <p>In addition, some of the other apps have their own optional settings. They’re described in detail in each service’s documentation.</p>
 <p>This is the complete list of service-specific settings with their default values:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DITTO_FLICKR_DIR_BASE</span> <span class="o">=</span> <span class="s1">&#39;flickr&#39;</span>
@@ -223,7 +224,7 @@ images:</p>
 </div>
 </section>
 <section id="other-optional-settings">
-<h3>Other optional settings<a class="headerlink" href="#other-optional-settings" title="Permalink to this heading"></a></h3>
+<h3>Other optional settings<a class="headerlink" href="#other-optional-settings" title="Link to this heading"></a></h3>
 <p>To have large numbers formatted nicely in the included templates, ensure these are in your <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_L10N</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">USE_THOUSAND_SEPARATOR</span> <span class="o">=</span> <span class="kc">True</span>
@@ -232,7 +233,7 @@ images:</p>
 </section>
 </section>
 <section id="set-up-each-service">
-<h2>Set up each service<a class="headerlink" href="#set-up-each-service" title="Permalink to this heading"></a></h2>
+<h2>Set up each service<a class="headerlink" href="#set-up-each-service" title="Link to this heading"></a></h2>
 <p>Each service (such as Flickr or Twitter) you want to use will require some set-up in order to link your account(s) on the service with Django Ditto. See the documentation for each service for how to do this.</p>
 </section>
 </section>

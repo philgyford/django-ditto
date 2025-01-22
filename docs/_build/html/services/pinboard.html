@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinboard &mdash; Django Ditto 3.2.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Pinboard &mdash; Django Ditto 3.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b0e360d0"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -28,14 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Django Ditto
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Django Ditto
           </a>
-              <div class="version">
-                3.2
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -91,8 +92,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Pinboard</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pinboard</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/services/pinboard.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -103,15 +104,15 @@
            <div itemprop="articleBody">
              
   <section id="pinboard">
-<h1>Pinboard<a class="headerlink" href="#pinboard" title="Permalink to this heading"></a></h1>
+<h1>Pinboard<a class="headerlink" href="#pinboard" title="Link to this heading"></a></h1>
 <p>You can fetch, store and display data about all your bookmarks for one or more <a class="reference external" href="https://pinboard.in/">Pinboard</a> accounts.</p>
 <section id="set-up">
-<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this heading"></a></h2>
+<h2>Set-up<a class="headerlink" href="#set-up" title="Link to this heading"></a></h2>
 <p>In the Django admin, add an <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Pinboard app with your API token from <a class="reference external" href="https://pinboard.in/settings/password">https://pinboard.in/settings/password</a> .</p>
 <p>Then use the <a class="reference internal" href="#pinboard-management-commands"><span class="std std-ref">Management commands</span></a> to download your Bookmarks.</p>
 </section>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Link to this heading"></a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.pinboard.models</span></code> are:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>A single Pinboard account. (Note: other services, like Twitter and Flickr, have separate <code class="docutils literal notranslate"><span class="pre">User</span></code> and <code class="docutils literal notranslate"><span class="pre">Account</span></code> models. Pinboard is currently simpler.)</p>
@@ -125,7 +126,7 @@
 </dl>
 </section>
 <section id="managers">
-<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this heading"></a></h2>
+<h2>Managers<a class="headerlink" href="#managers" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Bookmark</span></code> models have several managers:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Bookmark.objects.all()</span></code></dt><dd><p>The default manager fetches <em>all</em> Bookmarks, posted by all Accounts, whether they’re public or private.</p>
@@ -138,7 +139,7 @@
 </dd>
 </dl>
 <p>Of course, these can all be filtered as usual. So, to display public ‘To read’ Bookmarks posted by a particular Account:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.pinboard.models</span> <span class="kn">import</span> <span class="n">Account</span><span class="p">,</span> <span class="n">Bookmark</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ditto.pinboard.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Account</span><span class="p">,</span> <span class="n">Bookmark</span>
 
 <span class="n">account</span> <span class="o">=</span> <span class="n">Account</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span><span class="p">)</span>
 <span class="n">bookmarks</span> <span class="o">=</span> <span class="n">Bookmark</span><span class="o">.</span><span class="n">public_to_read_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">account</span><span class="o">=</span><span class="n">account</span><span class="p">)</span>
@@ -146,114 +147,114 @@
 </div>
 </section>
 <section id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this heading"></a></h2>
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Link to this heading"></a></h2>
 <p>There are two template tags available for displaying Bookmarks in your templates.</p>
 <section id="annual-bookmark-counts">
-<h3>Annual Bookmark Counts<a class="headerlink" href="#annual-bookmark-counts" title="Permalink to this heading"></a></h3>
+<h3>Annual Bookmark Counts<a class="headerlink" href="#annual-bookmark-counts" title="Link to this heading"></a></h3>
 <p>Get the number of bookmarks per year for all or one Account. This fetches totals for all Accounts:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Both the <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code> in each row are integers.</p>
 <p>To restrict totals to a single Account:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_bookmark_counts</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="day-bookmarks">
-<h3>Day Bookmarks<a class="headerlink" href="#day-bookmarks" title="Permalink to this heading"></a></h3>
+<h3>Day Bookmarks<a class="headerlink" href="#day-bookmarks" title="Link to this heading"></a></h3>
 <p>To display Bookmarks posted to Pinboard on a particular day, use
 <code class="docutils literal notranslate"><span class="pre">day_bookmarks</span></code>. By default it gets Bookmarks posted by all Accounts.
 In this example, <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Or we can restrict this to the Boomarks posted by a single account on that day:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_bookmarks</span> <span class="nv">my_date</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="recent-bookmarks">
-<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Permalink to this heading"></a></h3>
+<h3>Recent Bookmarks<a class="headerlink" href="#recent-bookmarks" title="Link to this heading"></a></h3>
 <p>To display the most recently-posted Bookmarks use <code class="docutils literal notranslate"><span class="pre">recent_bookmarks</span></code>. By default it gets the 10 most recent Bookmarks posted by all Accounts:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">bookmark</span> <span class="k">in</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">bookmark.url</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span><span class="cp">{{</span> <span class="nv">bookmark.title</span> <span class="cp">}}</span><span class="x">&lt;/a&gt;&lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>The tag can also fetch a different number of Bookmarks and/or only get Bookmarks from a single Account. Here we only get the 5 most recent Bookmarks posted by the Account with a <code class="docutils literal notranslate"><span class="pre">username</span></code> of <code class="docutils literal notranslate"><span class="pre">'philgyford'</span></code>.:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_bookmarks</span> <span class="nv">account</span><span class="o">=</span><span class="s1">&#39;philgyford&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">bookmarks</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="popular-bookmark-tags">
-<h3>Popular Bookmark Tags<a class="headerlink" href="#popular-bookmark-tags" title="Permalink to this heading"></a></h3>
+<h3>Popular Bookmark Tags<a class="headerlink" href="#popular-bookmark-tags" title="Link to this heading"></a></h3>
 <p>To display the most common public Tags on public Bookmarks use
 <code class="docutils literal notranslate"><span class="pre">popular_bookmark_tags</span></code>. By default it gets the 10 Tags used most across all
 Accounts.</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_pinboard</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">tag</span> <span class="k">in</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">tag</span> <span class="k">in</span> <span class="nv">tags</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        &lt;a href=&quot;</span><span class="cp">{%</span> <span class="k">url</span> <span class="s1">&#39;pinboard:tag_detail&#39;</span> <span class="nv">slug</span><span class="o">=</span><span class="nv">tag.slug</span> <span class="cp">%}</span><span class="x">&quot;&gt;</span>
-<span class="x">            </span><span class="cp">{{</span> <span class="nv">tag.name</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">            </span><span class="cp">{{</span> <span class="nv">tag.name</span> <span class="cp">}}</span>
 <span class="x">        &lt;/a&gt;</span>
 <span class="x">        (</span><span class="cp">{{</span> <span class="nv">tag.num_times</span> <span class="cp">}}</span><span class="x">)</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>The tag can also fetch a different number of Tags. Here we only get the 5 most popular Tags.:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">popular_bookmark_tags</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">tags</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="management-commands">
-<span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this heading"></a></h2>
+<span id="pinboard-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Link to this heading"></a></h2>
 <p>Once you have set up an Account with your Pinboard API token (see above), you
 can fetch Bookmarks.</p>
 <section id="fetch-bookmarks">
-<h3>Fetch Bookmarks<a class="headerlink" href="#fetch-bookmarks" title="Permalink to this heading"></a></h3>
+<h3>Fetch Bookmarks<a class="headerlink" href="#fetch-bookmarks" title="Link to this heading"></a></h3>
 <p>Import all of your bookmarks:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --all
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_pinboard_bookmarks<span class="w"> </span>--all
 </pre></div>
 </div>
 <p>Periodically fetch the most recent bookmarks, eg 20 of them:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --recent<span class="o">=</span><span class="m">20</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_pinboard_bookmarks<span class="w"> </span>--recent<span class="o">=</span><span class="m">20</span>
 </pre></div>
 </div>
 <p>Or fetch bookmarks posted on one date:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --date<span class="o">=</span><span class="m">2015</span>-06-20
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_pinboard_bookmarks<span class="w"> </span>--date<span class="o">=</span><span class="m">2015</span>-06-20
 </pre></div>
 </div>
 <p>Or fetch a single bookmark by its URL (eg, if you’ve changed the description
 of a particular bookmark you’ve alread fetched):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --url<span class="o">=</span>http://new-aesthetic.tumblr.com/
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_pinboard_bookmarks<span class="w"> </span>--url<span class="o">=</span>http://new-aesthetic.tumblr.com/
 </pre></div>
 </div>
 <p>The above commands fetch bookmark(s) for all Accounts you’ve added. To restrict to a single account use <code class="docutils literal notranslate"><span class="pre">--account</span></code> with the Pinboard username, eg:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_pinboard_bookmarks --recent<span class="o">=</span><span class="m">20</span> --account<span class="o">=</span>philgyford
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_pinboard_bookmarks<span class="w"> </span>--recent<span class="o">=</span><span class="m">20</span><span class="w"> </span>--account<span class="o">=</span>philgyford
 </pre></div>
 </div>
 <p>Be aware of the rate limits: <a class="reference external" href="https://pinboard.in/api/#limits">https://pinboard.in/api/#limits</a></p>

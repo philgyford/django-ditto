@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flickr &mdash; Django Ditto 3.2.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Flickr &mdash; Django Ditto 3.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b0e360d0"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -28,14 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Django Ditto
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Django Ditto
           </a>
-              <div class="version">
-                3.2
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -99,8 +100,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Flickr</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Flickr</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/services/flickr.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -111,10 +112,10 @@
            <div itemprop="articleBody">
              
   <section id="flickr">
-<h1>Flickr<a class="headerlink" href="#flickr" title="Permalink to this heading"></a></h1>
+<h1>Flickr<a class="headerlink" href="#flickr" title="Link to this heading"></a></h1>
 <p>You can fetch, store and display data about all your Photos and Photosets (Albums) for one or more <a class="reference external" href="https://flickr.com/">Flickr</a> Accounts. By default the included models and templates will link to the photo files on flickr.com, but you can also download the original files to store locally. These can then be used to generate images in all other sizes, to be served locally.  See the <a class="reference external" href="#fetch-files-media">Fetch Files management command</a> below.</p>
 <section id="set-up">
-<h2>Set-up<a class="headerlink" href="#set-up" title="Permalink to this heading"></a></h2>
+<h2>Set-up<a class="headerlink" href="#set-up" title="Link to this heading"></a></h2>
 <p>In the Django admin, create a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> in the Flickr app, and add your Flickr API key and secret from <a class="reference external" href="https://www.flickr.com/services/apps/create/apply/">https://www.flickr.com/services/apps/create/apply/</a> (you can ignore the User for the moment).</p>
 <p>By default this will only allow the fetching of fully public photos. To fetch all photos your Flickr account can access, you’ll need to do this:</p>
 <ol class="arabic">
@@ -123,7 +124,7 @@
 it might be easier to <a class="reference external" href="https://github.com/philgyford/django-ditto/blob/main/ditto/scripts/flickr_authorize.py">download the script from GitHub</a>.)</p></li>
 <li><p>Run the script on the command line (if you downloaded the file, change the path to wherever the script is):</p>
 <blockquote>
-<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python ditto/scripts/flickr_authorize.py
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>ditto/scripts/flickr_authorize.py
 </pre></div>
 </div>
 </div></blockquote>
@@ -133,13 +134,13 @@ in order to authorize your Flickr account. You’ll then get a code to paste
 into your Terminal.</p></li>
 </ol>
 <p>Finally, back in the Django Admin note the ID of the <code class="docutils literal notranslate"><span class="pre">Account</span></code> you created. e.g. if the Django Admin’s URL is something like <code class="docutils literal notranslate"><span class="pre">/admin/flickr/account/1/change/</span></code> then the ID is <code class="docutils literal notranslate"><span class="pre">1</span></code>. Run the following management command to fetch information about the <code class="docutils literal notranslate"><span class="pre">Account</span></code>’s associated Flickr <code class="docutils literal notranslate"><span class="pre">User</span></code> (replacing <code class="docutils literal notranslate"><span class="pre">1</span></code> with your <code class="docutils literal notranslate"><span class="pre">Account</span></code>’s Django ID, if different):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span><span class="m">1</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_account_user<span class="w"> </span>--id<span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 <p>Now you can download your photos’ data and, optionally, their original image/video files. See <a class="reference internal" href="#flickr-management-commands"><span class="std std-ref">Management commands</span></a>.</p>
 </section>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Link to this heading"></a></h2>
 <p>The models available in <code class="docutils literal notranslate"><span class="pre">ditto.flickr.models</span></code> are:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">Account</span></code></dt><dd><p>Representing a Flickr account that has API credentials and that we fetch Photos for. It has a one-to-one relationship with a <code class="docutils literal notranslate"><span class="pre">User</span></code> model.</p>
@@ -155,9 +156,9 @@ into your Terminal.</p></li>
 </dl>
 </section>
 <section id="managers">
-<h2>Managers<a class="headerlink" href="#managers" title="Permalink to this heading"></a></h2>
+<h2>Managers<a class="headerlink" href="#managers" title="Link to this heading"></a></h2>
 <section id="photos">
-<h3>Photos<a class="headerlink" href="#photos" title="Permalink to this heading"></a></h3>
+<h3>Photos<a class="headerlink" href="#photos" title="Link to this heading"></a></h3>
 <p>There are several managers available for Photos. There are two main
 differentiators we want to restrict things by:</p>
 <ul class="simple">
@@ -176,7 +177,7 @@ differentiators we want to restrict things by:</p>
 </dd>
 </dl>
 <p>Of course, these can all be filtered as usual. So, if you wanted to get all the public Photos posted by a particular <code class="docutils literal notranslate"><span class="pre">User</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ditto.flickr.models</span> <span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Photo</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ditto.flickr.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Photo</span>
 
 <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span><span class="p">)</span>
 <span class="n">photos</span> <span class="o">=</span> <span class="n">Photo</span><span class="o">.</span><span class="n">public_photo_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
@@ -185,7 +186,7 @@ differentiators we want to restrict things by:</p>
 <p>NOTE: You can find a user’s NSID (the ID used by Flickr) at <a class="reference external" href="http://idgettr.com">http://idgettr.com</a></p>
 </section>
 <section id="users">
-<h3>Users<a class="headerlink" href="#users" title="Permalink to this heading"></a></h3>
+<h3>Users<a class="headerlink" href="#users" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">User.objects.all()</span></code></dt><dd><p>The default manager fetches all Users in the system.</p>
 </dd>
@@ -195,84 +196,84 @@ differentiators we want to restrict things by:</p>
 </section>
 </section>
 <section id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this heading"></a></h2>
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Link to this heading"></a></h2>
 <p>There are three assigment template tags and one simple template tag available for displaying Photos, Photosets and information about a Photo.</p>
 <section id="annual-photo-counts">
-<h3>Annual Photo Counts<a class="headerlink" href="#annual-photo-counts" title="Permalink to this heading"></a></h3>
+<h3>Annual Photo Counts<a class="headerlink" href="#annual-photo-counts" title="Link to this heading"></a></h3>
 <p>Get the number of Photos taken or uploaded per year for all or one User-with-Account. This fetches totals for all Users, by time uploaded:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">counts</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
-<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">        </span><span class="cp">{{</span> <span class="nv">row.year</span> <span class="cp">}}</span><span class="x">: </span><span class="cp">{{</span> <span class="nv">row.count</span> <span class="cp">}}</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Both the <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code> in each row are integers.</p>
 <p>To count by time taken instead:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>The alternative <code class="docutils literal notranslate"><span class="pre">count_by</span></code> value is equivalent to the default behaviour:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>To restrict totals to a single User-with-Account, include their <code class="docutils literal notranslate"><span class="pre">nsid</span></code>:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">annual_photo_counts</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">count_by</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">counts</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="day-photos">
-<h3>Day Photos<a class="headerlink" href="#day-photos" title="Permalink to this heading"></a></h3>
+<h3>Day Photos<a class="headerlink" href="#day-photos" title="Link to this heading"></a></h3>
 <p>Gets public Photos posted or taken on a particular day by any of the Users-with-Accounts. In this example, <code class="docutils literal notranslate"><span class="pre">my_date</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/datetime.html#datetime.date">datetime.datetime.date</a> type:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>By default this will return photos posted on the date. To specify whether it
 uses <code class="docutils literal notranslate"><span class="pre">post_time</span></code> or <code class="docutils literal notranslate"><span class="pre">taken_time</span></code> use the <code class="docutils literal notranslate"><span class="pre">time</span></code> parameter:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;taken_time&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>Or we can restrict this to Photos posted by a single User-with-an-Account:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">day_photos</span> <span class="nv">my_date</span> <span class="nv">time</span><span class="o">=</span><span class="s1">&#39;post_time&#39;</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="photosets">
-<h3>Photosets<a class="headerlink" href="#photosets" title="Permalink to this heading"></a></h3>
+<h3>Photosets<a class="headerlink" href="#photosets" title="Link to this heading"></a></h3>
 <p>Gets Photosets. By default they are by any User and only 10 are returned.</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">photosets</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">photosets</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photoset</span> <span class="k">in</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photoset</span> <span class="k">in</span> <span class="nv">photoset_list</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nv">photoset.title</span> <span class="cp">}}</span><span class="x">&lt;br&gt;</span>
 <span class="x">        &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_url</span> <span class="cp">}}</span><span class="x">&quot; width=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_width</span> <span class="cp">}}</span><span class="x">&quot; height=&quot;</span><span class="cp">{{</span> <span class="nv">photoset.primary_photo.large_square_height</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>You can restrict it to Photosets by a single User and/or change the number returned:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">photosets</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">300</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">photosets</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">300</span> <span class="k">as</span> <span class="nv">photoset_list</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 <section id="photo-license">
-<h3>Photo license<a class="headerlink" href="#photo-license" title="Permalink to this heading"></a></h3>
+<h3>Photo license<a class="headerlink" href="#photo-license" title="Link to this heading"></a></h3>
 <p>When displaying information about a <code class="docutils literal notranslate"><span class="pre">Photo</span></code> you may want to display a user-friendly version of its <code class="docutils literal notranslate"><span class="pre">license</span></code> (indicating Creative Commons level, All rights reserved, etc). This tag makes that easy. Pass it the <code class="docutils literal notranslate"><span class="pre">license</span></code> property of a <code class="docutils literal notranslate"><span class="pre">Photo</span></code> object. Here, <code class="docutils literal notranslate"><span class="pre">photo</span></code> is a <code class="docutils literal notranslate"><span class="pre">Photo</span></code> object:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{{</span> <span class="nv">photo_license</span> <span class="nv">photo.license</span> <span class="cp">}}</span><span class="x"></span>
+<span class="cp">{{</span> <span class="nv">photo_license</span> <span class="nv">photo.license</span> <span class="cp">}}</span>
 </pre></div>
 </div>
 <p>This would create HTML something like this, depending on the license:</p>
@@ -281,41 +282,41 @@ uses <code class="docutils literal notranslate"><span class="pre">post_time</spa
 </div></blockquote>
 </section>
 <section id="recent-photos">
-<h3>Recent Photos<a class="headerlink" href="#recent-photos" title="Permalink to this heading"></a></h3>
+<h3>Recent Photos<a class="headerlink" href="#recent-photos" title="Link to this heading"></a></h3>
 <p>To display the most recent public Photos posted by any of the Users associated
 with Accounts. By default the most recent 10 are fetched:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">ditto_flickr</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">recent_photos</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">recent_photos</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 
-<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photo</span> <span class="k">in</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">photo</span> <span class="k">in</span> <span class="nv">photos</span> <span class="cp">%}</span>
 <span class="x">    &lt;p&gt;</span>
 <span class="x">        </span><span class="cp">{{</span> <span class="nv">photo.title</span> <span class="cp">}}</span><span class="x">&lt;br&gt;</span>
 <span class="x">        &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_url</span> <span class="cp">}}</span><span class="x">&quot; width=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_width</span> <span class="cp">}}</span><span class="x">&quot; height=&quot;</span><span class="cp">{{</span> <span class="nv">photo.small_height</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
 <span class="x">    &lt;/p&gt;</span>
-<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>The tag can also fetch a different number of Photos and/or only get Photos
 posted by a single User-with-an-Account. Here we only get the 5 most recent
 Photos posted by the User with an <code class="docutils literal notranslate"><span class="pre">nsid</span></code> of <code class="docutils literal notranslate"><span class="pre">'35034346050&#64;N01'</span></code>:</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_photos</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">recent_photos</span> <span class="nv">nsid</span><span class="o">=</span><span class="s1">&#39;35034346050@N01&#39;</span> <span class="nv">limit</span><span class="o">=</span><span class="m">5</span> <span class="k">as</span> <span class="nv">photos</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="management-commands">
-<span id="flickr-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Permalink to this heading"></a></h2>
+<span id="flickr-management-commands"></span><h2>Management commands<a class="headerlink" href="#management-commands" title="Link to this heading"></a></h2>
 <section id="fetch-account-user">
-<h3>Fetch Account User<a class="headerlink" href="#fetch-account-user" title="Permalink to this heading"></a></h3>
+<h3>Fetch Account User<a class="headerlink" href="#fetch-account-user" title="Link to this heading"></a></h3>
 <p>This is only used when setting up a new <code class="docutils literal notranslate"><span class="pre">Account</span></code> object with API credentials. It fetches data about the Flickr User associated with this <code class="docutils literal notranslate"><span class="pre">Account</span></code>.</p>
 <p>Once the <code class="docutils literal notranslate"><span class="pre">Account</span></code> has been created in the Django admin, and its API credentials entered, run this (using the Django ID for the object instead of <code class="docutils literal notranslate"><span class="pre">1</span></code>):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_account_user --id<span class="o">=</span><span class="m">1</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_account_user<span class="w"> </span>--id<span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 </section>
 <section id="fetch-photos">
-<h3>Fetch Photos<a class="headerlink" href="#fetch-photos" title="Permalink to this heading"></a></h3>
+<h3>Fetch Photos<a class="headerlink" href="#fetch-photos" title="Link to this heading"></a></h3>
 <p>Fetches data about Photos (including videos). The data fetched can be restricted by setting:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">--days</span></code> - fetch data from that many most recent days</p></li>
@@ -326,29 +327,29 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
 <p>The <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> arguments can be combined to fetch data from within a range of dates.</p>
 <p>If no <cite>–account</cite> argument is supplied, data is fecthed for ALL Accounts.</p>
 <p>So, this will fetch data for ALL Photos for ALL Accounts:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span>all
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--days<span class="o">=</span>all
 </pre></div>
 </div>
 <p><strong>NOTE 1:</strong> This took about 75 minutes to fetch data for 3,000 photos on my MacBook.</p>
 <p><strong>NOTE 2:</strong> Trying to run the same thing on a 512MB Digital Ocean machine resulted in the process being killed after fetching about 1,500 photos. See <a class="reference external" href="https://github.com/philgyford/django-ditto/issues/148">this bug</a>.</p>
 <p>This will only fetch Photos uploaded in the past 3 days:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --days<span class="o">=</span><span class="m">3</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <p>This will fetch Photos uploaded since midnight at the start of 31 December 2021:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --start<span class="o">=</span><span class="m">2021</span>-12-31
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--start<span class="o">=</span><span class="m">2021</span>-12-31
 </pre></div>
 </div>
 <p>This will fetch Photos uploaded before the end of the day (23:59:59) on 1 February 2022:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --end<span class="o">=</span><span class="m">2022</span>-02-01
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--end<span class="o">=</span><span class="m">2022</span>-02-01
 </pre></div>
 </div>
 <p>And this will fetch Photos uploaded from the start of 31 December 2021 and the end of 1 February 2022:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --start<span class="o">=</span><span class="m">2021</span>-12-31 --end<span class="o">=</span><span class="m">2022</span>-02-01
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--start<span class="o">=</span><span class="m">2021</span>-12-31<span class="w"> </span>--end<span class="o">=</span><span class="m">2022</span>-02-01
 </pre></div>
 </div>
 <p>All time-related options can be restricted to only fetch for a single Account by adding the NSID of the Account’s User, eg:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photos --account<span class="o">=</span><span class="m">35034346050</span>@N01 --days<span class="o">=</span><span class="m">3</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photos<span class="w"> </span>--account<span class="o">=</span><span class="m">35034346050</span>@N01<span class="w"> </span>--days<span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <p>Whenever a Photo is fetched, data about its User will also be fetched, if it hasn’t been fetched on this occasion.</p>
@@ -362,18 +363,18 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
 </div>
 </section>
 <section id="fetch-originals">
-<h3>Fetch originals<a class="headerlink" href="#fetch-originals" title="Permalink to this heading"></a></h3>
+<h3>Fetch originals<a class="headerlink" href="#fetch-originals" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">fetch_flickr_photos</span></code> management command only fetches data <em>about</em> the photos (title, locations, EXIF, tags, etc). To download the original photo and video files themselves, use the <code class="docutils literal notranslate"><span class="pre">fetch_flickr_originals</span></code> command, <em>after</em> fetching the photos’ data:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_originals
 </pre></div>
 </div>
 <p>This took over 90 minutes for about 3,000 photos (and very few videos) for me.</p>
 <p>By default this command will fetch all the original files that haven’t yet been downloaded (so the first time, it will fetch all of them). To force it to download <em>all</em> the files again (if you’ve deleted them locally, but they’re still on Flickr) then:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --all
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_originals<span class="w"> </span>--all
 </pre></div>
 </div>
 <p>Both variants can be restricted to fetching files for a single account:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_originals --account<span class="o">=</span><span class="m">35034346050</span>@N01
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_originals<span class="w"> </span>--account<span class="o">=</span><span class="m">35034346050</span>@N01
 </pre></div>
 </div>
 <p>Files will be saved within your project’s <code class="docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code> directory, as defined in <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>. There are two optional settings to customise the directories in which the files are saved. Their default values are as shown here:</p>
@@ -412,15 +413,15 @@ Photos posted by the User with an <code class="docutils literal notranslate"><sp
 <p>Note that Ditto currently can’t do the same for videos, even if the original video file has been downloaded. No matter what the  value of <code class="docutils literal notranslate"><span class="pre">DITTO_FLICKR_USE_LOCAL_MEDIA</span></code> the flickr.com URL for videos is always used.</p>
 </section>
 <section id="fetch-photosets">
-<h3>Fetch Photosets<a class="headerlink" href="#fetch-photosets" title="Permalink to this heading"></a></h3>
+<h3>Fetch Photosets<a class="headerlink" href="#fetch-photosets" title="Link to this heading"></a></h3>
 <p>You can fetch data about your Photosets any time, but it doesn’t fetch detailed data about Photos within them.</p>
 <p>So, for best results, only run this <em>after</em> getting running <code class="docutils literal notranslate"><span class="pre">fetch_flickr_photos</span></code>.</p>
 <p>To fetch Photosets for all Accounts:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photosets
 </pre></div>
 </div>
 <p>Or fetch for only one Account:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./manage.py fetch_flickr_photosets --account<span class="o">=</span><span class="m">35034346050</span>@N01
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span>fetch_flickr_photosets<span class="w"> </span>--account<span class="o">=</span><span class="m">35034346050</span>@N01
 </pre></div>
 </div>
 </section>

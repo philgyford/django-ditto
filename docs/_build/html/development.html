@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Development &mdash; Django Ditto 3.2.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Development &mdash; Django Ditto 3.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=b0e360d0"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -27,14 +27,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Django Ditto
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Django Ditto
           </a>
-              <div class="version">
-                3.2
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -54,9 +55,11 @@
 <p class="caption" role="heading"><span class="caption-text">For Developers</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-django-project">Creating a Django project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-commit">pre-commit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#other-notes-for-development">Other notes for development</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#coverage">Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment">Environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#packaging">Packaging</a></li>
 </ul>
@@ -83,8 +86,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Development</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Development</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/development.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -95,109 +98,125 @@
            <div itemprop="articleBody">
              
   <section id="development">
-<h1>Development<a class="headerlink" href="#development" title="Permalink to this heading"></a></h1>
-<p>There’s a basic Django project in <code class="docutils literal notranslate"><span class="pre">devproject/</span></code> to make it easier to work on
-the app. This might be enough to get things up and running (assumes pipenv is
-installed):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> devproject
-$ virtualenv --prompt ditto-devproject venv
-$ <span class="nb">source</span> venv/bin/activate
-<span class="o">(</span>ditto-devproject<span class="o">)</span>$ pyenv <span class="nb">local</span> <span class="m">3</span>.10.5
-<span class="o">(</span>ditto-devproject<span class="o">)</span>$ python -m pip install -r requirements.txt
+<h1>Development<a class="headerlink" href="#development" title="Link to this heading"></a></h1>
+<section id="creating-a-django-project">
+<h2>Creating a Django project<a class="headerlink" href="#creating-a-django-project" title="Link to this heading"></a></h2>
+<p>How I would create a new project to work on django-ditto’s code.</p>
+<ol class="arabic">
+<li><p>Check out django-ditto</p></li>
+<li><p>Create an empty directory at the same level as django-ditto, like <code class="docutils literal notranslate"><span class="pre">django-ditto-devproject</span></code>.</p></li>
+<li><p>On the command line do the following:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>django-ditto-devproject
+uv<span class="w"> </span>init
+rm<span class="w"> </span>hello.py<span class="w">  </span><span class="c1"># Created by uv init but we don&#39;t need it</span>
+uv<span class="w"> </span>add<span class="w"> </span>--editable<span class="w"> </span>./../django-ditto
+uv<span class="w"> </span>run<span class="w"> </span>django-admin<span class="w"> </span>startproject<span class="w"> </span>devsite<span class="w"> </span>.
 </pre></div>
 </div>
-<p>Then run migrations and start the server:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>ditto-devproject<span class="o">)</span>$ ./manage.py migrate
-<span class="o">(</span>ditto-devproject<span class="o">)</span>$ ./manage.py runserver
+</li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">devsite/settings.py</span></code> add these to <code class="docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;sortedm2m&quot;</span><span class="p">,</span>
+<span class="s2">&quot;taggit&quot;</span><span class="p">,</span>
+<span class="s2">&quot;ditto.core&quot;</span><span class="p">,</span>
+<span class="s2">&quot;ditto.flickr&quot;</span><span class="p">,</span>
+<span class="s2">&quot;ditto.lastfm&quot;</span><span class="p">,</span>
+<span class="s2">&quot;ditto.pinboard&quot;</span><span class="p">,</span>
+<span class="s2">&quot;ditto.twitter&quot;</span><span class="p">,</span>
 </pre></div>
 </div>
+</li>
+<li><p>On the command line o:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</pre></div>
+</div>
+</li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">devproject/urls.py</span></code> add these to <code class="docutils literal notranslate"><span class="pre">urlpatterns</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;flickr/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;ditto.flickr.urls&quot;</span><span class="p">)),</span>
+<span class="n">path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;lastfm/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;ditto.lastfm.urls&quot;</span><span class="p">)),</span>
+<span class="n">path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;pinboard/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;ditto.pinboard.urls&quot;</span><span class="p">)),</span>
+<span class="n">path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;twitter/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;ditto.twitter.urls&quot;</span><span class="p">)),</span>
+<span class="n">path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;ditto.core.urls&quot;</span><span class="p">)),</span>
+</pre></div>
+</div>
+</li>
+<li><p>On the command line do:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>runserver
+</pre></div>
+</div>
+</li>
+<li><p>You can then visit <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> to view the Django-spectator front page. Use <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">manage.py</span> <span class="pre">createsuperuser</span></code> as normal with a Django project to create a superuser.</p></li>
+</ol>
+</section>
+<section id="pre-commit">
+<h2>pre-commit<a class="headerlink" href="#pre-commit" title="Link to this heading"></a></h2>
 <p>pre-commit will run flake8, black, isort and prettier across all files on commit.
 I think you just need to do this first:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pre-commit install
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pre-commit<span class="w"> </span>install
 </pre></div>
 </div>
-<p>You can add a <cite>.env</cite> file in <cite>devproject/</cite> and its environment variables will be
-read in <cite>devproject/devproject/settings.py</cite>. e.g.:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">DJANGO_SECRET_KEY</span><span class="o">=</span><span class="s2">&quot;your-secret-key&quot;</span>
-<span class="nv">DJANGO_LOG_LEVEL</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
-</pre></div>
-</div>
-<p>pre-commit will run flake8, black, isort and prettier across all files on commit.
-I think you just need to do this first:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pre-commit install
-</pre></div>
-</div>
+</section>
 <section id="tests">
-<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading"></a></h2>
-<p>Run tests with tox. Install it with:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install tox
+<h2>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h2>
+<p>Run tests with tox. Install it with <a class="reference external" href="https://github.com/astral-sh/uv">uv</a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>tox<span class="w"> </span>--with-uv
 </pre></div>
 </div>
 <p>You’ll need to have all versions of python available that are tested against (see <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code>). This might mean deactivating a virtualenv if you’re using one with <code class="docutils literal notranslate"><span class="pre">devproject/</span></code>. Then run all tests in all environments like:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tox
 </pre></div>
 </div>
-<p>To run tests in only one environment, specify it. In this case, Python 3.11 and
+<p>To run tests in only one environment, specify it. In this case, Python 3.13 and
 Django 4.2:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py311-django42
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>py313-django51
 </pre></div>
 </div>
 <p>To run a specific test, add its path after <code class="docutils literal notranslate"><span class="pre">--</span></code>, eg:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e py311-django42 -- tests.flickr.test_views.HomeViewTests.test_home_templates
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>py313-django51<span class="w"> </span>--<span class="w"> </span>tests.flickr.test_views.HomeViewTests.test_home_templates
 </pre></div>
 </div>
 <p>Running the tests in all environments will generate coverage output. There will
 also be an <code class="docutils literal notranslate"><span class="pre">htmlcov/</span></code> directory containing an HTML report. You can also
 generate these reports without running all the other tests:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tox -e coverage
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>coverage
 </pre></div>
 </div>
 </section>
 <section id="other-notes-for-development">
-<h2>Other notes for development<a class="headerlink" href="#other-notes-for-development" title="Permalink to this heading"></a></h2>
-<section id="coverage">
-<h3>Coverage<a class="headerlink" href="#coverage" title="Permalink to this heading"></a></h3>
-<p>Using coverage.py to check test coverage:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ coverage run --source<span class="o">=</span><span class="s1">&#39;.&#39;</span> ./manage.py <span class="nb">test</span>
-$ coverage report
+<h2>Other notes for development<a class="headerlink" href="#other-notes-for-development" title="Link to this heading"></a></h2>
+<section id="environment">
+<h3>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h3>
+<p>Create a virtual environment using <code class="docutils literal notranslate"><span class="pre">uv</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>uv<span class="w"> </span>sync
 </pre></div>
 </div>
-<p>Instead of the in-terminal report, get an HTML version:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ coverage html
-$ open -a <span class="s2">&quot;Google Chrome&quot;</span> htmlcov/index.html
-</pre></div>
-</div>
+<p>This can be used in your text editor if required. It will also enable building
+the documentation (see below).</p>
+<p>This is currently the only thing the <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code> file is present for. (Should
+we actually gitignore it?)</p>
 </section>
 <section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h3>
-<p>You’ll need <a class="reference external" href="http://www.sphinx-doc.org/en/master/">sphinx</a> installed. You
-could do this using pip and the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
-$ virtualenv --prompt ditto-docs venv
-$ <span class="nb">source</span> venv/bin/activate
-<span class="o">(</span>ditto-docs<span class="o">)</span>$ python -m pip install -r requirements.txt
-</pre></div>
-</div>
-<p>Build the documentation:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>ditto-docs<span class="o">)</span>$ make html
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
+<p>If you have done <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> then <a class="reference external" href="http://www.sphinx-doc.org/en/master/">sphinx</a>
+should already be installed.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>docs
+$<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>make<span class="w"> </span>html
 </pre></div>
 </div>
 </section>
 <section id="packaging">
-<h3>Packaging<a class="headerlink" href="#packaging" title="Permalink to this heading"></a></h3>
-<p>Set version number in <code class="docutils literal notranslate"><span class="pre">ditto/__init__.py</span></code>.</p>
-<p>Rebuild documentation (which includes the version number).</p>
-<p>Ensure <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> is up-to-date for new version.</p>
-<p>Commit changes to git.</p>
-<p>Ensure GitHub Actions still build OK.</p>
-<p>Add a version tag:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py tag
-</pre></div>
-</div>
-<p>Then:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python setup.py publish
-</pre></div>
-</div>
+<h3>Packaging<a class="headerlink" href="#packaging" title="Link to this heading"></a></h3>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">4.0.1</span></code> with current version number:</p>
+<ol class="arabic simple">
+<li><p>Put new changes on <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>Set version number in <code class="docutils literal notranslate"><span class="pre">src/ditto/__init__.py</span></code></p></li>
+<li><p>Rebuild documentation (which includes the version number).</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code>.</p></li>
+<li><p>Commit code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-a</span> <span class="pre">4.0.1</span> <span class="pre">-m</span> <span class="pre">'version</span> <span class="pre">4.0.1'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">--tags</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">build</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">publish</span> <span class="pre">dist/django_ditto-4.0.1*</span></code></p></li>
+</ol>
 </section>
 </section>
 </section>
