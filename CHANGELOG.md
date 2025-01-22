@@ -19,10 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Move main code within an `src/` directory
+- Improve title for Pinboard Bookmark detail pages (#224)
 - Improved Flickr image URLs and videos:
   - Changed from using the `farm*n*.static.flickr.com` domains to `live.staticflickr.com` domain for the URLs of Flickr-hosted images.
   - Fixed missing image for videos when viewed in lists.
   - Added "(Video)" after the title of any Flickr videos when viewed in lists.
+  - If a video has no current valid video URL, its detail page now displays an
+    an image plus a link to it on Flickr.com.
 
 ## [3.3] - 2024--08-13
 
