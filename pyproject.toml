@@ -58,6 +58,8 @@ dev = [
   "responses",
   "ruff",
   "unittest-parametrize",
+  "sphinx",
+  "sphinx-rtd-theme",
 ]
 
 # coverage #####################################################################

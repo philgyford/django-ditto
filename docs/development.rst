@@ -72,11 +72,11 @@ I think you just need to do this first:
 Tests
 *****
 
-Run tests with tox. Install it with:
+Run tests with tox. Install it with `uv <https://github.com/astral-sh/uv>`_:
 
 .. code-block:: shell
 
-    $ pip install tox
+    $ uv tool install tox --with-uv
 
 You'll need to have all versions of python available that are tested against (see ``tox.ini``). This might mean deactivating a virtualenv if you're using one with ``devproject/``. Then run all tests in all environments like:
 
@@ -110,24 +110,31 @@ generate these reports without running all the other tests:
 Other notes for development
 ***************************
 
+Environment
+===========
+
+Create a virtual environment using ``uv``:
+
+.. code-block:: shell
+
+    $ uv sync
+
+This can be used in your text editor if required. It will also enable building
+the documentation (see below).
+
+This is currently the only thing the ``uv.lock`` file is present for. (Should
+we actually gitignore it?)
+
 Documentation
 =============
 
-You'll need `sphinx <http://www.sphinx-doc.org/en/master/>`_ installed. You
-could do this using pip and the ``requirements.txt`` file:
+If you have done ``uv sync`` then `sphinx <http://www.sphinx-doc.org/en/master/>`_
+should already be installed.
 
 .. code-block:: shell
 
     $ cd docs
-    $ virtualenv --prompt ditto-docs venv
-    $ source venv/bin/activate
-    (ditto-docs)$ python -m pip install -r requirements.txt
-
-Build the documentation:
-
-.. code-block:: shell
-
-    (ditto-docs)$ make html
+    $ uv run make html
 
 Packaging
 =========
