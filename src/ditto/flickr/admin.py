@@ -216,6 +216,9 @@ class PhotoAdmin(DittoItemModelAdmin):
     list_filter = (
         "post_time",
         "fetch_time",
+        "media",
+        "safety_level",
+        "license",
     )
     date_hierarchy = "post_time"
     search_fields = [
