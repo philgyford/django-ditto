@@ -66,7 +66,7 @@ def get_entity(package, entity):
     eg, get_entity('ditto', 'version') returns `__version__` value in
     `__init__.py`.
     """
-    path = os.path.join(os.path.dirname(__file__), "..", "ditto", "__init__.py")
+    path = os.path.join(os.path.dirname(__file__), "..", "src", "ditto", "__init__.py")
     with open(path) as f:
         init_py = f.read()
         find = f"__{entity}__ = ['\"]([^'\"]+)['\"]"
