@@ -18,7 +18,7 @@ urlpatterns = [
         name="account_favorite_list",
     ),
     re_path(
-        r"^(?P<screen_name>\w+)/(?P<twitter_id>\d+)/$",
+        r"^(?P<screen_name>\w+)/(?P<twitter_id>[0-9]+)/$",
         view=views.TweetDetailView.as_view(),
         name="tweet_detail",
     ),

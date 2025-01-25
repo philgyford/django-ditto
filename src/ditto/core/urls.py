@@ -18,7 +18,7 @@ urlpatterns = [
     # ),
     re_path(
         # /2016/04/18/twitter/favorites
-        r"^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})(?:/(?P<app>[a-z]+))?(?:/(?P<variety>[a-z\/]+|))?$",
+        r"^(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})(?:/(?P<app>[a-z]+))?(?:/(?P<variety>[a-z\/]+|))?$",
         view=views.DayArchiveView.as_view(),
         name="day_archive",
     ),
