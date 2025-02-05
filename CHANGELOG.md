@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [3.5] - 2025-02-05
+
+### Changed
+
+- Tweaks to Pinboard Bookmarks to make it easier to add/edit them (so that if
+  you stop using Pinboard itself, you could carry on adding new Bookmarks
+  directly via Django Admin)
+  - Changed `Bookmark.url` from a `TextField` to a `URLField` with a
+    `max_length` of 1000.
+  - Change `Bookmark.tags` so that it's not a required field.
+  - Changed layout of the Bookmark change form in Django Admin to be more
+    useful for adding new Bookmarks.
+- Set the default value of `post_time` fields on `Bookmark`, `Scrobble`,
+  `Tweet` and `Photo` to "now".
+
 ## [3.4] - 2025-01-22
 
 ### Added
