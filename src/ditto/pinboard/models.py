@@ -160,7 +160,13 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     )
 
     # `url` in the Pinboard API:
-    url = models.TextField(null=False, blank=False, validators=[URLValidator()])
+    url = models.URLField(
+        null=False,
+        blank=False,
+        validators=[URLValidator()],
+        verbose_name="URL",
+        max_length=1000,
+    )
 
     # `extended` in the Pinboard API:
     description = models.TextField(
@@ -181,6 +187,7 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
         max_length=12,
         db_index=True,
         help_text="Slug in the Bookmark's local URL.",
+        verbose_name="URL hash",
     )
 
     # Up to 100 tags
