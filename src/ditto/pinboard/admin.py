@@ -76,35 +76,28 @@ class BookmarkAdmin(DittoItemModelAdmin):
             {
                 "fields": (
                     "account",
-                    "title",
                     "url",
+                    "title",
                     "description",
-                    "summary",
                     "tags",
+                    ("is_private", "to_read"),
                     "post_time",
-                    "post_year_str",
+                )
+            },
+        ),
+        (
+            "Raw data, times, etc.",
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "summary",
                     "url_hash",
-                )
-            },
-        ),
-        (
-            "Options",
-            {
-                "fields": (
-                    "is_private",
-                    "to_read",
-                )
-            },
-        ),
-        (
-            "Data",
-            {
-                "fields": (
                     "raw",
+                    "post_year_str",
                     "fetch_time",
                     "time_created",
                     "time_modified",
-                )
+                ),
             },
         ),
     )
@@ -133,4 +126,16 @@ class BookmarkAdmin(DittoItemModelAdmin):
         "title",
         "url",
         "description",
+        "tags__name",
     )
+
+    def get_changeform_initial_data(self, request):
+        """
+        If there's only one Account, set it as the initial value for
+        the account field.
+        (Unless it's already set from the GET values.)
+        """
+        initial_data = super().get_changeform_initial_data(request)
+        if Account.objects.count() == 1 and "account" not in initial_data:
+            initial_data["account"] = str(Account.objects.first().pk)
+        return initial_data
