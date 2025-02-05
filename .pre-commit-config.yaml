@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3.12
+  python: python3.13
 
 exclude: |
   (?x)^(
@@ -28,7 +28,7 @@ repos:
           - javascript
           - json
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.4
     hooks:
       - id: ruff
         args: [--fix]

@@ -191,9 +191,13 @@ class Bookmark(DittoItemModel, ExtraBookmarkManagers):
     )
 
     # Up to 100 tags
-    # Up to 255 chars each. No commas or whitespace.
-    # Private tags start with a period.
-    tags = TaggableManager(manager=_BookmarkTaggableManager, through=TaggedBookmark)
+    # Up to 255 chars each.
+    tags = TaggableManager(
+        manager=_BookmarkTaggableManager,
+        through=TaggedBookmark,
+        blank=True,
+        help_text="Separated by spaces. Private tags start with a period.",
+    )
 
     class Meta:
         ordering = ["-post_time"]
