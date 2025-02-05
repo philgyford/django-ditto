@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from .managers import PublicItemManager
 from .utils import truncate_string
@@ -110,6 +111,7 @@ class DittoItemModel(TimeStampedModelMixin, DiffModelMixin, models.Model):
         blank=True,
         db_index=True,
         help_text="The time the item was originally posted/created on its service.",
+        default=timezone.now,
     )
     post_year = models.PositiveSmallIntegerField(
         null=True, blank=True, db_index=True, help_text="Set automatically on save"
