@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.9"
 
 [[package]]
@@ -243,7 +244,6 @@ wheels = [
 
 [[package]]
 name = "django-ditto"
-version = "3.5.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django-imagekit" },
@@ -274,7 +274,7 @@ requires-dist = [
     { name = "django-sortedm2m", specifier = ">=4.0,<5.0" },
     { name = "django-taggit", specifier = ">=5.0.0,<7.0" },
     { name = "flickrapi", specifier = ">=2.4,<2.5" },
-    { name = "pillow", specifier = ">=9.0.0,<11.0" },
+    { name = "pillow", specifier = ">=10.0.0,<12.0" },
     { name = "twitter-text-python", specifier = ">=1.1.1,<1.2" },
     { name = "twython", specifier = ">=3.7.0,<3.10" },
 ]

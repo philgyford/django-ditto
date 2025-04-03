@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [3.6] - 2025-04-03
+
+### Changed
+
+- Changed allowed versions of Pillow from 9.x and 10.x, to 10.x and 11.x.
+- Dropped mention of supporting end-of-life Django 5.0.
+
 ## [3.5] - 2025-02-05
 
 ### Changed
