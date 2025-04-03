@@ -149,7 +149,7 @@ class FilesFetcherTestCase(TestCase):
     def test_saves_downloaded_photo_file(self, download):
         with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
             # Make a temporary file, like download() would make:
-            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))
             temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
@@ -170,7 +170,7 @@ class FilesFetcherTestCase(TestCase):
     def test_saves_downloaded_video_file(self, download):
         with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
             # Make a temporary file, like download() would make:
-            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="mp4"))  # noqa: SIM115
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="mp4"))
             temp_filepath = temp_file.name
             download.return_value = temp_filepath
 

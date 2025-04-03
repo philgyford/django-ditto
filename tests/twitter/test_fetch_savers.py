@@ -479,7 +479,7 @@ class UserSaverTestCase(FetchTwitterTestCase):
         "Should call download() and save avatar."
         with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
             # Make a temporary file, like download() would make:
-            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))
             download.return_value = temp_file.name
 
             user_data = self.make_user_data()

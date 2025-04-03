@@ -169,7 +169,7 @@ class UserFetcherTestCase(FlickrFetchTestCase):
         "Should call download() and save avatar when fetching user."
         with self.settings(MEDIA_ROOT=self.enterContext(TemporaryDirectory())):
             # Make a temporary file, like download() would make:
-            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))  # noqa: SIM115
+            temp_file = self.enterContext(NamedTemporaryFile(mode="rb", suffix="jpg"))
             temp_filepath = temp_file.name
             download.return_value = temp_filepath
 
