@@ -4,7 +4,7 @@ Introduction
 
 A collection of Django apps for copying things from third-party sites and services. If something doesn't make sense, `email Phil Gyford <mailto:phil@gyford.com>`_ and I'll try and clarify it.
 
-Requires Python 3.9 to 3.13, and Django 4.2, 5.0, 5.1 or 5.2.
+Requires Python 3.9 to 3.13, and Django 4.2, 5.1 or 5.2.
 
 `See screenshots of a site using the supplied templates. <https://github.com/philgyford/django-ditto/tree/main/screenshots>`_
 
