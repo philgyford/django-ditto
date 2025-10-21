@@ -435,7 +435,7 @@ class Photo(DittoItemModel, ExtraPhotoManagers):
     )
     exif_camera = models.CharField(blank=True, max_length=50)
     exif_lens_model = models.CharField(
-        blank=True, max_length=50, help_text="eg, 'E PZ 16-50mm F3.5-5.6 OSS'."
+        blank=True, max_length=100, help_text="eg, 'E PZ 16-50mm F3.5-5.6 OSS'."
     )
     exif_aperture = models.CharField(
         blank=True, max_length=30, help_text="eg, 'f/13.0'."
