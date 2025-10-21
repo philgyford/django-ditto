@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [3.6.1] - 2025-10-21
+
+### Changed
+
+- Increased length of `Photo.exif_lens_model` field from 50 to 100.
+
 ## [3.6] - 2025-04-03
 
 ### Changed
