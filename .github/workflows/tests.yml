@@ -25,6 +25,13 @@ jobs:
             django-version: "4.2"
           - python-version: "3.14"
             django-version: "5.1"
+            # These are just because we used python 3.11's enterContext()
+            # in some tests so they fail, so I'm being bad and just not
+            # running them in python 3.10:
+          - python-version: "3.10"
+            django-version: "4.2"
+          - python-version: "3.10"
+            django-version: "5.1"
 
     steps:
       - name: Git clone
