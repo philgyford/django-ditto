@@ -14,11 +14,11 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Internet :: WWW/HTTP",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
   "Topic :: Software Development :: Libraries",
@@ -39,7 +39,7 @@ keywords = ["ditto", "twitter", "flickr", "pinboard", "last.fm"]
 license = { file = "LICENSE" }
 name = "django-ditto"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.urls]
 "Changelog" = "https://github.com/philgyford/django-ditto/blob/main/CHANGELOG.md"
@@ -84,7 +84,7 @@ source = ["ditto"]
 [tool.ruff]
 extend-exclude = ["*/migrations/*"]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 ignore = []
