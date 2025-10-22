@@ -25,11 +25,11 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-  "django-imagekit>=4.0,<6.0",
+  "django-imagekit>=5.0,<7.0",
   "django-sortedm2m>=4.0,<5.0",
   "django-taggit>=5.0.0,<7.0",
   "flickrapi>=2.4,<2.5",
-  "pillow>=10.0.0,<12.0",
+  "pillow>=10.0.0,<13.0",
   "twitter-text-python>=1.1.1,<1.2",
   "twython>=3.7.0,<3.10",
 ]
