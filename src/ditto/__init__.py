@@ -1,5 +1,5 @@
 __title__ = "Django Ditto"
-__version__ = "3.6.1"
+__version__ = "3.7.0"
 __author__ = "Phil Gyford"
 __author_email__ = "phil@gyford.com"
 __license__ = "MIT"
